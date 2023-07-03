@@ -91,4 +91,61 @@ class AdminProfileController extends Controller
             return response($response);
         }
     }
+    public function updateProfile(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'email'          => 'required|email',
+                'date_of_birth' => 'required|date',
+                'address'=>'required',
+                'blood_group_id'=>'required',
+                'gender_id'=>'required',
+                'address'=>'required',
+                'profile_image'=>'sometimes|required|max:50'
+
+
+            ],
+            [
+                'blood_group_id.required'=>'Blood Group is required',
+                'gender_id.required'=>'Gender is required',
+                'profile_image.max'=>'Profile imag should not be exceeded 50KB'
+
+            ]
+        );
+        $validator->sometimes('profile_image', 'required', function ($request) {
+            return isset($request->profile_image);
+        });
+        if (!$validator->fails()) {
+            $user=User::find(Auth::id());
+            $user->email=$request->email;
+            $user->date_of_birth=$request->date_of_birth;
+            $user->blood_group=$request->blood_group_id;
+            $user->address=$request->address;
+            $user->gender=$request->gender_id;
+            if ($request->hasFile('profile_image')) {
+
+                $filePro = $request->file('profile_image');
+                $filenamePro = $filePro->getClientOriginalName();
+                $filePro->move('assets/uploads/admin_profile/images', $filenamePro);
+                $user->profile_image=$filenamePro;
+            }
+            $user->update();
+            $data['status']=1;
+            $data['user']=$user;
+            $data['message'] = "Profile updated successfully.";
+            return response($data);
+
+        }
+        else
+        {
+            $data['status'] = 0;
+            $data['errors'] = $validator->errors();
+            $data['message'] = "failed";
+            return response($data);
+
+        }
+        
+
+    }
 }

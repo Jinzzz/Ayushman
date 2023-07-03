@@ -26,4 +26,5 @@ Route::post('admin/login', [AuthController::class,'loginCustomer']);
 Route::middleware(['auth:api'])->group(function () {
     Route::get('admin/get-admin-details', [AdminProfileController::class,'getAdminDetails']);
     Route::post('admin/change-password', [AdminProfileController::class,'updatePassword']);
+    Route::post('admin/update-profile', [AdminProfileController::class,'updateProfile']);
 });
