@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mst_User;
 use App\Models\Sys_Blood_Group;
 use App\Models\Sys_Gender;
+use App\Models\Trn_UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -109,23 +110,31 @@ class ProfileController extends Controller
             return isset($request->user_profile_image);
         });
         if (!$validator->fails()) {
-            $user=Mst_User::with('profile')->find(Auth::id());
-            $user->user_email=$request->user_email;
-            $user->username=$request->user_name;
-            $user->profile->date_of_birth=$request->date_of_birth;
-            $user->profile->blood_group_id=$request->blood_group_id;
-            $user->profile->address=$request->address;
-            $user->profile->gender_id=$request->gender_id;
+            $user = Mst_User::with('profile')->find(Auth::id());
+            $user->user_email = $request->user_email;
+            $user->username = $request->user_name;
+            $userProfile = $user->profile; // Get the profile separately
+            
+            if (!$userProfile) {
+                $userProfile = new Trn_UserProfile();
+            }
+            
+            $userProfile->date_of_birth = $request->date_of_birth;
+            $userProfile->blood_group_id = $request->blood_group_id;
+            $userProfile->address = $request->user_address;
+            $userProfile->gender_id = $request->gender_id;
+            
             if ($request->hasFile('user_profile_image')) {
-
                 $filePro = $request->file('user_profile_image');
                 $filenamePro = $filePro->getClientOriginalName();
                 $filePro->move('assets/uploads/doctor_profile/images', $filenamePro);
-                $user->profile->profile_image=$filenamePro;
+                $userProfile->profile_image = $filenamePro;
             }
             $user->update();
-            $user->profile->update();
-            return redirect()->back()->with('status','Profile updated successfully');
+            
+            $user->profile()->save($userProfile);
+            
+            return redirect()->back()->with('status', 'Profile updated successfully');
 
         }
         else
