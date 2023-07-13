@@ -12,11 +12,16 @@
      <div class="app-sidebar__user">
          <div class="dropdown user-pro-body text-center">
               <div class="user-pic">
+                @if(auth()->user()->profile)
                  @if(auth()->user()->profile->profile_image)
                  <img src="{{ asset('assets/uploads/doctor_profile/images/'.auth()->user()->profile->profile_image) }}" alt="user-img" class="avatar-xl rounded-circle">
                  @else
                  <img src="{{asset('assets/images/avatar.png')}}" alt="user-img" class="avatar-xl rounded-circle">
                  @endif
+              @else
+               <img src="{{asset('assets/images/avatar.png')}}" alt="user-img" class="avatar-xl rounded-circle">
+
+              @endif
              </div> 
               <div class="user-info">
                  <h6 class=" mb-0 text-dark">{{ ucfirst(auth()->user()->username)}}</h6>
