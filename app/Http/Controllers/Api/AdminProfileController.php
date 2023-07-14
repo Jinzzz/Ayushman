@@ -93,6 +93,8 @@ class AdminProfileController extends Controller
     }
     public function updateProfile(Request $request)
     {
+        $data=array();
+        try{
         $validator = Validator::make(
             $request->all(),
             [
@@ -102,6 +104,7 @@ class AdminProfileController extends Controller
                 'blood_group_id'=>'required',
                 'gender_id'=>'required',
                 'address'=>'required',
+                'phone_number'=>'required',
                 'profile_image'=>'sometimes|required|max:50'
 
 
@@ -121,6 +124,7 @@ class AdminProfileController extends Controller
             $user->email=$request->email;
             $user->date_of_birth=$request->date_of_birth;
             $user->blood_group=$request->blood_group_id;
+            $user->phone_number=$request->phone_number;
             $user->address=$request->address;
             $user->gender=$request->gender_id;
             if ($request->hasFile('profile_image')) {
@@ -144,6 +148,14 @@ class AdminProfileController extends Controller
             $data['message'] = "failed";
             return response($data);
 
+        }
+    }
+    catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
         }
         
 
