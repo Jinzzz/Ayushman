@@ -41,13 +41,11 @@ class DashboardController extends Controller
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
             ->whereIn('booking_status_id', [1, 2])
             ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
-            ->join('booking_availabilities', 'trn_consultation_bookings.availability_id', '=', 'booking_availabilities.id')
-            ->join('sys_booking_types', 'booking_availabilities.booking_type_id', '=', 'sys_booking_types.booking_type_id')
-            ->join('mst_timeslots', 'booking_availabilities.time_slot_id', '=', 'mst_timeslots.id')
+            ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
+            ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
             ->select('mst_users.username', 'trn_consultation_bookings.booking_date', 'sys_booking_types.booking_type_name', 'mst_timeslots.time_from')
             ->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
             ->where('mst_timeslots.time_from', '>=', $currentTime)
-            ->where('booking_availabilities.availability_status',1)
             ->get();
 
             

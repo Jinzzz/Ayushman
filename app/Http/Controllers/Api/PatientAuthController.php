@@ -192,11 +192,7 @@ class PatientAuthController extends Controller
         }
     }
 
-    public function getUserDetails()
-    {
-        $patient = Auth::id();
-        print_r($patient);die();
-    }
+    
 
     public function otpVerification(Request $request){
         $data=array();

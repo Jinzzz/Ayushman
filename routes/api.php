@@ -28,9 +28,13 @@ Route::get('branches', [DoctorBookingController::class,'getBranches']);
 
 
 Route::middleware(['auth:api'])->group(function () {   
-    Route::get('user-details', [PatientAuthController::class,'getUserDetails']);
+
     Route::get('patient/home', [DashboardController::class,'homePage']);
-    Route::post('patient/doctors_list', [DoctorBookingController::class,'doctorsList']);
-    Route::post('patient/doctors_details', [DoctorBookingController::class,'doctorsDetails']);
-    Route::post('patient/doctor_availability', [DoctorBookingController::class,'doctorsAvailability']);
-});
+    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class,'doctorsList']);
+    Route::post('patient/consultation/doctors_details', [DoctorBookingController::class,'doctorsDetails']);
+    Route::post('patient/consultation/doctor_availability', [DoctorBookingController::class,'doctorsAvailability']);
+    Route::post('patient/consultation/booking_details', [DoctorBookingController::class,'bookingDetails']);
+    Route::post('patient/consultation/booking_summary', [DoctorBookingController::class,'bookingSummary']);
+    Route::post('patient/consultation/booking_confirmation', [DoctorBookingController::class,'bookingConfirmation']);
+
+}); 
