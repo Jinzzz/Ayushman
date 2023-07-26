@@ -18,5 +18,9 @@ class Trn_Patient_Family_Member extends Model
         'date_of_birth',
         'created_by',
         'is_active',
+        'address',
+        'mobile_number',
+        'email_address',
+        'relationship_id',
     ];
 }

@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Sys_Blood_Group;
+use App\Models\Sys_Gender;
 use App\Models\Mst_Patient;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Helpers\PatientHelper;
 use App\Models\Trn_Patient_Otp;
 
 class PatientAuthController extends Controller
@@ -465,5 +468,123 @@ class PatientAuthController extends Controller
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
+    }
+
+    public function updateDetails(Request $request){
+        $data=array();
+        try{
+            $patient_id = Auth::id();
+            if($patient_id){
+
+                $currentData = Mst_Patient::where('id', $patient_id)->first();
+
+                if($request->patient_blood_group){
+                    $blood_group_id = Sys_Blood_Group::where('blood_group_name', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
+                }
+                if($request->patient_gender){
+                    $patient_gender_id = Sys_Gender::where('gender_name', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                }
+
+                if($request->patient_dob){
+                    $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
+                }
+
+                Mst_Patient::where('id', $patient_id)->update([
+                    'patient_name'      => $request->patient_name ?? $currentData->patient_name,
+                    'patient_email'     => $request->patient_email ?? $currentData->patient_email,
+                    'patient_address'   => $request->patient_address ?? $currentData->patient_address,
+                    'patient_gender'    => $patient_gender_id ?? $currentData->patient_gender,
+                    'patient_dob'       => $patient_dob ?? $currentData->patient_dob,
+                    'patient_blood_group_id' => $blood_group_id ?? $currentData->patient_blood_group_id,
+                    'created_at'        => Carbon::now(),
+                ]);
+
+                $data['status'] = 1;
+                $data['message'] = "Profile updated successfully";
+                return response($data);
+            }else{
+                $data['status'] = 0;
+                $data['message'] = "User does not exist";
+                return response($data);
+            }
+        }
+        catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+            
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
+    public function changePassword(Request $request){
+        $data=array();
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'old_password'      => 'required',
+                    'new_password'          => 'required|min:6',
+                    'confirm_password'   => 'required|min:6|same:new_password',
+                ],
+                [
+                    'old_password.required'             => 'Old password id required',
+                    'new_password.required'             => 'New password required',
+                    'confirm_password.required'      => 'Confirm password required',
+                    'confirm_password.same'          => 'new passwords and confirm password does not match',
+                ]
+            );
+            if (!$validator->fails()) 
+            {
+                if (isset($request->old_password) && isset($request->new_password) && isset($request->confirm_password))
+                $patient_id = Auth::id();
+                $patient=Mst_Patient::where('id',$patient_id)->first();
+                if($patient)
+                {
+                    if(!Hash::check($request->new_password, $patient->password)){
+                        $patient->password = Hash::make($request->new_password);
+                        $patient->save();
+                        $data['status'] = 1;
+                        $data['message'] = "Password changed sussessfully.";
+                        return response($data);
+                    }else{
+                        $data['status'] = 0;
+                        $data['message'] = "Your new password is similar to the old Password. Please try another password.";
+                        return response($data);
+                    }
+                }
+                else{
+                    $data['status'] = 0;
+                    $data['message'] = "User does not exist.";
+                    return response($data);
+                }
+            }
+            else
+            {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
+        }
+        catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+            
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
+    public function logout()
+    {
+    $user = Auth::user();
+    $user->tokens->each(function ($token, $key) {
+        $token->delete();
+    });
+
+    return response()->json(['message' => 'Logged out successfully']);
     }
 }

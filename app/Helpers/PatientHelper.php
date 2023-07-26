@@ -6,11 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Mst_Patient;
 use App\Models\Mst_TimeSlot;
 use App\Models\Trn_Consultation_Booking;
+use App\Models\Trn_Patient_Family_Member;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class PatientHelper
 {
+
+    // get week day using date 
     public static function getWeekDay($date)
     {
         $carbon_date = Carbon::parse($date);
@@ -18,12 +21,14 @@ class PatientHelper
         return  $day_of_week;
     }
 
+    // get date as how it saving in DB 
     public static function dateFormatDb($date)
     {
         $formattedDate = Carbon::parse($date)->format('Y-m-d');
         return $formattedDate;
     }
 
+    // get date as how user seeing 
     public static function dateFormatUser($date)
     {
         $formattedDate = Carbon::parse($date)->format('d-m-Y');
@@ -53,6 +58,7 @@ class PatientHelper
     }
 
     // rechecking whether the slot is available or not 
+
     public static function recheckAvailability($booking_date, $slot_id, $doctor_id){
 
         $timeSlot = Mst_TimeSlot::where('id', $slot_id)->where('is_active', 1)->first();
@@ -86,4 +92,48 @@ class PatientHelper
         return $available_slots;
     }
     
+    // get all amily members array using patient_id 
+    public static function getFamilyDetails($patient_id){
+        $family_details=array();
+        $accountHolder = Mst_Patient::where('id',$patient_id)->first();
+        $members = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
+        ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
+        ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
+        ->select('trn_patient_family_member.id','trn_patient_family_member.family_member_name','trn_patient_family_member.email_address','trn_patient_family_member.mobile_number','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
+        ->where('trn_patient_family_member.patient_id',$patient_id)
+        ->where('trn_patient_family_member.is_active',1)
+        ->get();
+    
+        $currentYear = Carbon::now()->year;
+        $carbonDate = Carbon::parse($accountHolder->patient_dob);
+        $year = $carbonDate->year;
+    
+        $family_details[] = [
+            'member_id' => $accountHolder->id,
+            'member_name' => $accountHolder->patient_name,
+            'relationship' => "Yourself",
+            'age' => $currentYear - $year,
+            'dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
+            'gender' => $accountHolder->patient_gender,
+            'mobile_number' => $accountHolder->patient_mobile,
+            'email_address' => $accountHolder->patient_email,
+        ];
+    
+        foreach ($members as $member){
+            $carbonDate = Carbon::parse($member->date_of_birth);
+            $year = $carbonDate->year;
+    
+            $family_details[] = [
+                'member_id' => $member->id,
+                'member_name' => $member->family_member_name,
+                'relationship' => $member->relationship,
+                'age' => $currentYear - $year,
+                'dob' => Carbon::parse($member->date_of_birth)->format('d-m-Y'),
+                'gender' => $member->gender_name,
+                'mobile_number' => $member->mobile_number,
+                'email_address' => $member->email_address,
+            ];
+        }
+        return $family_details;
+    }
 }

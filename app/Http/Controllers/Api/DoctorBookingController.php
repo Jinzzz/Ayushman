@@ -16,16 +16,32 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
 {
     public function getBranches(){
-        $branches = Mst_Branch::where('is_active', 1)->get(['id', 'branch_name'])->toArray();
-
-        $data['status'] = 1;
-        $data['message'] = "Data fetched.";
-        $data['data'] = $branches;
+        $data=array();
+        try{
+            $branches = Mst_Branch::where('is_active', 1)->get(['id', 'branch_name'])->toArray();
+            if($branches){
+                $data['status'] = 1;
+                $data['message'] = "Data fetched.";
+                $data['data'] = $branches;
+            }else{
+                $data['status'] = 0;
+                $data['message'] = "No branches found.";
+            }
         return response($data);
+        }
+        catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
     }
 
     public function doctorsList(Request $request){
@@ -61,7 +77,8 @@ class DoctorBookingController extends Controller
                     $queries = Mst_User::join('mst_branches', 'mst_users.branch_id', '=', 'mst_branches.id')
                                 ->join('mst__doctors', 'mst_users.id', '=', 'mst__doctors.user_id')
                                 ->join('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id')
-                                ->select('mst_users.id as doctor_id', 'mst_users.username as name', 'mst_branches.branch_name as branch_name', 'mst__designations.designation as designation')
+                                ->join('trn_user_profiles', 'mst_users.id', '=', 'trn_user_profiles.user_id')
+                                ->select('mst_users.id as doctor_id', 'mst_users.username as name', 'mst_branches.branch_name as branch_name', 'mst__designations.designation as designation','trn_user_profiles.profile_image')
                                 ->where('mst_users.user_type_id', 3)
                                 ->where('mst_users.branch_id', $request->branch_id)
                                 ->whereIn('mst_users.id', $filteredDoctorsArray);
@@ -79,6 +96,9 @@ class DoctorBookingController extends Controller
                     }
             
                     $doctorsList = $queries->get();
+                    foreach ($doctorsList as $doctor) {
+                        $doctor->profile_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $doctor->profile_image;
+                    }
 
                     $data['status'] = 1;
                     $data['message'] = "Data fetched";
@@ -135,7 +155,7 @@ class DoctorBookingController extends Controller
                     ->first();
 
                     if ($doctorDetails) {
-                        $doctorDetails->profile_image = 'http://127.0.0.1:8000/public/assets/uploads/doctor_profile/' . $doctorDetails->profile_image;
+                        $doctorDetails->profile_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $doctorDetails->profile_image;
                         $doctorDetails->description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
                         $data['status'] = 1;
                         $data['message'] = "Data fetched";
@@ -180,16 +200,29 @@ class DoctorBookingController extends Controller
                     'doctor_id' => ['required'],
                     'branch_id' => ['required'],
                     'booking_date' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
                     'branch_id.required' => 'Branch required',
                     'booking_date.required' => 'Booking date required',
+                    'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date)) {
+                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key )) {
+                    
+                    if ($request->reschedule_key == 1) {
+                        if (!$request->has('booking_id')) {
+                            $data['status'] = 0;
+                            $data['message'] = "Booking id is required";
+                            return response($data);
+                        } else {
+                            $booking_id = $request->booking_id;
+                        }
+                    }
+                    
                     $day_of_week = PatientHelper::getWeekDay($request->booking_date);
             
                     $timeSlots = Mst_TimeSlot::where('doctor_id', $request->doctor_id)
@@ -197,11 +230,12 @@ class DoctorBookingController extends Controller
                         ->where('is_active', 1)
                         ->get();
                     
-                    $booking_date = PatientHelper::dateFormatDb($request->booking_date);
+                    if($timeSlots){
+                        $booking_date = PatientHelper::dateFormatDb($request->booking_date);
 
                     $currentDate = Carbon::now()->format('Y-m-d');
                     $currentTime = Carbon::now()->format('H:i:s');
-            
+
                     $time_slots = [];
                     foreach ($timeSlots as $timeSlot) {
                         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
@@ -245,13 +279,17 @@ class DoctorBookingController extends Controller
                             ];
                         }
                     }
-
-
-            
-                    $data['status'] = 1;
-                    $data['message'] = "Data fetched.";
-                    $data['data'] = $time_slots;
+                        $data['status'] = 1;
+                        $data['message'] = "Data fetched.";
+                        $data['data'] = $time_slots;
+                        $data['booking_id'] = $booking_id ?? '';
+                        return response($data);
+                    }else{
+                        $data['status'] = 0;
+                        $data['message'] = "No slots available on this date.";
+                        $data['data'] = $time_slots;
                     return response($data);
+                    }
                 } else {
                     $data['status'] = 0;
                     $data['message'] = "Please fill mandatory fields";
@@ -281,69 +319,44 @@ class DoctorBookingController extends Controller
                 $request->all(),
                 [
                     'doctor_id' => ['required'],
-                    'patient_id' => ['required'],
                     'branch_id' => ['required'],
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
-                    'patient_id.required' => 'Patient required',
                     'branch_id.required' => 'Branch required',
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
+                    'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->doctor_id) && isset($request->patient_id) && isset($request->branch_id ) && isset($request->booking_date) && isset($request->slot_id )) {
-                    $patient_id = $request->patient_id;
-                    $accountHolder = Mst_Patient::where('id',$patient_id)->first();
-                    $members = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
-                    ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
-                    ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
-                    ->select('trn_patient_family_member.id','trn_patient_family_member.family_member_name','trn_patient_family_member.email_address','trn_patient_family_member.mobile_number','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
-                    ->where('trn_patient_family_member.patient_id',$patient_id)
-                    ->where('trn_patient_family_member.is_active',1)
-                    ->get();
-    
-                    $currentYear = Carbon::now()->year;
-                    $carbonDate = Carbon::parse($accountHolder->patient_dob);
-                    $year = $carbonDate->year;
-    
-                    $family_members[] = [
-                        'member_id' => $accountHolder->id,
-                        'member_name' => $accountHolder->patient_name,
-                        'relationship' => "Yourself",
-                        'age' => $currentYear - $year,
-                        'dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
-                        'gender' => $accountHolder->patient_gender,
-                        'mobile_number' => $accountHolder->patient_mobile,
-                        'email_address' => $accountHolder->patient_email,
-                    ];
-    
-                    foreach ($members as $member){
-                        $carbonDate = Carbon::parse($member->date_of_birth);
-                        $year = $carbonDate->year;
-    
-                        $family_members[] = [
-                            'member_id' => $member->id,
-                            'member_name' => $member->family_member_name,
-                            'relationship' => $member->relationship,
-                            'age' => $currentYear - $year,
-                            'dob' => Carbon::parse($member->date_of_birth)->format('d-m-Y'),
-                            'gender' => $member->gender_name,
-                            'mobile_number' => $member->mobile_number,
-                            'email_address' => $member->email_address,
-                        ];
+                if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id ) && isset($request->reschedule_key )) {
+                    $patient_id = Auth::id();
+                    if ($request->reschedule_key == 1) {
+                        if (!$request->has('booking_id')) {
+                            $data['status'] = 0;
+                            $data['message'] = "Booking id is required";
+                            return response($data);
+                        } else {
+                            $booking_id = $request->booking_id;
+                        }
                     }
-    
+
+                    $family_details=array();
+
+                    $family_details = PatientHelper::getFamilyDetails($patient_id);
+
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
     
                     if($available_slots > 0){
                         $data['status'] = 1;
                         $data['message'] = "Data Fetched";
-                        $data['data'] = $family_members;
+                        $data['data'] = $family_details;
+                        $data['booking_id'] = $booking_id ?? '';
                         return response($data);
                     }else{
                         $data['status'] = 0;
@@ -380,26 +393,36 @@ class DoctorBookingController extends Controller
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'patient_id' => ['required'],
                     'doctor_id' => ['required'],
                     'member_id' => ['required'],
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
                     'yourself' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
-                    'patient_id.required' => 'Patient id required',
                     'doctor_id.required' => 'Doctor required',
                     'member_id.required' => 'Member id required',
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
                     'yourself.required' => 'Yourself is required',
+                    'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->member_id) && isset($request->yourself) && isset($request->slot_id) && isset($request->patient_id) && isset($request->doctor_id) && isset($request->booking_date)) {
-                    
+                if (isset($request->member_id) && isset($request->yourself) && isset($request->slot_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key)) {
+                    $patient_id = Auth::id();
+                    if ($request->reschedule_key == 1) {
+                        if (!$request->has('booking_id')) {
+                            $data['status'] = 0;
+                            $data['message'] = "Booking id is required";
+                            return response($data);
+                        } else {
+                            $booking_id = $request->booking_id;
+                        }
+                    }
+
                     $slotDetails = Mst_TimeSlot::find($request->slot_id);
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));
@@ -418,13 +441,13 @@ class DoctorBookingController extends Controller
                         'doctor_name' => $doctor->name,
                         'doctor_designatiom' => $doctor->designation,
                         'doctor_branch' => $doctor->branch_name,
-                        'doctor_profile_image' => 'http://127.0.0.1:8000/public/assets/uploads/doctor_profile/' . $doctor->profile_image,
+                        'doctor_profile_image' => 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $doctor->profile_image,
                     ];
 
                     $patientDetails = [];
 
                     if($request->yourself == 1){
-                        $accountHolder = Mst_Patient::where('id',$request->patient_id)->first();
+                        $accountHolder = Mst_Patient::where('id',$patient_id)->first();
                         $patientDetails[] = [
                             'id' => $accountHolder->id,
                             'yourself' => 1,
@@ -441,7 +464,7 @@ class DoctorBookingController extends Controller
                             ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
                             ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
                             ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
-                            ->where('trn_patient_family_member.patient_id',$request->patient_id)
+                            ->where('trn_patient_family_member.patient_id',$patient_id)
                             ->where('trn_patient_family_member.id',$request->member_id)
                             ->where('trn_patient_family_member.is_active',1)
                             ->first();
@@ -472,6 +495,7 @@ class DoctorBookingController extends Controller
                         $data['doctor_details'] = $doctorDetails;
                         $data['patient_details'] = $patientDetails;
                         $data['payment_details'] = $paymentDetails;
+                        $data['booking_id'] = $booking_id ?? '';
                         return response($data);
                     }else{
                         $data['status'] = 0;
@@ -509,26 +533,36 @@ class DoctorBookingController extends Controller
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'patient_id' => ['required'],
                     'doctor_id' => ['required'],
                     'member_id' => ['required'],
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
                     'yourself' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
-                    'patient_id.required' => 'Patient id required',
                     'doctor_id.required' => 'Doctor required',
                     'member_id.required' => 'Member id required',
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
                     'yourself.required' => 'Yourself is required',
+                    'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->yourself) && isset($request->slot_id) && isset($request->patient_id) && isset($request->doctor_id) && isset($request->booking_date)) {
-                    
+                if (isset($request->yourself) && isset($request->slot_id) && isset($request->doctor_id) && isset($request->booking_date) && isset($request->reschedule_key)) {
+                    $patient_id = Auth::id();
+                    if ($request->reschedule_key == 1) {
+                        if (!$request->has('booking_id')) {
+                            $data['status'] = 0;
+                            $data['message'] = "Booking id is required";
+                            return response($data);
+                        } else {
+                            $booking_id = $request->booking_id;
+                        }
+                    }
+
                     $slotDetails = Mst_TimeSlot::find($request->slot_id);
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));
@@ -540,26 +574,32 @@ class DoctorBookingController extends Controller
                     ->first();
 
                     $yourself = $request->yourself;
+                    $booking_date = PatientHelper::dateFormatDb($request->booking_date);
                     $newRecordData = [
                         'booking_type_id' => 1,
-                        'patient_id' => $request->patient_id,
+                        'patient_id' => $patient_id,
                         'doctor_id' => $request->doctor_id,
                         'branch_id' => $doctor->branch_id, 
-                        'booking_date' => $request->booking_date,
+                        'booking_date' => $booking_date,
                         'time_slot_id' => $request->slot_id,
                         'booking_status_id' => 2,
                         'booking_fee' => $doctor->consultation_fee,
+                        'is_for_family_member' => null,
+                        'family_member_id' => null,
                         'created_at' => Carbon::now(),
-                        
+
                     ];
 
                     if(!$yourself == 1){
                         if (isset($request->member_id)){
-                            $newRecordData = [
+                            $familyMemberData = [
                                 'is_for_family_member' => 1,
                                 'family_member_id' => $request->member_id,
                             ];
-                            $booked_for = Trn_Patient_Family_Member::where('id', $request->member_id)->pluck('family_member_name');
+                            $newRecordData = $familyMemberData + $newRecordData;
+
+                            $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->member_id)->first();
+                            $booked_for = $bookedMemberDetails->family_member_name;
                         }else{
                             $data['status'] = 0;
                             $data['message'] = "Member is required";
@@ -567,26 +607,51 @@ class DoctorBookingController extends Controller
                         }
                         
                     }else{
-                        $booked_for = Mst_User::where('id', $request->patient_id)->pluck('username');
+                        $booked_for = Auth::user()->patient_name;
                     }
  
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
 
                     if($available_slots >= 1){
-                        $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                        $lastInsertedId = $createdRecord->id;
-                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                        $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                        $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                        'updated_at' => Carbon::now(),
-                        'booking_reference_number' => $bookingRefNo
-                        ]);
+                        if(isset($booking_id)){
+                            // Update existing data
+                            $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
+                            if($bookingDetails->booking_status_id == 3){
+                            $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                            $lastInsertedId = $createdRecord->id;
+                            $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                            $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                            $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'booking_reference_number' => $bookingRefNo
+                            ]);
+                            }else{
+                                $updateRecord = Trn_Consultation_Booking::where('id', $booking_id)->update($newRecordData);
+                                $bookingRefNo = $bookingDetails->booking_reference_number;
+                            }
+                        }else{
+                            $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                            $lastInsertedId = $createdRecord->id;
+                            $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                            $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                            $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'booking_reference_number' => $bookingRefNo
+                            ]);
+                        }
+
+                        $booking_details = [];
+
+                        $booking_details[] = [
+                            'booking_referance_number' => $bookingRefNo,
+                            'booking_for' => $booked_for,
+                            'booking_date' => $request->booking_date,
+                            'time_slot' => $time_from .' - '. $time_to,
+                        ];
+
                         $data['status'] = 1;
                         $data['message'] = "Data Fetched";
-                        $data['booking_referance_number'] = $bookingRefNo;
-                        $data['booking_for'] = $booked_for;
-                        $data['booking_date'] = $request->booking_date;
-                        $data['time_slot'] = $time_from .' - '. $time_to;
+                        $data['booking_details'] = $booking_details;
                         return response($data);
                     }else{
                         $data['status'] = 0;
