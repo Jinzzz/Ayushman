@@ -5,17 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Mst_Wellness extends Model
+class Mst_Membership_Benefit extends Model
 {
     use HasFactory;
-    protected $table = 'mst_wellness';
+
+    protected $table = 'mst__membership__benefits';
 
     protected $fillable = [
-        'wellness_name',
-        'wellness_cost',
-        'remarks',
+        'package_id',
+        'title',
         'is_active',
-        'is_deleted',
         'deleted_by',
     ];
 }

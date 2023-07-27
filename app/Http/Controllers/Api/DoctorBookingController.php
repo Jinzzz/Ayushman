@@ -213,6 +213,9 @@ class DoctorBookingController extends Controller
             {
                 if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key )) {
                     
+                    $doctor_details = Mst_User::find($request->doctor_id);
+                    $doctor_name = $doctor_details->username;
+
                     if ($request->reschedule_key == 1) {
                         if (!$request->has('booking_id')) {
                             $data['status'] = 0;
@@ -229,6 +232,7 @@ class DoctorBookingController extends Controller
                         ->where('time_slot_name', $day_of_week)
                         ->where('is_active', 1)
                         ->get();
+                    
                     
                     if($timeSlots){
                         $booking_date = PatientHelper::dateFormatDb($request->booking_date);
@@ -281,6 +285,7 @@ class DoctorBookingController extends Controller
                     }
                         $data['status'] = 1;
                         $data['message'] = "Data fetched.";
+                        $data['doctor_name'] = $doctor_name;
                         $data['data'] = $time_slots;
                         $data['booking_id'] = $booking_id ?? '';
                         return response($data);
@@ -584,8 +589,8 @@ class DoctorBookingController extends Controller
                         'time_slot_id' => $request->slot_id,
                         'booking_status_id' => 2,
                         'booking_fee' => $doctor->consultation_fee,
-                        'is_for_family_member' => null,
-                        'family_member_id' => null,
+                        'is_for_family_member' => 0,
+                        'family_member_id' => 0,
                         'created_at' => Carbon::now(),
 
                     ];
@@ -609,6 +614,13 @@ class DoctorBookingController extends Controller
                     }else{
                         $booked_for = Auth::user()->patient_name;
                     }
+
+                    $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id',Auth::id())->where('booking_date',$newRecordData['booking_date'])->where('time_slot_id',$newRecordData['time_slot_id'])->where('family_member_id',$newRecordData['family_member_id'])->first();
+                    if($checkAlreadyBooked){
+                        $data['status'] = 0;
+                        $data['message'] = "Already booked";
+                        return response($data);
+                    }
  
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
 
@@ -630,6 +642,7 @@ class DoctorBookingController extends Controller
                                 $bookingRefNo = $bookingDetails->booking_reference_number;
                             }
                         }else{
+                            // Create new data 
                             $createdRecord = Trn_Consultation_Booking::create($newRecordData);
                             $lastInsertedId = $createdRecord->id;
                             $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);

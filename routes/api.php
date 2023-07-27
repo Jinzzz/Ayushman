@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DoctorBookingController;
 use App\Http\Controllers\Api\FamilyController;
 use App\Http\Controllers\Api\MyBookingsController;
 use App\Http\Controllers\Api\BookingHistoryController;
+use App\Http\Controllers\Api\MembershipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,5 +60,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/update_details', [PatientAuthController::class,'updateDetails']);
     Route::post('patient/change_password', [PatientAuthController::class,'changePassword']);
     Route::get('patient/logout', [PatientAuthController::class,'logout']);
-    
+
+    // Membership
+    Route::get('patient/membership_packages', [MembershipController::class,'membershipPackages']);
+
 }); 
