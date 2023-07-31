@@ -28,7 +28,7 @@ class Mst_User extends Model
 
     public function branch()
     {
-        return $this->belongsTo(Mst_Branch::class, 'branch_id', 'id');
+        return $this->belongsTo(Mst_Branch::class, 'branch_id', 'branch_id');
     }
 
 }

@@ -221,7 +221,7 @@ class PatientAuthController extends Controller
             {
                 if(isset($request->patient_id, $request->otp_type, $request->otp)){
                     $patient_id = $request->input('patient_id');
-                    $patient=Mst_Patient::where('id',$patient_id)->first();
+                    $patient=Mst_Patient::find($patient_id);
                     if(!$patient)
                     {
                     $data['status'] = 0;
@@ -230,7 +230,7 @@ class PatientAuthController extends Controller
                     }
 
                     $lastInsertedRow = Trn_Patient_Otp::where('otp_type', $request->otp_type)
-                    ->where('patient_id', $request->patient_id)
+                    ->where('patient_id', $patient_id)
                     ->where('otp', $request->otp)
                     ->latest('otp_id')
                     ->first();
@@ -243,6 +243,15 @@ class PatientAuthController extends Controller
                             'updated_at' => Carbon::now(),
                             'verified' => 1,
                             ]);
+
+                            // is_otp_verified
+
+                            if($request->otp_type == 1){
+                                Mst_Patient::where('id',$patient_id)->update([
+                                    'updated_at' => Carbon::now(),
+                                    'is_otp_verified' => 1,
+                                    ]);
+                            }
 
                         $data['status'] = 1;
                         $data['message'] = "OTP Verified successfully";
@@ -322,6 +331,13 @@ class PatientAuthController extends Controller
                         'verified' => 0,
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
+
+                    if($lastInsertedRow->otp_type == 1){
+                        Mst_Patient::where('id',$patient_id)->update([
+                            'updated_at' => Carbon::now(),
+                            'is_otp_verified' => 0,
+                            ]);
+                    }
                     
                     $data['status'] = 1;
                     $data['otp']=$verification_otp;
@@ -542,17 +558,24 @@ class PatientAuthController extends Controller
                 $patient=Mst_Patient::where('id',$patient_id)->first();
                 if($patient)
                 {
-                    if(!Hash::check($request->new_password, $patient->password)){
-                        $patient->password = Hash::make($request->new_password);
-                        $patient->save();
-                        $data['status'] = 1;
-                        $data['message'] = "Password changed sussessfully.";
-                        return response($data);
+                    if(Hash::check($request->old_password, $patient->password)){
+                        if(!Hash::check($request->new_password, $patient->password)){
+                            $patient->password = Hash::make($request->new_password);
+                            $patient->save();
+                            $data['status'] = 1;
+                            $data['message'] = "Password changed sussessfully.";
+                            return response($data);
+                        }else{
+                            $data['status'] = 0;
+                            $data['message'] = "Your new password is similar to the old Password. Please try another password.";
+                            return response($data);
+                        }
                     }else{
                         $data['status'] = 0;
-                        $data['message'] = "Your new password is similar to the old Password. Please try another password.";
+                        $data['message'] = "Old password is incorrect.";
                         return response($data);
                     }
+                    
                 }
                 else{
                     $data['status'] = 0;

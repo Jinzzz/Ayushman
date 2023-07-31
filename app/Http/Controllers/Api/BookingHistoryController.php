@@ -12,6 +12,7 @@ use App\Models\Mst_Patient;
 use App\Models\Mst_Wellness;
 use App\Models\Mst_Therapy;
 use App\Helpers\PatientHelper;
+use App\Models\Trn_Patient_Family_Member;
 
 class BookingHistoryController extends Controller
 {
@@ -42,10 +43,10 @@ class BookingHistoryController extends Controller
 
 
                 $all_bookings = Trn_Consultation_Booking::where('patient_id', $patient_id)
-                    ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
+                    ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
                     ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
                     ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.id')
+                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                     ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
                     ->where(function ($query) use ($currentDate, $currentTime) {
                         $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
@@ -65,6 +66,7 @@ class BookingHistoryController extends Controller
                         'trn_consultation_bookings.booking_reference_number',
                         'trn_consultation_bookings.is_for_family_member',
                         'trn_consultation_bookings.booking_type_id',
+                        'trn_consultation_bookings.family_member_id',
                         'sys_booking_types.booking_type_name',
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
@@ -155,10 +157,10 @@ class BookingHistoryController extends Controller
                     if($patient_id){
                         $booking_details = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
                         ->where('patient_id', $patient_id)
-                        ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
+                        ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
                         ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
                         ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-                        ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.id')
+                        ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                         ->leftJoin('mst__doctors', 'trn_consultation_bookings.doctor_id', '=', 'mst__doctors.user_id')
                         ->leftJoin('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id') 
                         ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
@@ -166,7 +168,7 @@ class BookingHistoryController extends Controller
                             'mst_users.username as doctor_name',
                             'sys_booking_status.status_name',
                             'mst_branches.branch_name',
-                            'mst_branches.id as branch_id',
+                            'mst_branches.branch_id as branch_id',
                             'trn_consultation_bookings.booking_date',
                             'trn_consultation_bookings.id',
                             'trn_consultation_bookings.wellness_id',
@@ -174,6 +176,7 @@ class BookingHistoryController extends Controller
                             'trn_consultation_bookings.booking_reference_number',
                             'trn_consultation_bookings.is_for_family_member',
                             'trn_consultation_bookings.booking_type_id',
+                            'trn_consultation_bookings.family_member_id',
                             'sys_booking_types.booking_type_name',
                             'mst_timeslots.time_from',
                             'mst_timeslots.time_to',

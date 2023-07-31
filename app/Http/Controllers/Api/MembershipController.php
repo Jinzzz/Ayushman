@@ -17,7 +17,7 @@ class MembershipController extends Controller
             $patient_id = Auth::id();
             $accountHolder = Mst_Patient::find($patient_id);
             
-            if ($accountHolder->available_membership != 0) {
+            if ($accountHolder->available_membership !== 0) {
                 $membership_package_id = $accountHolder->available_membership;
             }
             

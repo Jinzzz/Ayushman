@@ -22,7 +22,7 @@ class CreateMstDoctorsTable extends Migration
             $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('mst_users')->onDelete('cascade');
-            $table->foreign('branch_id')->references('id')->on('mst_branches')->onDelete('cascade');
+            $table->foreign('branch_id')->references('branch_id')->on('mst_branches')->onDelete('cascade');
             $table->foreign('designation_id')->references('id')->on('mst__designations')->onDelete('cascade');
             $table->timestamps();
         });

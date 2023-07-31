@@ -13,6 +13,7 @@ use App\Models\Mst_Therapy;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use Illuminate\Support\Facades\Validator;
+use DB;
 
 class MyBookingsController extends Controller
 {
@@ -22,19 +23,17 @@ class MyBookingsController extends Controller
             $patient_id = Auth::id();
             if($patient_id){
                 $currentDate = date('Y-m-d');
-                $currentTime = date('H:i:s');
-
+                
                 $all_bookings = [];
 
                 $all_bookings = Trn_Consultation_Booking::where('patient_id', $patient_id)
                     ->whereIn('trn_consultation_bookings.booking_status_id', [1, 2])
-                    ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
+                    ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
                     ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
                     ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.id')
+                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                     ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
                     ->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
-                    ->where('mst_timeslots.time_from', '>=', $currentTime)
                     ->select(
                         'mst_users.username as doctor_name',
                         'sys_booking_status.status_name',
@@ -46,13 +45,15 @@ class MyBookingsController extends Controller
                         'trn_consultation_bookings.booking_reference_number',
                         'trn_consultation_bookings.is_for_family_member',
                         'trn_consultation_bookings.booking_type_id',
+                        'trn_consultation_bookings.family_member_id',
                         'sys_booking_types.booking_type_name',
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
                     )
                     ->get();
-                                
-                if ($all_bookings->isNotEmpty()) {
+
+
+                    if ($all_bookings->isNotEmpty()) {
                     foreach ($all_bookings as $booking) {
                         // If booking_type_id = 1, then title is the name of the doctor
                         $title = $booking->doctor_name;
@@ -138,10 +139,10 @@ class MyBookingsController extends Controller
                     if($patient_id){
                         $booking_details = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
                         ->where('patient_id', $patient_id)
-                        ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
+                        ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
                         ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
                         ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-                        ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.id')
+                        ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                         ->leftJoin('mst__doctors', 'trn_consultation_bookings.doctor_id', '=', 'mst__doctors.user_id')
                         ->leftJoin('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id') 
                         ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
@@ -149,7 +150,7 @@ class MyBookingsController extends Controller
                             'mst_users.username as doctor_name',
                             'sys_booking_status.status_name',
                             'mst_branches.branch_name',
-                            'mst_branches.id as branch_id',
+                            'mst_branches.branch_id as branch_id',
                             'trn_consultation_bookings.booking_date',
                             'trn_consultation_bookings.id',
                             'trn_consultation_bookings.wellness_id',
@@ -157,6 +158,7 @@ class MyBookingsController extends Controller
                             'trn_consultation_bookings.booking_reference_number',
                             'trn_consultation_bookings.is_for_family_member',
                             'trn_consultation_bookings.booking_type_id',
+                            'trn_consultation_bookings.family_member_id',
                             'sys_booking_types.booking_type_name',
                             'mst_timeslots.time_from',
                             'mst_timeslots.time_to',

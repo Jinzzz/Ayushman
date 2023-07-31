@@ -61,13 +61,13 @@ class PatientHelper
 
     public static function recheckAvailability($booking_date, $slot_id, $doctor_id){
 
+        $booking_date = self::dateFormatDb($booking_date);
         $timeSlot = Mst_TimeSlot::where('id', $slot_id)->where('is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)->where('time_slot_id', $slot_id)
                         ->whereIn('booking_status_id', [1, 2])->count();
 
-        $available_slots = $timeSlot->no_tockens - $booked_tokens;
-
+        $available_slots = $timeSlot->no_tokens - $booked_tokens;
         $currentDate = Carbon::now()->format('Y-m-d');
         $currentTime = Carbon::now()->format('H:i:s');
 
@@ -95,7 +95,11 @@ class PatientHelper
     // get all amily members array using patient_id 
     public static function getFamilyDetails($patient_id){
         $family_details=array();
-        $accountHolder = Mst_Patient::where('id',$patient_id)->first();
+        $accountHolder = Mst_Patient::join('sys_gender', 'mst_patients.patient_gender', '=', 'sys_gender.id')
+        ->where('mst_patients.id', $patient_id)
+        ->select('mst_patients.*', 'sys_gender.gender_name')
+        ->first();
+
         $members = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
         ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
         ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
@@ -114,7 +118,7 @@ class PatientHelper
             'relationship' => "Yourself",
             'age' => $currentYear - $year,
             'dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
-            'gender' => $accountHolder->patient_gender,
+            'gender' => $accountHolder->gender_name,
             'mobile_number' => $accountHolder->patient_mobile,
             'email_address' => $accountHolder->patient_email,
         ];

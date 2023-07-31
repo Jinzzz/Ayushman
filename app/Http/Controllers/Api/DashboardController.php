@@ -30,24 +30,37 @@ class DashboardController extends Controller
                 return response($data);
             }
             
-            $membership = Mst_Membership::find($patient->available_membership);
-            $membership_status = $membership ? 1 : 0;
-            $membership_name = isset($membership->membership_name) ? $membership->membership_name : "";
-            $validity = isset($membership->validity) ? $membership->validity : "";
+            $membership_status = "";
+            $membership_name = "";
+            $validity = "";
+
+            if ($patient->available_membership !== 0) {
+                $membership = Mst_Membership::find($patient->available_membership);
+                $membership_status = $membership ? 1 : 0;
+                $membership_name = $membership ? $membership->membership_name : "";
+                if (isset($membership->validity)) {
+                    $validity = Carbon::parse($membership->validity)->format('d-m-Y');
+                }
+            }
 
             $currentDate = date('Y-m-d');
             $currentTime = date('H:i:s');
 
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
             ->whereIn('booking_status_id', [1, 2])
-            ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.id')
+            ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
             ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
             ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
             ->select('mst_users.username', 'trn_consultation_bookings.booking_date', 'sys_booking_types.booking_type_name', 'mst_timeslots.time_from')
-            ->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
-            ->where('mst_timeslots.time_from', '>=', $currentTime)
+            ->where(function ($query) use ($currentDate, $currentTime) {
+                $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
+                    ->orWhere(function ($query) use ($currentDate, $currentTime) {
+                        $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
+                            ->where('mst_timeslots.time_to', '>', $currentTime);
+                    });
+            })
             ->get();
-
+            
             
             foreach ($consultationDetails as $consultation) {
                 $booking_date = Carbon::parse($consultation->booking_date)->format('d-m-Y');
@@ -67,7 +80,7 @@ class DashboardController extends Controller
                 'patient_name' => $patient->patient_name,
                 'membership_status' => $membership_status,
                 'membership_name' => $membership_name,
-                'validity' => Carbon::parse($validity)->format('d-m-Y'),
+                'validity' => $validity,
                 'upcoming_bookings' => $upcoming_bookings
             );
             return response()->json($data);
