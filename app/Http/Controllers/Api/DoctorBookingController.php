@@ -466,7 +466,7 @@ class DoctorBookingController extends Controller
                             'email_address' => $accountHolder->patient_email,
                         ];
                     }else{
-                        $members = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
+                        $member = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
                             ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
                             ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
                             ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')

@@ -54,12 +54,16 @@ class PatientAuthController extends Controller
                     ->orWhere('patient_email', $request->patient_email)
                     ->first();
 
+                    if($request->patient_gender){
+                        $patient_gender_id = Sys_Gender::where('gender_name', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                    }
+
                     if (!$patients) {
                         $lastInsertedId = Mst_Patient::insertGetId([
                         'patient_name'      => $request->patient_name,
                         'patient_email'     => $request->patient_email,
                         'patient_address'   => $request->patient_address,
-                        'patient_gender'    => $request->patient_gender,
+                        'patient_gender'    => $patient_gender_id,
                         'patient_dob'       => $request->patient_dob,
                         'patient_mobile'    => $request->patient_mobile,
                         'password'          => Hash::make($request->password),
