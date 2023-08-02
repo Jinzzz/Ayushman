@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FamilyController;
 use App\Http\Controllers\Api\MyBookingsController;
 use App\Http\Controllers\Api\BookingHistoryController;
 use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\WellnessController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,5 +64,11 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Membership
     Route::get('patient/membership_packages', [MembershipController::class,'membershipPackages']);
+
+    // Wellness 
+    Route::post('patient/wellness/search_list', [WellnessController::class,'wellnessSearchList']);
+    Route::post('patient/wellness/details', [WellnessController::class,'wellnessDetails']);
+    Route::post('patient/wellness/booking_summary', [WellnessController::class,'wellnessSummary']);
+    Route::post('patient/wellness/booking_confirmation', [WellnessController::class,'wellnessConfirmation']);
 
 }); 
