@@ -64,12 +64,13 @@ class DoctorBookingController extends Controller
             {
                 if (isset($request->branch_id) && !empty($request->booking_date)) {
 
+                    // getting the doctors id  as array, they are leave on the day 
                     $doctorONLeave = Trn_Staff_Leave::where('leave_date', $request->booking_date)->pluck('user_id')->toArray();
-
                     $day_of_week = PatientHelper::getWeekDay($request->booking_date);
                     $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('master_value_id')->first();
                     $allotted_doctors = Mst_TimeSlot::where('week_day',$weekDayId)->where('is_active', 1)->distinct()->pluck('staff_id')->toArray();
 
+                    // getting the available doctors id as array 
                     $doctorONLeaveCollection = collect($doctorONLeave);
                     $allottedDoctorsCollection = collect($allotted_doctors);
                     $filteredDoctors = $allottedDoctorsCollection->diff($doctorONLeaveCollection);
@@ -201,13 +202,13 @@ class DoctorBookingController extends Controller
                     'doctor_id' => ['required'],
                     'branch_id' => ['required'],
                     'booking_date' => ['required'],
-                    'reschedule_key' => ['required'],
+                    // 'reschedule_key' => ['required'],
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
                     'branch_id.required' => 'Branch required',
                     'booking_date.required' => 'Booking date required',
-                    'reschedule_key.required' => 'Reschedule key required',
+                    // 'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
@@ -217,15 +218,15 @@ class DoctorBookingController extends Controller
                     $doctor_details = Mst_User::where('user_id',$request->doctor_id)->first();
                     $doctor_name = $doctor_details->username;
 
-                    if ($request->reschedule_key == 1) {
-                        if (!$request->has('booking_id')) {
-                            $data['status'] = 0;
-                            $data['message'] = "Booking id is required";
-                            return response($data);
-                        } else {
-                            $booking_id = $request->booking_id;
-                        }
-                    }
+                    // if ($request->reschedule_key == 1) {
+                    //     if (!$request->has('booking_id')) {
+                    //         $data['status'] = 0;
+                    //         $data['message'] = "Booking id is required";
+                    //         return response($data);
+                    //     } else {
+                    //         $booking_id = $request->booking_id;
+                    //     }
+                    // }
                     
                     $day_of_week = PatientHelper::getWeekDay($request->booking_date);
                     $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('master_value_id')->first();
@@ -288,7 +289,7 @@ class DoctorBookingController extends Controller
                         $data['message'] = "Data fetched.";
                         $data['doctor_name'] = $doctor_name;
                         $data['data'] = $time_slots;
-                        $data['booking_id'] = $booking_id ?? '';
+                        // $data['booking_id'] = $booking_id ?? '';
                         return response($data);
                     }else{
                         $data['status'] = 0;
@@ -328,29 +329,29 @@ class DoctorBookingController extends Controller
                     'branch_id' => ['required'],
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
-                    'reschedule_key' => ['required'],
+                    // 'reschedule_key' => ['required'],
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
                     'branch_id.required' => 'Branch required',
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
-                    'reschedule_key.required' => 'Reschedule key required',
+                    // 'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
                 if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id ) && isset($request->reschedule_key )) {
                     $patient_id = Auth::id();
-                    if ($request->reschedule_key == 1) {
-                        if (!$request->has('booking_id')) {
-                            $data['status'] = 0;
-                            $data['message'] = "Booking id is required";
-                            return response($data);
-                        } else {
-                            $booking_id = $request->booking_id;
-                        }
-                    }
+                    // if ($request->reschedule_key == 1) {
+                    //     if (!$request->has('booking_id')) {
+                    //         $data['status'] = 0;
+                    //         $data['message'] = "Booking id is required";
+                    //         return response($data);
+                    //     } else {
+                    //         $booking_id = $request->booking_id;
+                    //     }
+                    // }
 
                     $family_details=array();
 
@@ -362,7 +363,7 @@ class DoctorBookingController extends Controller
                         $data['status'] = 1;
                         $data['message'] = "Data Fetched";
                         $data['data'] = $family_details;
-                        $data['booking_id'] = $booking_id ?? '';
+                        // $data['booking_id'] = $booking_id ?? '';
                         return response($data);
                     }else{
                         $data['status'] = 0;
@@ -404,7 +405,7 @@ class DoctorBookingController extends Controller
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
                     'yourself' => ['required'],
-                    'reschedule_key' => ['required'],
+                    // 'reschedule_key' => ['required'],
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
@@ -412,22 +413,23 @@ class DoctorBookingController extends Controller
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
                     'yourself.required' => 'Yourself is required',
-                    'reschedule_key.required' => 'Reschedule key required',
+                    // 'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
             if (!$validator->fails()) 
             {
                 if (isset($request->member_id) && isset($request->yourself) && isset($request->slot_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key)) {
                     $patient_id = Auth::id();
-                    if ($request->reschedule_key == 1) {
-                        if (!$request->has('booking_id')) {
-                            $data['status'] = 0;
-                            $data['message'] = "Booking id is required";
-                            return response($data);
-                        } else {
-                            $booking_id = $request->booking_id;
-                        }
-                    }
+                    
+                    // if ($request->reschedule_key == 1) {
+                    //     if (!$request->has('booking_id')) {
+                    //         $data['status'] = 0;
+                    //         $data['message'] = "Booking id is required";
+                    //         return response($data);
+                    //     } else {
+                    //         $booking_id = $request->booking_id;
+                    //     }
+                    // }
 
                     $slotDetails = Mst_TimeSlot::find($request->slot_id);
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
@@ -501,7 +503,7 @@ class DoctorBookingController extends Controller
                         $data['doctor_details'] = $doctorDetails;
                         $data['patient_details'] = $patientDetails;
                         $data['payment_details'] = $paymentDetails;
-                        $data['booking_id'] = $booking_id ?? '';
+                        // $data['booking_id'] = $booking_id ?? '';
                         return response($data);
                     }else{
                         $data['status'] = 0;
@@ -614,7 +616,7 @@ class DoctorBookingController extends Controller
                     }
 
                     $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id',Auth::id())->where('booking_date',$newRecordData['booking_date'])->where('time_slot_id',$newRecordData['time_slot_id'])->where('family_member_id',$newRecordData['family_member_id'])->where('doctor_id',$newRecordData['doctor_id'])->first();
-                    // print_r($checkAlreadyBooked);die();
+
                     if($checkAlreadyBooked){
                         $data['status'] = 0;
                         $data['message'] = "Already booked";

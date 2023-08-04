@@ -279,12 +279,14 @@ class WellnessController extends Controller
                     'reschedule_key' => ['required'],
                     'branch_id' => ['required'],
                     'booking_date' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
                     'branch_id.required' => 'Branch required',
                     'booking_date.required' => 'Booking date required',
                     'wellness_id.required' => 'Wellness required',
                     'yourself.required' => 'Yourself required',
+                    'reschedule_key.required' => 'Reschedule key required',
                     'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
@@ -308,6 +310,7 @@ class WellnessController extends Controller
                     $booking_date = PatientHelper::dateFormatDb($request->booking_date);
                     $newRecordData = [
                         'booking_type_id' => 2,
+                        'wellness_id' => $request->wellness_id,
                         'patient_id' => $patient_id,
                         'branch_id' => $request->branch_id, 
                         'booking_date' => $booking_date,
@@ -332,6 +335,13 @@ class WellnessController extends Controller
                             $data['message'] = "Member is required";
                             return response($data);
                         }
+                    }
+
+                    $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id',Auth::id())->where('booking_date',$newRecordData['booking_date'])->where('wellness_id',$newRecordData['wellness_id'])->where('family_member_id',$newRecordData['family_member_id'])->first();
+                    if($checkAlreadyBooked){
+                        $data['status'] = 0;
+                        $data['message'] = "Already booked";
+                        return response($data);
                     }
 
 
