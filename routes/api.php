@@ -29,6 +29,8 @@ Route::post('patient/resend_otp', [PatientAuthController::class,'reSendOtp']);
 Route::post('patient/forgot_password', [PatientAuthController::class,'forgotPassword']);
 Route::post('patient/reset_password', [PatientAuthController::class,'resetPassword']);
 
+Route::post('patient/membership_packages_details', [MembershipController::class,'membershipPackageDetails']);
+
 Route::get('branches', [DoctorBookingController::class,'getBranches']);
 
 
@@ -64,6 +66,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Membership
     Route::get('patient/membership_packages', [MembershipController::class,'membershipPackages']);
+    Route::get('patient/current_membership_details', [MembershipController::class,'currentMembershipDetails']);
+
 
     // Wellness 
     Route::post('patient/wellness/search_list', [WellnessController::class,'wellnessSearchList']);
