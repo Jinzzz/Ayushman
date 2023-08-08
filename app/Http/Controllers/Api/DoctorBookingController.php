@@ -13,6 +13,7 @@ use App\Models\Mst_Patient;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
+use App\Models\Mst_Staff;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
@@ -33,7 +34,7 @@ class DoctorBookingController extends Controller
                 $data['status'] = 0;
                 $data['message'] = "No branches found.";
             }
-        return response($data);
+        return response($data); 
         }
         catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
@@ -65,9 +66,9 @@ class DoctorBookingController extends Controller
                 if (isset($request->branch_id) && !empty($request->booking_date)) {
 
                     // getting the doctors id  as array, they are leave on the day 
-                    $doctorONLeave = Trn_Staff_Leave::where('leave_date', $request->booking_date)->pluck('user_id')->toArray();
+                    $doctorONLeave = Trn_Staff_Leave::where('leave_date', $request->booking_date)->where('leave_duration', 83)->pluck('user_id')->toArray();
                     $day_of_week = PatientHelper::getWeekDay($request->booking_date);
-                    $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('master_value_id')->first();
+                    $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
                     $allotted_doctors = Mst_TimeSlot::where('week_day',$weekDayId)->where('is_active', 1)->distinct()->pluck('staff_id')->toArray();
 
                     // getting the available doctors id as array 
@@ -76,17 +77,17 @@ class DoctorBookingController extends Controller
                     $filteredDoctors = $allottedDoctorsCollection->diff($doctorONLeaveCollection);
                     $filteredDoctorsArray = $filteredDoctors->values()->all();
 
-                    $queries = Mst_User::join('mst__doctors', 'mst_users.user_id', '=', 'mst__doctors.user_id')
-                   ->join('mst_branches', 'mst__doctors.branch_id', '=', 'mst_branches.branch_id')
-                   ->join('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id')
-                   ->join('trn_user_profiles', 'mst_users.user_id', '=', 'trn_user_profiles.user_id')
-                   ->select('mst_users.user_id as doctor_id', 'mst_users.username as name', 'mst_branches.branch_name as branch_name', 'mst__designations.designation as designation', 'trn_user_profiles.profile_image')
-                   ->where('mst_users.user_type_id', 3)
-                   ->where('mst__doctors.branch_id', $request->branch_id)
-                   ->whereIn('mst_users.user_id', $filteredDoctorsArray);
+
+                   $queries = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
+                    ->join('mst_master_values', 'mst_staffs.staff_qualification', '=', 'mst_master_values.id')
+                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
+                    ->select('mst_staffs.staff_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'mst_master_values.master_value as qualification', 'trn_user_profiles.profile_image')
+                    ->where('mst_staffs.staff_type', 20)
+                    ->where('mst_staffs.branch_id', $request->branch_id)
+                    ->whereIn('mst_staffs.staff_id', $filteredDoctorsArray);
 
                     if(isset($request->search_doctor_name)){
-                        $queries = $queries->where('mst_users.username', 'like', '%' . $request->search_doctor_name . '%');
+                        $queries = $queries->where('mst_staffs.staff_name', 'like', '%' . $request->search_doctor_name . '%');
                     }
 
                     if(isset($request->search_branch_name)){
@@ -94,7 +95,7 @@ class DoctorBookingController extends Controller
                     }
 
                     if(isset($request->search_designation_name)){
-                        $queries = $queries->where('mst__designations.designation', 'like', '%' . $request->search_designation_name . '%');
+                        $queries = $queries->where('mst_master_values.master_value', 'like', '%' . $request->search_designation_name . '%');
                     }
             
                     $doctorsList = $queries->get();
@@ -147,13 +148,13 @@ class DoctorBookingController extends Controller
             if (!$validator->fails()) 
             {
                 if(isset($request->doctor_id)){
-                    $doctorDetails = Mst_User::join('mst__doctors', 'mst_users.user_id', '=', 'mst__doctors.user_id')
-                    ->join('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id')
-                    ->join('trn_user_profiles', 'mst_users.user_id', '=', 'trn_user_profiles.user_id')
-                    ->leftJoin('mst_branches', 'mst__doctors.branch_id', '=', 'mst_branches.branch_id')
-                    ->select('mst_users.user_id as doctor_id', 'mst_users.username as name', 'mst_branches.branch_name as branch_name', 'mst__doctors.qualification', 'trn_user_profiles.address', 'trn_user_profiles.profile_image', 'mst__designations.designation as designation')
-                    ->where('mst_users.user_type_id', 3)
-                    ->where('mst_users.user_id', $request->doctor_id)
+                    $doctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
+                    ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
+                    ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
+                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
+                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'trn_user_profiles.profile_image', 'trn_user_profiles.address')
+                    ->where('mst_staffs.staff_type', 20)
+                    ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
 
                     if ($doctorDetails) {
@@ -213,10 +214,10 @@ class DoctorBookingController extends Controller
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key )) {
+                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date )) {
                     
-                    $doctor_details = Mst_User::where('user_id',$request->doctor_id)->first();
-                    $doctor_name = $doctor_details->username;
+                    $doctor_details = Mst_Staff::where('mst_staffs.staff_id', $request->doctor_id)->first();
+                    $doctor_name = $doctor_details->staff_name;
 
                     // if ($request->reschedule_key == 1) {
                     //     if (!$request->has('booking_id')) {
@@ -229,15 +230,28 @@ class DoctorBookingController extends Controller
                     // }
                     
                     $day_of_week = PatientHelper::getWeekDay($request->booking_date);
-                    $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('master_value_id')->first();
+                    $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
             
-                    $timeSlots = Mst_TimeSlot::where('staff_id', $request->doctor_id)
-                        ->where('week_day', $weekDayId)
-                        ->where('is_active', 1)
-                        ->get();
-                    
+                    $booking_date = PatientHelper::dateFormatDb($request->booking_date);
+
+                    $doctorOnLeave = Trn_Staff_Leave::where('leave_date', $booking_date)
+                    ->where('user_id', $request->doctor_id)
+                    ->whereIn('leave_duration', [81, 82])
+                    ->first();
+
+                    $timeSlotsQuery = Mst_TimeSlot::where('staff_id', $request->doctor_id)
+                    ->where('week_day', $weekDayId)
+                    ->where('is_active', 1);
+
+                    if (!empty($doctorOnLeave)) {
+                        $timeToCondition = $doctorOnLeave->leave_duration == 81 ? '>=' : '<=';
+                        $timeSlotsQuery->where('time_from', $timeToCondition, "12:00:00");
+                    }
+
+                    $timeSlots = $timeSlotsQuery->get();
+                    // print_r($timeSlots);die();
+
                     if($timeSlots){
-                        $booking_date = PatientHelper::dateFormatDb($request->booking_date);
 
                         $currentDate = Carbon::now()->format('Y-m-d');
                         $currentTime = Carbon::now()->format('H:i:s');

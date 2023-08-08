@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sys_Blood_Group;
-use App\Models\Sys_Gender;
+use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -55,7 +55,7 @@ class PatientAuthController extends Controller
                     ->first();
 
                     if($request->patient_gender){
-                        $patient_gender_id = Sys_Gender::where('gender_name', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                        $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('master_value_id')->first();
                     }
 
                     if (!$patients) {
@@ -499,10 +499,11 @@ class PatientAuthController extends Controller
                 $currentData = Mst_Patient::where('id', $patient_id)->first();
 
                 if($request->patient_blood_group){
-                    $blood_group_id = Sys_Blood_Group::where('blood_group_name', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
+                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('master_value_id')->first();
+
                 }
                 if($request->patient_gender){
-                    $patient_gender_id = Sys_Gender::where('gender_name', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                    $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('master_value_id')->first();
                 }
 
                 if($request->patient_dob){
