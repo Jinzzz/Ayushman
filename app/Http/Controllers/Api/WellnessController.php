@@ -309,12 +309,12 @@ class WellnessController extends Controller
                     $yourself = $request->yourself;
                     $booking_date = PatientHelper::dateFormatDb($request->booking_date);
                     $newRecordData = [
-                        'booking_type_id' => 2,
+                        'booking_type_id' => 85,
                         'wellness_id' => $request->wellness_id,
                         'patient_id' => $patient_id,
                         'branch_id' => $request->branch_id, 
                         'booking_date' => $booking_date,
-                        'booking_status_id' => 2,
+                        'booking_status_id' => 88,
                         'booking_fee' => $wellness->wellness_cost,
                         'is_for_family_member' => 0,
                         'family_member_id' => 0,
@@ -348,7 +348,7 @@ class WellnessController extends Controller
                     if(isset($booking_id)){
                         // Update existing data
                         $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
-                        if($bookingDetails->booking_status_id == 3){
+                        if($bookingDetails->booking_status_id == 89){
                         $createdRecord = Trn_Consultation_Booking::create($newRecordData);
                         $lastInsertedId = $createdRecord->id;
                         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
@@ -363,15 +363,67 @@ class WellnessController extends Controller
                             $lastInsertedId = $booking_id;
                         }
                     }else{
-                        // Create new data 
-                        $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                        $lastInsertedId = $createdRecord->id;
-                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                        $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                        $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                        'updated_at' => Carbon::now(),
-                        'booking_reference_number' => $bookingRefNo
-                        ]);
+                        // to check whether that patient have membership or not 
+                        $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
+                        if($checkMembership == 1){
+                            $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
+                            if(!empty($membership)){
+                                $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
+                                ->where('wellness_id',$request->wellness_id)
+                                ->where('is_active',1)
+                                ->first();
+
+                                if (!empty($checkWellness)) {
+                                    $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
+                                    ->where('wellness_id',$request->wellness_id)
+                                    ->where('created_at','>=',$membership->created_at)
+                                    ->where('created_at','<=',$membership->membership_expiry_date)
+                                    ->count();
+
+                                    if($bookedCountWellness < $checkWellness->maximum_usage_limit){
+                                        $otpCreate = Trn_Patient_Wellness_Sessions::create([
+                                            'membership_patient_id' => $membership->id,
+                                            'wellness_id' => $request->wellness_id,
+                                            'created_at' => Carbon::now(),
+                                            'updated_at' => Carbon::now(),
+                                        ]);
+                                        $bookingRefNo = 0;
+                                        $lastInsertedId = 0;
+                                    }else{
+                                        // Create new data 
+                                        $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                                        $lastInsertedId = $createdRecord->id;
+                                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                                        $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                                        $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                                        'updated_at' => Carbon::now(),
+                                        'booking_reference_number' => $bookingRefNo
+                                        ]);
+                                    }
+                                } else {
+                                    // Create new data 
+                                    $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                                    $lastInsertedId = $createdRecord->id;
+                                    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                                    $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                                    $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                                    'updated_at' => Carbon::now(),
+                                    'booking_reference_number' => $bookingRefNo
+                                    ]);
+                                }
+                            }
+                        }
+                        else{
+                            // Create new data 
+                            $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                            $lastInsertedId = $createdRecord->id;
+                            $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                            $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                            $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'booking_reference_number' => $bookingRefNo
+                            ]);
+                        }
                     }
 
                     $booking_details = [];

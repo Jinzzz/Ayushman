@@ -25,7 +25,7 @@ class BookingHistoryController extends Controller
                 $currentDate = date('Y-m-d');
                 $currentTime = date('H:i:s');
 
-                $pending_to_cancel = Trn_Consultation_Booking::where('booking_status_id', 1)
+                $pending_to_cancel = Trn_Consultation_Booking::where('booking_status_id', 87)
                 ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                 ->where(function ($query) use ($currentDate) {
                     $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
@@ -36,7 +36,7 @@ class BookingHistoryController extends Controller
                 })
                 ->update([
                     'updated_at' => Carbon::now(),
-                    'booking_status_id' => 4
+                    'booking_status_id' => 90
                 ]);
 
                 $all_bookings = [];
@@ -47,7 +47,7 @@ class BookingHistoryController extends Controller
                     ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
                     ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                     ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
-                    ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
+                    ->join('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
                     ->where(function ($query) use ($currentDate, $currentTime) {
                         $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
                             ->orWhere(function ($query) use ($currentDate, $currentTime) {
@@ -57,7 +57,7 @@ class BookingHistoryController extends Controller
                     })
                     ->select(
                         'mst_users.username as doctor_name',
-                        'sys_booking_status.status_name',
+                        'mst_master_values.master_value',
                         'mst_branches.branch_name',
                         'trn_consultation_bookings.booking_date',
                         'trn_consultation_bookings.id',
@@ -75,7 +75,7 @@ class BookingHistoryController extends Controller
                 
                 if ($all_bookings->isNotEmpty()) {
                     foreach ($all_bookings as $booking) {
-                        // If booking_type_id = 1, then title is the name of the doctor
+                        // If booking_type_id = 84, then title is the name of the doctor
                         $title = $booking->doctor_name;
                 
                         if ($booking->is_for_family_member == 1) {
@@ -86,12 +86,12 @@ class BookingHistoryController extends Controller
                             $patient_name = $patient->patient_name;
                         }
                 
-                        if ($booking->booking_type_id == 2) {
+                        if ($booking->booking_type_id == 85) {
                             $wellness = Mst_Wellness::find($booking->wellness_id);
                             $title = $wellness->wellness_name;
                         }
                 
-                        if ($booking->booking_type_id == 3) {
+                        if ($booking->booking_type_id == 86) {
                             $therapy = Mst_Therapy::find($booking->therapy_id);
                             $title = $therapy->therapy_name;
                         }
@@ -163,10 +163,10 @@ class BookingHistoryController extends Controller
                         ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                         ->leftJoin('mst__doctors', 'trn_consultation_bookings.doctor_id', '=', 'mst__doctors.user_id')
                         ->leftJoin('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id') 
-                        ->join('sys_booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'sys_booking_status.id')
+                        ->join('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
                         ->select(
                             'mst_users.username as doctor_name',
-                            'sys_booking_status.status_name',
+                            'mst_master_values.master_value',
                             'mst_branches.branch_name',
                             'mst_branches.branch_id as branch_id',
                             'trn_consultation_bookings.booking_date',

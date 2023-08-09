@@ -7,10 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\PatientHelper;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Trn_Patient_Family_Member;
-use App\Models\Sys_Relationship;
-use App\Models\Sys_Blood_Group;
-use App\Models\Sys_Gender;
-use App\Models\Sys_Mst_PatientGender;
+use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Family_Member_Otp;
 use Carbon\Carbon;
@@ -79,10 +76,10 @@ class FamilyController extends Controller
                 if(isset($request->member_name) && isset($request->member_email) && isset($request->member_mobile) && isset($request->member_address) && isset($request->member_gender) && isset($request->member_dob) && isset($request->member_blood_group) && isset($request->relationship)){
                     $patient_id = Auth::id();
                     $member_dob = PatientHelper::dateFormatDb($request->member_dob);
-                    
-                    $member_gender_id = Sys_Gender::where('gender_name', 'LIKE', '%' . $request->member_gender . '%')->pluck('id')->first();
-                    $blood_group_id = Sys_Blood_Group::where('blood_group_name', 'LIKE', '%' . $request->member_blood_group . '%')->pluck('id')->first();
-                    $relationship_id = Sys_Relationship::where('relationship', 'LIKE', '%' . $request->relationship . '%')->pluck('id')->first();
+
+                    $member_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->member_gender . '%')->pluck('id')->first();
+                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->member_blood_group . '%')->pluck('id')->first();
+                    $relationship_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->relationship . '%')->pluck('id')->first();
 
                     $addFamilyMember = Trn_Patient_Family_Member::create([
                         'patient_id' => $patient_id,

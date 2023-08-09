@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Mst_Branch;
 use App\Models\Mst_TimeSlot;
-use App\Models\Mst_User;
 use App\Models\Trn_Staff_Leave;
 use App\Models\Mst_Doctor;
 use App\Models\Mst_Patient;
@@ -260,7 +259,7 @@ class DoctorBookingController extends Controller
                         foreach ($timeSlots as $timeSlot) {
                         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
                             ->where('time_slot_id', $timeSlot->id)
-                            ->whereIn('booking_status_id', [1, 2])
+                            ->whereIn('booking_status_id', [87, 88])
                             ->count();
             
                         $available_slots = $timeSlot->no_tokens - $booked_tokens;
@@ -355,7 +354,7 @@ class DoctorBookingController extends Controller
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id ) && isset($request->reschedule_key )) {
+                if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id )) {
                     $patient_id = Auth::id();
                     // if ($request->reschedule_key == 1) {
                     //     if (!$request->has('booking_id')) {
@@ -432,7 +431,7 @@ class DoctorBookingController extends Controller
             );
             if (!$validator->fails()) 
             {
-                if (isset($request->member_id) && isset($request->yourself) && isset($request->slot_id) && isset($request->doctor_id) && isset($request->booking_date ) && isset($request->reschedule_key)) {
+                if (isset($request->member_id) && isset($request->yourself) && isset($request->slot_id) && isset($request->doctor_id) && isset($request->booking_date )) {
                     $patient_id = Auth::id();
                     
                     // if ($request->reschedule_key == 1) {
@@ -449,19 +448,20 @@ class DoctorBookingController extends Controller
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));
                     ;
-                    $doctor = Mst_User::join('mst__doctors', 'mst_users.user_id', '=', 'mst__doctors.user_id')
-                    ->join('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id')
-                    ->join('trn_user_profiles', 'mst_users.user_id', '=', 'trn_user_profiles.user_id')
-                    ->leftJoin('mst_branches', 'mst__doctors.branch_id', '=', 'mst_branches.branch_id')
-                    ->select('mst_users.user_id as doctor_id', 'mst_users.username as name', 'mst_branches.branch_name as branch_name', 'mst__doctors.qualification', 'mst__doctors.consultation_fee', 'trn_user_profiles.profile_image', 'mst__designations.designation as designation')
-                    ->where('mst_users.user_type_id', 3)
-                    ->where('mst_users.user_id', $request->doctor_id)
+                    
+                    $doctor = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
+                    ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
+                    ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
+                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
+                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name','mst_staffs.staff_booking_fee', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'trn_user_profiles.profile_image')
+                    ->where('mst_staffs.staff_type', 20)
+                    ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
 
                     $doctorDetails[] = [
                         'doctor_id' => $doctor->doctor_id,
                         'doctor_name' => $doctor->name,
-                        'doctor_designatiom' => $doctor->designation,
+                        'doctor_qualification' => $doctor->qualification,
                         'doctor_branch' => $doctor->branch_name,
                         'doctor_profile_image' => 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $doctor->profile_image,
                     ];
@@ -589,23 +589,22 @@ class DoctorBookingController extends Controller
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));
 
-                    $doctor = Mst_User::join('mst__doctors', 'mst_users.user_id', '=', 'mst__doctors.user_id')
-                    ->leftJoin('mst_branches', 'mst__doctors.branch_id', '=', 'mst_branches.branch_id')
-                    ->select('mst_users.user_id as doctor_id','mst_users.username as doctor_name', 'mst_branches.branch_id', 'mst__doctors.consultation_fee')
-                    ->where('mst_users.user_type_id', 3)
-                    ->where('mst_users.user_id', $request->doctor_id)
+                    $doctor = Mst_Staff::join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
+                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as doctor_name','mst_staffs.staff_booking_fee', 'mst_staffs.branch_id')
+                    ->where('mst_staffs.staff_type', 20)
+                    ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
 
                     $yourself = $request->yourself;
                     $booking_date = PatientHelper::dateFormatDb($request->booking_date);
                     $newRecordData = [
-                        'booking_type_id' => 1,
+                        'booking_type_id' => 84,
                         'patient_id' => $patient_id,
                         'doctor_id' => $request->doctor_id,
                         'branch_id' => $doctor->branch_id, 
                         'booking_date' => $booking_date,
                         'time_slot_id' => $request->slot_id,
-                        'booking_status_id' => 2,
+                        'booking_status_id' => 88,
                         'booking_fee' => $doctor->consultation_fee,
                         'is_for_family_member' => 0,
                         'family_member_id' => 0,
@@ -642,7 +641,7 @@ class DoctorBookingController extends Controller
                         if(isset($booking_id)){
                             // Update existing data
                             $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
-                            if($bookingDetails->booking_status_id == 3){
+                            if($bookingDetails->booking_status_id == 89){
                             $createdRecord = Trn_Consultation_Booking::create($newRecordData);
                             $lastInsertedId = $createdRecord->id;
                             $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);

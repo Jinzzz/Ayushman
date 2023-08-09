@@ -60,7 +60,7 @@ class DashboardController extends Controller
             $currentTime = date('H:i:s');
 
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
-            ->whereIn('booking_status_id', [1, 2])
+            ->whereIn('booking_status_id', [87, 88])
             ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
             ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
             ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')

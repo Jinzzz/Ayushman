@@ -65,7 +65,7 @@ class PatientHelper
         $timeSlot = Mst_TimeSlot::where('id', $slot_id)->where('is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)->where('time_slot_id', $slot_id)
-                        ->whereIn('booking_status_id', [1, 2])->count();
+                        ->whereIn('booking_status_id', [87, 88])->count();
 
         $available_slots = $timeSlot->no_tokens - $booked_tokens;
         $currentDate = Carbon::now()->format('Y-m-d');
@@ -95,18 +95,19 @@ class PatientHelper
     // get all amily members array using patient_id 
     public static function getFamilyDetails($patient_id){
         $family_details=array();
-        $accountHolder = Mst_Patient::join('sys_gender', 'mst_patients.patient_gender', '=', 'sys_gender.id')
+        $accountHolder = Mst_Patient::join('mst_master_values', 'mst_patients.patient_gender', '=', 'mst_master_values.id')
         ->where('mst_patients.id', $patient_id)
-        ->select('mst_patients.*', 'sys_gender.gender_name')
+        ->select('mst_patients.*', 'mst_master_values.master_value as gender_name')
         ->first();
 
-        $members = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
-        ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
-        ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
-        ->select('trn_patient_family_member.id','trn_patient_family_member.family_member_name','trn_patient_family_member.email_address','trn_patient_family_member.mobile_number','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
-        ->where('trn_patient_family_member.patient_id',$patient_id)
-        ->where('trn_patient_family_member.is_active',1)
+        $members = Trn_Patient_Family_Member::join('mst_patients', 'trn_patient_family_member.patient_id', 'mst_patients.id')
+        ->join('mst_master_values as gender', 'trn_patient_family_member.gender_id', '=', 'gender.id')
+        ->join('mst_master_values as relationship', 'trn_patient_family_member.relationship_id', '=', 'relationship.id')
+        ->select('trn_patient_family_member.id', 'trn_patient_family_member.family_member_name', 'trn_patient_family_member.email_address', 'trn_patient_family_member.mobile_number', 'gender.master_value as gender_name', 'trn_patient_family_member.date_of_birth', 'relationship.master_value as relationship')
+        ->where('trn_patient_family_member.patient_id', $patient_id)
+        ->where('trn_patient_family_member.is_active', 1)
         ->get();
+
     
         $currentYear = Carbon::now()->year;
         $carbonDate = Carbon::parse($accountHolder->patient_dob);
