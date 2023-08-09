@@ -38,10 +38,11 @@ class DashboardController extends Controller
             
             if ($patient->available_membership == 1) {
                 $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                    ->latest()
-                    ->first();
+                ->where('membership_expiry_date','>=',Carbon::now()->format('Y-m-d'))
+                ->latest()
+                ->first();
             
-                if ($membership) {
+                if (!empty($membership)) {
                     $membership_status = 1;
             
                     $membership_name = Mst_Membership_Package::where('membership_package_id', $membership->membership_package_id)
