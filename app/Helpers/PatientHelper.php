@@ -92,7 +92,7 @@ class PatientHelper
         return $available_slots;
     }
     
-    // get all amily members array using patient_id 
+    // get all family members array using patient_id 
     public static function getFamilyDetails($patient_id){
         $family_details=array();
         $accountHolder = Mst_Patient::join('mst_master_values', 'mst_patients.patient_gender', '=', 'mst_master_values.id')

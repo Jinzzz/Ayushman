@@ -11,6 +11,9 @@ use App\Models\Mst_Branch;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Trn_Consultation_Booking;
+use App\Models\Mst_Patient_Membership_Booking;
+use App\Models\Mst_Membership_Package_Wellness;
+use App\Models\Trn_Patient_Wellness_Sessions;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 
@@ -240,7 +243,7 @@ class WellnessController extends Controller
                     $data['package_name'] = $wellness->wellness_name;
                     $data['patient_details'] = $patientDetails;
                     $data['payment_details'] = $paymentDetails;
-                    $data['booking_id'] = $booking_id ?? '';
+                    // $data['booking_id'] = $booking_id ?? '';
                     return response($data);
 
                 }
@@ -367,6 +370,7 @@ class WellnessController extends Controller
                         $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
                         if($checkMembership == 1){
                             $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
+
                             if(!empty($membership)){
                                 $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
                                 ->where('wellness_id',$request->wellness_id)
@@ -381,8 +385,9 @@ class WellnessController extends Controller
                                     ->count();
 
                                     if($bookedCountWellness < $checkWellness->maximum_usage_limit){
+
                                         $otpCreate = Trn_Patient_Wellness_Sessions::create([
-                                            'membership_patient_id' => $membership->id,
+                                            'membership_patient_id' => $membership->membership_patient_id,
                                             'wellness_id' => $request->wellness_id,
                                             'created_at' => Carbon::now(),
                                             'updated_at' => Carbon::now(),

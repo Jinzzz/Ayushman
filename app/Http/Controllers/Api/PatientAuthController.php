@@ -55,8 +55,10 @@ class PatientAuthController extends Controller
                     ->first();
 
                     if($request->patient_gender){
-                        $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('master_value_id')->first();
+                        $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
                     }
+
+                    $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
 
                     if (!$patients) {
                         $lastInsertedId = Mst_Patient::insertGetId([
@@ -64,7 +66,7 @@ class PatientAuthController extends Controller
                         'patient_email'     => $request->patient_email,
                         'patient_address'   => $request->patient_address,
                         'patient_gender'    => $patient_gender_id,
-                        'patient_dob'       => $request->patient_dob,
+                        'patient_dob'       => $patient_dob,
                         'patient_mobile'    => $request->patient_mobile,
                         'password'          => Hash::make($request->password),
                         'is_active'         => 1,
@@ -499,11 +501,11 @@ class PatientAuthController extends Controller
                 $currentData = Mst_Patient::where('id', $patient_id)->first();
 
                 if($request->patient_blood_group){
-                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('master_value_id')->first();
+                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
 
                 }
                 if($request->patient_gender){
-                    $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('master_value_id')->first();
+                    $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
                 }
 
                 if($request->patient_dob){

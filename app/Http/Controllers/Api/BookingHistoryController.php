@@ -25,7 +25,7 @@ class BookingHistoryController extends Controller
                 $currentDate = date('Y-m-d');
                 $currentTime = date('H:i:s');
 
-                $pending_to_cancel = Trn_Consultation_Booking::where('booking_status_id', 87)
+                $pending_to_cancel = Trn_Consultation_Booking::whereIn('booking_status_id', ['87','88'])
                 ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                 ->where(function ($query) use ($currentDate) {
                     $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
@@ -43,11 +43,11 @@ class BookingHistoryController extends Controller
 
 
                 $all_bookings = Trn_Consultation_Booking::where('patient_id', $patient_id)
-                    ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
-                    ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
+                    ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+                    ->join('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
                     ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                     ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
-                    ->join('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
+                    ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
                     ->where(function ($query) use ($currentDate, $currentTime) {
                         $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
                             ->orWhere(function ($query) use ($currentDate, $currentTime) {
@@ -56,8 +56,8 @@ class BookingHistoryController extends Controller
                             });
                     })
                     ->select(
-                        'mst_users.username as doctor_name',
-                        'mst_master_values.master_value',
+                        'mst_staffs.staff_name as doctor_name',
+                        'booking_status.master_value as booking_status_name',
                         'mst_branches.branch_name',
                         'trn_consultation_bookings.booking_date',
                         'trn_consultation_bookings.id',
@@ -67,7 +67,7 @@ class BookingHistoryController extends Controller
                         'trn_consultation_bookings.is_for_family_member',
                         'trn_consultation_bookings.booking_type_id',
                         'trn_consultation_bookings.family_member_id',
-                        'sys_booking_types.booking_type_name',
+                        'booking_type.master_value as booking_type_name',
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
                     )
@@ -103,7 +103,7 @@ class BookingHistoryController extends Controller
                         $my_bookings[] = [
                             'booking_id' => $booking->id,
                             'booking_reference_number' => $booking->booking_reference_number,
-                            'booking_status' => $booking->status_name,
+                            'booking_status' => $booking->booking_status_name,
                             'title' => $title,
                             'booking_date' => $booking_date,
                             'timeslot' => $time_from . '-' . $time_to,
@@ -157,16 +157,15 @@ class BookingHistoryController extends Controller
                     if($patient_id){
                         $booking_details = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
                         ->where('patient_id', $patient_id)
-                        ->join('mst_users', 'trn_consultation_bookings.doctor_id', '=', 'mst_users.user_id')
-                        ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
+                        ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+                        ->join('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
                         ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                         ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
-                        ->leftJoin('mst__doctors', 'trn_consultation_bookings.doctor_id', '=', 'mst__doctors.user_id')
-                        ->leftJoin('mst__designations', 'mst__doctors.designation_id', '=', 'mst__designations.id') 
-                        ->join('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
+                        ->leftJoin('mst_master_values as qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id') 
+                        ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
                         ->select(
-                            'mst_users.username as doctor_name',
-                            'mst_master_values.master_value',
+                            'mst_staffs.staff_name as doctor_name',
+                            'booking_status.master_value as status_name',
                             'mst_branches.branch_name',
                             'mst_branches.branch_id as branch_id',
                             'trn_consultation_bookings.booking_date',
@@ -177,12 +176,11 @@ class BookingHistoryController extends Controller
                             'trn_consultation_bookings.is_for_family_member',
                             'trn_consultation_bookings.booking_type_id',
                             'trn_consultation_bookings.family_member_id',
-                            'sys_booking_types.booking_type_name',
+                            'booking_type.master_value as booking_type_name',
                             'mst_timeslots.time_from',
                             'mst_timeslots.time_to',
-                            'mst__doctors.consultation_fee',
-                            'mst__doctors.user_id as doctor_id',
-                            'mst__designations.designation' 
+                            'mst_staffs.staff_id as doctor_id',
+                            'qualification.master_value as qualification' 
                         )->first();
 
                         $doctor_details = [];
@@ -206,7 +204,7 @@ class BookingHistoryController extends Controller
                                 'doctor_id' => $booking_details->doctor_id,
                                 'branch_id' => $booking_details->branch_id,
                                 'doctor_name' => $booking_details->doctor_name,
-                                'designation' => $booking_details->designation,
+                                'qualification' => $booking_details->qualification,
                                 'branch_name' => $booking_details->branch_name,
                             ];
                 
@@ -214,7 +212,7 @@ class BookingHistoryController extends Controller
                                 'booking_id' => $booking_details->id,
                                 'booking_reference_number' => $booking_details->booking_reference_number,
                                 'booking_status' => $booking_details->status_name,
-                                'booking_fee' => $booking_details->consultation_fee,
+                                'booking_fee' => "500",
                                 'booking_date' => $booking_date,
                                 'timeslot' => $time_from . '-' . $time_to,
                                 'booked_for' =>$patient_name,

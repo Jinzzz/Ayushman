@@ -13,6 +13,7 @@ use App\Models\Trn_Consultation_Booking;
 use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Mst_Staff;
+use App\Models\Sys_Gender;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
@@ -453,7 +454,10 @@ class DoctorBookingController extends Controller
                     ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                     ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
                     ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
-                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name','mst_staffs.staff_booking_fee', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'trn_user_profiles.profile_image')
+                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name',
+                    'mst_staffs.staff_booking_fee', 'mst_branches.branch_name as branch_name',
+                     'qualification.master_value as qualification', 'specialization.master_value as specialization',
+                      'trn_user_profiles.profile_image')
                     ->where('mst_staffs.staff_type', 20)
                     ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
@@ -470,6 +474,7 @@ class DoctorBookingController extends Controller
 
                     if($request->yourself == 1){
                         $accountHolder = Mst_Patient::where('id',$patient_id)->first();
+                        $gender_name = Mst_Master_Value::where('id',$accountHolder->patient_gender)->value('master_value');
                         $patientDetails[] = [
                             'id' => $accountHolder->id,
                             'yourself' => 1,
@@ -477,15 +482,15 @@ class DoctorBookingController extends Controller
                             'slot' => $time_from .' | '. $time_to,
                             'member_name' => $accountHolder->patient_name       ,
                             'dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
-                            'gender' => $accountHolder->patient_gender,
+                            'gender' => $gender_name,
                             'mobile_number' => $accountHolder->patient_mobile,
                             'email_address' => $accountHolder->patient_email,
                         ];
                     }else{
                         $member = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
-                            ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
-                            ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
-                            ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
+                            ->join('mst_master_values as gender','trn_patient_family_member.gender_id','gender.id')
+                            ->join('mst_master_values as relationship','trn_patient_family_member.relationship_id','relationship.id')
+                            ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','relationship.master_value as gender_name','trn_patient_family_member.date_of_birth','relationship.master_value as relationship')
                             ->where('trn_patient_family_member.patient_id',$patient_id)
                             ->where('trn_patient_family_member.id',$request->member_id)
                             ->where('trn_patient_family_member.is_active',1)
@@ -505,8 +510,8 @@ class DoctorBookingController extends Controller
                     }
 
                     $paymentDetails[] = [
-                        'consultation_fee' => $doctor->consultation_fee,
-                        'total_amount' => $doctor->consultation_fee,
+                        'consultation_fee' => "500",
+                        'total_amount' => "500",
                     ];
                     
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);

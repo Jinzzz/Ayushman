@@ -32,7 +32,7 @@ class DashboardController extends Controller
                 return response($data);
             }
             
-            $membership_status = "";
+            $membership_status = 0;
             $membership_name = "";
             $validity = "";
             
@@ -63,9 +63,9 @@ class DashboardController extends Controller
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
             ->whereIn('booking_status_id', [87, 88])
             ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
-            ->join('sys_booking_types', 'trn_consultation_bookings.booking_type_id', '=', 'sys_booking_types.booking_type_id')
+            ->join('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
             ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'sys_booking_types.booking_type_name', 'mst_timeslots.time_from')
+            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'mst_master_values.master_value', 'mst_timeslots.time_from')
             ->where(function ($query) use ($currentDate, $currentTime) {
                 $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
                     ->orWhere(function ($query) use ($currentDate, $currentTime) {
@@ -83,7 +83,7 @@ class DashboardController extends Controller
                 $upcoming_bookings[] = [
                 'doctor_name' => $consultation->staff_name,
                 'booking_date' => $booking_date,
-                'booking_type' => $consultation->booking_type_name,
+                'booking_type' => $consultation->master_value,
                 'time_from' => $time_from,
                 ];
             }
