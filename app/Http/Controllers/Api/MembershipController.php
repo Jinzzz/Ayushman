@@ -23,9 +23,13 @@ class MembershipController extends Controller
         try{
             $patient_id = Auth::id();
             $accountHolder = Mst_Patient::find($patient_id);
-            
+            $joined_membership_package_id = "";
             if ($accountHolder->available_membership !== 0) {
-                $membership_package_id = $accountHolder->available_membership;
+                $membership_details = Mst_Patient_Membership_Booking::where('patient_id', $patient_id)
+                ->latest()
+                ->first();
+
+                $joined_membership_package_id = $membership_details->membership_package_id;
             }
             
             $memberships = Mst_Membership_Package::where('is_active', 1)->get();
@@ -37,7 +41,7 @@ class MembershipController extends Controller
                         ->where('is_active', 1)
                         ->pluck('title');
             
-                    $is_joined = isset($membership_package_id) && $membership->membership_package_id === $membership_package_id
+                    $is_joined = isset($joined_membership_package_id) && $membership->membership_package_id === $joined_membership_package_id
                         ? 1
                         : 0;
             
@@ -90,6 +94,7 @@ class MembershipController extends Controller
             {
                 if(isset($request->membership_package_id)){
                     $package_details= Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)->where('is_active', 1)->first();
+                   
                     $membership_package_details[] = [
                         'membership_package_id' => $package_details->membership_package_id,
                         'package_title' => $package_details->package_title,

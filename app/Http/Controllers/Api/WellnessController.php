@@ -38,18 +38,44 @@ class WellnessController extends Controller
             if (!$validator->fails()) 
             {
                 if(isset($request->booking_date) && isset($request->branch_id)){
+
+                    $patient_id = Auth::id();
                     $all_wellness = Mst_Wellness::where('is_active', 1)->where('branch_id', $request->branch_id)->get();
                     $wellness_list = [];
 
-                if (!$all_wellness->isEmpty()) {
+                    $is_included = 0;
 
-                    foreach ($all_wellness as $wellness) {
-                        $wellness_list[] = [
-                        'id' => $wellness->id,
-                        'wellness_name' => $wellness->wellness_name,
-                        'wellness_cost' => $wellness->wellness_cost,
-                        ];
+                    $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
+                    if($checkMembership == 1){
+                        $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
+                        // array of all wellness ids included in that membership package.
+
+                        if(!empty($membership)){
+                            $allWellnessIds = Mst_Membership_Package_Wellness::where('package_id', $membership->membership_package_id)
+                            ->where('is_active', 1)
+                            ->pluck('wellness_id')
+                            ->toArray();
+                        }
                     }
+
+                    if (!$all_wellness->isEmpty()) {
+                        foreach ($all_wellness as $wellness) {
+                            $is_included = 0;
+                            // Convert the wellness ID to an integer
+                            $wellnessId = intval($wellness->id);
+                        
+                            if (in_array($wellnessId, $allWellnessIds)) {
+                                $is_included = 1;
+                            }
+                        
+                            $wellness_list[] = [
+                                'id' => $wellness->id,
+                                'wellness_name' => $wellness->wellness_name,
+                                'wellness_cost' => $wellness->wellness_cost,
+                                'is_included' => $is_included,
+                            ];
+                        }
+                        
 
                     $data['status'] = 1;
                     $data['message'] = "Data fetched";
@@ -204,15 +230,15 @@ class WellnessController extends Controller
                     }
                     else{
                         if(isset($request->member_id)){
+                            
                             $member = Trn_Patient_Family_Member::join('mst_patients','trn_patient_family_member.patient_id','mst_patients.id') 
-                            ->join('sys_gender','trn_patient_family_member.gender_id','sys_gender.id')
-                            ->join('sys_relationships','trn_patient_family_member.relationship_id','sys_relationships.id')
-                            ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','sys_gender.gender_name','trn_patient_family_member.date_of_birth','sys_relationships.relationship')
+                            ->join('mst_master_values','trn_patient_family_member.gender_id','mst_master_values.id')
+                            ->select('trn_patient_family_member.id','trn_patient_family_member.mobile_number','trn_patient_family_member.email_address','trn_patient_family_member.family_member_name','mst_master_values.master_value as gender_name','trn_patient_family_member.date_of_birth')
                             ->where('trn_patient_family_member.patient_id',$patient_id)
                             ->where('trn_patient_family_member.id',$request->member_id)
                             ->where('trn_patient_family_member.is_active',1)
                             ->first();
-
+                            
                             $patientDetails[] = [
                                 'id' => $member->id,
                                 'yourself' => 0,
@@ -363,72 +389,20 @@ class WellnessController extends Controller
                         }else{
                             $updateRecord = Trn_Consultation_Booking::where('id', $booking_id)->update($newRecordData);
                             $bookingRefNo = $bookingDetails->booking_reference_number;
-                            $lastInsertedId = $booking_id;
+                            $lastInsertedId = intval($booking_id);
                         }
-                    }else{
-                        // to check whether that patient have membership or not 
-                        $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
-                        if($checkMembership == 1){
-                            $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
-
-                            if(!empty($membership)){
-                                $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
-                                ->where('wellness_id',$request->wellness_id)
-                                ->where('is_active',1)
-                                ->first();
-
-                                if (!empty($checkWellness)) {
-                                    $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
-                                    ->where('wellness_id',$request->wellness_id)
-                                    ->where('created_at','>=',$membership->created_at)
-                                    ->where('created_at','<=',$membership->membership_expiry_date)
-                                    ->count();
-
-                                    if($bookedCountWellness < $checkWellness->maximum_usage_limit){
-
-                                        $otpCreate = Trn_Patient_Wellness_Sessions::create([
-                                            'membership_patient_id' => $membership->membership_patient_id,
-                                            'wellness_id' => $request->wellness_id,
-                                            'created_at' => Carbon::now(),
-                                            'updated_at' => Carbon::now(),
-                                        ]);
-                                        $bookingRefNo = 0;
-                                        $lastInsertedId = 0;
-                                    }else{
-                                        // Create new data 
-                                        $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                                        $lastInsertedId = $createdRecord->id;
-                                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                                        $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                                        $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                                        'updated_at' => Carbon::now(),
-                                        'booking_reference_number' => $bookingRefNo
-                                        ]);
-                                    }
-                                } else {
-                                    // Create new data 
-                                    $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                                    $lastInsertedId = $createdRecord->id;
-                                    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                                    $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                                    $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                                    'updated_at' => Carbon::now(),
-                                    'booking_reference_number' => $bookingRefNo
-                                    ]);
-                                }
-                            }
-                        }
-                        else{
-                            // Create new data 
-                            $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                            $lastInsertedId = $createdRecord->id;
-                            $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                            $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                            $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                            'updated_at' => Carbon::now(),
-                            'booking_reference_number' => $bookingRefNo
-                            ]);
-                        }
+                    }
+                    else{
+                       // Create new data 
+                       $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                       $lastInsertedId = $createdRecord->id;
+                       $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                       $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                       $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                       'updated_at' => Carbon::now(),
+                       'booking_reference_number' => $bookingRefNo
+                       ]);
+                        
                     }
 
                     $booking_details = [];
