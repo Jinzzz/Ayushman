@@ -80,8 +80,7 @@ class DoctorBookingController extends Controller
 
                    $queries = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                     ->join('mst_master_values', 'mst_staffs.staff_qualification', '=', 'mst_master_values.id')
-                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
-                    ->select('mst_staffs.staff_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'mst_master_values.master_value as qualification', 'trn_user_profiles.profile_image')
+                    ->select('mst_staffs.staff_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'mst_master_values.master_value as qualification', 'mst_staffs.staff_image as profile_image')
                     ->where('mst_staffs.staff_type', 20)
                     ->where('mst_staffs.branch_id', $request->branch_id)
                     ->whereIn('mst_staffs.staff_id', $filteredDoctorsArray);
@@ -151,8 +150,7 @@ class DoctorBookingController extends Controller
                     $doctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                     ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                     ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
-                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
-                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'trn_user_profiles.profile_image', 'trn_user_profiles.address')
+                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'mst_staffs.staff_image as profile_image', 'mst_staffs.staff_address as address')
                     ->where('mst_staffs.staff_type', 20)
                     ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
@@ -453,11 +451,10 @@ class DoctorBookingController extends Controller
                     $doctor = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                     ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                     ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
-                    ->join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
                     ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name',
                     'mst_staffs.staff_booking_fee', 'mst_branches.branch_name as branch_name',
                      'qualification.master_value as qualification', 'specialization.master_value as specialization',
-                      'trn_user_profiles.profile_image')
+                      'mst_staffs.staff_image as profile_image')
                     ->where('mst_staffs.staff_type', 20)
                     ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
@@ -594,8 +591,7 @@ class DoctorBookingController extends Controller
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));
 
-                    $doctor = Mst_Staff::join('trn_user_profiles', 'mst_staffs.staff_id', '=', 'trn_user_profiles.user_id')
-                    ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as doctor_name','mst_staffs.staff_booking_fee', 'mst_staffs.branch_id')
+                    $doctor = Mst_Staff::select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as doctor_name','mst_staffs.staff_booking_fee', 'mst_staffs.branch_id')
                     ->where('mst_staffs.staff_type', 20)
                     ->where('mst_staffs.staff_id', $request->doctor_id)
                     ->first();
