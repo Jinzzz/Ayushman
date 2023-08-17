@@ -43,7 +43,7 @@ class WellnessController extends Controller
                     $all_wellness = Mst_Wellness::where('is_active', 1)->where('branch_id', $request->branch_id)->get();
                     $wellness_list = [];
 
-                    $is_included = 0;
+                   
 
                     $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
                     if($checkMembership == 1){
@@ -55,27 +55,40 @@ class WellnessController extends Controller
                             ->where('is_active', 1)
                             ->pluck('wellness_id')
                             ->toArray();
+
+                            // $commaSeparatedWellnesses = implode(',', $allWellnessIds);
                         }
                     }
 
                     if (!$all_wellness->isEmpty()) {
-                        foreach ($all_wellness as $wellness) {
-                            $is_included = 0;
-                            // Convert the wellness ID to an integer
-                            $wellnessId = intval($wellness->id);
-                        
-                            if (in_array($wellnessId, $allWellnessIds)) {
-                                $is_included = 1;
+                    foreach ($all_wellness as $wellness) {
+                        $is_included = 0;
+                            if (in_array($wellness->id, $allWellnessIds)) {
+                                $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
+                                ->where('wellness_id',$wellness->id)
+                                ->where('is_active',1)
+                                ->first();
+
+                            if (!empty($checkWellness)) {
+                                $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
+                                ->where('wellness_id',$wellness->id)
+                                ->where('status',1)
+                                ->count();
+
+                                if($bookedCountWellness < $checkWellness->maximum_usage_limit){
+                                    $is_included = 1;
+                                }
                             }
-                        
-                            $wellness_list[] = [
-                                'id' => $wellness->id,
-                                'wellness_name' => $wellness->wellness_name,
-                                'wellness_cost' => $wellness->wellness_cost,
-                                'is_included' => $is_included,
-                            ];
-                        }
-                        
+                            }
+
+                        $wellness_list[] = [
+                        'id' => $wellness->id,
+                        'wellness_name' => $wellness->wellness_name,
+                        'wellness_cost' => $wellness->wellness_cost,
+                        'is_included' => $is_included,
+                        ];
+                    }
+
 
                     $data['status'] = 1;
                     $data['message'] = "Data fetched";
