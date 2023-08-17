@@ -68,10 +68,12 @@ class WellnessController extends Controller
                                 ->where('wellness_id',$wellness->id)
                                 ->where('is_active',1)
                                 ->first();
-
+                                
                             if (!empty($checkWellness)) {
                                 $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
                                 ->where('wellness_id',$wellness->id)
+                                ->where('created_at','>=',$membership->created_at)
+                                ->where('created_at','<=',$membership->membership_expiry_date)
                                 ->where('status',1)
                                 ->count();
 
