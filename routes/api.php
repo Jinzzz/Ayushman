@@ -69,9 +69,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/membership_packages_details', [MembershipController::class,'membershipPackageDetails']);
     Route::post('patient/purchase_membership_package', [MembershipController::class,'purchaseMembershipPackage']);
     Route::get('patient/current_membership_details', [MembershipController::class,'currentMembershipDetails']);
-    Route::post('patient/renew_membership_package', [MembershipController::class,'renewMembershipPackage']);
 
-
+    
+    
     // Wellness 
     Route::post('patient/wellness/search_list', [WellnessController::class,'wellnessSearchList']);
     Route::post('patient/wellness/details', [WellnessController::class,'wellnessDetails']);

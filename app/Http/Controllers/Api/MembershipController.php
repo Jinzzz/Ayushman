@@ -144,92 +144,89 @@ class MembershipController extends Controller
     }
 
     public function currentMembershipDetails(Request $request){
-        $data=array();
-        try
-        {
-            $data = [];
+        $data = array();
+        try {
             $membership_package_id = Mst_Patient::where('id', Auth::id())->value('available_membership');
-            // check whether the user have membership or not?
+    
             if ($membership_package_id != 0) {
-                // Carbon::now()->format('Y-m-d')
+                $latest_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
+                    ->where('membership_expiry_date', '>=', Carbon::now())
+                    ->where('is_active', 1)
+                    ->get();
     
-                $latest_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                ->where('membership_expiry_date', '>=', Carbon::now())
-                ->orderBy('created_at', 'asc') // Order by created_at in ascending order (earliest first)
-                ->first();
-
-                    
-                $package_details = Mst_Membership_Package::where('membership_package_id', $latest_membership_booking->membership_package_id)
-                ->where('is_active', 1)
-                ->first();
+                foreach ($latest_membership_bookings as $latest_membership_booking) {
+                    $package_details = Mst_Membership_Package::where('membership_package_id', $latest_membership_booking->membership_package_id)
+                        ->where('is_active', 1)
+                        ->first();
     
-                $targetDate = Carbon::parse($latest_membership_booking->membership_expiry_date);
-                $membership_booking_date = $latest_membership_booking->created_at->format('d-m-Y');
-                $membership_expiry_date = $targetDate->format('d-m-Y');
-                $days_left = Carbon::now()->diffInDays($targetDate) . " days";
+                    $targetDate = Carbon::parse($latest_membership_booking->membership_expiry_date);
+                    $membership_booking_date = $latest_membership_booking->created_at->format('d-m-Y');
+                    $membership_expiry_date = $targetDate->format('d-m-Y');
+                    $days_left = Carbon::now()->diffInDays($targetDate) . " days";
     
-                $patient_membership_details = [
-                    'package_title' => $package_details->package_title,
-                    'membership_booking_date' => $membership_booking_date,
-                    'membership_expiry_date' => $membership_expiry_date,
-                    'days_left' => $days_left,
-                ];
+                    $membership_wellnesses = Mst_Membership_Package_Wellness::where('mst__membership__package__wellnesses.package_id', $latest_membership_booking->membership_package_id)
+                        ->where('mst__membership__package__wellnesses.is_active', 1)
+                        ->get();
     
-                $membership_wellnesses = Mst_Membership_Package_Wellness::where('mst__membership__package__wellnesses.package_id', $latest_membership_booking->membership_package_id)
-                ->where('mst__membership__package__wellnesses.is_active', 1)
-                ->get();
-
-                $completedSessions = [];
-                $remainingSessions = [];
-
-                foreach ($membership_wellnesses as $membership_wellness) {
-                    $sessionDetails = Trn_Patient_Wellness_Sessions::where('membership_patient_id', $latest_membership_booking->membership_patient_id)
-                    ->where('wellness_id', $membership_wellness->wellness_id)
-                    ->where('status', 0)
-                    ->first();
-
-                    $wellness_name = Mst_Wellness::where('id',$membership_wellness->wellness_id)->value('wellness_name');
-
-                    if (!empty($sessionDetails)) {
-                        $remainingSessions[] = $wellness_name;
-                    } else {
-                        $completedSessions[] = $wellness_name; // Store in completedSessions array
+                    $completedSessions = [];
+                    $remainingSessions = [];
+    
+                    foreach ($membership_wellnesses as $membership_wellness) {
+                        $sessionDetails = Trn_Patient_Wellness_Sessions::where('membership_patient_id', $latest_membership_booking->membership_patient_id)
+                            ->where('wellness_id', $membership_wellness->wellness_id)
+                            ->where('status', 0)
+                            ->first();
+    
+                        $wellness_name = Mst_Wellness::where('id', $membership_wellness->wellness_id)->value('wellness_name');
+    
+                        if (!empty($sessionDetails)) {
+                            $remainingSessions[] = $wellness_name;
+                        } else {
+                            $completedSessions[] = $wellness_name;
+                        }
                     }
-                }
-
-
-                if ($patient_membership_details !== null && $completedSessions !== null && $remainingSessions !== null) {
-                    $data = [
-                        'status' => 1,
-                        'message' => "Data Fetched",
-                        'patient_membership_details' => $patient_membership_details,
+    
+                    $membership_data = [
+                        'package_id' => $package_details->membership_package_id,
+                        'package_title' => $package_details->package_title,
+                        'membership_booking_date' => $membership_booking_date,
+                        'membership_expiry_date' => $membership_expiry_date,
+                        'days_left' => $days_left,
                         'completed_sessions' => $completedSessions,
                         'remaining_sessions' => $remainingSessions,
                     ];
-                    return response()->json($data);
-                } else {
-                    $data['status'] = 0;
-                    $data['message'] = "Data Incomplete";
-                    return response()->json($data);
+    
+                    $data[] = $membership_data;
                 }
     
-               
+                if (!empty($data)) {
+                    $response = [
+                        'status' => 1,
+                        'message' => "Data Fetched",
+                        'current_membership_details' => $data,
+                    ];
+                } else {
+                    $response = [
+                        'status' => 0,
+                        'message' => "No active membership bookings found",
+                    ];
+                }
             } else {
-                $data['status'] = 0;
-                $data['message'] = "Currently not a member of any membership packages";
-                return response()->json($data);
+                $response = [
+                    'status' => 0,
+                    'message' => "Currently not a member of any membership packages",
+                ];
             }
     
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
         }
+    
+        return response()->json($response);
     }
+    
 
     public function purchaseMembershipPackage(Request $request){
         $data=array();
@@ -253,10 +250,12 @@ class MembershipController extends Controller
                     ->where('is_active', 1)
                     ->first();
                     $package_duration = $package_details->package_duration; // Number of days to add
-                    if ($is_membership == 1) {
 
+                    if ($is_membership == 1) {
+                        // Checking all membership booking in this package_id? if yes taking last inserted row 
                         $last_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
                             ->where('membership_expiry_date', '>=', Carbon::now())
+                            ->where('membership_package_id', $request->membership_package_id)
                             ->orderBy('created_at', 'desc') 
                             ->first();
 
@@ -268,12 +267,14 @@ class MembershipController extends Controller
                         }
 
                     }else{
+                        // fresh booking updating patients table and find expiry date 
                         $updatePatientCode = Mst_Patient::where('id', Auth::id())->update([
                             'updated_at' => Carbon::now(),
                             'available_membership' => 1
                             ]);
                         $expiry_date = Carbon::now()->addDays($package_duration);
                     }
+
                     $membership_wellnesses = Mst_Membership_Package_Wellness::where('package_id', $request->membership_package_id)
                         ->where('is_active', 1)
                         ->select('wellness_id', 'maximum_usage_limit')
@@ -335,98 +336,4 @@ class MembershipController extends Controller
         }
     }
 
-    public function renewMembershipPackage(Request $request){
-        $data=array();
-        try
-        {
-            $validator = Validator::make(
-                $request->all(),
-                [
-                    'membership_package_id' => ['required'],
-                ],
-                [
-                    'membership_package_id.required' => 'Membership package required',
-                ]
-            );
-
-            if (!$validator->fails()) 
-            {
-                if(isset($request->membership_package_id)){
-                    $is_membership = Mst_Patient::where('id', Auth::id())->value('available_membership');
-                    $package_details = Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)
-                    ->where('is_active', 1)
-                    ->first();
-                    $package_duration = $package_details->package_duration;
-
-                    $last_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                            ->where('membership_expiry_date', '>=', Carbon::now())
-                            ->orderBy('created_at', 'desc') 
-                            ->first();
-
-                        if (!empty($last_membership_booking)) {
-                            $expiry_date = Carbon::parse($last_membership_booking->membership_expiry_date)->addDays($package_duration);
-                        } else {
-                            // If no previous membership booking is found, set the expiry_date based on the current date
-                            $expiry_date = Carbon::now()->addDays($package_duration);
-                        }
-                        $membership_wellnesses = Mst_Membership_Package_Wellness::where('package_id', $request->membership_package_id)
-                        ->where('is_active', 1)
-                        ->select('wellness_id', 'maximum_usage_limit')
-                        ->get()
-                        ->map->toArray()
-                        ->values()
-                        ->all();
-
-
-                        $lastInsertedId = Mst_Patient_Membership_Booking::insertGetId([
-                            'patient_id' => Auth::id(),
-                            'membership_package_id' => $request->membership_package_id,
-                            'membership_expiry_date' => $expiry_date,
-                            'payment_type' => 1,
-                            'details' => "test",
-                            'payment_amount' => $package_details->package_price,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                        ]);
-
-                        foreach ($membership_wellnesses as $membership_wellness) {
-                            for ($i = 0; $i < $membership_wellness['maximum_usage_limit']; $i++) {
-                                $createRecord = Trn_Patient_Wellness_Sessions::create([
-                                    'membership_patient_id' => $lastInsertedId,
-                                    'wellness_id' => $membership_wellness['wellness_id'],
-                                    'status' => 0,
-                                    'created_at' => Carbon::now(),
-                                    'updated_at' => Carbon::now(),
-                                ]);
-                            }
-                        }
-                        
-                        $data = [
-                            'status' => 1,
-                            'message' => "Membership added successfully",
-                        ];
-                        return response()->json($data);
-                }
-                else{
-                    $data['status'] = 0;
-                    $data['message'] = "Please fill mandatory fields";
-                    return response()->json($data);
-                }
-            }
-            else{
-                $data['status'] = 0;
-                $data['errors'] = $validator->errors();
-                $data['message'] = "Validation errors";
-                return response($data);
-            }
-        }
-        catch (\Exception $e) {
-            $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
-            
-        } catch (\Throwable $e) {
-            $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
-        }
-    }
 }
