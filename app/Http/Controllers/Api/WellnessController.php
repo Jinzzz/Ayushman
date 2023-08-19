@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Mst_Wellness;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Patient;
+use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Mst_Patient_Membership_Booking;
@@ -232,13 +233,14 @@ class WellnessController extends Controller
 
                     if($request->yourself == 1){
                         $accountHolder = Mst_Patient::where('id',$patient_id)->first();
+                        $patient_gender_name = Mst_Master_Value::where('id',$accountHolder->patient_gender)->value('master_value');
                         $patientDetails[] = [
                             'id' => $accountHolder->id,
                             'yourself' => 1,
                             'booking_date' => Carbon::parse($request->booking_date)->format('d-m-Y'),
                             'member_name' => $accountHolder->patient_name       ,
                             'dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
-                            'gender' => $accountHolder->patient_gender,
+                            'gender' => $patient_gender_name,
                             'mobile_number' => $accountHolder->patient_mobile,
                             'email_address' => $accountHolder->patient_email,
                         ];
