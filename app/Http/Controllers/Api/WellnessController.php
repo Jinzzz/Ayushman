@@ -44,7 +44,7 @@ class WellnessController extends Controller
                     $all_wellness = Mst_Wellness::where('is_active', 1)->where('branch_id', $request->branch_id)->get();
                     $wellness_list = [];
 
-                   
+                   $allWellnessIds = [];
 
                     $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
                     if($checkMembership == 1){
@@ -64,15 +64,15 @@ class WellnessController extends Controller
                     if (!$all_wellness->isEmpty()) {
                     foreach ($all_wellness as $wellness) {
                         $is_included = 0;
-                            if (in_array($wellness->id, $allWellnessIds)) {
+                            if (in_array($wellness->wellness_id, $allWellnessIds)) {
                                 $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
-                                ->where('wellness_id',$wellness->id)
+                                ->where('wellness_id',$wellness->wellness_id)
                                 ->where('is_active',1)
                                 ->first();
                                 
                             if (!empty($checkWellness)) {
                                 $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
-                                ->where('wellness_id',$wellness->id)
+                                ->where('wellness_id',$wellness->wellness_id)
                                 ->where('created_at','>=',$membership->created_at)
                                 ->where('created_at','<=',$membership->membership_expiry_date)
                                 ->where('status',1)
@@ -85,7 +85,7 @@ class WellnessController extends Controller
                             }
 
                         $wellness_list[] = [
-                        'id' => $wellness->id,
+                        'id' => $wellness->wellness_id,
                         'wellness_name' => $wellness->wellness_name,
                         'wellness_cost' => $wellness->wellness_cost,
                         'is_included' => $is_included,
