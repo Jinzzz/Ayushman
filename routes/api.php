@@ -71,7 +71,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('patient/current_membership_details', [MembershipController::class,'currentMembershipDetails']);
 
     
-    
+
     // Wellness 
     Route::post('patient/wellness/search_list', [WellnessController::class,'wellnessSearchList']);
     Route::post('patient/wellness/details', [WellnessController::class,'wellnessDetails']);

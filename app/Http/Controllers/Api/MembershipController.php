@@ -105,10 +105,10 @@ class MembershipController extends Controller
                     ];
                     $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)->where('is_active', 1)->pluck('title');
                     
-                    $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.id')
+                    $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
                     ->where('mst__membership__package__wellnesses.package_id', $request->membership_package_id)
                     ->where('mst__membership__package__wellnesses.is_active', 1)
-                    ->selectRaw('mst_wellness.id as wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst_wellness.wellness_inclusions')
+                    ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst_wellness.wellness_inclusions')
                     ->get();
 
 
@@ -154,7 +154,7 @@ class MembershipController extends Controller
                     ->where('is_active', 1)
                     ->get();
     
-                foreach ($latest_membership_bookings as $latest_membership_booking) {
+                    foreach ($latest_membership_bookings as $latest_membership_booking) {
                     $package_details = Mst_Membership_Package::where('membership_package_id', $latest_membership_booking->membership_package_id)
                         ->where('is_active', 1)
                         ->first();
@@ -177,7 +177,7 @@ class MembershipController extends Controller
                             ->where('status', 0)
                             ->first();
     
-                        $wellness_name = Mst_Wellness::where('id', $membership_wellness->wellness_id)->value('wellness_name');
+                        $wellness_name = Mst_Wellness::where('wellness_id', $membership_wellness->wellness_id)->value('wellness_name');
     
                         if (!empty($sessionDetails)) {
                             $remainingSessions[] = $wellness_name;
@@ -260,9 +260,12 @@ class MembershipController extends Controller
                             ->first();
 
                         if (!empty($last_membership_booking)) {
+                            // print_r($last_membership_booking->membership_expiry_date);die();
+                            $is_active = 0;
                             $expiry_date = Carbon::parse($last_membership_booking->membership_expiry_date)->addDays($package_duration);
                         } else {
                             // If no previous membership booking is found, set the expiry_date based on the current date
+                            $is_active = 1;
                             $expiry_date = Carbon::now()->addDays($package_duration);
                         }
 
@@ -273,6 +276,7 @@ class MembershipController extends Controller
                             'available_membership' => 1
                             ]);
                         $expiry_date = Carbon::now()->addDays($package_duration);
+                        $is_active = 1;
                     }
 
                     $membership_wellnesses = Mst_Membership_Package_Wellness::where('package_id', $request->membership_package_id)
@@ -290,6 +294,7 @@ class MembershipController extends Controller
                             'membership_expiry_date' => $expiry_date,
                             'payment_type' => 1,
                             'details' => "test",
+                            'is_active' => $is_active,
                             'payment_amount' => $package_details->package_price,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),

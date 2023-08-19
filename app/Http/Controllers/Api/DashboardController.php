@@ -35,23 +35,31 @@ class DashboardController extends Controller
             $membership_status = 0;
             $membership_name = "";
             $validity = "";
+
+            $membership_details = [];
             
             if ($patient->available_membership == 1) {
-                $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                ->where('membership_expiry_date','>=',Carbon::now()->format('Y-m-d'))
-                ->latest()
-                ->first();
+                $memberships = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
+                    ->where('membership_expiry_date', '>=', Carbon::now())
+                    ->where('is_active', 1)
+                    ->get();
             
-                if (!empty($membership)) {
+                if (!empty($memberships)) {
                     $membership_status = 1;
-            
-                    $membership_name = Mst_Membership_Package::where('membership_package_id', $membership->membership_package_id)
+
+                    foreach ($memberships as $membership) {
+                        $membership_name = Mst_Membership_Package::where('membership_package_id', $membership->membership_package_id)
                         ->where('is_active', 1)
                         ->value('package_title');
-                    $membership_name = $membership_name ?: "";
-            
-                    if (isset($membership->membership_expiry_date)) {
-                        $validity = Carbon::parse($membership->membership_expiry_date)->format('d-m-Y');
+
+                        if (isset($membership->membership_expiry_date)) {
+                            $validity = Carbon::parse($membership->membership_expiry_date)->format('d-m-Y');
+                        }
+
+                        $membership_details[] = [
+                            'membership_name' => $membership_name ?: "",
+                            'validity' => $validity,
+                        ];
                     }
                 }
             }
@@ -93,8 +101,7 @@ class DashboardController extends Controller
             $data['data'] = array(
                 'patient_name' => $patient->patient_name,
                 'membership_status' => $membership_status,
-                'membership_name' => $membership_name,
-                'validity' => $validity,
+                'membership_details' => $membership_details,
                 'upcoming_bookings' => $upcoming_bookings
             );
             return response()->json($data);

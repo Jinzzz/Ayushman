@@ -150,13 +150,13 @@ class WellnessController extends Controller
             {
                 if(isset($request->booking_date) && isset($request->wellness_id) && isset($request->branch_id)){
                     
-                    $wellness = Mst_Wellness::where('id',$request->wellness_id)->where('branch_id', $request->branch_id)->where('is_active', 1)->first();
+                    $wellness = Mst_Wellness::where('wellness_id',$request->wellness_id)->where('branch_id', $request->branch_id)->where('is_active', 1)->first();
                     $branch_name = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_name');
                      
                     $wellness_details = [];
                     if (!empty($wellness)) {
                         $wellness_details[] = [
-                            'id' => $wellness->id,
+                            'id' => $wellness->wellness_id,
                             'wellness_name' => $wellness->wellness_name,
                             'wellness_description' => $wellness->wellness_description,
                             'wellness_cost' => $wellness->wellness_cost,
@@ -227,7 +227,7 @@ class WellnessController extends Controller
                 if(isset($request->branch_id) && isset($request->wellness_id) && isset($request->yourself) && isset($request->booking_date)){
                     $patient_id = Auth::id();
                     $branch_name = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_name');
-                    $wellness = Mst_Wellness::where('id', $request->wellness_id)->where('is_active', 1)->where('branch_id', $request->branch_id)->first();
+                    $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->where('branch_id', $request->branch_id)->first();
                     $patientDetails = [];
 
                     if($request->yourself == 1){
@@ -339,7 +339,7 @@ class WellnessController extends Controller
             {
                 if(isset($request->booking_date)){
                     $patient_id = Auth::id();
-                    $wellness = Mst_Wellness::where('id', $request->wellness_id)->where('is_active', 1)->where('branch_id', $request->branch_id)->first();
+                    $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->where('branch_id', $request->branch_id)->first();
                     if ($request->reschedule_key == 1) {
                         if (!$request->has('booking_id')) {
                             $data['status'] = 0;
