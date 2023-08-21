@@ -24,8 +24,19 @@ class BookingHistoryController extends Controller
 
                 $currentDate = date('Y-m-d');
                 $currentTime = date('H:i:s');
+                // wellness
+                $pending_to_cancel = Trn_Consultation_Booking::whereIn('booking_type_id', ['85','86'])
+                ->whereIn('booking_status_id', ['87','88'])
+                ->where('trn_consultation_bookings.booking_date', '<', $currentDate)
+                ->update([
+                    'updated_at' => Carbon::now(),
+                    'booking_status_id' => 90
+                ]);
 
-                $pending_to_cancel = Trn_Consultation_Booking::whereIn('booking_status_id', ['87','88'])
+                // consultation
+
+                $pending_to_cancel = Trn_Consultation_Booking::where('booking_type_id', 84)
+                ->whereIn('booking_status_id', ['87', '88'])
                 ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                 ->where(function ($query) use ($currentDate) {
                     $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
@@ -33,16 +44,19 @@ class BookingHistoryController extends Controller
                             $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
                             ->where('mst_timeslots.time_from', '<', Carbon::now()->format('H:i:s'));
                         });
-                })
+                    })
                 ->update([
-                    'updated_at' => Carbon::now(),
-                    'booking_status_id' => 90
+                'updated_at' => Carbon::now(),
+                'booking_status_id' => 90
                 ]);
 
-                $all_bookings = [];
+                $my_bookings = [];
 
+                
 
-                $all_bookings = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                // consultation 
+                $all_bookings_consultation = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                    ->where('booking_type_id', 84)
                     ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
                     ->join('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
                     ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
@@ -71,10 +85,11 @@ class BookingHistoryController extends Controller
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
                     )
-                    ->get();
+                ->get();
+
                 
-                if ($all_bookings->isNotEmpty()) {
-                    foreach ($all_bookings as $booking) {
+                if ($all_bookings_consultation->isNotEmpty()) {
+                    foreach ($all_bookings_consultation as $booking) {
                         // If booking_type_id = 84, then title is the name of the doctor
                         $title = $booking->doctor_name;
                 
@@ -112,16 +127,79 @@ class BookingHistoryController extends Controller
                             'booked_for' => $patient_name,
                         ];
                     }
+                } 
+
+                // wellness
+
+                $all_bookings_wellness = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                    ->where('booking_type_id', 85)
+                    ->join('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
+                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
+                    ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
+                    ->where('trn_consultation_bookings.booking_date', '<', $currentDate)
+                    ->select(
+                        'booking_status.master_value as booking_status_name',
+                        'mst_branches.branch_name',
+                        'trn_consultation_bookings.booking_date',
+                        'trn_consultation_bookings.id',
+                        'trn_consultation_bookings.wellness_id',
+                        'trn_consultation_bookings.therapy_id',
+                        'trn_consultation_bookings.booking_reference_number',
+                        'trn_consultation_bookings.is_for_family_member',
+                        'trn_consultation_bookings.booking_type_id',
+                        'trn_consultation_bookings.family_member_id',
+                        'booking_type.master_value as booking_type_name'
+                    )
+                ->get();
+
+
+
+                if ($all_bookings_wellness->isNotEmpty()) {
+                    foreach ($all_bookings_wellness as $booking) {
+                        // If booking_type_id = 84, then title is the name of the doctor
+                        $title = $booking->booking_type_name;
                 
-                    $data['status'] = 1;
-                    $data['message'] = "Data fetched";
-                    $data['data'] = $my_bookings;
-                    return response($data);
-                } else {
-                    $data['status'] = 0;
-                    $data['message'] = "No bookings";
-                    return response($data);
-                }
+                        if ($booking->is_for_family_member == 1) {
+                            $patient = Trn_Patient_Family_Member::find($booking->family_member_id);
+                            $patient_name = $patient->family_member_name;
+                        } else {
+                            $patient = Mst_Patient::find($patient_id);
+                            $patient_name = $patient->patient_name;
+                        }
+                
+                        if ($booking->booking_type_id == 85) {
+                            $wellness = Mst_Wellness::find($booking->wellness_id);
+                            $title = $wellness->wellness_name;
+                        }
+                
+                        if ($booking->booking_type_id == 86) {
+                            $therapy = Mst_Therapy::find($booking->therapy_id);
+                            $title = $therapy->therapy_name;
+                        }
+                
+                        $booking_date = PatientHelper::dateFormatUser($booking->booking_date);
+                        // $time_from = Carbon::parse($booking->time_from)->format('h:i a');
+                        // $time_to = Carbon::parse($booking->time_to)->format('h:i a');
+                
+                        $my_bookings[] = [
+                            'booking_id' => $booking->id,
+                            'booking_reference_number' => $booking->booking_reference_number,
+                            'booking_status' => $booking->booking_status_name,
+                            'title' => $title,
+                            'booking_date' => $booking_date,
+                            'timeslot' => "",
+                            'branch_name' => $booking->branch_name,
+                            'booking_type' => $booking->booking_type_name,
+                            'booked_for' => $patient_name,
+                        ];
+                    }
+                } 
+
+                $data['status'] = 1;
+                $data['message'] = "Data fetched";
+                $data['data'] = $my_bookings;
+                return response($data);
+                
             }else{
                 $data['status'] = 0;
                 $data['message'] = "User does not exist";

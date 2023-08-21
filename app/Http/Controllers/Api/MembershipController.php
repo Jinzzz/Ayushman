@@ -24,7 +24,7 @@ class MembershipController extends Controller
             $patient_id = Auth::id();
             $accountHolder = Mst_Patient::find($patient_id);
             $joined_membership_package_id = "";
-            if ($accountHolder->available_membership !== 0) {
+            if ($accountHolder->available_membership !=  0) {
                 $membership_details = Mst_Patient_Membership_Booking::where('patient_id', $patient_id)
                 ->latest()
                 ->first();
