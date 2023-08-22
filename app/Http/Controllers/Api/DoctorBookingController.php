@@ -14,9 +14,11 @@ use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Mst_Staff;
 use App\Models\Sys_Gender;
+use App\Models\Trn_Patient_Device_Tocken;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
+use App\Helpers\DeviceTockenHelper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -642,7 +644,7 @@ class DoctorBookingController extends Controller
                         if(isset($booking_id)){
                             // Update existing data
                             $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
-                            if($bookingDetails->booking_status_id == 89){
+                            if($bookingDetails->booking_status_id == 89 || ($bookingDetails->booking_status_id == 90 && $bookingDetails->booking_date < Carbon::now())){
                             $createdRecord = Trn_Consultation_Booking::create($newRecordData);
                             $lastInsertedId = $createdRecord->id;
                             $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
@@ -655,6 +657,15 @@ class DoctorBookingController extends Controller
                                 $updateRecord = Trn_Consultation_Booking::where('id', $booking_id)->update($newRecordData);
                                 $bookingRefNo = $bookingDetails->booking_reference_number;
                                 $lastInsertedId = $booking_id;
+
+                                $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                                foreach ($patientDevice as $pdt) {
+                                $title = 'Booking rescheduled';
+                                $body = ' Rescheduled the booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '. Please check and confirm.';
+                                $clickAction = "PatientBookingCancelling";
+                                $type = "cancel";
+                                $data['response'] =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body,$clickAction,$type);
+                                }
                             }
                         }else{
                             // Create new data 

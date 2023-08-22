@@ -394,7 +394,7 @@ class WellnessController extends Controller
                     if(isset($booking_id)){
                         // Update existing data
                         $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
-                        if($bookingDetails->booking_status_id == 89 || $bookingDetails->booking_status_id == 90){
+                        if($bookingDetails->booking_status_id == 89 || ($bookingDetails->booking_status_id == 90 && $bookingDetails->booking_date < Carbon::now())){
                         $createdRecord = Trn_Consultation_Booking::create($newRecordData);
                         $lastInsertedId = $createdRecord->id;
                         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);

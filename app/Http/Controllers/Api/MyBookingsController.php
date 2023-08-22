@@ -10,8 +10,11 @@ use App\Models\Trn_Patient_Family_Member;
 use App\Models\Mst_Patient;
 use App\Models\Mst_Wellness;
 use App\Models\Mst_Therapy;
+use App\Models\Mst_Staff;
+use App\Models\Trn_Patient_Device_Tocken;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
+use App\Helpers\DeviceTockenHelper;
 use Illuminate\Support\Facades\Validator;
 use DB;
 
@@ -262,10 +265,23 @@ class MyBookingsController extends Controller
                     $cancelBooking = Trn_Consultation_Booking::where('id', $request->booking_id)->update([
                         'updated_at' => Carbon::now(),
                         'booking_status_id' => 90
-                        ]);
-                        $data['status'] = 1;
-                        $data['message'] = "Booking cancelled successfuly";
-                        return response($data);
+                    ]);
+
+                    $updatedBooking = Trn_Consultation_Booking::find($request->booking_id);
+                    $doctor_name = Mst_Staff::where('staff_id',$updatedBooking->doctor_id)->value('staff_name');
+
+                    $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', Auth::id())->get();
+                    foreach ($patientDevice as $pdt) {
+                        $title = 'Booking Cancelled';
+                        $body = 'Your booking for ' . $doctor_name . ' on ' . $updatedBooking->booking_date . ' has been cancelled! . Please check and confirm';
+                        $clickAction = "PatientBookingCancelling";
+                        $type = "cancel";
+                        $data['response'] =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body,$clickAction,$type);
+                    }
+
+                    $data['status'] = 1;
+                    $data['message'] = "Booking cancelled successfuly";
+                    return response($data);
                 }else{
                     $data['status'] = 0;
                     $data['message'] = "Please fill mandatory fields";

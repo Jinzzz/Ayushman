@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use App\Models\Trn_Patient_Otp;
+use App\Models\Trn_Patient_Device_Tocken;
 
 class PatientAuthController extends Controller
 {
@@ -92,6 +93,16 @@ class PatientAuthController extends Controller
                             'updated_at' => Carbon::now(),
                             'otp_expire_at' => Carbon::now()->addMinutes(10),
                         ]);
+
+                        if (isset($request->device_token) && isset($request->device_type)) {
+                            Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
+    
+                            $pdt = new Trn_Patient_Device_Tocken;
+                            $pdt->patient_id =$lastInsertedId;
+                            $pdt->patient_device_token = $request->device_token;
+                            $pdt->patient_device_type = $request->device_type;
+                            $pdt->save();
+                        }
                        
                         $data['status'] = 1;
                         $data['otp']=$verification_otp;
