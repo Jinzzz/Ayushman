@@ -71,6 +71,8 @@ class PatientAuthController extends Controller
                         'patient_mobile'    => $request->patient_mobile,
                         'password'          => Hash::make($request->password),
                         'is_active'         => 1,
+                        'patient_blood_group_id' => 68,
+                        'available_membership'  => 0,
                         'patient_code'         => rand(50, 100),
                         'created_at'         => Carbon::now(),
                         ]);
@@ -387,7 +389,6 @@ class PatientAuthController extends Controller
         $data=array();
         try
         {
-            $patient_mobile = $request->input('patient_mobile');
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -401,6 +402,7 @@ class PatientAuthController extends Controller
 
             if (!$validator->fails()) 
             {
+                $patient_mobile = $request->input('patient_mobile');
                 $patient=Mst_Patient::where('patient_mobile',$patient_mobile)->first();
                 if($patient)
                 {

@@ -95,8 +95,8 @@ class DoctorBookingController extends Controller
                         $queries = $queries->where('mst_branches.branch_name', 'like', '%' . $request->search_branch_name . '%');
                     }
 
-                    if(isset($request->search_designation_name)){
-                        $queries = $queries->where('mst_master_values.master_value', 'like', '%' . $request->search_designation_name . '%');
+                    if(isset($request->search_qualification_name)){
+                        $queries = $queries->where('mst_master_values.master_value', 'like', '%' . $request->search_qualification_name . '%');
                     }
             
                     $doctorsList = $queries->get();
@@ -203,13 +203,13 @@ class DoctorBookingController extends Controller
                     'doctor_id' => ['required'],
                     'branch_id' => ['required'],
                     'booking_date' => ['required'],
-                    // 'reschedule_key' => ['required'],
+                    
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
                     'branch_id.required' => 'Branch required',
                     'booking_date.required' => 'Booking date required',
-                    // 'reschedule_key.required' => 'Reschedule key required',
+                    
                 ]
             );
             if (!$validator->fails()) 
@@ -343,14 +343,14 @@ class DoctorBookingController extends Controller
                     'branch_id' => ['required'],
                     'slot_id' => ['required'],
                     'booking_date' => ['required'],
-                    // 'reschedule_key' => ['required'],
+                    
                 ],
                 [
                     'doctor_id.required' => 'Doctor required',
                     'branch_id.required' => 'Branch required',
                     'slot_id.required' => 'Slot required',
                     'booking_date.required' => 'Booking date required',
-                    // 'reschedule_key.required' => 'Reschedule key required',
+                    
                 ]
             );
             if (!$validator->fails()) 
