@@ -25,11 +25,11 @@ class MembershipController extends Controller
             $accountHolder = Mst_Patient::find($patient_id);
             $joined_membership_package_id = "";
             if ($accountHolder->available_membership !=  0) {
-                $membership_details = Mst_Patient_Membership_Booking::where('patient_id', $patient_id)
-                ->latest()
-                ->first();
-
-                $joined_membership_package_id = $membership_details->membership_package_id;
+                $included_package_ids = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
+                    ->where('membership_expiry_date', '>=', Carbon::now())
+                    ->where('is_active', 1)
+                    ->pluck('membership_package_id')
+                    ->toArray();
             }
             
             $memberships = Mst_Membership_Package::where('is_active', 1)->get();
@@ -40,10 +40,12 @@ class MembershipController extends Controller
                     $benefits = Mst_Membership_Benefit::where('package_id', $membership->membership_package_id)
                         ->where('is_active', 1)
                         ->pluck('title');
-            
-                    $is_joined = isset($joined_membership_package_id) && $membership->membership_package_id === $joined_membership_package_id
-                        ? 1
-                        : 0;
+
+                    $is_joined = 0;
+                    
+                    if (in_array($membership->membership_package_id, $included_package_ids)) {
+                        $is_joined = 1;
+                    }
             
                     $membership_packages[] = [
                         'membership_package_id' => $membership->membership_package_id,
