@@ -77,14 +77,14 @@ class FamilyController extends Controller
                     $patient_id = Auth::id();
                     $member_dob = PatientHelper::dateFormatDb($request->member_dob);
 
-                    $member_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->member_gender . '%')->pluck('id')->first();
-                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->member_blood_group . '%')->pluck('id')->first();
-                    $relationship_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->relationship . '%')->pluck('id')->first();
+                    $member_gender_id = Mst_Master_Value::where('master_value', $request->member_gender)->pluck('id')->first();
+                    $blood_group_id = Mst_Master_Value::where('master_value', $request->member_blood_group)->pluck('id')->first();
+                    $relationship_id = Mst_Master_Value::where('master_value', $request->relationship)->pluck('id')->first();
 
                     $addFamilyMember = Trn_Patient_Family_Member::create([
                         'patient_id' => $patient_id,
                         'family_member_name' => $request->member_name,
-                        'mobile_number' => $request->member_name,
+                        'mobile_number' => $request->member_mobile,
                         'email_address' => $request->member_email,
                         'gender_id' => $member_gender_id,
                         'blood_group_id' => $blood_group_id,
