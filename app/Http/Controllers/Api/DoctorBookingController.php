@@ -656,7 +656,7 @@ class DoctorBookingController extends Controller
                             }else{
                                 $updateRecord = Trn_Consultation_Booking::where('id', $booking_id)->update($newRecordData);
                                 $bookingRefNo = $bookingDetails->booking_reference_number;
-                                $lastInsertedId = $booking_id;
+                                $lastInsertedId = intval($booking_id);
 
                                 $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
                                 foreach ($patientDevice as $pdt) {
