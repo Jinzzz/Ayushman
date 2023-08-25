@@ -103,6 +103,8 @@ class PatientAuthController extends Controller
                             $pdt->patient_id =$lastInsertedId;
                             $pdt->patient_device_token = $request->device_token;
                             $pdt->patient_device_type = $request->device_type;
+                            $pdt->created_at = Carbon::now();
+                            $pdt->updated_at = Carbon::now();
                             $pdt->save();
                         }
                        
@@ -471,6 +473,7 @@ class PatientAuthController extends Controller
                 {
                     if(!Hash::check($request->password, $patient->password)){
                         $patient->password = Hash::make($request->password);
+                        $patient->updated_at = Carbon::now();
                         $patient->save();
                         $data['status'] = 1;
                         $data['message'] = "Password reset sussessfully.";
@@ -581,6 +584,7 @@ class PatientAuthController extends Controller
                     if(Hash::check($request->old_password, $patient->password)){
                         if(!Hash::check($request->new_password, $patient->password)){
                             $patient->password = Hash::make($request->new_password);
+                            $patient->updated_at = Carbon::now();
                             $patient->save();
                             $data['status'] = 1;
                             $data['message'] = "Password changed sussessfully.";
