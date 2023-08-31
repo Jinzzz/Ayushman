@@ -112,7 +112,7 @@ class PatientAuthController extends Controller
                         $data['otp']=$verification_otp;
                         $data['otp_type']=1;
                         $data['patient_id']=$lastInsertedId;
-                        $data['message'] = "Registration completed successfully.";
+                        $data['message'] = "OTP sent successfully.";
                         return response($data);
                     } else {
                        
