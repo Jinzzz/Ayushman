@@ -274,8 +274,12 @@ class PatientAuthController extends Controller
                                     ]);
                             }
 
+
                         $data['status'] = 1;
-                        $data['message'] = "OTP Verified successfully";
+                        $data['message'] = "Registration completed successfully";
+                        if($request->otp_type == 2){
+                            $data['message'] = "OTP verified successfully";
+                        }
                         return response($data);
 
                     }else{
