@@ -22,29 +22,34 @@ use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
 {
-    public function getQualifications(){
-        $data=array();
-        try{
-            $qualifications = Mst_Master_Value::where('master_id',6)->pluck('master_value');
-            if($qualifications){
+    public function getQualifications()
+    {
+        $data = [];
+    
+        try {
+            $qualifications = Mst_Master_Value::where('master_id', 6)->pluck('master_value');
+    
+            if ($qualifications->count() > 0) {
                 $data['status'] = 1;
                 $data['message'] = "Data fetched.";
-                $data['data'] = $qualifications;
-            }else{
+                $data['data'] = $qualifications->map(function ($qualification) {
+                    return ['name' => $qualification];
+                });
+            } else {
                 $data['status'] = 0;
                 $data['message'] = "No qualifications found.";
             }
-        return response($data); 
-        }
-        catch (\Exception $e) {
+    
+            return response($data);
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-        
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
+    
 
     public function getBranches(){
         $data=array();
