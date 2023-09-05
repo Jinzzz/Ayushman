@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Mst_Branch;
 use App\Models\Mst_TimeSlot;
 use App\Models\Trn_Staff_Leave;
-use App\Models\Mst_Doctor;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Mst_Staff;
-use App\Models\Sys_Gender;
 use App\Models\Trn_Patient_Device_Tocken;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -24,6 +22,30 @@ use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
 {
+    public function getQualifications(){
+        $data=array();
+        try{
+            $qualifications = Mst_Master_Value::where('master_id',6)->pluck('master_value');
+            if($qualifications){
+                $data['status'] = 1;
+                $data['message'] = "Data fetched.";
+                $data['data'] = $qualifications;
+            }else{
+                $data['status'] = 0;
+                $data['message'] = "No qualifications found.";
+            }
+        return response($data); 
+        }
+        catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
     public function getBranches(){
         $data=array();
         try{

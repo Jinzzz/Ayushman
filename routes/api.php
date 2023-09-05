@@ -32,7 +32,7 @@ Route::post('patient/reset_password', [PatientAuthController::class,'resetPasswo
 Route::post('patient/membership_packages_details', [MembershipController::class,'membershipPackageDetails']);
 
 Route::get('branches', [DoctorBookingController::class,'getBranches']);
-
+Route::get('qualifications', [DoctorBookingController::class,'getQualifications']);
 
 Route::middleware(['auth:api'])->group(function () {   
 // Consultation
