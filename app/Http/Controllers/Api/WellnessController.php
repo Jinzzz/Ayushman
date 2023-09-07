@@ -48,40 +48,26 @@ class WellnessController extends Controller
 
                     $checkMembership = Mst_Patient::where('id',$patient_id)->value('available_membership');
                     if($checkMembership == 1){
-                        $membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
-                        // array of all wellness ids included in that membership package.
+                        $active_membership_booking_ids = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
+                        ->where('membership_expiry_date', '>=', Carbon::now())
+                        ->where('is_active', 1)
+                        ->pluck('membership_patient_id')
+                        ->toArray();
 
-                        if(!empty($membership)){
-                            $allWellnessIds = Mst_Membership_Package_Wellness::where('package_id', $membership->membership_package_id)
-                            ->where('is_active', 1)
-                            ->pluck('wellness_id')
-                            ->toArray();
+                        $allWellnessIds = Trn_Patient_Wellness_Sessions::whereIn('membership_patient_id', $active_membership_booking_ids)
+                        ->where('status',0)
+                        ->distinct()
+                        ->pluck('wellness_id');
 
-                            // $commaSeparatedWellnesses = implode(',', $allWellnessIds);
-                        }
+                        $allWellnessIds = $allWellnessIds->toArray();
                     }
 
                     if (!$all_wellness->isEmpty()) {
                     foreach ($all_wellness as $wellness) {
                         $is_included = 0;
+                        // print_r($allWellnessIds);die();
                             if (in_array($wellness->wellness_id, $allWellnessIds)) {
-                                $checkWellness = Mst_Membership_Package_Wellness::where('package_id',$membership->membership_package_id)
-                                ->where('wellness_id',$wellness->wellness_id)
-                                ->where('is_active',1)
-                                ->first();
-                                
-                            if (!empty($checkWellness)) {
-                                $bookedCountWellness = Trn_Patient_Wellness_Sessions::where('membership_patient_id',$membership->membership_package_id)
-                                ->where('wellness_id',$wellness->wellness_id)
-                                ->where('created_at','>=',$membership->created_at)
-                                ->where('created_at','<=',$membership->membership_expiry_date)
-                                ->where('status',1)
-                                ->count();
-
-                                if($bookedCountWellness < $checkWellness->maximum_usage_limit){
-                                    $is_included = 1;
-                                }
-                            }
+                                $is_included = 1;
                             }
 
                         $wellness_list[] = [
