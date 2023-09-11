@@ -9,6 +9,7 @@ class Mst_User extends Model
 {
     use HasFactory;
     protected $table = 'mst_users';
+    protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'username',
