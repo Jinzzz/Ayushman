@@ -40,7 +40,7 @@
         <a class="side-menu__item"  data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
         <ul class="slide-menu">
                       <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
-                      <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualification') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
                       <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Medicine Dosage') }}</a></li>-->
                       <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Leave Types') }}</a></li>-->
                       <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Manufacturer') }}</a></li>-->
