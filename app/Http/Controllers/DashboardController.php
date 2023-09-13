@@ -13,8 +13,8 @@ class DashboardController extends Controller
 
     public function index()
     {
-        dd(1);
-        $title="Dashboard";
-        return view('home',compact('title'));
+        //  dd('welcome to dashboard');
+        $pageTitle="Dashboard";
+        return view('home',compact('pageTitle'));
     }
 }

@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'mst_users_guard',
         'passwords' => 'users',
     ],
 
@@ -36,11 +36,12 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'mst_users_guard' => [
+            'driver' => 'session', // Use 'session' driver for web-based authentication
+            'provider' => 'mst_users', // The provider for retrieving users
         ],
     ],
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -60,16 +61,16 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'mst_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Mst_User::class, // Replace with the actual namespace of your MstUser model
         ],
-
+    ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-    ],
+   
 
     /*
     |--------------------------------------------------------------------------

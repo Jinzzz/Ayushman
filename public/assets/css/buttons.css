@@ -52,7 +52,7 @@ a.btn.disabled, fieldset:disabled a.btn {
 	color: #fff;
 	background: #d43f8d !important;
 	border-color: #d43f8d;
-	box-shadow: 0 5px 10px rgba(167, 66, 153, 0.3);
+	/* box-shadow: 0 5px 10px rgba(167, 66, 153, 0.3); */
 }
 .btn-secondary:hover {
 	color: #fff;

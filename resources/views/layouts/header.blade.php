@@ -1,10 +1,11 @@
 <div class="page-header">
     <a aria-label="Hide Sidebar" class="app-sidebar__toggle close-toggle" data-toggle="sidebar" href="#"></a><!-- sidebar-toggle-->
+    
     <div>
         <h1 class="page-title"></h1>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ isset($pageTitle) ? $pageTitle : 'Default Text' }}</li>
         </ol>
     </div>
     <div class="d-flex  ml-auto header-right-icons header-search-icon">
@@ -57,10 +58,15 @@
                  document.getElementById('logout-form').submit();" >
                     <i class="dropdown-icon mdi  mdi-logout-variant"></i> Sign Out
                 </a>
+                 <a class="dropdown-item"  onclick="event.preventDefault();
+                 document.getElementById('logout-form').submit();" >
+                    <i class="dropdown-icon mdi  mdi-logout-variant"></i> Change Password
+                </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
             </div>
         </div>
+       
     </div>
 </div>

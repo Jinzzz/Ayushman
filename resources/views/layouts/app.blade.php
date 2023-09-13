@@ -15,7 +15,8 @@
 
     <!-- TITLE -->
     <title>Ayushman Ayurveda - </title>
-
+     <!-- DATA TABLE CSS --> 
+		<link href="{{('assets/plugins/datatable/dataTables.bootstrap4.min.css" rel="stylesheet')}}"/>
     <!-- BOOTSTRAP CSS -->
     <link href="{{asset('assets/plugins/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" />
 
@@ -50,6 +51,9 @@
     <link id="theme" rel="stylesheet" type="text/css" media="all" href="{{asset('assets/colors/color1.css')}}" />
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+       <!-- ckeditor  -->
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/adapters/jquery.js"></script>
     @yield('css')
    
 </head>
@@ -82,6 +86,8 @@
                     <!-- PAGE-HEADER -->
                     @include('layouts.header')
                     <!-- PAGE-HEADER END -->
+
+                   
 
                     <!-- content starts -->
                     @yield('content')
@@ -147,10 +153,17 @@
     <!-- INDEX JS -->
     <script src="{{asset('assets/js/index1.js')}}"></script>
 
+    <script src="{{asset('assets/js/index5.js')}}"></script>
+
     <!-- SWEET-ALERT JS -->
     <script src="{{asset('assets/plugins/sweet-alert/sweetalert.min.js')}}"></script>
     <script src="{{asset('assets/js/sweet-alert.js')}}"></script>
 
+        <script src="{{asset('assets/plugins/datatable/jquery.dataTables.min.js')}}"></script>
+		<script src="{{asset('assets/plugins/datatable/dataTables.bootstrap4.min.js')}}"></script>
+		<script src="{{asset('assets/plugins/datatable/datatable.js')}}"></script>
+		<script src="{{asset('assets/plugins/datatable/datatable-2.js')}}"></script>
+		<script src="{{asset('assets/plugins/datatable/dataTables.responsive.min.js')}}"></script>
     <!-- CUSTOM JS -->
     <script src="{{asset('assets/js/custom.js')}}"></script>
 
