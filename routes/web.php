@@ -25,6 +25,9 @@ use App\Http\Controllers\MstTherapyRoomAssigningController;
 use App\Http\Controllers\MstMasterValueController;
 use App\Http\Controllers\UserPrivilageController;
 use App\Http\Controllers\MstQualificationController;
+use App\Http\Controllers\MstMedicineDosageController;
+use App\Http\Controllers\MstLeaveTypeController;
+use App\Http\Controllers\MstManufacturerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -283,3 +286,11 @@ Route::post('/leave-type/store', [MstLeaveTypeController::class, 'store'])->name
 Route::delete('/leave-type/destroy/{id}', [MstLeaveTypeController::class, 'destroy'])->name('leave.type.destroy');
 Route::get('/leave-type/edit/{id}', [MstLeaveTypeController::class, 'edit'])->name('leave.type.edit');
 Route::patch('leave-type/{id}/change-status', [MstLeaveTypeController::class, 'changeStatus'])->name('leave.type.changeStatus');
+
+// Manufacturer- Screen for manufacturer
+Route::get('/manufacturer', [MstManufacturerController::class, 'index'])->name('manufacturer.index');
+Route::get('/manufacturer/create', [MstManufacturerController::class, 'create'])->name('manufacturer.create');
+Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])->name('manufacturer.store');
+Route::delete('/manufacturer/destroy/{id}', [MstManufacturerController::class, 'destroy'])->name('manufacturer.destroy');
+Route::get('/manufacturer/edit/{id}', [MstManufacturerController::class, 'edit'])->name('manufacturer.edit');
+Route::patch('manufacturer/{id}/change-status', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');

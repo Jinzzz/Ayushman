@@ -4,7 +4,7 @@
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
          <div class="card">
-         @if ($messages = Session::get('error'))
+            @if ($messages = Session::get('error'))
             <div class="alert alert-danger">
                <ul>
                   @foreach (json_decode($messages, true) as $field => $errorMessages)
@@ -49,8 +49,9 @@
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> {{ isset($qualification->qualification_id) ? 'Update' : 'Add' }}</button>
-                        <button type="reset" class="btn btn-raised btn-success">
-                           Reset</button>
+                        @if (!isset($qualification->qualification_id))
+                        <button type="reset" class="btn btn-raised btn-success">Reset</button>
+                        @endif
                         <a class="btn btn-danger" href="{{route('qualifications.index')}}">Cancel</a>
                      </center>
                   </div>

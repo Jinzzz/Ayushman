@@ -23,7 +23,7 @@
             <h3 class="card-title">{{$pageTitle}}</h3>
         </div>
         <div class="card-body">
-            <a href="{{ route('leave.type.create') }}" class="btn btn-block btn-info">
+            <a href="{{ route('manufacturer.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
                 Add {{$pageTitle}}
             </a>
@@ -35,7 +35,7 @@
                     <thead>
                         <tr>
                             <th class="wd-15p">SL.NO</th>
-                            <th class="wd-20p">Leave Types</th>
+                            <th class="wd-20p">Manufacturers</th>
                             <th class="wd-15p">Status</th>
                             <th class="wd-15p">Action</th>
                         </tr>
@@ -44,16 +44,16 @@
                         @php
                         $i = 0;
                         @endphp
-                        @foreach($leave_types as $leave_type)
-                        <tr id="qualificationRow_{{ $leave_type->leave_type_id }}">
+                        @foreach($manufacturers as $manufacturer)
+                        <tr id="qualificationRow_{{ $manufacturer->manufacturer_id }}">
                             <td>{{ ++$i }}</td>
-                            <td>{{ $leave_type->name}}</td>
+                            <td>{{ $manufacturer->name}}</td>
                             <td>
-                                <form action="{{ route('leave.type.changeStatus', $leave_type->leave_type_id) }}" method="POST">
+                                <form action="{{ route('manufacturer.changeStatus', $manufacturer->manufacturer_id) }}" method="POST">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($leave_type->is_active == 0)
+                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($manufacturer->is_active == 0) btn-danger @else btn-success @endif">
+                                        @if($manufacturer->is_active == 0)
                                         InActive
                                         @else
                                         Active
@@ -63,11 +63,11 @@
                             </td>
 
                             <td>
-                                <a class="btn btn-primary" href="{{ route('leave.type.edit', $leave_type->leave_type_id) }}">
+                                <a class="btn btn-primary" href="{{ route('manufacturer.edit', $manufacturer->manufacturer_id) }}">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
 
-                                <form style="display: inline-block" action="{{ route('leave.type.destroy', $leave_type->leave_type_id) }}" method="post">
+                                <form style="display: inline-block" action="{{ route('manufacturer.destroy', $manufacturer->manufacturer_id) }}" method="post">
                                     @csrf
                                     @method('delete')
                                     <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>

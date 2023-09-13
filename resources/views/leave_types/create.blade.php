@@ -4,7 +4,7 @@
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
          <div class="card">
-         @if ($messages = Session::get('error'))
+            @if ($messages = Session::get('error'))
             <div class="alert alert-danger">
                <ul>
                   @foreach (json_decode($messages, true) as $field => $errorMessages)
@@ -21,6 +21,7 @@
             <!-- Success message -->
             <div class="col-lg-12" style="background-color:#fff">
                <form action="{{ route('leave.type.store') }}" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="hidden_id" value="{{ isset($leave_types->leave_type_id) ? $leave_types->leave_type_id : '' }}">
                   @csrf
                   <div class="row">
                      <div class="col-md-6">
@@ -48,8 +49,9 @@
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> {{ isset($leave_types->leave_type_id) ? 'Update' : 'Add' }}</button>
-                        <button type="reset" class="btn btn-raised btn-success">
-                           Reset</button>
+                        @if (!isset($leave_types->leave_type_id))
+                        <button type="reset" class="btn btn-raised btn-success">Reset</button>
+                        @endif
                         <a class="btn btn-danger" href="{{route('leave.type.index')}}">Cancel</a>
                      </center>
                   </div>

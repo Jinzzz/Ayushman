@@ -41,9 +41,9 @@
         <ul class="slide-menu">
                       <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
                       <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
-                      <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Medicine Dosage') }}</a></li>-->
-                      <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Leave Types') }}</a></li>-->
-                      <!--<li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Manufacturer') }}</a></li>-->
+                      <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
