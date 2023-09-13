@@ -21,7 +21,7 @@
                         </div>
                        
                         
-                        <div class="col-md-4 d-flex align-items-center">
+                        <div class="col-md-4 d-flex align-items-end">
                             <div>
                                 <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
                                 <a class="btn btn-secondary ml-2" href="{{ route('branches') }}"><i class="fa fa-times" aria-hidden="true"></i>Reset</a>
