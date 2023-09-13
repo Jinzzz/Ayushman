@@ -289,7 +289,7 @@ Route::delete('/leave-type/destroy/{id}', [MstLeaveTypeController::class, 'destr
 Route::get('/leave-type/edit/{id}', [MstLeaveTypeController::class, 'edit'])->name('leave.type.edit');
 Route::patch('leave-type/{id}/change-status', [MstLeaveTypeController::class, 'changeStatus'])->name('leave.type.changeStatus');
 
-// Manufacturer- Screen for manufacturer
+// Manufacturer- Screen for manufacturer//update
 Route::get('/manufacturer', [MstManufacturerController::class, 'index'])->name('manufacturer.index');
 Route::get('/manufacturer/create', [MstManufacturerController::class, 'create'])->name('manufacturer.create');
 Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])->name('manufacturer.store');
