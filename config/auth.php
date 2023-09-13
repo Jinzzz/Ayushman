@@ -40,6 +40,11 @@ return [
             'driver' => 'session', // Use 'session' driver for web-based authentication
             'provider' => 'mst_users', // The provider for retrieving users
         ],
+        'api' => [
+            'driver' => 'passport', //update this line
+            'provider' => 'users',
+            'hash' => false,
+        ],
     ],
     
 
