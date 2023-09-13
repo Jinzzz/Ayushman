@@ -216,6 +216,8 @@ Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->n
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
 Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
 
+
+
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
 Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
