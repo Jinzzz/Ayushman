@@ -39,9 +39,9 @@ class MstTherapyRoomController extends Controller
             'is_active' => 'required',
         ]);
 
-        $is_active = Mst_Therapy_Room::where('room_name', $request->input('room_name'))->where('branch_id', $request->input('branch'))->first();
-        if ($is_active) {
-            return redirect()->route('therapyrooms.index')->with('error', 'This therapy room already exists.');
+        $is_exists = Mst_Therapy_Room::where('room_name', $request->input('room_name'))->where('branch_id', $request->input('branch'))->first();
+        if ($is_exists) {
+            return redirect()->route('therapyrooms.index')->with('error', 'This therapy room is already exists.');
         } else {
             $is_active = $request->input('is_active') ? 1 : 0;
 

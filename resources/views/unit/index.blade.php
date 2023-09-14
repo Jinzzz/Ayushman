@@ -11,7 +11,7 @@
                @endif
                  @if ($message = Session::get('error'))
                <div class="alert alert-danger">
-                  <p></p>
+               <p>{{$message}}</p>
                </div>
                @endif
             <div class="card-header">
@@ -31,6 +31,7 @@
                                 <tr>
                                     <th class="wd-15p">SL.NO</th>
                                     <th class="wd-15p">Unit Name</th>
+                                    <th class="wd-15p">Short Name</th>
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -43,6 +44,7 @@
                                 <tr>
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $unit->unit_name }}</td>
+                                    <td>{{ $unit->unit_short_name }}</td>
                                     <td>
                                        <form action="{{ route('unit.changeStatus', $unit->id) }}" method="POST">
                                         @csrf
