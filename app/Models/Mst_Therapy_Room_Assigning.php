@@ -9,7 +9,18 @@ class Mst_Therapy_Room_Assigning extends Model
 {
     use HasFactory;
     protected $table = 'mst_therapy_room_assigning';
+    protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'therapy_room_id',
+        'branch_id',
+        'staff_id',
+        'is_active',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+        'deleted_at',
+    ];
 
     public function therapyroomName()
     {

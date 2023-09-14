@@ -236,7 +236,7 @@ Route::delete('/specialization/destroy/{id}', [MstStaffSpecializationController:
 Route::patch('specialization/{id}/change-status', [MstStaffSpecializationController::class, 'changeStatus'])->name('specialization.changeStatus');
 
 //therapy-room-assigning:
-Route::get('/therapyroom-assigning/index', [MstTherapyRoomAssigningController::class, 'index'])->name('therapyroomassigning.index');
+Route::get('/therapyroom-assigning/index/{id}', [MstTherapyRoomAssigningController::class, 'index'])->name('therapyroomassigning.index');
 Route::get('/therapyroom-assigning/create', [MstTherapyRoomAssigningController::class, 'create'])->name('therapyroomassigning.create');
 Route::post('/therapyroom-assigning/store', [MstTherapyRoomAssigningController::class, 'store'])->name('therapyroomassigning.store');
 Route::get('/therapyroom-assigning/edit/{id}', [MstTherapyRoomAssigningController::class, 'edit'])->name('therapyroomassigning.edit');
