@@ -131,6 +131,9 @@
                      </div>
                   </div>
                   <div class="tab-pane" id="tab-61">
+                     <div class="media-heading">
+                        <h5><strong>Staff Qualification</strong></h5>
+                     </div>
                      <ul class="widget-users row">
                         <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                            <div class="card">
@@ -140,19 +143,17 @@
                               </div>
                            </div>
                         </li>
-                        
-                        
-                    
-
-
                      </ul>
                   </div>
                   <div class="tab-pane" id="tab-71">
+                     <div class="media-heading">
+                        <h5><strong>Staff Salary Information</strong></h5>
+                     </div>
                      <ul class="widget-users row">
                         <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                            <div class="card">
                               <div class="card-body text-center">
-                                 <h4 class="h4 mb-0 mt-3">{{ $show->salaryType->salary_type}}</h4>
+                                 <h4 class="h5 mb-0 mt-3">{{ $show->salaryType->salary_type}}</h4>
                                  <p class="card-text">₹{{ $show->salary_amount}}</p>
                               </div>
                            </div>
