@@ -25923,8 +25923,9 @@ button.btn.btn-sm.btn-success:hover{
 }
 
 .btn:not(:disabled):not(.disabled) {
-	padding: 3px 10px;
-	font-size: 12px;
+	padding: 4.5px 10px;
+	
+	margin-top: -2px;
 }
 
 .btn-secondary {
@@ -26251,5 +26252,14 @@ color: #fff!important;
 .btn-secondary {
     background: rgb(48 209 88)!important;
     border-color: rgb(48 209 88)!important;
+}
+
+.edit-custom{
+	font-size: 0.65rem !important;
+    margin-right: 0;
+}
+.status-custom{
+	font-size: 0.65rem !important;
+    margin-right: 0;
 }
 /* End */
