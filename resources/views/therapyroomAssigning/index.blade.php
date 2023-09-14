@@ -15,7 +15,7 @@
                </div>
                @endif
             <div class="card-header">
-                <h3 class="card-title">List Assigned Therapy Rooms</h3>
+                <h3 class="card-title"> {{$pageTitle}}</h3>
             </div>
             <div class="card-body">
                 <a href="{{ route('therapyroomassigning.create') }}" class="btn btn-block btn-info">

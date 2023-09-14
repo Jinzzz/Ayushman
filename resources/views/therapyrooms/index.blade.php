@@ -47,11 +47,11 @@
                @endif
                  @if ($message = Session::get('error'))
                <div class="alert alert-danger">
-                  <p></p>
+               <p>{{$message}}</p>
                </div>
                @endif
             <div class="card-header">
-                <h3 class="card-title">List Therapy Room</h3>
+                <h3 class="card-title">{{$pageTitle}}</h3>
             </div>
             <div class="card-body">
                 <a href="{{ route('therapyrooms.create') }}" class="btn btn-block btn-info">
@@ -68,8 +68,8 @@
                                     <th class="wd-15p">SL.NO</th>
                                     <th class="wd-15p">Branch</th>
                                     <th class="wd-20p">Room Name</th>
-                                    <th class="wd-20p">Room Type</th>
-                                    <th class="wd-20p">Room Capacity</th>
+                                    <!-- <th class="wd-20p">Room Type</th>
+                                    <th class="wd-20p">Room Capacity</th> -->
                                     <th class="wd-20p">Room Assigning</th>
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
@@ -84,8 +84,8 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $therapyroom->branch->branch_name }}</td>
                                     <td>{{ $therapyroom->room_name }}</td>
-                                    <td>{{ $therapyroom->roomType->master_value}}</td>
-                                    <td>{{ $therapyroom->room_capacity }}</td>
+                                    <!-- <td>{{ $therapyroom->roomType->master_value}}</td>
+                                    <td>{{ $therapyroom->room_capacity }}</td> -->
 
                                     <td>
                                         <a class="btn btn-sm  btn-outline-success "

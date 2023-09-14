@@ -5,7 +5,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0 card-title">Create Therapy Room</h3>
+                    <h3 class="mb-0 card-title">{{$pageTitle}}</h3>
                 </div>
                 <div class="card-body">
                     @if ($message = Session::get('status'))
@@ -16,7 +16,7 @@
 
                     @if ($errors->any())
                     <div class="alert alert-danger">
-                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                         <ul>
                             @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -34,7 +34,7 @@
                                     <input type="text" class="form-control" required name="room_name" value="{{old('room_name')}}" placeholder="Room Name">
                                 </div>
 
-                             <div class="form-group">
+                             <!-- <div class="form-group">
                                  <label class="form-label">Room Capacity*</label>
                                  <select class="form-control" name="room_capacity" required>
                                    <option value="" disabled>Select Room Capacity</option>
@@ -42,7 +42,7 @@
                                              <option value="{{ $i }}"{{ old('room_capacity') == $i ? ' selected' : '' }}>{{ $i }}</option>
                                          @endfor
                                </select>
-                            </div>
+                            </div> -->
 
 
                                 <div class="form-group">
@@ -67,7 +67,7 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                     <label class="form-label">Room Type*</label>
                                     <select class="form-control" name="room_type" id="room_type">
                                         <option value="">Select Room Type</option>
@@ -75,7 +75,7 @@
                                         <option value="{{ $masterId }}"{{ old('room_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
                                         @endforeach
                                     </select>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 

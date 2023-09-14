@@ -49,7 +49,7 @@
                                     </select>
                                 </div>
                             </div>
-                          <div class="col-md-6">
+                          <!-- <div class="col-md-6">
                             <div class="form-group">
                                <label class="form-label">Room Capacity</label>
                                   <select class="form-control" name="room_capacity" required>
@@ -61,9 +61,9 @@
                                @endfor
                             </select>
                             </div>
-                            </div>
+                            </div> -->
 
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Room Type</label>
                                     <select class="form-control" name="room_type" id="room_type">
@@ -75,7 +75,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="form-label">Status</div>

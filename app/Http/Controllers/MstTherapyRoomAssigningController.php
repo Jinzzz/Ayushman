@@ -12,7 +12,7 @@ class MstTherapyRoomAssigningController extends Controller
 {
     public function index()
     {
-        $pageTitle = "TherapyRoomAssigning";
+        $pageTitle = "Therapy Room Assigning";
         $roomAssigning = Mst_Therapy_Room_Assigning::with('therapyroomName','branch','staff')->latest()->get();
         return view('therapyroomAssigning.index',compact('pageTitle','roomAssigning'));
     }
