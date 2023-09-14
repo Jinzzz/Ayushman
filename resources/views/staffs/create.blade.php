@@ -74,8 +74,8 @@
                   <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Branch*</label>
-                           <select class="form-control" name="branch_id" id="branch_id">
+                           <label class="form-label branch" id="branchLabel">Branch*</label>
+                           <select class="form-control" name="branch_id" id="branch_field">
                               <option value="">Choose Branch</option>
                               @foreach($branch as $id => $branchName)
                               <option value="{{ $id }}"{{ old('branch_id') == $id ? 'selected' : '' }}>
@@ -123,12 +123,21 @@
                   </div>
                   <div class="row">
                      <div class="col-md-6">
-                        <div class="form-group">
-                           <label class="form-label">Work Experience</label>
-                           <input type="text" class="form-control" name="staff_work_experience" value="{{ old('staff_work_experience') }}" placeholder="Work Experience" pattern="[0-9]+" title="Please enter digits only">
-                           <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
-                        </div>
+                     <div class="form-group">
+                        <label class="form-label">Specialization</label>
+                        <input type="text" class="form-control" required name="staff_specialization" placeholder="Specialization">
                      </div>
+                    </div>
+                    <div class="col-md-6">
+                     <div class="form-group">
+                        <label class="form-label">Work Experience</label>
+                        <input type="text" class="form-control" name="staff_work_experience" value="{{ old('staff_work_experience') }}" placeholder="Work Experience" pattern="[0-9]+" title="Please enter digits only">
+                        <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
+                     </div>
+                  </div>
+                  </div>
+                  <div class="row">
+                    
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Commission Type</label>
@@ -139,14 +148,15 @@
                            </select>
                         </div>
                      </div>
-                  </div>
-               <div class ="row">
-                  <div class="col-md-6">
+                       <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Staff Commission*</label>
                         <input type="text" class="form-control" required name="staff_commission" value="{{ old('staff_commission') }}" placeholder="Staff Commission">
                      </div>
                   </div>
+                  </div>
+               <div class ="row">
+                
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Salary Type*</label>
@@ -160,16 +170,12 @@
                         </select>
                      </div>
                   </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                   <div class="form-group">
-                     <label class="form-label">Salary Amount*</label>
-                     <input type="text" class="form-control"  name="salary_amount" value="{{ old('salary_amount') }}" placeholder="Salary Amount">
-                   </div>
-                </div>
-               
-
+                  <div class="col-md-6">
+                     <div class="form-group">
+                       <label class="form-label">Salary Amount*</label>
+                       <input type="text" class="form-control"  name="salary_amount" value="{{ old('salary_amount') }}" placeholder="Salary Amount">
+                     </div>
+                  </div>
               </div>
 
                   <!-- ... -->
@@ -284,6 +290,9 @@
    function toggleBookingFeeField() {
        var staffTypeSelect = document.getElementById('staff_type');
        var bookingFeeField = document.getElementById('booking_fee_field');
+       var branchField = document.getElementById('branch_field');
+       var branchLabel = document.getElementById('branchLabel');
+
    
        // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
        if (staffTypeSelect.value === '20') {
@@ -291,7 +300,17 @@
        } else {
            bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
        }
+       //hide branch field if the selected staff type is an accountant:
+       if(staffTypeSelect.value === '21') {
+         branchField.style.display = 'none';// hide the Branch field
+         branchLabel.style.display = 'none';
+      }else{
+         branchField.style.display = 'block'; // Show the Branch field
+         branchLabel.style.display = 'block'; 
+      }
    }
+
+   
    
    // Call the toggleLoginFields and toggleBookingFeeField functions initially to set the initial state of the fields
    toggleLoginFields();

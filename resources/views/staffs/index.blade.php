@@ -55,10 +55,10 @@
                     
                        
                         <div class="col-md-3 d-flex align-items-end">
-                            <div>
+                            {{-- <div> --}}
                                 <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
                                 <a class="btn btn-secondary ml-2" href="{{ route('staffs.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
-                            </div>
+                            {{-- </div> --}}
                         </div>
                     </div>
                 </form>
@@ -102,8 +102,7 @@
                                     <th class="wd-15p">Branch</th> 
                                     <th class="wd-15p">Contact Number</th>
                                     <th class="wd-15p">Qualification</th>
-                                    <th class="wd-15p">Slots</th>
-                                    <th class="wd-15p">Specialization</th>
+                                  
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -121,16 +120,8 @@
                                     <td>{{ $staff->branch->branch_name}}</td>
                                     <td>{{ $staff->staff_contact_number }}</td>
                                     <td>{{ $staff->staff_qualification}}</td>
-                                      <td>
-                                        <a class="btn btn-sm  btn-outline-success "
-                                            href="{{ route('staff.slot', $staff->staff_id) }}"><i
-                                                class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a>
-                                                </td>
-                                      <td>
-                                        <a class="btn btn-sm  btn-outline-success "
-                                            href="{{ route('specialization.index', $staff->staff_id) }}"><i
-                                                class="fa fa-pencil-square-o" aria-hidden="true"></i>Specialization</a>
-                                                </td>
+                                     
+                                     
                                     <td>
                                         <form action="{{ route('staffs.changeStatus', $staff->staff_id) }}" method="POST">
                                         @csrf
@@ -148,19 +139,25 @@
                                     </td>
                                        
                                     <td>
-                                        <a class="btn btn-primary"
+                                        <a class="btn btn-primary btn-sm"
                                             href="{{ route('staffs.edit', $staff->staff_id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                                   <a class="btn btn-secondary" href="{{ route('staffs.show', $staff->staff_id) }}">
+                                                   <a class="btn btn-secondary btn-sm" href="{{ route('staffs.show', $staff->staff_id) }}">
                                                    <i class="fa fa-eye" aria-hidden="true"></i> View    </a>
 
                                         <form style="display: inline-block"
                                             action="{{ route('staffs.destroy', $staff->staff_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn btn-danger"><i class="fa fa-trash"
+                                            <button type="submit" class="btn-danger btn-sm"  onclick="return confirm('Do you want to delete it?');"><i class="fa fa-trash"
                                                     aria-hidden="true"></i>Delete</button>
                                         </form>
+                                        <br>
+                                        @if($staff->staff_type == '20')
+                                        <a class="btn btn-sm  btn-outline-success "
+                                        href="{{ route('staff.slot', $staff->staff_id) }}"><i
+                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a>
+                                            @endif
                                     </td>
                                 </tr>
                                 @endforeach

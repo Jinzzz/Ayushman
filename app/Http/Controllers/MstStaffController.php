@@ -8,6 +8,7 @@ use App\Models\Mst_Staff;
 use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Staff_Commission_Log;
+use App\Models\Trn_Staff_Salary_History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -50,8 +51,6 @@ class MstStaffController extends Controller
         $gender = Mst_Master_Value::where('master_id',17)->pluck('master_value','id');
         $branch = Mst_Branch::pluck('branch_name','branch_id');
         $salaryType = Sys_Salary_Type::pluck('salary_type','id');
-        // $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
-        // $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
         return view('staffs.create',compact('pageTitle','stafftype','employmentType','gender','branch','commissiontype','salaryType'));
     }
@@ -73,7 +72,7 @@ class MstStaffController extends Controller
             'staff_contact_number' => 'required',
             'staff_address' => 'required',
             'staff_qualification' => 'required',
-            // 'staff_work_experience' => 'required|integer', 
+            'staff_specialization' => 'required', 
             // 'staff_commission_type' => 'required',
             'staff_commission' => 'required|numeric', 
             // 'staff_booking_fee' => 'required|numeric',
@@ -83,13 +82,14 @@ class MstStaffController extends Controller
 
          ]);
          $is_active = $request->input('is_active') ? 1 : 0;
+         $is_login = $request->input('is_login') ? 1 : 0;
         
          $lastInsertedId = Mst_Staff::insertGetId([
             'staff_code' => rand(50, 100),
             'staff_type' => $request->staff_type,
             'employment_type' => $request->employment_type,
-            'staff_username' => $request->input('is_login') ? 'required' : '',
-            'password' => $request->input('is_login') ? 'required' : '',
+            'staff_username' => $is_login ? $request->staff_username : null,
+            'password' => $is_login ? Hash::make($request->password) : null,
             'staff_name' => $request->staff_name,
             'gender' => $request->gender,
             'is_active' =>  $is_active ,
@@ -99,8 +99,8 @@ class MstStaffController extends Controller
             'staff_contact_number' => $request->staff_contact_number,
             'staff_address' => $request->staff_address,
             'staff_qualification' => $request->staff_qualification,
+            'staff_specialization' => $request->staff_specialization,
             'staff_work_experience' => $request->staff_work_experience,
-            // 'staff_logon_type' => $request->staff_logon_type,
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
             'staff_booking_fee' => $request->input('staff_type') === '20' ? 'required|numeric' : null,
@@ -110,12 +110,15 @@ class MstStaffController extends Controller
             'created_by' => auth()->id(),
 
          ]);
+        
          $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
          $staffCode = 'SC' . $leadingZeros . $lastInsertedId;
+       
      
          Mst_Staff::where('staff_id', $lastInsertedId)->update([
              'staff_code' => $staffCode
          ]);
+
          
 
          return redirect()->route('staffs.index')->with('success','Staff added successfully');
@@ -126,13 +129,12 @@ class MstStaffController extends Controller
     {
         $pageTitle = "Edit Staff";
         $staffs = Mst_Staff::findOrFail($staff_id);
+
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
         $employmentType = Mst_Master_Value::where('master_id',5)->pluck('master_value','id');
         $gender = Mst_Master_Value::where('master_id',17)->pluck('master_value','id'); 
         $branch = Mst_Branch::pluck('branch_name','branch_id');
         $salaryType = Sys_Salary_Type::pluck('salary_type','id');
-        // $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
-        // $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
         return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branch','salaryType','commissiontype'));
 
@@ -140,67 +142,87 @@ class MstStaffController extends Controller
 
     public function update(Request $request, $staff_id)
     {
+        $is_login = $request->input('is_login') ? 1 : 0;
         $is_active = $request->input('is_active') ? 1 : 0;
+
         //staff-transfer-logs:
         $existing = Mst_Staff::where('staff_id', $staff_id)->value('branch_id');
         $updating = $request->branch_id;
+
         //staff-commission-logs:
-        $existingCommission = Mst_Staff::where('staff_id',$staff_id)->value('staff_commission');
+        $existingCommission = Mst_Staff::where('staff_id', $staff_id)->value('staff_commission');
         $updatedCommission = $request->staff_commission;
-    
+
+        //staff-salary-updation:
+        $existingSalary = Mst_Staff::where('staff_id', $staff_id)->value('salary_amount');
+        $updatedSalary = $request->salary_amount;
+   
         $update = Mst_Staff::find($staff_id);
+      
         $update->update([
             'staff_type' => $request->staff_type,
             'employment_type' => $request->employment_type,
-            'staff_username' => $request->staff_username,
-            'password' => hash::make($request->password),
+            'staff_username' => $is_login ? $request->staff_username : null,
             'staff_name' => $request->staff_name,
             'gender' => $request->gender,
-            'is_active' =>  $is_active ,
+            'is_active' => $is_active,
             'branch_id' => $request->branch_id,
             'date_of_birth' => $request->date_of_birth,
             'staff_email' => $request->staff_email,
             'staff_contact_number' => $request->staff_contact_number,
             'staff_address' => $request->staff_address,
             'staff_qualification' => $request->staff_qualification,
+            'staff_specialization' => $request->staff_specialization,
             'staff_work_experience' => $request->staff_work_experience,
-            // 'staff_logon_type' => $request->staff_logon_type,
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
             'staff_booking_fee' => $request->staff_booking_fee,
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
-
         ]);
-
-        if($existing != $updating)
-        {
-        $createdBy = auth()->id();
-        $transfer =  Mst_Staff_Transfer_Log::create([
-           
+    
+        if ($request->has('password') && !empty($request->password)) {
+            // Hash and update the password only if a new password is provided
+            $update->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
+    
+        if ($existing != $updating) {
+            $createdBy = auth()->id();
+            $transfer =  Mst_Staff_Transfer_Log::create([
                 'staff_id' => $staff_id,
-                'branch_id_from' =>  $existing,
+                'branch_id_from' => $existing,
                 'branch_id_to' => $request->branch_id,
                 'transfer_date' => Carbon::now(),
                 'created_by' => $createdBy,
             ]);
         }
-
-        if($existingCommission !=  $updatedCommission )
-        {
+    
+        if ($existingCommission != $updatedCommission) {
             $commission = Mst_Staff_Commission_Log::create([
                 'staff_id' => $staff_id,
                 'commission_type' => $request->staff_commission_type,
                 'staff_commission' => $updatedCommission,
                 'commission_change_date' => Carbon::now(),
                 'created_by' => auth()->id(),
-
             ]);
         }
 
-        return redirect()->route('staffs.index')->with('success','Staff updated successfully');
+        if($existingSalary != $updatedSalary){
+            $salary = Trn_Staff_Salary_History::create([
+                'staff_id' => $staff_id,
+                'old_salary' => $existingSalary,
+                'new_salary' => $request->salary_amount,
+                'updated_date' => carbon::now(),
+                'created_by' => auth()->id(),
 
+            ]);
+        }
+    
+        return redirect()->route('staffs.index')->with('success', 'Staff updated successfully');
     }
+    
 
     public function show($id)
     {

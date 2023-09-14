@@ -21,12 +21,12 @@ class MstTimeSlotController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'slot_name' => 'required|unique:mst_master_values,master_value',
+            'master_value' => 'required|unique:mst_master_values,master_value',
         ]);
 
         $slot = new Mst_Master_Value();
         $slot->master_id = 24;
-        $slot->master_value = $request->input('slot_name');
+        $slot->master_value = $request->input('master_value');
         $slot->group_id = 0;
         $slot->is_active = 1;
         $slot->created_by = auth()->id();
@@ -96,14 +96,16 @@ class MstTimeSlotController extends Controller
             'week_day' => 'required',
             'slot' => 'required',
             'tokens' => 'required',
-            'is_active' => 'required',
+            
         ]);
+       
 
         $staffslot = new Mst_TimeSlot();
+       
         $staffslot->staff_id = $request->input('staff_id');
         $staffslot->week_day = $request->input('week_day');
-        $staffslot->time_slots = $request->input('slot');
-        $staffslot->no_tokens = $request->input('tokens');
+        $staffslot->time_slot = $request->input('slot');
+        $staffslot->max_tokens = $request->input('tokens');
         $staffslot->is_available = 1;
         $staffslot->is_active = 1;
         $staffslot->created_by  = auth()->id();
