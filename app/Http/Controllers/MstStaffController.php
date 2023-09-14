@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Staff;
-use App\Models\Sys_Gender;
+use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Staff_Commission_Log;
 use Illuminate\Http\Request;
@@ -18,34 +18,28 @@ class MstStaffController extends Controller
     {
        
         $pageTitle = "staffs";
+        $branch = Mst_Branch::pluck('branch_name','branch_id');
+        $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
         $query = Mst_Staff::query();
 
-        if($request->has('staff_code')){
-            $query->where('staff_code','LIKE',"%{$request->staff_code}%");
-        }
-        if ($request->filled('staff_types')) {
-            $query->whereHas('staffType', function ($q) use ($request) {
-                $q->where('master_value', 'like', '%' . $request->input('staff_types') . '%');
-            });
+        if($request->has('staff_type')){
+            $query->where('staff_type','LIKE',"%{$request->staff_type}%");
         }
         if($request->has('staff_name')){
             $query->where('staff_name','LIKE',"%{$request->staff_name}%");
         }
-        if ($request->filled('branch_name')) {
-            $query->whereHas('branch', function ($q) use ($request) {
-                $q->where('branch_name', 'like', '%' . $request->input('branch_name') . '%');
-            });
+        if($request->has('staff_name')){
+            $query->where('staff_name','LIKE',"%{$request->staff_name}%");
+        }
+        if($request->has('branch_id')){
+            $query->where('branch_id','LIKE',"%{$request->branch_id}%");
         }
         if($request->has('contact_number')){
             $query->where('staff_contact_number','LIKE',"%{$request->contact_number}%");
         }
-        if ($request->filled('qualification')) {
-            $query->whereHas('qualification', function ($q) use ($request) {
-                $q->where('master_value', 'like', '%' . $request->input('qualification') . '%');
-            });
-        }
+      
         $staffs = $query->orderBy('updated_at', 'desc')->get();
-        return view('staffs.index',compact('pageTitle','staffs'));
+        return view('staffs.index',compact('pageTitle','staffs','branch','stafftype'));
     }
 
     public function create()
@@ -55,34 +49,37 @@ class MstStaffController extends Controller
         $employmentType = Mst_Master_Value::where('master_id',5)->pluck('master_value','id');
         $gender = Mst_Master_Value::where('master_id',17)->pluck('master_value','id');
         $branch = Mst_Branch::pluck('branch_name','branch_id');
-        $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
-        $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
+        $salaryType = Sys_Salary_Type::pluck('salary_type','id');
+        // $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
+        // $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
-        return view('staffs.create',compact('pageTitle','stafftype','employmentType','gender','branch','stafflogonType','qualification','commissiontype'));
+        return view('staffs.create',compact('pageTitle','stafftype','employmentType','gender','branch','commissiontype','salaryType'));
     }
 
     public function store(Request $request)
     {
+        // print_r($request->all());die();
         $request->validate([
             'staff_type' => 'required',
             'employment_type' => 'required',
-            'staff_username' => 'required',
-            'password' => 'required',
-            'confirm_password' => 'required|same:password',
+            // 'staff_username' => 'required',
+            // 'password' => 'required',
+            // 'confirm_password' => 'required|same:password',
             'staff_name' => 'required',
-            'gender' => 'required',
-            'is_active' => 'required',
+            'gender' => 'required',          
             'branch_id' => 'required|exists:mst_branches,branch_id',
             'date_of_birth' => 'required|date', 
-            'staff_email' => 'required|email|unique:mst_staffs', 
+            'staff_email' => 'sometimes|email|unique:mst_staffs',
             'staff_contact_number' => 'required',
             'staff_address' => 'required',
             'staff_qualification' => 'required',
-            'staff_work_experience' => 'required|integer', 
-            'staff_logon_type' => 'required',
-            'staff_commission_type' => 'required',
+            // 'staff_work_experience' => 'required|integer', 
+            // 'staff_commission_type' => 'required',
             'staff_commission' => 'required|numeric', 
-            'staff_booking_fee' => 'required|numeric', 
+            // 'staff_booking_fee' => 'required|numeric',
+            'salary_type' => 'required',
+            'salary_amount' => 'required',
+            'is_active' => 'required', 
 
          ]);
          $is_active = $request->input('is_active') ? 1 : 0;
@@ -91,8 +88,8 @@ class MstStaffController extends Controller
             'staff_code' => rand(50, 100),
             'staff_type' => $request->staff_type,
             'employment_type' => $request->employment_type,
-            'staff_username' => $request->staff_username,
-            'password' => hash::make($request->employment_type),
+            'staff_username' => $request->input('is_login') ? 'required' : '',
+            'password' => $request->input('is_login') ? 'required' : '',
             'staff_name' => $request->staff_name,
             'gender' => $request->gender,
             'is_active' =>  $is_active ,
@@ -103,10 +100,12 @@ class MstStaffController extends Controller
             'staff_address' => $request->staff_address,
             'staff_qualification' => $request->staff_qualification,
             'staff_work_experience' => $request->staff_work_experience,
-            'staff_logon_type' => $request->staff_logon_type,
+            // 'staff_logon_type' => $request->staff_logon_type,
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
-            'staff_booking_fee' => $request->staff_booking_fee,
+            'staff_booking_fee' => $request->input('staff_type') === '20' ? 'required|numeric' : null,
+            'salary_type' => $request->salary_type,
+            'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
             'created_by' => auth()->id(),
 
@@ -117,6 +116,7 @@ class MstStaffController extends Controller
          Mst_Staff::where('staff_id', $lastInsertedId)->update([
              'staff_code' => $staffCode
          ]);
+         
 
          return redirect()->route('staffs.index')->with('success','Staff added successfully');
     }
@@ -130,10 +130,11 @@ class MstStaffController extends Controller
         $employmentType = Mst_Master_Value::where('master_id',5)->pluck('master_value','id');
         $gender = Mst_Master_Value::where('master_id',17)->pluck('master_value','id'); 
         $branch = Mst_Branch::pluck('branch_name','branch_id');
-        $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
-        $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
+        $salaryType = Sys_Salary_Type::pluck('salary_type','id');
+        // $stafflogonType = Mst_Master_Value::where('master_id',7)->pluck('master_value','id');
+        // $qualification = Mst_Master_Value::where('master_id',6)->pluck('master_value','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
-        return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branch','stafflogonType','qualification','commissiontype'));
+        return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branch','salaryType','commissiontype'));
 
     }
 
@@ -163,10 +164,13 @@ class MstStaffController extends Controller
             'staff_address' => $request->staff_address,
             'staff_qualification' => $request->staff_qualification,
             'staff_work_experience' => $request->staff_work_experience,
-            'staff_logon_type' => $request->staff_logon_type,
+            // 'staff_logon_type' => $request->staff_logon_type,
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
             'staff_booking_fee' => $request->staff_booking_fee,
+            'salary_type' => $request->salary_type,
+            'salary_amount' => $request->salary_amount,
+
         ]);
 
         if($existing != $updating)

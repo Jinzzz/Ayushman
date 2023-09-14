@@ -45,6 +45,10 @@ class Mst_Staff extends Model
     {
         return $this->belongsTo(Mst_Master_Value::class,'employment_type','id');
     }
+    public function salaryType()
+    {
+        return $this->belongsTo(Sys_Salary_Type::class,'salary_type','id');
+    }
 
     public function Gender()
     {

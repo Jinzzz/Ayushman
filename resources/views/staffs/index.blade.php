@@ -7,35 +7,53 @@
             <div class="card-header">
                 <h3 class="card-title">Search Staff</h3>
             </div>
-            <form action="{{ route('staffs.index') }}" method="GET">
-                <div class="card-body">
+            <div class="card-body">
+                <form action="{{ route('staffs.index') }}" method="GET">
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="staff-code">Staff Code:</label>
                             <input type="text" id="staff-code" name="staff_code" class="form-control" value="{{ request('staff_code') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label for="staff-types">Staff Type:</label>
-                            <input type="text" id="staff-types" name="staff_types" class="form-control" value="{{ request('staff_types') }}">
-                        </div>
-                        <div class="col-md-3">
+                         <div class="col-md-3">
                             <label for="staff-name">Staff Name:</label>
                             <input type="text" id="staff-name" name="staff_name" class="form-control" value="{{ request('staff_name') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label for="branch-name">Branch:</label>
-                            <input type="text" id="branch-name" name="branch_name" class="form-control" value="{{ request('branch_name') }}">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-3">
+                         <div class="col-md-3">
                             <label for="contact-number">Contact Number:</label>
                             <input type="text" id="contact-number" name="contact_number" class="form-control" value="{{ request('contact_number') }}">
                         </div>
+                   </div>
+                   <div class="row mb-3">
                         <div class="col-md-3">
-                            <label for="qualification">Qualification:</label>
-                            <input type="text" id="qualification" name="qualification" class="form-control" value="{{ request('qualification') }}">
+                            <div class="form-group">
+                                <label for="staff_type">Staff Type*</label>
+                                <select class="form-control" name="staff_type" id="staff_type" onchange="toggleBookingFeeField()">
+                                    <option value="">Select Staff Type</option>
+                                    @foreach($stafftype as $masterId => $masterValue)
+                                    <option value="{{ $masterId }}" {{ old('staff_type') == $masterId ? 'selected' : '' }}>
+                                        {{ $masterValue }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
+                       
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control" name="branch_id" id="branch_id">
+                                    <option value="">Choose Branch</option>
+                                    @foreach($branch as $id => $branchName)
+                                    <option value="{{ $id }}"{{ old('branch_id') == $id ? 'selected' : '' }}>
+                                        {{ $branchName }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                   
+                    
+                       
                         <div class="col-md-3 d-flex align-items-end">
                             <div>
                                 <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
@@ -43,9 +61,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
+
         <div class="card">
 
       
@@ -81,6 +102,8 @@
                                     <th class="wd-15p">Branch</th> 
                                     <th class="wd-15p">Contact Number</th>
                                     <th class="wd-15p">Qualification</th>
+                                    <th class="wd-15p">Slots</th>
+                                    <th class="wd-15p">Specialization</th>
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -97,7 +120,17 @@
                                     <td>{{ $staff->staff_name}}</td>
                                     <td>{{ $staff->branch->branch_name}}</td>
                                     <td>{{ $staff->staff_contact_number }}</td>
-                                    <td>{{ $staff->qualification->master_value}}</td>
+                                    <td>{{ $staff->staff_qualification}}</td>
+                                      <td>
+                                        <a class="btn btn-sm  btn-outline-success "
+                                            href="{{ route('staff.slot', $staff->staff_id) }}"><i
+                                                class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a>
+                                                </td>
+                                      <td>
+                                        <a class="btn btn-sm  btn-outline-success "
+                                            href="{{ route('specialization.index', $staff->staff_id) }}"><i
+                                                class="fa fa-pencil-square-o" aria-hidden="true"></i>Specialization</a>
+                                                </td>
                                     <td>
                                         <form action="{{ route('staffs.changeStatus', $staff->staff_id) }}" method="POST">
                                         @csrf

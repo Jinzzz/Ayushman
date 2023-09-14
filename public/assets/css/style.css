@@ -25810,11 +25810,13 @@ button.btn.btn-sm.btn-info {
 button.btn.btn-secondary {
 	background: transparent !important;
 	color: #d43f8d !important;
+	color: rgb(10,132,255)!important;
 }
 
 button.btn.btn-secondary:hover {
 	background: #d43f8d !important;
 	color: #fff !important;
+	background-color: rgb(10,132,255)!important;
 }
 
 /* .btn-primary {
@@ -25880,8 +25882,8 @@ p.number-font.mb-0 {
 }
 
 .btn-secondary {
-	background: #0d97c6 !important;
-	border-color: #0d97c6 !important;
+	background: rgb(10,132,255)!important;
+    border-color: rgb(10,132,255)!important;
 }
 
 .btn-secondary:hover {
@@ -25908,6 +25910,12 @@ button.btn.btn-sm.btn-success {
 	padding: 7px 14px;
 	font-size: 12px;
 	color: white !important;
+	background: rgb(48,209,88)!important;
+    border-color: rgb(48,209,88)!important;
+}
+button.btn.btn-sm.btn-success:hover{
+	background-color:#0ea333!important;
+	border-color: #0ea333!important;
 }
 
 .fa-trash:before {
@@ -25934,6 +25942,12 @@ button.btn.btn-sm.btn-danger {
 	color: white !important;
 	padding: 7px 8px;
 	font-size: 12px;
+	background-color: #cfcfcf!important;
+	border-color: #cfcfcf!important;
+}
+button.btn.btn-sm.btn-danger:hover{
+	background-color: #a39c9c!important;
+	border-color: #a39c9c!important;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -26220,14 +26234,15 @@ aside.app-sidebar{
     padding: 0;
     margin-bottom: 20px;
 }
+.btn.btn-primary.edit-btn{
+	background: rgb(255,159,10)!important;
+    border-color: rgb(255,159,10)!important;
+}
+.btn.btn-primary.edit-btn:hover{
+background-color: #ed950c!important;
+border-color: #ed950c!important;
+}
+.btn.btn-secondary.view-btn .fa-eye::before{
+color: #fff!important;
+}
 /* End */
-
-.p-6.reset-p-6 {
-    height: 30rem!important;
-}
-.card-header-home {
-    font-size: 16px;
-}
-
-
-
