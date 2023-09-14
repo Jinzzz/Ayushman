@@ -148,46 +148,16 @@
                      </ul>
                   </div>
                   <div class="tab-pane" id="tab-71">
-                     <div class="row">
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/8.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/10.jpg" alt="banner image ">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/11.jpg" alt="banner image ">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5 " src="./assets/images/media/12.jpg" alt="banner image ">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/13.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/14.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-5" src="./assets/images/media/15.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-0" src="./assets/images/media/16.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-0" src="./assets/images/media/17.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-0" src="./assets/images/media/18.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded mb-0" src="./assets/images/media/19.jpg " alt="banner image">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                           <img class="img-fluid rounded" src="./assets/images/media/20.jpg " alt="banner image">
-                        </div>
-                     </div>
-                  </div>
-                  <div class="tab-pane" id="tab-81">
+                     <ul class="widget-users row">
+                        <li class="col-lg-4  col-md-6 col-sm-12 col-12">
+                           <div class="card">
+                              <div class="card-body text-center">
+                                 <h4 class="h4 mb-0 mt-3">{{ $show->salaryType->salary_type}}</h4>
+                                 <p class="card-text">₹{{ $show->salary_amount}}</p>
+                              </div>
+                           </div>
+                        </li>
+                  {{-- <div class="tab-pane" id="tab-81">
                      <div class="row">
                         <div class=" col-lg-6 col-md-12">
                            <div class="card borderover-flow-hidden">
@@ -245,7 +215,7 @@
                               </div>
                            </div>
                         </div>
-                     </div>
+                     </div> --}}
                   </div>
                </div>
             </div>
