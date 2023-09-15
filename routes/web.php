@@ -261,9 +261,9 @@ Route::patch('masters/{id}/change-status', [MstMasterValueController::class, 'ch
 //timeslot-storing in mst_master_values table:
 Route::post('/mastervalues/store', [MstTimeSlotController::class,'store'])->name('mastervalues.store');
 //adding timeslot for a particular staff:
-Route::get('/timeslot-staff/slot/{id}',[MstTimeSlotController::class,'slotIndex'])->name('staff.slot');
+Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
 Route::post('/timeslot-staff/store',[MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
-
+Route::delete('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
 // Qualification - Screen for qualification
 Route::get('/qualifications', [MstQualificationController::class, 'index'])->name('qualifications.index');
 Route::get('/qualifications/create', [MstQualificationController::class, 'create'])->name('qualifications.create');

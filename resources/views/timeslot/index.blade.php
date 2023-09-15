@@ -23,7 +23,7 @@
                                    <i class="fa fa-check-square-o"></i>Submit
                                    </button>
         
-                            <a class="btn btn-secondary ml-2" href="{{ route('timeslot.index') }}">
+                            <a class="btn btn-primary" href="{{ route('timeslot.index') }}">
                                 <i class="fa fa-times" aria-hidden="true"></i> Reset
                             </a>
                         </div>
@@ -84,7 +84,7 @@
                                     </form>
                                 </td>
                                 <td>
-                                    <a class="btn btn-primary"
+                                    <a class="btn btn-primary btn-sm edit-custom"
                                         href="{{ route('timeslot.edit', $timeslot->id) }}"><i
                                             class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
             
@@ -93,7 +93,7 @@
                                         @csrf
                                         @method('delete')
                                         <button type="submit" onclick="return confirm('Do you want to delete it?');"
-                                            class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                                            class="btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
                                     </form>
                                 </td>
                             </tr>

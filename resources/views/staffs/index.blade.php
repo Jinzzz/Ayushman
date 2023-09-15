@@ -56,7 +56,7 @@
                        
                         <div class="col-md-12 d-flex align-items-end">
                            
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp;
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp; &nbsp;
                                 <a class="btn btn-primary" href="{{ route('staffs.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                           
                         </div>

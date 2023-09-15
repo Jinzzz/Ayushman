@@ -79,7 +79,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <center>
-                                    <button type="submit" class="btn btn-raised btn-primary">
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="fa fa-check-square-o"></i> Add
                                     </button>
                                     <a class="btn btn-danger" href="{{ route('externaldoctors.index') }}">Cancel</a>

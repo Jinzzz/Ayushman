@@ -7,14 +7,7 @@
             <div class="card-header">
                <h3 class="mb-0 card-title">Edit Therapy</h3>
             </div>
-            <div class="card-body">
-               @if ($message = Session::get('status'))
-               <div class="alert alert-success">
-                  <p></p>
-               </div>
-               @endif
-            </div>
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>

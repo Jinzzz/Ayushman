@@ -868,7 +868,7 @@ input[type="submit"].btn-block, input[type="reset"].btn-block, input[type="butto
 	cursor: pointer;
     font-weight: 400;
     letter-spacing: .03em;
-    font-size: 0.8125rem;
+    font-size:12px;
     min-width: 2.375rem;
 }
 .btn-icon {

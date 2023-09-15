@@ -10,15 +10,15 @@
             <div class="card-body">
                <div class="row mb-3">
                   <div class="col-md-4">
-                     <label for="patient-code">Patient Code:</label>
+                     <label for="patient-code" class="form-label">Patient Code:</label>
                      <input type="text" id="patient-code" name="patient_code" class="form-control" value="{{ request('patient_code') }}">
                   </div>
                   <div class="col-md-4">
-                     <label for="patient-name">Patient Name:</label>
+                     <label for="patient-name" class="form-label">Patient Name:</label>
                      <input type="text" id="patient-name" name="patient_name" class="form-control" value="{{ request('patient_name') }}">
                   </div>
                   <div class="col-md-4">
-                     <label for="patient-mobile">Patient Mobile:</label>
+                     <label for="patient-mobile" class="form-label">Patient Mobile:</label>
                      <input type="text" id="patient-mobile" name="patient_mobile" class="form-control" value="{{ request('patient_mobile') }}">
                   </div>
                </div>

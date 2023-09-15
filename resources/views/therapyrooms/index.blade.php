@@ -10,7 +10,7 @@
             <div class="card-body">
                 <form action="{{ route('therapyrooms.index') }}" method="GET">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="branch_id">Branch</label>
                                 <select class="form-control" name="branch_id" id="branch_id">
@@ -23,10 +23,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4 d-flex">
+                        <div class="col-md-12 d-flex align-items-end">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
-                                <a class="btn btn-secondary" href="{{ route('therapyrooms.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;&nbsp;
+                                <a class="btn btn-primary" href="{{ route('therapyrooms.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                             </div>
                         </div>
                     </div>
@@ -96,8 +96,8 @@
                             </button>
                         </td>
                         <td>
-                            <a class="btn btn-secondary" href="{{ route('therapyrooms.edit', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                            <button type="button" onclick="deleteData({{ $therapyroom->id }})" class="btn btn-danger">
+                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('therapyrooms.edit', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
+                            <button type="button" onclick="deleteData({{ $therapyroom->id }})" class="btn-danger btn-sm">
                                 <i class="fa fa-trash" aria-hidden="true"></i> Delete
                             </button>
                         </td>
