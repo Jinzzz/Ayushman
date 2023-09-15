@@ -67,7 +67,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Patient Dob*</label>
+                                    <label class="form-label">Date Of Birth*</label>
                                     <input type="date" class="form-control" name="patient_dob" required
                                         placeholder="Patient Dob">
                                 </div>

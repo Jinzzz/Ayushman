@@ -102,13 +102,13 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Medical History</label>
-                     <textarea class="form-control" readonly name="patient_medical_history">{{$show->patient_medical_history}}</textarea>
+                     <textarea class="form-control" readonly name="patient_medical_history" id="medicalHistory">{{$show->patient_medical_history}}</textarea>
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Patient Current Medication</label>
-                     <textarea class="form-control" readonly name="patient_current_medications">{{ $show->patient_current_medications }}</textarea>
+                     <textarea class="form-control" readonly name="patient_current_medications" id="currentMedication">{{ $show->patient_current_medications }}</textarea>
                   </div>
                </div>
             </div>
@@ -141,7 +141,24 @@
 </div>
 @endsection
 @section('js')
-<script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        CKEDITOR.replace('medicalHistory', {
+            removePlugins: 'image',
+           
+        });
+
+        $(document).ready(function() {
+        CKEDITOR.replace('currentMedication', {
+            removePlugins: 'image',
+           
+        });
+
+        });
+      });
    function toggleStatus(checkbox) {
        if (checkbox.checked) {
            $("#statusText").text('Active');
