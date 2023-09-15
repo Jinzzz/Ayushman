@@ -11,11 +11,7 @@
     <div class="app-sidebar__user">
     <div class="dropdown user-pro-body text-center">
         <div class="user-pic">
-            @if(auth()->user()->image)
-                <img src="{{ auth()->user()->image_url }}" alt="user-img" class="avatar-xl rounded-circle">
-            @else
                 <img src="{{ asset('assets/images/avatar.png') }}" alt="user-img" class="avatar-xl rounded-circle">
-            @endif
         </div>
         <div class="user-info">
             <h6 class="mb-0 text-dark">{{ ucfirst(auth()->user()->admin_name) }}</h6>
