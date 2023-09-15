@@ -129,7 +129,7 @@ Route::post('/therapyrooms/store', [MstTherapyRoomController::class, 'store'])->
 Route::get('/therapyrooms/edit/{id}', [MstTherapyRoomController::class, 'edit'])->name('therapyrooms.edit');
 Route::delete('/therapyrooms/destroy/{id}', [MstTherapyRoomController::class,'destroy'])->name('therapyrooms.destroy');
 Route::put('/therapyrooms/update/{id}', [MstTherapyRoomController::class,'update'])->name('therapyrooms.update');
-Route::patch('therapyrooms/{id}/change-status', [MstTherapyRoomController::class, 'changeStatus'])->name('therapyrooms.changeStatus');
+Route::patch('therapyrooms/change-status/{id}', [MstTherapyRoomController::class, 'changeStatus'])->name('therapyrooms.changeStatus');
 
 //Manage-Memberships:
 Route::get('/membership/index', [MstMembershipController::class, 'index'])->name('membership.index');
@@ -162,7 +162,7 @@ Route::post('/unit/store', [MstUnitController::class, 'store'])->name('unit.stor
 Route::get('/unit/edit/{id}', [MstUnitController::class, 'edit'])->name('unit.edit');
 Route::put('/unit/update/{id}', [MstUnitController::class, 'update'])->name('unit.update');
 Route::delete('/unit/destroy/{id}', [MstUnitController::class, 'destroy'])->name('unit.destroy');
-Route::patch('unit/{id}/change-status', [MstUnitController::class, 'changeStatus'])->name('unit.changeStatus');
+Route::patch('unit/change-status/{id}', [MstUnitController::class, 'changeStatus'])->name('unit.changeStatus');
 
 //Manage-Taxes:
 Route::get('/tax/index', [MstTaxController::class, 'index'])->name('tax.index');
@@ -242,7 +242,7 @@ Route::post('/therapyroom-assigning/store', [MstTherapyRoomAssigningController::
 Route::get('/therapyroom-assigning/edit/{id}', [MstTherapyRoomAssigningController::class, 'edit'])->name('therapyroomassigning.edit');
 Route::put('/therapyroom-assigning/update/{id}', [MstTherapyRoomAssigningController::class, 'update'])->name('therapyroomassigning.update');
 Route::delete('/therapyroom-assigning/destroy/{id}', [MstTherapyRoomAssigningController::class, 'destroy'])->name('therapyroomassigning.destroy');
-Route::patch('therapyroom-assigning/{id}/change-status', [MstTherapyRoomAssigningController::class, 'changeStatus'])->name('therapyroomassigning.changeStatus');
+Route::patch('therapyroom-assigning/change-status/{id}', [MstTherapyRoomAssigningController::class, 'changeStatus'])->name('therapyroomassigning.changeStatus');
 Route::get('/get-therapy-rooms/{branchId}', [MstTherapyRoomAssigningController::class, 'getTherapyRooms']);
 
 
@@ -270,7 +270,7 @@ Route::get('/qualifications/create', [MstQualificationController::class, 'create
 Route::post('/qualifications/store', [MstQualificationController::class, 'store'])->name('qualifications.store');
 Route::delete('/qualifications/destroy/{id}', [MstQualificationController::class, 'destroy'])->name('qualifications.destroy');
 Route::get('/qualifications/edit/{id}', [MstQualificationController::class, 'edit'])->name('qualifications.edit');
-Route::patch('qualifications/{id}/change-status', [MstQualificationController::class, 'changeStatus'])->name('qualifications.changeStatus');
+Route::patch('qualifications/change-status/{id}', [MstQualificationController::class, 'changeStatus'])->name('qualifications.changeStatus');
 
 // Medicine dosage - Screen for medicine dosges
 Route::get('/medicine-dosage', [MstMedicineDosageController::class, 'index'])->name('medicine.dosage.index');
@@ -278,7 +278,7 @@ Route::get('/medicine-dosage/create', [MstMedicineDosageController::class, 'crea
 Route::post('/medicine-dosage/store', [MstMedicineDosageController::class, 'store'])->name('medicine.dosage.store');
 Route::delete('/medicine-dosage/destroy/{id}', [MstMedicineDosageController::class, 'destroy'])->name('medicine.dosage.destroy');
 Route::get('/medicine-dosage/edit/{id}', [MstMedicineDosageController::class, 'edit'])->name('medicine.dosage.edit');
-Route::patch('medicine-dosage/{id}/change-status', [MstMedicineDosageController::class, 'changeStatus'])->name('medicine.dosage.changeStatus');
+Route::patch('medicine-dosage/change-status/{id}', [MstMedicineDosageController::class, 'changeStatus'])->name('medicine.dosage.changeStatus');
 
 
 // Leave type - Screen for leave types
@@ -287,7 +287,7 @@ Route::get('/leave-type/create', [MstLeaveTypeController::class, 'create'])->nam
 Route::post('/leave-type/store', [MstLeaveTypeController::class, 'store'])->name('leave.type.store');
 Route::delete('/leave-type/destroy/{id}', [MstLeaveTypeController::class, 'destroy'])->name('leave.type.destroy');
 Route::get('/leave-type/edit/{id}', [MstLeaveTypeController::class, 'edit'])->name('leave.type.edit');
-Route::patch('leave-type/{id}/change-status', [MstLeaveTypeController::class, 'changeStatus'])->name('leave.type.changeStatus');
+Route::patch('leave-type/change-status/{id}', [MstLeaveTypeController::class, 'changeStatus'])->name('leave.type.changeStatus');
 
 // Manufacturer- Screen for manufacturer
 Route::get('/manufacturer', [MstManufacturerController::class, 'index'])->name('manufacturer.index');
@@ -295,4 +295,4 @@ Route::get('/manufacturer/create', [MstManufacturerController::class, 'create'])
 Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])->name('manufacturer.store');
 Route::delete('/manufacturer/destroy/{id}', [MstManufacturerController::class, 'destroy'])->name('manufacturer.destroy');
 Route::get('/manufacturer/edit/{id}', [MstManufacturerController::class, 'edit'])->name('manufacturer.edit');
-Route::patch('manufacturer/{id}/change-status', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');
+Route::patch('manufacturer/change-status/{id}', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');

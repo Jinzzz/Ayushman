@@ -18,7 +18,7 @@ class MstLeaveTypeController extends Controller
             $leave_types = Mst_Leave_Type::orderBy('created_at', 'desc')->get();
             return view('leave_types.index', compact('pageTitle', 'leave_types'));
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching leave types.');
+            return redirect()->route('home')->with('error', 'Something went wrong.');
         }
     }
 
@@ -29,8 +29,7 @@ class MstLeaveTypeController extends Controller
             $pageTitle = "Add Leave Types";
             return view('leave_types.create', compact('pageTitle'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching leave types.');
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -81,7 +80,7 @@ class MstLeaveTypeController extends Controller
                 return redirect()->route('leave.type.create')->with('error', $messages);
             }
         } catch (QueryException $e) {
-            return redirect()->route('leave.type.create')->with('error', 'An error occurred while processing the request.');
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -93,27 +92,32 @@ class MstLeaveTypeController extends Controller
             $leave_types->deleted_by = Auth::id();
             $leave_types->save();
             $leave_types->delete();
-            // return 1;
-            return redirect()->route('leave.type.index')->with('success', 'Deleted successfully');
+            return 1;
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching leave types.');
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
         }
     }
 
     public function edit($id)
     {
-        $pageTitle = "Edit Leave Types";
-        $leave_types = Mst_Leave_Type::findOrFail($id);
-        return view('leave_types.create', compact('pageTitle', 'leave_types'));
+        try {
+            $pageTitle = "Edit Leave Types";
+            $leave_types = Mst_Leave_Type::findOrFail($id);
+            return view('leave_types.create', compact('pageTitle', 'leave_types'));
+        } catch (QueryException $e) {
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
+        }
     }
 
     public function changeStatus($id)
     {
-        $leave_types = Mst_Leave_Type::findOrFail($id);
-
-        $leave_types->is_active = !$leave_types->is_active;
-        $leave_types->save();
-
-        return redirect()->back()->with('success', 'Status changed successfully');
+        try {
+            $leave_types = Mst_Leave_Type::findOrFail($id);
+            $leave_types->is_active = !$leave_types->is_active;
+            $leave_types->save();
+            return 1;
+        } catch (QueryException $e) {
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
+        }
     }
 }

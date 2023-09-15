@@ -10,19 +10,19 @@
             <div class="card-body">
                 <form action="{{ route('therapyrooms.index') }}" method="GET">
                     <div class="row">
-                    <div class="col-md-8">
-                <div class="form-group">
-                    <label for="branch_id">Branch</label>
-                    <select class="form-control" name="branch_id" id="branch_id">
-                        <option value="">Choose Branch</option>
-                        @foreach($branch as $id => $branchName)
-                        <option value="{{ $id }}" {{ old('branch_id') == $id ? 'selected' : '' }}>
-                            {{ $branchName }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="branch_id">Branch</label>
+                                <select class="form-control" name="branch_id" id="branch_id">
+                                    <option value="">Choose Branch</option>
+                                    @foreach($branch as $id => $branchName)
+                                    <option value="{{ $id }}" {{ old('branch_id') == $id ? 'selected' : '' }}>
+                                        {{ $branchName }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-4 d-flex">
                             <div class="form-group">
                                 <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
@@ -76,7 +76,7 @@
                     $i = 0;
                     @endphp
                     @foreach($therapyrooms as $therapyroom)
-                    <tr>
+                    <tr id="dataRow_{{ $therapyroom->id }}">
                         <td>{{ ++$i }}</td>
                         <td>{{ $therapyroom->branch->branch_name }}</td>
                         <td>{{ $therapyroom->room_name }}</td>
@@ -87,26 +87,19 @@
                             <a class="btn btn-sm  btn-outline-success " href="{{ route('therapyroomassigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>RoomAssigning</a>
                         </td>
                         <td>
-                            <form action="{{ route('therapyrooms.changeStatus', $therapyroom->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-
-                                <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
-                                    @if($therapyroom->is_active == 0)
-                                    InActive
-                                    @else
-                                    Active
-                                    @endif
-                                </button>
-                            </form>
+                            <button type="button" onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
+                                @if($therapyroom->is_active == 0)
+                                InActive
+                                @else
+                                Active
+                                @endif
+                            </button>
                         </td>
                         <td>
                             <a class="btn btn-secondary" href="{{ route('therapyrooms.edit', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                            <form style="display: inline-block" action="{{ route('therapyrooms.destroy', $therapyroom->id) }}" method="post">
-                                @csrf
-                                @method('delete')
-                                <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                            </form>
+                            <button type="button" onclick="deleteData({{ $therapyroom->id }})" class="btn btn-danger">
+                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                            </button>
                         </td>
                     </tr>
                     @endforeach
@@ -121,3 +114,86 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('therapyrooms.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    // Change status 
+    function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('therapyrooms.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
+                }
+            });
+    }
+</script>

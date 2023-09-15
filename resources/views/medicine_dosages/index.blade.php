@@ -25,7 +25,7 @@
         <div class="card-body">
             <a href="{{ route('medicine.dosage.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
-                Add {{$pageTitle}}
+                Create {{$pageTitle}}
             </a>
 
 
@@ -45,21 +45,17 @@
                         $i = 0;
                         @endphp
                         @foreach($medicine_dosages as $medicine_dosage)
-                        <tr id="qualificationRow_{{ $medicine_dosage->medicine_dosage_id }}">
+                        <tr id="dataRow_{{ $medicine_dosage->medicine_dosage_id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $medicine_dosage->name}}</td>
                             <td>
-                                <form action="{{ route('medicine.dosage.changeStatus', $medicine_dosage->medicine_dosage_id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($medicine_dosage->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($medicine_dosage->is_active == 0)
-                                        InActive
-                                        @else
-                                        Active
-                                        @endif
-                                    </button>
-                                </form>
+                                <button type="button" onclick="changeStatus({{ $medicine_dosage->medicine_dosage_id }})" class="btn btn-sm @if($medicine_dosage->is_active == 0) btn-danger @else btn-success @endif">
+                                    @if($medicine_dosage->is_active == 0)
+                                    InActive
+                                    @else
+                                    Active
+                                    @endif
+                                </button>
                             </td>
 
                             <td>
@@ -67,11 +63,9 @@
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
 
-                                <form style="display: inline-block" action="{{ route('medicine.dosage.destroy', $medicine_dosage->medicine_dosage_id) }}" method="post">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                </form>
+                                <button type="button" onclick="deleteData({{ $medicine_dosage->medicine_dosage_id }})" class="btn btn-danger">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                </button>
                             </td>
 
                         </tr>
@@ -89,7 +83,7 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-    function deleteQualification(qualificationId) {
+    function deleteData(dataId) {
         swal({
                 title: "Delete selected data?",
                 text: "Are you sure you want to delete this data",
@@ -104,7 +98,7 @@
             function(isConfirm) {
                 if (isConfirm) {
                     $.ajax({
-                        url: "{{ route('qualifications.destroy', '') }}/" + qualificationId,
+                        url: "{{ route('medicine.dosage.destroy', '') }}/" + dataId,
                         type: "DELETE",
                         data: {
                             _token: "{{ csrf_token() }}",
@@ -112,7 +106,7 @@
                         success: function(response) {
                             // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
-                                $("#qualificationRow_" + qualificationId).remove();
+                                $("#dataRow_" + dataId).remove();
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
@@ -124,6 +118,49 @@
                     });
                 } else {
                     return;
+                }
+            });
+    }
+    // Change status 
+    function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('medicine.dosage.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
                 }
             });
     }

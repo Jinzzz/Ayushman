@@ -5,7 +5,7 @@
       <div class="col-md-12">
          <div class="card">
             <div class="card-header">
-               <h3 class="mb-0 card-title">Create Unit</h3>
+               <h3 class="mb-0 card-title">{{$pageTitle}}</h3>
             </div>
             <div class="card-body">
                @if ($message = Session::get('status'))

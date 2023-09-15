@@ -19,8 +19,7 @@ class MstQualificationController extends Controller
             $qualifications = Mst_Qualification::orderBy('created_at', 'desc')->get();
             return view('qualifications.index', compact('pageTitle', 'qualifications'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching qualifications.');
+            return redirect()->route('home')->with('error', 'Something went wrong');
         }
     }
 
@@ -31,8 +30,7 @@ class MstQualificationController extends Controller
             $pageTitle = "Add Qualifications";
             return view('qualifications.create', compact('pageTitle'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching qualifications.');
+            return redirect()->route('qualifications.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -61,10 +59,10 @@ class MstQualificationController extends Controller
                     ]);
                     $message = 'Qualifications updated successfully';
                 } else {
-                    $checkExists = Mst_Qualification::where('name',$request->qualification)->first();
-                    if($checkExists){
+                    $checkExists = Mst_Qualification::where('name', $request->qualification)->first();
+                    if ($checkExists) {
                         return redirect()->route('qualifications.index')->with('exists', 'This qualification is aready exists.');
-                    }else{
+                    } else {
                         Mst_Qualification::create([
                             'name' => $request->qualification,
                             'is_active' => $request->is_active,
@@ -75,17 +73,14 @@ class MstQualificationController extends Controller
                         ]);
                         $message = 'Qualifications added successfully';
                     }
-                    
                 }
                 return redirect()->route('qualifications.index')->with('success', $message);
             } else {
                 $messages = $validator->errors();
-
-                // print_r($messages);die();
                 return redirect()->route('qualifications.create')->with('error', $messages);
             }
         } catch (QueryException $e) {
-            return redirect()->route('qualifications.create')->with('error', 'An error occurred while processing the request.');
+            return redirect()->route('qualifications.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -98,26 +93,32 @@ class MstQualificationController extends Controller
             $qualification->save();
             $qualification->delete();
             return 1;
-            return redirect()->route('qualifications.index')->with('success', 'Deleted successfully');
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching qualifications.');
+            return redirect()->route('qualifications.index')->with('error', 'Something went wrong');
         }
     }
 
     public function edit($id)
     {
-        $pageTitle = "Edit Qualifications";
-        $qualification = Mst_Qualification::findOrFail($id);
-        return view('qualifications.create', compact('pageTitle', 'qualification'));
+        try {
+            $pageTitle = "Edit Qualifications";
+            $qualification = Mst_Qualification::findOrFail($id);
+            return view('qualifications.create', compact('pageTitle', 'qualification'));
+        } catch (QueryException $e) {
+            return redirect()->route('qualifications.index')->with('error', 'Something went wrong');
+        }
     }
 
     public function changeStatus($id)
     {
-        $qualification = Mst_Qualification::findOrFail($id);
-    
-        $qualification->is_active = !$qualification->is_active;
-        $qualification->save();
-    
-        return redirect()->back()->with('success','Status changed successfully');
+        try {
+            $qualification = Mst_Qualification::findOrFail($id);
+
+            $qualification->is_active = !$qualification->is_active;
+            $qualification->save();
+            return 1;
+        } catch (QueryException $e) {
+            return redirect()->route('qualifications.index')->with('error', 'Something went wrong');
+        }
     }
 }

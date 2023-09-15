@@ -18,7 +18,7 @@ class MstMedicineDosageController extends Controller
             $medicine_dosages = Mst_Medicine_Dosage::orderBy('created_at', 'desc')->get();
             return view('medicine_dosages.index', compact('pageTitle', 'medicine_dosages'));
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching medicine dosages.');
+            return redirect()->route('home')->with('error', 'Something went wrong.');
         }
     }
 
@@ -29,8 +29,7 @@ class MstMedicineDosageController extends Controller
             $pageTitle = "Add Medicine Dosages";
             return view('medicine_dosages.create', compact('pageTitle'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching medicine dosages.');
+            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -59,10 +58,10 @@ class MstMedicineDosageController extends Controller
                     ]);
                     $message = 'Medicine dosage updated successfully';
                 } else {
-                    $checkExists = Mst_Medicine_Dosage::where('name',$request->medicine_dosages)->first();
-                    if($checkExists){
+                    $checkExists = Mst_Medicine_Dosage::where('name', $request->medicine_dosages)->first();
+                    if ($checkExists) {
                         return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is aready exists.');
-                    }else{
+                    } else {
                         Mst_Medicine_Dosage::create([
                             'name' => $request->medicine_dosages,
                             'is_active' => $request->is_active,
@@ -73,7 +72,6 @@ class MstMedicineDosageController extends Controller
                         ]);
                         $message = 'Medicine dosage added successfully';
                     }
-                    
                 }
                 return redirect()->route('medicine.dosage.index')->with('success', $message);
             } else {
@@ -82,7 +80,7 @@ class MstMedicineDosageController extends Controller
                 return redirect()->route('medicine.dosage.create')->with('error', $messages);
             }
         } catch (QueryException $e) {
-            return redirect()->route('medicine.dosage.create')->with('error', 'An error occurred while processing the request.');
+            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -94,27 +92,34 @@ class MstMedicineDosageController extends Controller
             $medicine_dosages->deleted_by = Auth::id();
             $medicine_dosages->save();
             $medicine_dosages->delete();
-            // return 1;
-            return redirect()->route('medicine.dosage.index')->with('success', 'Deleted successfully');
+            return 1;
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching medicine_dosages.');
+            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
         }
     }
 
     public function edit($id)
     {
-        $pageTitle = "Edit Medicine Dosages";
-        $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
-        return view('medicine_dosages.create', compact('pageTitle', 'medicine_dosages'));
+        try {
+            $pageTitle = "Edit Medicine Dosages";
+            $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
+            return view('medicine_dosages.create', compact('pageTitle', 'medicine_dosages'));
+        } catch (QueryException $e) {
+            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
+        }
     }
 
     public function changeStatus($id)
     {
-        $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
-    
-        $medicine_dosages->is_active = !$medicine_dosages->is_active;
-        $medicine_dosages->save();
-    
-        return redirect()->back()->with('success','Status changed successfully');
+        try {
+            $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
+
+            $medicine_dosages->is_active = !$medicine_dosages->is_active;
+            $medicine_dosages->save();
+            return 1;
+            return redirect()->back()->with('success', 'Status changed successfully');
+        } catch (QueryException $e) {
+            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
+        }
     }
 }

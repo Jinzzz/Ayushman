@@ -18,8 +18,7 @@ class MstManufacturerController extends Controller
             $manufacturers = Mst_Manufacturer::orderBy('created_at', 'desc')->get();
             return view('manufacturers.index', compact('pageTitle', 'manufacturers'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching manufacturers.');
+            return redirect()->route('home')->with('error', 'Something went wrong.');
         }
     }
 
@@ -30,8 +29,7 @@ class MstManufacturerController extends Controller
             $pageTitle = "Add Manufacturers";
             return view('Manufacturers.create', compact('pageTitle'));
         } catch (QueryException $e) {
-            // Handle the exception, you can log it or display an error message
-            return redirect()->route('home')->with('error', 'An error occurred while fetching Manufacturers.');
+            return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -60,10 +58,10 @@ class MstManufacturerController extends Controller
                     ]);
                     $message = 'Qualifications updated successfully';
                 } else {
-                    $checkExists = Mst_Manufacturer::where('name',$request->manufacturer)->first();
-                    if($checkExists){
+                    $checkExists = Mst_Manufacturer::where('name', $request->manufacturer)->first();
+                    if ($checkExists) {
                         return redirect()->route('manufacturer.index')->with('exists', 'This manufacturer is aready exists.');
-                    }else{
+                    } else {
                         Mst_Manufacturer::create([
                             'name' => $request->manufacturer,
                             'is_active' => $request->is_active,
@@ -74,7 +72,6 @@ class MstManufacturerController extends Controller
                         ]);
                         $message = 'manufacturers added successfully';
                     }
-                    
                 }
                 return redirect()->route('manufacturer.index')->with('success', $message);
             } else {
@@ -83,7 +80,7 @@ class MstManufacturerController extends Controller
                 return redirect()->route('manufacturers.create')->with('error', $messages);
             }
         } catch (QueryException $e) {
-            return redirect()->route('manufacturers.create')->with('error', 'An error occurred while processing the request.');
+            return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -96,26 +93,33 @@ class MstManufacturerController extends Controller
             $manufacturer->save();
             $manufacturer->delete();
             return 1;
-            return redirect()->route('manufacturer.index')->with('success', 'Deleted successfully');
         } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'An error occurred while fetching manufacturers.');
+            return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
         }
     }
 
     public function edit($id)
     {
-        $pageTitle = "Edit Manufacturers";
-        $manufacturer = Mst_Manufacturer::findOrFail($id);
-        return view('manufacturers.create', compact('pageTitle', 'manufacturer'));
+        try {
+            $pageTitle = "Edit Manufacturers";
+            $manufacturer = Mst_Manufacturer::findOrFail($id);
+            return view('manufacturers.create', compact('pageTitle', 'manufacturer'));
+        } catch (QueryException $e) {
+            return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
+        }
     }
 
     public function changeStatus($id)
     {
-        $manufacturer = Mst_Manufacturer::findOrFail($id);
-    
-        $manufacturer->is_active = !$manufacturer->is_active;
-        $manufacturer->save();
-    
-        return redirect()->back()->with('success','Status changed successfully');
+        try {
+            $manufacturer = Mst_Manufacturer::findOrFail($id);
+
+            $manufacturer->is_active = !$manufacturer->is_active;
+            $manufacturer->save();
+
+            return 1;
+        } catch (QueryException $e) {
+            return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
+        }
     }
 }

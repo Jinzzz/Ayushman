@@ -25,7 +25,7 @@
         <div class="card-body">
             <a href="{{ route('qualifications.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
-                Add {{$pageTitle}}
+                Create {{$pageTitle}}
             </a>
 
 
@@ -49,17 +49,13 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $qualification->name}}</td>
                             <td>
-                                <form action="{{ route('qualifications.changeStatus', $qualification->qualification_id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($qualification->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($qualification->is_active == 0)
-                                        InActive
-                                        @else
-                                        Active
-                                        @endif
-                                    </button>
-                                </form>
+                                <button type="button" onclick="changeStatus({{ $qualification->qualification_id }})" class="btn btn-sm @if($qualification->is_active == 0) btn-danger @else btn-success @endif">
+                                    @if($qualification->is_active == 0)
+                                    InActive
+                                    @else
+                                    Active
+                                    @endif
+                                </button>
                             </td>
 
                             <td>
@@ -87,9 +83,10 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
+    // to delete that selected row 
     function deleteQualification(qualificationId) {
         swal({
-                title: "Delete selected data?",
+                title: "Delete data?",
                 text: "Are you sure you want to delete this data",
                 type: "warning",
                 showCancelButton: true,
@@ -108,7 +105,6 @@
                             _token: "{{ csrf_token() }}",
                         },
                         success: function(response) {
-                            // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
                                 $("#qualificationRow_" + qualificationId).remove();
                                 flashMessage('s', 'Data deleted successfully');
@@ -122,6 +118,50 @@
                     });
                 } else {
                     return;
+                }
+            });
+    }
+
+    // Change status 
+    function changeStatus(qualificationId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('qualifications.changeStatus', '') }}/" + qualificationId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#qualificationRow_' + qualificationId).find('td:eq(2)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + qualificationId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + qualificationId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
                 }
             });
     }

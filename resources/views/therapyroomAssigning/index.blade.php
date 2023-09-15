@@ -66,32 +66,25 @@
                         $i = 0;
                         @endphp
                         @foreach($roomAssigning as $assign)
-                        <tr>
+                        <tr id="dataRow_{{ $assign->id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $assign->therapyroomName->room_name}}</td>
                             <td>{{ $assign->branch->branch_name}}</td>
                             <td>{{ $assign->staff->staff_name}}</td>
                             <td>
-                                <form action="{{ route('therapyroomassigning.changeStatus', $assign->id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($assign->is_active == 0)
-                                        InActive
-                                        @else
-                                        Active
-                                        @endif
-                                    </button>
-                                </form>
+                            <button type="button" onclick="changeStatus({{ $assign->id }})" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
+                                    @if($assign->is_active == 0)
+                                    InActive
+                                    @else
+                                    Active
+                                    @endif
+                                </button>
                             </td>
 
                             <td>
-                                <!-- <a class="btn btn-secondary" href="{{ route('therapyroomassigning.edit', $assign->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a> -->
-                                <form style="display: inline-block" action="{{ route('therapyroomassigning.destroy', $assign->id) }}" method="post">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                </form>
+                            <button type="button" onclick="deleteData({{ $assign->id }})" class="btn btn-danger">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -107,3 +100,87 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('therapyroomassigning.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    // Change status 
+    function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('therapyroomassigning.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                           
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
+                }
+            });
+    }
+</script>

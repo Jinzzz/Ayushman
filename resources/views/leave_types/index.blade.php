@@ -25,7 +25,7 @@
         <div class="card-body">
             <a href="{{ route('leave.type.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
-                Add {{$pageTitle}}
+                Create {{$pageTitle}}
             </a>
 
 
@@ -45,35 +45,26 @@
                         $i = 0;
                         @endphp
                         @foreach($leave_types as $leave_type)
-                        <tr id="qualificationRow_{{ $leave_type->leave_type_id }}">
+                        <tr id="dataRow_{{ $leave_type->leave_type_id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $leave_type->name}}</td>
                             <td>
-                                <form action="{{ route('leave.type.changeStatus', $leave_type->leave_type_id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($leave_type->is_active == 0)
-                                        InActive
-                                        @else
-                                        Active
-                                        @endif
-                                    </button>
-                                </form>
+                                <button type="button" onclick="changeStatus({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
+                                    @if($leave_type->is_active == 0)
+                                    InActive
+                                    @else
+                                    Active
+                                    @endif
+                                </button>
                             </td>
-
                             <td>
                                 <a class="btn btn-primary" href="{{ route('leave.type.edit', $leave_type->leave_type_id) }}">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
-
-                                <form style="display: inline-block" action="{{ route('leave.type.destroy', $leave_type->leave_type_id) }}" method="post">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                </form>
+                                <button type="button" onclick="deleteData({{ $leave_type->leave_type_id }})" class="btn btn-danger">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                </button>
                             </td>
-
                         </tr>
                         @endforeach
                     </tbody>
@@ -89,7 +80,7 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-    function deleteQualification(qualificationId) {
+    function deleteData(dataId) {
         swal({
                 title: "Delete selected data?",
                 text: "Are you sure you want to delete this data",
@@ -104,7 +95,7 @@
             function(isConfirm) {
                 if (isConfirm) {
                     $.ajax({
-                        url: "{{ route('qualifications.destroy', '') }}/" + qualificationId,
+                        url: "{{ route('leave.type.destroy', '') }}/" + dataId,
                         type: "DELETE",
                         data: {
                             _token: "{{ csrf_token() }}",
@@ -112,7 +103,7 @@
                         success: function(response) {
                             // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
-                                $("#qualificationRow_" + qualificationId).remove();
+                                $("#dataRow_" + dataId).remove();
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
@@ -124,6 +115,49 @@
                     });
                 } else {
                     return;
+                }
+            });
+    }
+    // Change status 
+    function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('leave.type.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
                 }
             });
     }
