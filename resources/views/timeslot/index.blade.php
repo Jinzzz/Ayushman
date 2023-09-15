@@ -13,7 +13,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="slot_name"><b>Slot Name*</b></label>
-                            <input type="text" id="slot_name" name="slot_name" class="form-control">
+                            <input type="text" id="slot_name" required name="master_value" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-3 d-flex align-items-end">

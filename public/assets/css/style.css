@@ -25827,11 +25827,11 @@ button.btn.btn-secondary:hover {
 } */
 .btn-primary {
 	color: #ffffff !important;
-	background: #4ecc48 !important;
-	border-color: #4ecc48 !important;
-	box-shadow: 1px 1px 4px 1px #ff5e1820 !important;
+	background: rgb(48 209 88)!important;
+    border-color: rgb(48 209 88)!important;
+	/* box-shadow: 1px 1px 4px 1px #ff5e1820 !important; */
 	font-size: 16px;
-	font-weight: 500;
+	/* font-weight: 500; */
 }
 
 .fa-eye:before {
@@ -25907,7 +25907,7 @@ p.number-font.mb-0 {
 
 button.btn.btn-sm.btn-success {
 	background: green !important;
-	padding: 7px 14px;
+	/* padding: 7px 14px; */
 	font-size: 12px;
 	color: white !important;
 	background: rgb(48,209,88)!important;
@@ -25923,8 +25923,9 @@ button.btn.btn-sm.btn-success:hover{
 }
 
 .btn:not(:disabled):not(.disabled) {
-	padding: 3px 10px;
-	font-size: 12px;
+	padding: 4.5px 10px;
+	
+	margin-top: -2px;
 }
 
 .btn-secondary {
@@ -25940,7 +25941,7 @@ button.btn.btn-sm.btn-danger {
 	background: red !important;
 	box-shadow: unset !important;
 	color: white !important;
-	padding: 7px 8px;
+	/* padding: 7px 8px; */
 	font-size: 12px;
 	background-color: #cfcfcf!important;
 	border-color: #cfcfcf!important;
@@ -26244,5 +26245,21 @@ border-color: #ed950c!important;
 }
 .btn.btn-secondary.view-btn .fa-eye::before{
 color: #fff!important;
+}
+.fa-eye:before {
+    color: #fff!important;
+}
+.btn-secondary {
+    background: rgb(48 209 88)!important;
+    border-color: rgb(48 209 88)!important;
+}
+
+.edit-custom{
+	font-size: 0.65rem !important;
+    margin-right: 0;
+}
+.status-custom{
+	font-size: 0.65rem !important;
+    margin-right: 0;
 }
 /* End */

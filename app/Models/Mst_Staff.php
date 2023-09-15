@@ -33,6 +33,9 @@ class Mst_Staff extends Model
         'staff_commission_type',
         'staff_commission',
         'staff_booking_fee',
+        'staff_specialization',
+        'salary_type',
+        'salary_amount',
     ];
 
 
