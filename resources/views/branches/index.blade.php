@@ -23,8 +23,8 @@
                         
                         <div class="col-md-4 d-flex align-items-end">
                             <div>
-                                <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
-                                <a class="btn btn-secondary ml-2" href="{{ route('branches') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp;
+                                <a class="btn btn-primary" href="{{ route('branches') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                             </div>
                         </div>
                     </div>
@@ -99,16 +99,16 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary edit-btn"
+                                        <a class="btn btn-primary btn-sm edit-custom"
                                             href="{{ route('branches.edit', $branch->branch_id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                                  <a class="btn btn-secondary view-btn" href="{{ route('branches.show',$branch->branch_id) }}">
+                                                  <a class="btn btn-secondary btn-sm" href="{{ route('branches.show',$branch->branch_id) }}">
                                                 <i class="fa fa-eye" aria-hidden="true"></i> View </a>
                                         <form style="display: inline-block"
                                             action="{{ route('branches.destroy', $branch->branch_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash"
+                                            <button type="submit" onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
                                                     aria-hidden="true"></i>Delete</button>
                                         </form>
                                     </td>

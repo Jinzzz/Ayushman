@@ -20,6 +20,7 @@ class MstTimeSlotController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'master_value' => 'required|unique:mst_master_values,master_value',
         ]);
@@ -31,6 +32,7 @@ class MstTimeSlotController extends Controller
         $slot->is_active = 1;
         $slot->created_by = auth()->id();
         $slot->save();
+
 
         return redirect()->route('timeslot.index')->with('success', 'Timeslot added successfully');
     }

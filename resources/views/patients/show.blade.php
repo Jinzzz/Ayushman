@@ -7,7 +7,7 @@
       <div class="card-header">
          <h3 class="mb-0 card-title">Show Patient Details</h3>
       </div>
-      <div class="col-lg-12" style="background-color:#e6ebed;">
+      <div class="col-lg-12" style="background-color:#fff;">
          @if ($errors->any())
          <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
