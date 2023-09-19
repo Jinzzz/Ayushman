@@ -27,10 +27,10 @@ class EmployeeBranchTransferController extends Controller
 {
      // Validate the request data
      $request->validate([
-        'from_branch' => 'required|exists:mst_branch,branch_id',
-        'to_branch' => 'required|exists:mst_branch,branch_id',
+        'from_branch' => 'required|exists:mst_branches,branch_id',
+        'to_branch' => 'required|exists:mst_branches,branch_id',
         'selected_staff' => 'required|array', // Assuming 'selected_staff' is the name of the checkbox input
-        'selected_staff.*' => 'exists:mst_staff,staff_id',
+        'selected_staff.*' => 'exists:mst_staffs,staff_id',
     ]);
 
     $fromBranchId = $request->input('from_branch');

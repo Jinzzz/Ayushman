@@ -46,20 +46,23 @@
                             <div class="content vscroll h-200 mt-1">
                                 <div class="table-responsive" id="employee_list">
                                     <table class="w-100">
-                                        <thead>  
+                                        <thead>
                                             <tr>
                                                 <th style="width:5%">#</th>
                                                 <th style="width:55%;">Employees</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="activity in ActivityList">
-                                                <td style="vertical-align:top;"></td>
+                                            @foreach($employees as $employee)
+                                            <tr>
+                                                <td style="vertical-align:top;">
+                                                    <input type="checkbox" name="selected_staff[]" value="{{ $employee->id }}">
+                                                </td>
                                                 <td style="padding-top:3px;">
-                                                    <input type="checkbox" class="chck_btn" style="display:inline;">
-                                                    <label class="ng-binding" style="display:inline;"></label>
+                                                    {{ $employee->staff_name }}
                                                 </td>
                                             </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
