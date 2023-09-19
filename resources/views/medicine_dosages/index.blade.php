@@ -107,6 +107,11 @@
                             // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
                                 $("#dataRow_" + dataId).remove();
+                                i = 0;
+                                $("#example tbody tr").each(function() {
+                                    i++;
+                                    $(this).find("td:first").text(i);
+                                });
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');

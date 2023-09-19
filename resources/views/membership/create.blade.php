@@ -24,7 +24,7 @@
             <div class="card-header">
                <h3 class="mb-0 card-title">Create Membership Packages</h3>
             </div>
-            <div class="col-lg-12">
+            <div  class="col-lg-12" style="background-color:#fff">
                <form action="{{ route('membership.store') }}" method="POST" enctype="multipart/form-data">
                   <input type="hidden" id="checking_benefits" value="{{ isset($benefits) ? 1 : 0 }}">
                   @csrf

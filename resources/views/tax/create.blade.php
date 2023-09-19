@@ -14,7 +14,7 @@
                </div>
                @endif
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -26,73 +26,71 @@
                </div>
                @endif
                <form action="{{ route('tax.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+                  @csrf
                   <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Tax Title*</label>
-                           <input type="text" class="form-control" required name="tax_title" value="{{old('tax_title')}}" placeholder="Tax Title">
-                        </div>
-                     </div>
-
-                      <div class="col-md-6">
-                        <div class="form-group">
-                           <label class="form-label">Split Value 1*</label>
-                           <input type="text" class="form-control" required name="split_value_1" value="{{old('split_value_1')}}" placeholder="Split Value 1">
+                           <label class="form-label">Name*</label>
+                           <input type="text" class="form-control" required name="tax_name" value="{{old('tax_name')}}" placeholder="Tax Name">
                         </div>
                      </div>
 
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Split Value 2*</label>
-                           <input type="text" class="form-control" required name="split_value_2" value="{{old('split_value_2')}}" placeholder="Split Value 2">
+                           <label class="form-label">Rate(%)*</label>
+                           <input type="number" class="form-control" required name="tax_rate" value="{{old('tax_rate')}}" placeholder="Tax Rate">
                         </div>
                      </div>
-                   
 
-                  
-
-                      
-<div class="col-md-6">
-   <div class="form-group">
-      <div class="form-label">Status</div>
-      <label class="custom-switch">
-         <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
-         <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
-         <span id="statusLabel" class="custom-switch-indicator"></span>
-         <span id="statusText" class="custom-switch-description">Active</span>
-      </label>
-   </div>
-</div>
-</div> 
-
-<!-- ... -->
-
-                  
-
-
+                     <div class="col-md-6">
                         <div class="form-group">
-                           <center>
-                           <button type="submit" class="btn btn-raised btn-primary">
-                           <i class="fa fa-check-square-o"></i> Add</button>
-                           <button type="reset" class="btn btn-raised btn-success">
-                           Reset</button>
-                           <a class="btn btn-danger" href="{{route('tax.index')}}">Cancel</a>
-                           </center>
+                           <label class="form-label">Type*</label>
+                           <select class="form-control" name="tax_type" id="branch_id">
+                              <option value="">Select Tax Type</option>
+                              @foreach($taxes as $tax)
+                              <option value="{{ $tax->id }}" {{ old('tax_type') == $tax->id ? 'selected' : '' }}>
+                                 {{ $tax->tax_name }}
+                              </option>
+                              @endforeach
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <div class="form-label">Status</div>
+                           <label class="custom-switch">
+                              <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
+                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($qualification->is_active) && $qualification->is_active == 0 ? '' : 'checked' }}>
+                              <span id="statusLabel" class="custom-switch-indicator"></span>
+                              <span id="statusText" class="custom-switch-description">
+                                 {{ isset($qualification->is_active) && $qualification->is_active ? 'Active' : 'Inactive' }}
+                              </span>
+                           </label>
                         </div>
                      </div>
                   </div>
 
-               </form>
+                  <div class="form-group">
+                     <center>
+                        <button type="submit" class="btn btn-raised btn-primary">
+                           <i class="fa fa-check-square-o"></i> Add</button>
+                        <button type="reset" class="btn btn-raised btn-success">
+                           Reset</button>
+                        <a class="btn btn-danger" href="{{route('tax.group.index')}}">Cancel</a>
+                     </center>
+                  </div>
+            </div>
+         </div>
+
+         </form>
 
       </div>
    </div>
 </div>
 
-
 @endsection
 @section('js')
-{{-- <script>
+<script>
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
             $("#statusText").text('Active');
@@ -102,7 +100,7 @@
             $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
         }
     }
-</script> --}}
+</script>
 
 
 @endsection

@@ -15,7 +15,7 @@
                @endif
             </div>
             
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -39,7 +39,7 @@
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Unit Short Name</label>
-                           <input maxlength="5" pattern=".{1,5}" title="Maximum 5 characters allowed" type="text" class="form-control" name="unit_short_name " value="{{old('unit_short_name ')}}" placeholder="Unit Short Name">
+                           <input maxlength="5" pattern=".{1,5}" title="Maximum 5 characters allowed" type="text" class="form-control" name="unit_short_name" value="{{old('unit_short_name ')}}" placeholder="Unit Short Name">
                         </div>
                      </div>
                      <div class="col-md-4">
