@@ -67,7 +67,7 @@
                                     <textarea class="form-control" required name="remarks" placeholder="Remarks">{{ $doctor->remarks }}</textarea>
                                 </div>
                             </div>
-                        </div>
+                        
                         </div>
                         <div class="row">
                             <div class="col-md-6">

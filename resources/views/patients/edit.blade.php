@@ -7,14 +7,8 @@
       <div class="card-header">
          <h3 class="mb-0 card-title">Edit Patient</h3>
       </div>
-      <div class="card-body">
-         @if ($message = Session::get('status'))
-         <div class="alert alert-success">
-            <p></p>
-         </div>
-         @endif
-      </div>
-      <div class="col-lg-12">
+     
+      <div class="col-lg-12" style="background-color: #fff;">
          @if ($errors->any())
          <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -53,9 +47,9 @@
                      <input type="text" class="form-control" name="patient_address" value="{{$patient->patient_address}}"  placeholder="Patient Address">
                   </div>
                </div>
-               <div class="col-sm-6">
+               <div class="col-md-6">
                   <div class="form-group">
-                     <label for="patient_gender">Gender</label>
+                     <label for="patient_gender" class="form-label">Gender</label>
                      <select class="form-control" name="patient_gender" id="patient_gender">
                         <option value="">Choose Gender</option>
                         @foreach($gender as $genderId => $genderName)
@@ -68,7 +62,7 @@
                </div>
                <div class="col-md-6">
                   <div class="form-group">
-                     <label class="form-label">Date Of Birth</label>
+                     <label class="form-label" class="form-label">Date Of Birth</label>
                      <input type="date" class="form-control" name="patient_dob" value="{{$patient->patient_dob}}">
                   </div>
                </div>
@@ -112,20 +106,6 @@
             <div class="row">
                <div class="col-md-6">
                   <div class="form-group">
-                     <label class="form-label">Medical History</label>
-                     <textarea class="form-control" required name="patient_medical_history">{{$patient->patient_medical_history}}</textarea>
-                  </div>
-               </div>
-               <div class="col-md-6">
-                  <div class="form-group">
-                     <label class="form-label">Patient Current Medication</label>
-                     <textarea class="form-control" required name="patient_current_medications">{{ $patient->patient_current_medications }}</textarea>
-                  </div>
-               </div>
-            </div>
-            <div class="row">
-               <div class="col-md-6">
-                  <div class="form-group">
                      <label class="form-label">Patient Registration Type</label>
                      <select class="form-control" name="patient_registration_type" id="patient_registration_type">
                         <option value="">Choose Registration Type</option>
@@ -134,14 +114,30 @@
                      </select>
                   </div>
                </div>
-            </div>
-            <div class="row">
+            
+           
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Whatsapp Number</label>
                      <input type="text" class="form-control" name="whatsapp_number" value="{{$patient->whatsapp_number}}" placeholder="Whatsapp Number">
                   </div>
                </div>
+            </div>
+            <div class="row">
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label class="form-label">Medical History</label>
+                     <textarea class="form-control" required name="patient_medical_history" id="medicalHistory">{{$patient->patient_medical_history}}</textarea>
+                  </div>
+               </div>
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label class="form-label">Patient Current Medication</label>
+                     <textarea class="form-control" required name="patient_current_medications" id="currentMedication">{{ $patient->patient_current_medications }}</textarea>
+                  </div>
+               </div>
+            </div>
+           
                <!-- ... -->
                <div class="col-md-12">
                   <div class="form-group">
@@ -178,7 +174,24 @@
 </div>
 @endsection
 @section('js')
-<script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        CKEDITOR.replace('medicalHistory', {
+            removePlugins: 'image',
+           
+        });
+
+        $(document).ready(function() {
+        CKEDITOR.replace('currentMedication', {
+            removePlugins: 'image',
+           
+        });
+
+        });
+      });
    function toggleStatus(checkbox) {
        if (checkbox.checked) {
            $("#statusText").text('Active');

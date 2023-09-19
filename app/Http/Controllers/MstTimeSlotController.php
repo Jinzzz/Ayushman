@@ -20,6 +20,7 @@ class MstTimeSlotController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'master_value' => 'required|unique:mst_master_values,master_value',
         ]);
@@ -31,6 +32,7 @@ class MstTimeSlotController extends Controller
         $slot->is_active = 1;
         $slot->created_by = auth()->id();
         $slot->save();
+
 
         return redirect()->route('timeslot.index')->with('success', 'Timeslot added successfully');
     }
@@ -90,7 +92,7 @@ class MstTimeSlotController extends Controller
 
     public function slotStore(Request $request)
     {
-    //   print_r($request->all());die();
+   
         $request->validate([
             'staff_id' => 'required',
             'week_day' => 'required',
@@ -98,8 +100,11 @@ class MstTimeSlotController extends Controller
             'tokens' => 'required',
             
         ]);
-       
-
+       $is_exists = Mst_TimeSlot::where('week_day',$request->input('week_day'))->where('time_slot',$request->input('slot'))->first();
+       if($is_exists){
+        return redirect()->back()->with('error', 'This timeslot is already assigned.');
+       } else {
+      
         $staffslot = new Mst_TimeSlot();
        
         $staffslot->staff_id = $request->input('staff_id');
@@ -114,6 +119,15 @@ class MstTimeSlotController extends Controller
 
         return redirect()->route('staff.slot',['id'=> $request->input('staff_id')])->with('success','Timeslot added successfully');
     }
+}
+
+    public function slotDelete(Request $request, $id)
+{
+    $delete = Mst_TimeSlot::findOrFail($id);
+    $delete->delete();
+    return redirect()->back()->with('success', 'Timeslot deleted successfully');
+}
+
 }
 
 

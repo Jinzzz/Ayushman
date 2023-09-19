@@ -28,9 +28,6 @@ use App\Http\Controllers\MstQualificationController;
 use App\Http\Controllers\MstMedicineDosageController;
 use App\Http\Controllers\MstLeaveTypeController;
 use App\Http\Controllers\MstManufacturerController;
-use App\Http\Controllers\MstTaxGroupController;
-use App\Http\Controllers\AccountSubGroupController;
-use App\Http\Controllers\AccountLedgerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +79,7 @@ Route::get('/staffs/create', [MstStaffController::class, 'create'])->name('staff
 Route::post('/staffs/store', [MstStaffController::class, 'store'])->name('staffs.store');
 Route::get('/staffs/edit/{staff_id}', [MstStaffController::class, 'edit'])->name('staffs.edit');
 Route::get('/staffs/show/{staff_id}', [MstStaffController::class, 'show'])->name('staffs.show');
-Route::delete('/staffs/destroy/{staff_id}', [MstStaffController::class,'destroy'])->name('staffs.destroy');
+Route::delete('/staffs/destroy/{id}', [MstStaffController::class,'destroy'])->name('staffs.destroy');
 Route::put('/staffs/update/{staff_id}', [MstStaffController::class,'update'])->name('staffs.update');
 Route::post('/staffs/restore', [MstStaffController::class,'restore'])->name('staffs.restore');
 Route::patch('staffs/{staff_id}/change-status', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
@@ -219,7 +216,7 @@ Route::get('/supplier/edit/{id}', [MstSupplierController::class, 'edit'])->name(
 Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->name('supplier.update');
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
 Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
-
+Route::get('/supplier/show/{id}', [MstSupplierController::class, 'show'])->name('supplier.show');
 
 
 //Authentication:
@@ -265,9 +262,9 @@ Route::patch('masters/{id}/change-status', [MstMasterValueController::class, 'ch
 //timeslot-storing in mst_master_values table:
 Route::post('/mastervalues/store', [MstTimeSlotController::class,'store'])->name('mastervalues.store');
 //adding timeslot for a particular staff:
-Route::get('/timeslot-staff/slot/{id}',[MstTimeSlotController::class,'slotIndex'])->name('staff.slot');
+Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
 Route::post('/timeslot-staff/store',[MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
-
+Route::delete('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
 // Qualification - Screen for qualification
 Route::get('/qualifications', [MstQualificationController::class, 'index'])->name('qualifications.index');
 Route::get('/qualifications/create', [MstQualificationController::class, 'create'])->name('qualifications.create');
@@ -302,31 +299,3 @@ Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])-
 Route::delete('/manufacturer/destroy/{id}', [MstManufacturerController::class, 'destroy'])->name('manufacturer.destroy');
 Route::get('/manufacturer/edit/{id}', [MstManufacturerController::class, 'edit'])->name('manufacturer.edit');
 Route::patch('manufacturer/change-status/{id}', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');
-
-//Manage-Tax-Groups:
-Route::get('/tax-group/index', [MstTaxGroupController::class, 'index'])->name('tax.group.index');
-Route::get('/tax-group/create', [MstTaxGroupController::class, 'create'])->name('tax.group.create');
-Route::post('/tax-group/store', [MstTaxGroupController::class, 'store'])->name('tax.group.store');
-Route::get('/tax-group/edit/{id}', [MstTaxGroupController::class, 'edit'])->name('tax.group.edit');
-Route::put('/tax-group/update/{id}', [MstTaxGroupController::class, 'update'])->name('tax.group.update');
-Route::delete('/tax-group/destroy/{id}', [MstTaxGroupController::class, 'destroy'])->name('tax.group.destroy');
-Route::patch('tax-group/change-status/{id}', [MstTaxGroupController::class, 'changeStatus'])->name('tax-group.changeStatus');
-
-//Manage-Account-Subhead
-Route::get('/account-sub-group/index', [AccountSubGroupController::class, 'index'])->name('account.sub.group.index');
-Route::get('/account-sub-group/create', [AccountSubGroupController::class, 'create'])->name('account.sub.group.create');
-Route::post('/account-sub-group/store', [AccountSubGroupController::class, 'store'])->name('account.sub.group.store');
-Route::get('/account-sub-group/edit/{id}', [AccountSubGroupController::class, 'edit'])->name('account.sub.group.edit');
-Route::delete('/account-sub-group/destroy/{id}', [AccountSubGroupController::class,'destroy'])->name('account.sub.group.destroy');
-Route::put('/account-sub-group/update/{id}', [AccountSubGroupController::class,'update'])->name('account.sub.group.update');
-Route::patch('account-sub-group/change-status/{id}', [AccountSubGroupController::class, 'changeStatus'])->name('account.sub.group.changeStatus');
-
-//Manage-Account-Ledger
-Route::get('/account-ledger/index', [AccountLedgerController::class, 'index'])->name('account.ledger.index');
-Route::get('/account-ledger/create', [AccountLedgerController::class, 'create'])->name('account.ledger.create');
-Route::post('/account-ledger/store', [AccountLedgerController::class, 'store'])->name('account.ledger.store');
-Route::get('/account-ledger/edit/{id}', [AccountLedgerController::class, 'edit'])->name('account.ledger.edit');
-Route::delete('/account-ledger/destroy/{id}', [AccountLedgerController::class,'destroy'])->name('account.ledger.destroy');
-Route::put('/account-ledger/update/{id}', [AccountLedgerController::class,'update'])->name('account.ledger.update');
-Route::patch('account-ledger/changeStatus/{id}', [AccountLedgerController::class, 'changeStatus'])->name('account.ledger.changeStatus');
-Route::patch('/get-account-sub-groups/{id}', [AccountLedgerController::class,'getAccountSubGroups'])->name('get.account.sub.groups');

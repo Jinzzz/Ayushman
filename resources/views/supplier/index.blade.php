@@ -1,8 +1,48 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="row">
-<div class="card">
+   <div class="col-md-12 col-lg-12">
+      <div class="card">
+         <div class="card-header">
+            <h3 class="card-title">Search Supplier</h3>
+         </div>
+         <form action="{{ route('supplier.index') }}" method="GET">
+            <div class="card-body">
+               <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="form-label">Supplier Type</label>
+                        <select class="form-control" required name="supplier_type_id" id="supplier_type_id">
+                            <option value="">Select Supplier Type</option>
+                            <option value="1">Individual</option>
+                            <option value="2">Business</option>
+                        </select>
+                    </div>
+                </div>
+                  <div class="col-md-3">
+                     <label for="supplier-code" class="form-label">Supplier Code:</label>
+                     <input type="text" id="supplier-code" name="supplier_code" class="form-control" value="{{ request('supplier_code') }}">
+                  </div>
+                  <div class="col-md-3">
+                     <label for="supplier-name" class="form-label">Supplier Name:</label>
+                     <input type="text" id="supplier-name" name="supplier_name" class="form-control" value="{{ request('supplier_name') }}">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="supplier-number" class="form-label">Supplier Number:</label>
+                    <input type="text" id="supplier-number" name="phone_1" class="form-control" value="{{ request('phone_1') }}">
+                 </div>
+               </div>
+               <div class="col-md-3 d-flex align-items-end">
+                  <div>
+                     <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
+                     <a class="btn btn-primary" href="{{ route('supplier.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                  </div>
+               </div>
+            </div>
+      </div>
+      </form>
+   </div>
+   <div class="card">
       
 @if ($message = Session::get('success'))
                <div class="alert alert-success">
@@ -30,12 +70,15 @@
                             <thead>
                                 <tr>
                                     <th class="wd-15p">SL.NO</th>
+                                    <th class="wd-15p">supplier Code</th>
                                     <th class="wd-15p">supplier Name</th>
-                                    <th class="wd-15p">supplier Contact</th>
-                                    <th class="wd-15p">supplier Email</th>
-                                    <th class="wd-15p">supplier Address</th>
+                                    <th class="wd-15p">supplier City</th>
+                                    <th class="wd-15p">supplier State</th>
+                                    <th class="wd-15p">supplier Country</th>
+                                    <th class="wd-15p">Phone</th>
+                                    <th class="wd-15p">Email</th>
                                     <th class="wd-15p">GSTNO</th>
-                                    <th class="wd-15p">Remarks</th>
+                                    <th class="wd-15p">Opening Balance Type</th>
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -47,14 +90,17 @@
                                 @foreach($suppliers as $supplier)
                                 <tr>
                                     <td>{{ ++$i }}</td>
+                                    <td>{{ $supplier->supplier_code }}</td>
                                     <td>{{ $supplier->supplier_name }}</td>
-                                    <td>{{ $supplier->supplier_contact }}</td>
-                                    <td>{{ $supplier->supplier_email }}</td>
-                                    <td>{{ $supplier->supplier_address }}</td>
-                                    <td>{{ $supplier->gstno }}</td>
-                                    <td>{{ $supplier->remarks}}</td>
+                                    <td>{{ $supplier->supplier_city }}</td>
+                                    <td>{{ $supplier->state }}</td>
+                                    <td>{{ $supplier->country }}</td>
+                                    <td>{{ $supplier->phone_1 }}</td>
+                                    <td>{{ $supplier->email }}</td>
+                                    <td>{{ $supplier->GSTNO }}</td>
+                                    <td>{{ $supplier->opening_balance_type === 1 ? 'Debit' : 'Credit'}}</td>
                                     <td>
-                                       <form action="{{ route('supplier.changeStatus', $supplier->id) }}" method="POST">
+                                       <form action="{{ route('supplier.changeStatus', $supplier->supplier_id) }}" method="POST">
                                         @csrf
                                         @method('PATCH')
                                             <button type="submit"
@@ -70,14 +116,17 @@
                                     </td>
                                        
                                     <td>
-                                        <a class="btn btn-secondary"
-                                            href="{{ route('supplier.edit', $supplier->id) }}"><i
+                                        <a class="btn btn-primary btn-sm edit-custom"
+                                            href="{{ route('supplier.edit', $supplier->supplier_id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
+                                                <a class="btn btn-secondary btn-sm" href="{{ route('supplier.show', $supplier->supplier_id) }}" style="    font-size: 0.65rem;
+                                                    margin-right: 0;">
+                                                   <i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                         <form style="display: inline-block"
-                                            action="{{ route('supplier.destroy', $supplier->id) }}" method="post">
+                                            action="{{ route('supplier.destroy', $supplier->supplier_id ) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit"onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash"
+                                            <button type="submit"onclick="return confirm('Do you want to delete it?');" class="btn-danger btn-sm"><i class="fa fa-trash"
                                                     aria-hidden="true"></i>Delete</button>
                                         </form>
                                     </td>
