@@ -28,6 +28,7 @@ use App\Http\Controllers\MstQualificationController;
 use App\Http\Controllers\MstMedicineDosageController;
 use App\Http\Controllers\MstLeaveTypeController;
 use App\Http\Controllers\MstManufacturerController;
+use App\Http\Controllers\EmployeeBranchTransferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,7 +80,7 @@ Route::get('/staffs/create', [MstStaffController::class, 'create'])->name('staff
 Route::post('/staffs/store', [MstStaffController::class, 'store'])->name('staffs.store');
 Route::get('/staffs/edit/{staff_id}', [MstStaffController::class, 'edit'])->name('staffs.edit');
 Route::get('/staffs/show/{staff_id}', [MstStaffController::class, 'show'])->name('staffs.show');
-Route::delete('/staffs/destroy/{staff_id}', [MstStaffController::class,'destroy'])->name('staffs.destroy');
+Route::delete('/staffs/destroy/{id}', [MstStaffController::class,'destroy'])->name('staffs.destroy');
 Route::put('/staffs/update/{staff_id}', [MstStaffController::class,'update'])->name('staffs.update');
 Route::post('/staffs/restore', [MstStaffController::class,'restore'])->name('staffs.restore');
 Route::patch('staffs/{staff_id}/change-status', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
@@ -215,7 +216,7 @@ Route::get('/supplier/edit/{id}', [MstSupplierController::class, 'edit'])->name(
 Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->name('supplier.update');
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
 Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
-
+Route::get('/supplier/show/{id}', [MstSupplierController::class, 'show'])->name('supplier.show');
 
 
 //Authentication:
@@ -296,3 +297,8 @@ Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])-
 Route::delete('/manufacturer/destroy/{id}', [MstManufacturerController::class, 'destroy'])->name('manufacturer.destroy');
 Route::get('/manufacturer/edit/{id}', [MstManufacturerController::class, 'edit'])->name('manufacturer.edit');
 Route::patch('manufacturer/change-status/{id}', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');
+
+// staff-branch-transer:
+Route::get('/staff-branch-transfer', [EmployeeBranchTransferController::class, 'index'])->name('branchTransfer.index');
+Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::class, 'store'])->name('branchTransfer.store');
+Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');

@@ -9,15 +9,32 @@ class Mst_Supplier extends Model
 {
     use HasFactory;
     protected $table = 'mst_suppliers';
+    protected $primaryKey = 'supplier_id';
 
     protected $fillable = [
-        'supplier_code',
-        'supplier_name',
-        'supplier_contact',
-        'supplier_email',
-        'supplier_address',
-        'gstno',
-        'remarks',
-        'is_active',
+       'supplier_id ',
+       'supplier_type_id',
+       'supplier_code',
+       'supplier_name',
+       'supplier_address',
+       'supplier_city',
+       'state',
+       'country',
+       'pincode',
+       'business_name',
+       'phone_1',
+       'phone_2',
+       'email',
+       'website',
+       'GSTNO',
+       'gst_treatment',
+       'credit_period',
+       'credit_limit',
+       'opening_balance',
+       'opening_balance_type',
+       'is_active',
+       'account_ledger_id',
+       'terms_and_conditions',
+       'opening_balance_date',
     ];
 }

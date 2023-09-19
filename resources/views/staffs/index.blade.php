@@ -112,7 +112,7 @@
                                 $i = 0;
                                 @endphp
                                 @foreach($staffs as $staff)
-                                <tr>
+                                <tr id="dataRow_{{ $staff->staff_id }}">
                                     <td>{{ ++$i }}</td>
                                      <td>{{ $staff->staff_code}}</td>
                                     <td>{{ $staff->staffType->master_value }}</td>
@@ -121,7 +121,7 @@
                                     <td>{{ $staff->staff_contact_number }}</td>
                                     <td>{{ $staff->staff_qualification}}</td>
                                      
-                                     
+                                    
                                     <td>
                                         <form action="{{ route('staffs.changeStatus', $staff->staff_id) }}" method="POST">
                                         @csrf
@@ -150,8 +150,9 @@
                                             action="{{ route('staffs.destroy', $staff->staff_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" class="btn-danger btn-sm"  onclick="return confirm('Do you want to delete it?');"><i class="fa fa-trash"
-                                                    aria-hidden="true"></i>Delete</button>
+                                            <button type="button" onclick="deleteData({{ $staff->staff_id }})" class="btn btn-danger">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
                                         </form>
                                         <br>
                                         @if($staff->staff_type == '20')
@@ -176,6 +177,90 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+
+    <script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('staffs.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    // Change status 
+    function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('manufacturer.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
+                }
+            });
+    }
+    </script>
 
 
 
