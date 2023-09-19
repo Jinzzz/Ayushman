@@ -72,7 +72,7 @@
                             <td>{{ $assign->branch->branch_name}}</td>
                             <td>{{ $assign->staff->staff_name}}</td>
                             <td>
-                                <button type="button" onclick="changeStatus({{ $assign->id }})" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
+                            <button type="button" onclick="changeStatus({{ $assign->id }})" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($assign->is_active == 0)
                                     InActive
                                     @else
@@ -82,7 +82,7 @@
                             </td>
 
                             <td>
-                                <button type="button" onclick="deleteData({{ $assign->id }})" class="btn btn-danger">
+                            <button type="button" onclick="deleteData({{ $assign->id }})" class="btn btn-danger">
                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                 </button>
                             </td>
@@ -125,11 +125,6 @@
                             // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
                                 $("#dataRow_" + dataId).remove();
-                                i = 0;
-                                $("#example tbody tr").each(function() {
-                                    i++;
-                                    $(this).find("td:first").text(i);
-                                });
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
@@ -166,7 +161,7 @@
                             _token: "{{ csrf_token() }}",
                         },
                         success: function(response) {
-
+                           
                             if (response == '1') {
                                 var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 

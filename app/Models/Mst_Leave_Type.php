@@ -17,7 +17,6 @@ class Mst_Leave_Type extends Model
     protected $fillable = [
         'name',
         'is_active',
-        'is_dedactable',
         'created_by',
         'updated_by',
         'deleted_by',

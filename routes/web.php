@@ -116,7 +116,6 @@ Route::put('/patients/update/{id}', [MstPatientController::class,'update'])->nam
 Route::patch('patients/{id}/change-status', [MstPatientController::class, 'changeStatus'])->name('patients.changeStatus');
 Route::patch('/patients/{id}/toggle-otp-verification', [MstPatientController::class,'toggleOTPVerification'])->name('patients.toggleOTPVerification');
 Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class,'toggleApproval'])->name('patients.toggleApproval');
-Route::get('/patients/{id}/membership-assigning', [MstPatientController::class,'patientMembershipAssigning'])->name('patients.membership.assigning');
 
 
 // membership 
@@ -172,7 +171,7 @@ Route::post('/tax/store', [MstTaxController::class, 'store'])->name('tax.store')
 Route::get('/tax/edit/{id}', [MstTaxController::class, 'edit'])->name('tax.edit');
 Route::put('/tax/update/{id}', [MstTaxController::class, 'update'])->name('tax.update');
 Route::delete('/tax/destroy/{id}', [MstTaxController::class, 'destroy'])->name('tax.destroy');
-Route::patch('tax/change-status/{id}', [MstTaxController::class, 'changeStatus'])->name('tax.changeStatus');
+Route::patch('tax/{id}/change-status', [MstTaxController::class, 'changeStatus'])->name('tax.changeStatus');
 
 //Manage-Medicines:
 Route::get('/medicine/index', [MstMedicineController::class, 'index'])->name('medicine.index');
@@ -289,8 +288,6 @@ Route::post('/leave-type/store', [MstLeaveTypeController::class, 'store'])->name
 Route::delete('/leave-type/destroy/{id}', [MstLeaveTypeController::class, 'destroy'])->name('leave.type.destroy');
 Route::get('/leave-type/edit/{id}', [MstLeaveTypeController::class, 'edit'])->name('leave.type.edit');
 Route::patch('leave-type/change-status/{id}', [MstLeaveTypeController::class, 'changeStatus'])->name('leave.type.changeStatus');
-Route::patch('leave-type/change-deductible/{id}', [MstLeaveTypeController::class, 'changeDeductible'])->name('leave.type.changeDeductible');
-
 
 // Manufacturer- Screen for manufacturer
 Route::get('/manufacturer', [MstManufacturerController::class, 'index'])->name('manufacturer.index');

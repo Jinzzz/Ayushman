@@ -29,14 +29,9 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
-                            <div class="form-group">
-                                    <label class="form-label">Branch*</label>
-                                    <select class="form-control" name="branch" id="branch_id">
-                                        <option value="">Choose Branch</option>
-                                        @foreach($branch as $id => $branchName)
-                                        <option value="{{ $id }}"{{ old('branch') == $id ? 'selected' : '' }}>{{ $branchName }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="form-group">
+                                    <label class="form-label">Room Name*</label>
+                                    <input type="text" class="form-control" required name="room_name" value="{{old('room_name')}}" placeholder="Room Name">
                                 </div>
 
                              <!-- <div class="form-group">
@@ -49,6 +44,7 @@
                                </select>
                             </div> -->
 
+
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
@@ -59,11 +55,18 @@
                                     </label>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                            <div class="form-group">
-                                    <label class="form-label">Room Name*</label>
-                                    <input type="text" class="form-control" required name="room_name" value="{{old('room_name')}}" placeholder="Room Name">
+                                <div class="form-group">
+                                    <label class="form-label">Branch*</label>
+                                    <select class="form-control" name="branch" id="branch_id">
+                                        <option value="">Choose Branch</option>
+                                        @foreach($branch as $id => $branchName)
+                                        <option value="{{ $id }}"{{ old('branch') == $id ? 'selected' : '' }}>{{ $branchName }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
                                 <!-- <div class="form-group">
                                     <label class="form-label">Room Type*</label>
                                     <select class="form-control" name="room_type" id="room_type">
@@ -75,6 +78,7 @@
                                 </div> -->
                             </div>
                         </div>
+
                         <div class="form-group">
                             <center>
                                 <button type="submit" class="btn btn-raised btn-primary">

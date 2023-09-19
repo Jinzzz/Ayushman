@@ -37,7 +37,6 @@
                             <th class="wd-15p">SL.NO</th>
                             <th class="wd-20p">Leave Types</th>
                             <th class="wd-15p">Status</th>
-                            <th class="wd-15p">Deductible</th>
                             <th class="wd-15p">Action</th>
                         </tr>
                     </thead>
@@ -55,15 +54,6 @@
                                     InActive
                                     @else
                                     Active
-                                    @endif
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" onclick="changeDeductible({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_dedactable == 0) btn-danger @else btn-success @endif">
-                                    @if($leave_type->is_dedactable == 0)
-                                    Deductible
-                                    @else
-                                    Non-Deductible
                                     @endif
                                 </button>
                             </td>
@@ -114,11 +104,6 @@
                             // Handle the success response, e.g., remove the row from the table
                             if (response == '1') {
                                 $("#dataRow_" + dataId).remove();
-                                i = 0;
-                                $("#example tbody tr").each(function() {
-                                    i++;
-                                    $(this).find("td:first").text(i);
-                                });
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
@@ -165,50 +150,6 @@
                                 }
 
                                 flashMessage('s', 'Status changed successfully');
-                            } else {
-                                flashMessage('e', 'An error occurred! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while changing the qualification status.');
-                        },
-                    });
-                }
-            });
-    }
-
-    // Change deductible status 
-    function changeDeductible(dataId) {
-        swal({
-                title: "Change Deductible Status?",
-                text: "Are you sure you want to change the deductible status?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('leave.type.changeDeductible', '') }}/" + dataId,
-                        type: "patch",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(3)');
-
-                                if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeDeductible(' + dataId + ')" class="btn btn-sm btn-danger">Non-Deductible</button>');
-                                } else {
-                                    cell.html('<button type="button" onclick="changeDeductible(' + dataId + ')" class="btn btn-sm btn-success">Deductible</button>');
-                                }
-
-                                flashMessage('s', 'Deductible status changed successfully');
                             } else {
                                 flashMessage('e', 'An error occurred! Please try again later.');
                             }

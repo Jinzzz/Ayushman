@@ -27,7 +27,7 @@ class MstQualificationController extends Controller
     public function create()
     {
         try {
-            $pageTitle = "Create Qualifications";
+            $pageTitle = "Add Qualifications";
             return view('qualifications.create', compact('pageTitle'));
         } catch (QueryException $e) {
             return redirect()->route('qualifications.index')->with('error', 'Something went wrong');

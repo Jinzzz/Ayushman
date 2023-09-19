@@ -26,8 +26,8 @@ class MstManufacturerController extends Controller
     public function create()
     {
         try {
-            $pageTitle = "Create Manufacturers";
-            return view('manufacturers.create', compact('pageTitle'));
+            $pageTitle = "Add Manufacturers";
+            return view('Manufacturers.create', compact('pageTitle'));
         } catch (QueryException $e) {
             return redirect()->route('manufacturer.index')->with('error', 'Something went wrong');
         }
@@ -70,7 +70,7 @@ class MstManufacturerController extends Controller
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
-                        $message = 'Manufacturers added successfully';
+                        $message = 'manufacturers added successfully';
                     }
                 }
                 return redirect()->route('manufacturer.index')->with('success', $message);

@@ -38,15 +38,14 @@
                      <div class="col-md-4">
                         <div class="form-group">
                         <label class="form-label">Unit Short Name <span style="font-weight: normal;">(Max 5 characters)</span></label>
-                           <input type="text" class="form-control" name="unit_short_name" value="{{$units->unit_short_name}}" placeholder="Unit Short Name" maxlength="5">
+                           <input type="text" class="form-control" name="unit_short_name " value="{{$units->unit_short_name}}" placeholder="Unit Short Name" maxlength="5">
                         </div>
                      </div>
                      <div class="col-md-4">
                         <div class="form-group">
                            <div class="form-label">Status</div>
                            <label class="custom-switch">
-                           <input type="hidden" name="is_active" value="{{$units->is_active}}">
-                              <input type="checkbox" id="is_active" value="{{$units->is_active}}" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($units->is_active) checked @endif>
+                              <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($units->is_active) checked @endif>
                               <span id="statusLabel" class="custom-switch-indicator"></span>
                               <span id="statusText" class="custom-switch-description">
                                  @if($units->is_active)
@@ -68,6 +67,7 @@
                            <center>
                               <button type="submit" class="btn btn-raised btn-primary">
                                  <i class="fa fa-check-square-o"></i>Update</button>
+
                               <a class="btn btn-danger" href="{{route('unit.index')}}">Cancel</a>
                            </center>
                         </div>

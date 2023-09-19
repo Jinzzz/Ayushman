@@ -24,14 +24,14 @@
                   <input type="hidden" name="hidden_id" value="{{ isset($leave_types->leave_type_id) ? $leave_types->leave_type_id : '' }}">
                   @csrf
                   <div class="row">
-                     <div class="col-md-4">
+                     <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Leave type*</label>
                            <input required type="text" class="form-control" name="leave_types" value="{{ isset($leave_types->name) ? $leave_types->name : old('leave_types') }}" placeholder="Leave type">
                         </div>
                      </div>
 
-                     <div class="col-md-4">
+                     <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>
                            <label class="custom-switch">
@@ -44,21 +44,6 @@
                            </label>
                         </div>
                      </div>
-
-                     <div class="col-md-4">
-                        <div class="form-group">
-                           <div class="form-label">Is Deductible</div>
-                           <label class="custom-switch">
-                              <input type="hidden" name="is_dedactable" value="0"> <!-- Hidden field for false value -->
-                              <input type="checkbox" id="is_dedactable" name="is_dedactable" value="1" onchange="toggleDeductible(this)" class="custom-switch-input" {{ isset($leave_types->is_dedactable) && $leave_types->is_dedactable == 1 ? 'checked' : '' }}>
-                              <span id="dedactableLabel" class="custom-switch-indicator"></span>
-                              <span id="dedactableText" class="custom-switch-description">
-                                 {{ isset($leave_types->is_dedactable) && $leave_types->is_dedactable ? 'Deductible' : 'Non-Deductible' }}
-                              </span>
-                           </label>
-                        </div>
-                     </div>
-
                   </div>
                   <div class="form-group">
                      <center>
@@ -90,15 +75,6 @@
       } else {
          $("#statusText").text('Inactive');
          $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
-      }
-   }
-   function toggleDeductible(checkbox) {
-      if (checkbox.checked) {
-         $("#dedactableText").text('Deductible');
-         $("input[name=is_dedactable]").val(1); // Set the value to 1 when checked
-      } else {
-         $("#dedactableText").text('Non-Deductible');
-         $("input[name=is_dedactable").val(0); // Set the value to 0 when unchecked
       }
    }
 </script>

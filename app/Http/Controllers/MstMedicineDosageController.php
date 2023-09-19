@@ -26,7 +26,7 @@ class MstMedicineDosageController extends Controller
     public function create()
     {
         try {
-            $pageTitle = "Create Medicine Dosages";
+            $pageTitle = "Add Medicine Dosages";
             return view('medicine_dosages.create', compact('pageTitle'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');

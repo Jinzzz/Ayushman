@@ -4,11 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
-use App\Models\Mst_Membership_Package;
-use App\Models\Mst_Membership_Package_Wellness;
-use App\Models\Mst_Membership_Benefit;
-use App\Models\Mst_Patient_Membership_Booking;
-use App\Models\Trn_Patient_Wellness_Sessions;
+use App\Models\Mst_Membership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -200,14 +196,6 @@ class MstPatientController extends Controller
         $patient->save();
 
       return redirect()->back()->with('success','Approval status updated successfully');
-    }
-
-    public function patientMembershipAssigning($id){
-        $pageTitle ="Patient Membership Details";
-        $membership_packages = Mst_Membership_Package::where('is_active', 1)->get();
-        $booking_history = Mst_Patient_Membership_Booking::where('patient_id',$id)->get();
-        return view('patients.membership_details', compact('pageTitle','membership_packages','booking_history'));
-
     }
     
 }

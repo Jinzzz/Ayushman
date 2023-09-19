@@ -63,9 +63,9 @@ class MstTherapyRoomAssigningController extends Controller
             $store->is_active = 1;
             $store->save();
 
-            return redirect()->route('therapyroomassigning.index', $request->therapy_room_id)->with('success', 'Therapy room assigned successfully');
+            return redirect()->route('therapyrooms.index', $request->therapy_room_id)->with('success', 'Therapy room assigned successfully');
         } catch (QueryException $e) {
-            return redirect()->route('therapyroomassigning.index')->with('error', 'Something went wrong.');
+            return redirect()->route('therapyrooms.index')->with('error', 'Something went wrong.');
         }
     }
 
