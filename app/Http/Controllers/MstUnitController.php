@@ -72,16 +72,18 @@ class MstUnitController extends Controller
         try {
             $request->validate([
                 'unit_name' => 'required',
-
+                'is_active' => 'required',
             ]);
-            $is_exists = Mst_Unit::where('unit_name', $request->input('unit_name'))->first();
+            $is_exists = Mst_Unit::where('unit_name', $request->input('unit_name'))
+                                    ->where('id',!$id)
+                                    ->first();
             if ($is_exists) {
                 return redirect()->route('unit.index')->with('error', 'This unit is already exists.');
             } else {
-
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $units =  Mst_Unit::findOrFail($id);
                 $units->unit_name = $request->input('unit_name');
+                $units->unit_short_name = $request->input('unit_short_name');
                 $units->is_active = $is_active;
                 $units->save();
 

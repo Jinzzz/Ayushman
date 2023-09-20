@@ -36,18 +36,16 @@
         <div class="dropdown profile-1">
             <a href="#" data-toggle="dropdown" class="nav-link pr-2 leading-none d-flex">
                 <span>
-                    @if(auth()->user()->image)
-                    <img src="{{ auth()->user()->image_url }}" alt="profile-user" class="avatar  profile-user brround cover-image">
-                    @else
+                   
                     <img src="{{asset('assets/images/avatar.png')}}" alt="profile-user" class="avatar  profile-user brround cover-image">
-                    @endif
+            
                 </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                 <div class="drop-heading">
                     <div class="text-center">
-                        <h5 class="text-dark mb-0">{{ ucfirst(auth()->user()->admin_name) }}</h5>
-                        <small class="text-muted">{{ ucfirst(auth()->user()->email) }}</small>
+                        <h5 class="text-dark mb-0">admin_name</h5>
+                        <small class="text-muted">email</small>
                     </div>
                 </div>
                 <div class="dropdown-divider m-0"></div>
