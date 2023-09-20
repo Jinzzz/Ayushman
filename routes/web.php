@@ -31,10 +31,7 @@ use App\Http\Controllers\MstManufacturerController;
 use App\Http\Controllers\MstTaxGroupController;
 use App\Http\Controllers\AccountSubGroupController;
 use App\Http\Controllers\AccountLedgerController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\EmployeeBranchTransferController;
->>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
 
 /*
 |--------------------------------------------------------------------------
