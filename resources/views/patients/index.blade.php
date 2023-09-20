@@ -116,16 +116,16 @@
                         </form>
                      </td>
                      <td>
-                        <a class="btn btn-primary btn-sm edit-custom"
+                        <a class="btn btn-primary"
                            href="{{ route('patients.edit', $patient->id) }}"><i
                            class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                        <a class="btn btn-secondary btn-sm" href="{{ route('patients.show', $patient->id) }}">
+                        <a class="btn btn-secondary" href="{{ route('patients.show', $patient->id) }}">
                         <i class="fa fa-eye" aria-hidden="true"></i> View    </a>
                         <form style="display: inline-block"
                            action="{{ route('patients.destroy', $patient->id) }}" method="post">
                            @csrf
                            @method('delete')
-                           <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
+                           <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn btn-danger"><i class="fa fa-trash"
                               aria-hidden="true"></i>Delete</button>
                         </form>
                      </td>

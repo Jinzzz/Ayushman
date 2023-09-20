@@ -31,43 +31,43 @@
     <!-- Other menu items -->
   </ul>
 
-  <div class="container">
-    <li class="slide">
-      <a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
-      <ul class="slide-menu">
-        <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
-        <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
-        <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
-        <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
-        <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/therapyroom-assigning/index')}}">{{ __('Therapy Room Assigning') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/therapies/index')}}">{{ __('Therapy') }}</a></li>
-        <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Memberships') }}</a></li>
-        <li><a class="slide-item" href="{{ route('supplier.index')}}">{{ __('Suppliers') }}</a></li>
-        <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/tax/index')}}">{{ __('Taxes') }}</a></li>
-
-    </li>
-    </ul>
-    <li class="slide">
-      <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a>
-    </li>
-    {{-- <li class="slide">
+     <div class="container">
+      <li class="slide">
+        <a class="side-menu__item"  data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
+        <ul class="slide-menu">
+                      <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
+                      <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/therapyroom-assigning/index')}}">{{ __('Therapy Room Assigning') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/therapies/index')}}">{{ __('Therapy') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Memberships') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('supplier.index')}}">{{ __('Suppliers') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/tax/index')}}">{{ __('Taxes') }}</a></li>
+                      
+        </li>
+      </ul>
+       <li class="slide">
+             <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a>
+         </li>
+       {{-- <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-receipt"></i>
           <span class="side-menu__label"> {{ __('Employee Branch Transfer') }}</span><i class="angle fa fa-angle-right"></i>
-    </a>
-
-    </li>
-    </ul> --}}
+        </a>
+       
+      </li>
+      </ul> --}}
 
     {{-- <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">

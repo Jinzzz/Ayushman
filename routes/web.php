@@ -28,7 +28,6 @@ use App\Http\Controllers\MstQualificationController;
 use App\Http\Controllers\MstMedicineDosageController;
 use App\Http\Controllers\MstLeaveTypeController;
 use App\Http\Controllers\MstManufacturerController;
-use App\Http\Controllers\EmployeeBranchTransferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -297,8 +296,3 @@ Route::post('/manufacturer/store', [MstManufacturerController::class, 'store'])-
 Route::delete('/manufacturer/destroy/{id}', [MstManufacturerController::class, 'destroy'])->name('manufacturer.destroy');
 Route::get('/manufacturer/edit/{id}', [MstManufacturerController::class, 'edit'])->name('manufacturer.edit');
 Route::patch('manufacturer/change-status/{id}', [MstManufacturerController::class, 'changeStatus'])->name('manufacturer.changeStatus');
-
-// staff-branch-transer:
-Route::get('/staff-branch-transfer', [EmployeeBranchTransferController::class, 'index'])->name('branchTransfer.index');
-Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::class, 'store'])->name('branchTransfer.store');
-Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');
