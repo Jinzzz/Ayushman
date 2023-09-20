@@ -178,21 +178,12 @@
       </li>
     </ul> --}}
 
-<<<<<<< HEAD
-    <li class="slide">
-        <a class="side-menu__item" data-toggle="slide" href="#">
-          <i class="side-menu__icon ti-wallet"></i>
-          <span class="side-menu__label"> {{ __('Accounts') }}</span><i class="angle fa fa-angle-right"></i>
-    </a>
-    <ul class="slide-menu">
-=======
      <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-wallet"></i>
           <span class="side-menu__label"> {{ __('Accounts') }}</span><i class="angle fa fa-angle-right"></i>
         </a>
         <ul class="slide-menu">
->>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
       <li><a class="slide-item" href="{{ url('/account-sub-group/index') }}">{{__('Account Subhead')}}</a></li>
       <li><a class="slide-item" href="{{ url('/account-ledger/index') }}">{{__('Account ledger ')}}</a></li>
 
@@ -201,13 +192,8 @@
       <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
       </li>
     </ul> 
-<<<<<<< HEAD
-
-    {{-- <li class="slide">
-=======
        
          {{-- <li class="slide">
->>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-settings"></i>
           <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
