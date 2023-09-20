@@ -31,6 +31,10 @@ use App\Http\Controllers\MstManufacturerController;
 use App\Http\Controllers\MstTaxGroupController;
 use App\Http\Controllers\AccountSubGroupController;
 use App\Http\Controllers\AccountLedgerController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\EmployeeBranchTransferController;
+>>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
 
 /*
 |--------------------------------------------------------------------------
@@ -220,8 +224,6 @@ Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->n
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
 Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
 
-
-
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
 Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
@@ -330,3 +332,11 @@ Route::delete('/account-ledger/destroy/{id}', [AccountLedgerController::class,'d
 Route::put('/account-ledger/update/{id}', [AccountLedgerController::class,'update'])->name('account.ledger.update');
 Route::patch('account-ledger/changeStatus/{id}', [AccountLedgerController::class, 'changeStatus'])->name('account.ledger.changeStatus');
 Route::patch('/get-account-sub-groups/{id}', [AccountLedgerController::class,'getAccountSubGroups'])->name('get.account.sub.groups');
+
+
+// staff-branch-transer:
+Route::get('/staff-branch-transfer', [EmployeeBranchTransferController::class, 'index'])->name('branchTransfer.index');
+Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::class, 'store'])->name('branchTransfer.store');
+Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');
+
+

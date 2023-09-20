@@ -16,5 +16,6 @@ class Mst_Staff_Transfer_Log extends Model
         'branch_id_from',
         'branch_id_to',
         'created_by',
+        'updated_by',
     ];
 }

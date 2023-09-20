@@ -9,26 +9,27 @@
             </div>
             <form action="{{ route('medicine.index') }}" method="GET" class="card-body">
                 <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label for="medicine-name">Medicine Name:</label>
+                    <div class="col-md-4">
+                        <label for="medicine-name" class="form-label">Medicine Name:</label>
                         <input type="text" id="medicine-name" name="medicine_name" class="form-control" value="{{ request('medicine_name') }}">
                     </div>
-                    <div class="col-md-3">
-                        <label for="generic-name">Generic Name:</label>
+                    <div class="col-md-4">
+                        <label for="generic-name" class="form-label">Generic Name:</label>
                         <input type="text" id="generic-name" name="generic_name" class="form-control" value="{{ request('generic_name') }}">
                     </div>
-                    <div class="col-md-3">
-                        <label for="medicine-type">Medicine Type:</label>
+                    <div class="col-md-4">
+                        <label for="medicine-type" class="form-label">Medicine Type:</label>
                         <input type="text" id="medicine-type" name="medicine_type" class="form-control" value="{{ request('medicine_type') }}">
                     </div>
-                    
+                </div>    
                     <div class="col-md-3 d-flex align-items-end">
                         <div>
-                            <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
-                            <a class="btn btn-secondary ml-2" href="{{ route('medicine.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
+                            <a class="btn btn-primary" href="{{ route('medicine.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                         </div>
                     </div>
                 </div>
+            </div>
             </form>
         </div>
 
@@ -89,17 +90,17 @@
                                     </form>
                                 </td>
                                 <td>
-                                    <a class="btn btn-primary"
+                                    <a class="btn btn-primary btn-sm edit-custom"
                                         href="{{ route('medicine.edit', $medicine->id) }}"><i
                                             class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                    <a class="btn btn-secondary" href="{{ route('medicine.show', $medicine->id) }}">
+                                    <a class="btn btn-secondary btn-sm" href="{{ route('medicine.show', $medicine->id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View </a>
                                     <form style="display: inline-block"
                                         action="{{ route('medicine.destroy', $medicine->id) }}" method="post">
                                         @csrf
                                         @method('delete')
                                         <button type="submit" onclick="return confirm('Do you want to delete it?');"
-                                            class="btn btn-danger"><i class="fa fa-trash"
+                                            class="btn-danger btn-sm"><i class="fa fa-trash"
                                                 aria-hidden="true"></i>Delete</button>
                                     </form>
                                 </td>
@@ -110,6 +111,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
 </div>
 @endsection

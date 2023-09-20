@@ -66,7 +66,7 @@ class MstStaffController extends Controller
             // 'confirm_password' => 'required|same:password',
             'staff_name' => 'required',
             'gender' => 'required',          
-            'branch_id' => 'required|exists:mst_branches,branch_id',
+            // 'branch_id' => 'required|exists:mst_branches,branch_id',
             'date_of_birth' => 'required|date', 
             'staff_email' => 'sometimes|email|unique:mst_staffs',
             'staff_contact_number' => 'required',
@@ -103,7 +103,7 @@ class MstStaffController extends Controller
             'staff_work_experience' => $request->staff_work_experience,
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
-            'staff_booking_fee' => $request->input('staff_type') === '20' ? 'required|numeric' : null,
+            'staff_booking_fee' => $request->staff_booking_fee,
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
@@ -235,6 +235,7 @@ class MstStaffController extends Controller
     {
         $staff = Mst_Staff::findOrFail($staff_id);
         $staff->delete();
+        return 1;
 
         return redirect()->route('staffs.index')->with('success','Staff deleted successfully');
     }

@@ -10,13 +10,12 @@
   </div>
   <div class="app-sidebar__user">
     <div class="dropdown user-pro-body text-center">
-      <div class="user-pic">
-        <img src="{{ asset('assets/images/avatar.png') }}" alt="user-img" class="avatar-xl rounded-circle">
-      </div>
-      <div class="user-info">
-        <h6 class="mb-0 text-dark">admin_name</h6>
-        <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
-      </div>
+        <div class="user-pic">
+            <img src="{{ asset('assets/images/avatar.png') }}" alt="user-img" class="avatar-xl rounded-circle">
+        </div>
+        <div class="user-info">
+            <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
+        </div>
     </div>
   </div>
 
@@ -31,34 +30,37 @@
     <!-- Other menu items -->
   </ul>
 
-  <div class="container">
-    <li class="slide">
-      <a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
-      <ul class="slide-menu">
-        <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
-        <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
-        <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
-        <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
-        <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
-        <!-- <li><a class="slide-item" href="{{ url('/therapyroom-assigning/index')}}">{{ __('Therapy Room Assigning') }}</a></li> -->
-        <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/therapies/index')}}">{{ __('Therapy') }}</a></li>
-        <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Memberships') }}</a></li>
-        <li><a class="slide-item" href="{{ route('supplier.index')}}">{{ __('Suppliers') }}</a></li>
-        <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
+     <div class="container">
+      <li class="slide">
+        <a class="side-menu__item"  data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
+        <ul class="slide-menu">
+                      <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
+                      <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
+                      <!--<li><a class="slide-item" href="{{ url('/therapyroom-assigning/index')}}">{{ __('Therapy Room Assigning') }}</a></li>-->
+                      <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/therapies/index')}}">{{ __('Therapy') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Memberships') }}</a></li>
+                      <li><a class="slide-item" href="{{ route('supplier.index')}}">{{ __('Suppliers') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
+                      <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
         <!-- <li><a class="slide-item" href="{{ url('/tax/index')}}">{{ __('Taxes_') }}</a></li> -->
         <li><a class="slide-item" href="{{ url('/tax-group/index')}}">{{ __('Tax Groups') }}</a></li>
-
+                      
+        </li>
+      </ul>
+      <li class="slide">
+      <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a>
     </li>
-    </ul>
-    {{-- <li class="slide">
+       {{-- <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-receipt"></i>
           <span class="side-menu__label"> {{ __('Billings') }}</span><i class="angle fa fa-angle-right"></i>
@@ -176,12 +178,21 @@
       </li>
     </ul> --}}
 
+<<<<<<< HEAD
     <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-wallet"></i>
           <span class="side-menu__label"> {{ __('Accounts') }}</span><i class="angle fa fa-angle-right"></i>
     </a>
     <ul class="slide-menu">
+=======
+     <li class="slide">
+        <a class="side-menu__item" data-toggle="slide" href="#">
+          <i class="side-menu__icon ti-wallet"></i>
+          <span class="side-menu__label"> {{ __('Accounts') }}</span><i class="angle fa fa-angle-right"></i>
+        </a>
+        <ul class="slide-menu">
+>>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
       <li><a class="slide-item" href="{{ url('/account-sub-group/index') }}">{{__('Account Subhead')}}</a></li>
       <li><a class="slide-item" href="{{ url('/account-ledger/index') }}">{{__('Account ledger ')}}</a></li>
 
@@ -190,8 +201,13 @@
       <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
       </li>
     </ul> 
+<<<<<<< HEAD
 
     {{-- <li class="slide">
+=======
+       
+         {{-- <li class="slide">
+>>>>>>> 17198e18e09d2ade5b6aa6d4cb79e5d02eb26865
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-settings"></i>
           <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>

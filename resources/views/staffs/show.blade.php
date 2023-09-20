@@ -97,9 +97,11 @@
                               <tr>
                                  <td><strong>Staff Address:</strong>{{ $show->staff_address}}</td>
                               </tr>
+                          
                               <tr>
-                                 <td><strong>Staff Salary Type :</strong> {{ $show->salaryType->salary_type}}</td>
-                              </tr>
+                                 <td><strong>Staff Salary Type:</strong> {{ $show->salaryType->salary_type ?? '' }}</td>
+                             </tr>
+                             
                               <tr>
                                  <td><strong>Salary Amount:</strong>{{ $show->salary_amount}}</td>
                               </tr>

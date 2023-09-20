@@ -34,7 +34,7 @@
                   </div>
                   <div class="col-md-4">
                      <div class="form-group">
-                        <label for="tokens">Max Tokens*</label>
+                        <label for="tokens" class="form-label">Max Tokens*</label>
                         <input type="text" id="tokens" required name="tokens" class="form-control" placeholder="Max Tokens">
                      </div>
                   </div>
@@ -45,10 +45,10 @@
                   </div>
                </div>
                <div>
-                  <button type="submit" class="btn btn-raised btn-primary">
-                  <i class="fa fa-check-square-o"></i>Submit
-                  </button>
-                  <a class="btn btn-secondary ml-2" href="{{ route('timeslot.index') }}">
+                  <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-check-square-o"></i> Submit
+                  </button>&nbsp;&nbsp;
+                  <a class="btn btn-primary" href="{{ route('timeslot.index') }}">
                   <i class="fa fa-times" aria-hidden="true"></i> Reset
                   </a>
                </div>
@@ -64,7 +64,7 @@
       @endif
       @if ($message = Session::get('error'))
       <div class="alert alert-danger">
-         <p></p>
+         <p>{{$message}}</p>
       </div>
       @endif
       <div class="card-header">
@@ -109,15 +109,13 @@
                         </form>
                      </td>
                      <td>
-                        <a class="btn btn-primary"
-                           href="{{ route('timeslot.edit', $slot->id) }}"><i
-                           class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
+                       
                         <form style="display: inline-block"
-                           action="{{ route('timeslot.destroy', $slot->id) }}" method="post">
+                           action="{{ route('timeslotStaff.destroy', $slot->id) }}" method="post">
                            @csrf
                            @method('delete')
                            <button type="submit" onclick="return confirm('Do you want to delete it?');"
-                              class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                              class="btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
                         </form>
                      </td>
                   </tr>

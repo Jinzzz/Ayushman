@@ -9,23 +9,23 @@
          <form action="{{ route('patients.index') }}" method="GET">
             <div class="card-body">
                <div class="row mb-3">
-                  <div class="col-md-3">
-                     <label for="patient-code">Patient Code:</label>
+                  <div class="col-md-4">
+                     <label for="patient-code" class="form-label">Patient Code:</label>
                      <input type="text" id="patient-code" name="patient_code" class="form-control" value="{{ request('patient_code') }}">
                   </div>
-                  <div class="col-md-3">
-                     <label for="patient-name">Patient Name:</label>
+                  <div class="col-md-4">
+                     <label for="patient-name" class="form-label">Patient Name:</label>
                      <input type="text" id="patient-name" name="patient_name" class="form-control" value="{{ request('patient_name') }}">
                   </div>
-                  <div class="col-md-3">
-                     <label for="patient-mobile">Patient Mobile:</label>
+                  <div class="col-md-4">
+                     <label for="patient-mobile" class="form-label">Patient Mobile:</label>
                      <input type="text" id="patient-mobile" name="patient_mobile" class="form-control" value="{{ request('patient_mobile') }}">
                   </div>
                </div>
                <div class="col-md-3 d-flex align-items-end">
                   <div>
-                     <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
-                     <a class="btn btn-secondary ml-2" href="{{ route('patients.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                     <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
+                     <a class="btn btn-primary" href="{{ route('patients.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                   </div>
                </div>
             </div>

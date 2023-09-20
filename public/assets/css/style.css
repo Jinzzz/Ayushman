@@ -25830,7 +25830,7 @@ button.btn.btn-secondary:hover {
 	background: rgb(48 209 88)!important;
     border-color: rgb(48 209 88)!important;
 	/* box-shadow: 1px 1px 4px 1px #ff5e1820 !important; */
-	font-size: 16px;
+	font-size: 12px;
 	/* font-weight: 500; */
 }
 
@@ -25887,7 +25887,7 @@ p.number-font.mb-0 {
 }
 
 .btn-secondary:hover {
-	background: #046e93 !important;
+	background: #3cb35a!important;
 }
 
 .btn-secondary:focus {
@@ -26236,12 +26236,12 @@ aside.app-sidebar{
     margin-bottom: 20px;
 }
 .btn.btn-primary.edit-btn{
-	background: rgb(255,159,10)!important;
-    border-color: rgb(255,159,10)!important;
+	background: rgb(48 209 88)!important;
+    border-color: rgb(48 209 88)!important;
 }
 .btn.btn-primary.edit-btn:hover{
-background-color: #ed950c!important;
-border-color: #ed950c!important;
+background-color:#3cb35a!important;
+border-color: #3cb35a!important;
 }
 .btn.btn-secondary.view-btn .fa-eye::before{
 color: #fff!important;
