@@ -11,7 +11,6 @@ use App\Http\Controllers\MstPatientController;
 use App\Http\Controllers\MstTherapyRoomController;
 use App\Http\Controllers\MstMembershipController;
 use App\Http\Controllers\MstWellnessController;
-use App\Http\Controllers\MstMedicineCategoryController;
 use App\Http\Controllers\MstUnitController;
 use App\Http\Controllers\MstTaxController;
 use App\Http\Controllers\MstMedicineController;
@@ -32,6 +31,7 @@ use App\Http\Controllers\MstTaxGroupController;
 use App\Http\Controllers\AccountSubGroupController;
 use App\Http\Controllers\AccountLedgerController;
 use App\Http\Controllers\EmployeeBranchTransferController;
+use App\Http\Controllers\MedicinePurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -337,3 +337,6 @@ Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::c
 Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');
 
 
+// Medicine Purchase
+Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');
+Route::get('/medicine-purchase/create', [MedicinePurchaseController::class, 'create'])->name('medicine.purchase.create');

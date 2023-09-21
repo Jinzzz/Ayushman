@@ -192,6 +192,22 @@
       <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
       </li>
     </ul> 
+
+    <!-- Purchase Details  -->
+    <li class="slide">
+        <a class="side-menu__item" data-toggle="slide" href="#">
+          <i class="side-menu__icon ti-wallet"></i>
+          <span class="side-menu__label"> {{ __('Inventory') }}</span><i class="angle fa fa-angle-right"></i>
+        </a>
+        <ul class="slide-menu">
+      <li><a class="slide-item" href="{{ url('/medicine-purchase/index') }}">{{__('Medicine Purchase')}}</a></li>
+      <!-- <li><a class="slide-item" href="{{ url('/account-ledger/index') }}">{{__('Account ledger ')}}</a></li> -->
+
+      <!-- <li><a class="slide-item" href="#">{{__('Journel Entry')}}</a></li> -->
+      <!-- <li><a class="slide-item" href="#">{{__('Attendence View-Biometric')}}</a></li> -->
+      <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
+      </li>
+    </ul> 
        
          {{-- <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
