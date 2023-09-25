@@ -77,9 +77,9 @@ class FamilyController extends Controller
                     $patient_id = Auth::id();
                     $member_dob = PatientHelper::dateFormatDb($request->member_dob);
 
-                    $member_gender_id = Mst_Master_Value::where('master_value', $request->member_gender)->pluck('id')->first();
-                    $blood_group_id = Mst_Master_Value::where('master_value', $request->member_blood_group)->pluck('id')->first();
-                    $relationship_id = Mst_Master_Value::where('master_value', $request->relationship)->pluck('id')->first();
+                    $member_gender_id = $request->member_gender;
+                    $blood_group_id =  $request->member_blood_group;
+                    $relationship_id = $request->relationship;
 
                     $addFamilyMember = Trn_Patient_Family_Member::create([
                         'patient_id' => $patient_id,

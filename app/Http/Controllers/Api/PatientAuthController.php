@@ -56,7 +56,7 @@ class PatientAuthController extends Controller
                     ->first();
 
                     if($request->patient_gender){
-                        $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                        $patient_gender_id = $request->patient_gender;
                     }
 
                     $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);

@@ -152,6 +152,8 @@ class MyBookingsController extends Controller
                             'mst_staffs.staff_name as doctor_name',
                             'booking_status.master_value as status_name',
                             'mst_branches.branch_name',
+                            'mst_branches.latitude',
+                            'mst_branches.longitude',
                             'mst_branches.branch_id as branch_id',
                             'trn_consultation_bookings.booking_date',
                             'trn_consultation_bookings.id',
@@ -194,6 +196,8 @@ class MyBookingsController extends Controller
                                 'doctor_name' => $booking_details->doctor_name,
                                 'qualification' => $booking_details->staff_qualification,
                                 'branch_name' => $booking_details->branch_name,
+                                'latitude' => $booking_details->latitude ?? 0,
+                                'longitude' => $booking_details->longitude ?? 0,
                             ];
                 
                             $other_booking_details[] = [

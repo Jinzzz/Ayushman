@@ -33,6 +33,10 @@ Route::post('patient/membership_packages_details', [MembershipController::class,
 
 Route::get('branches', [DoctorBookingController::class,'getBranches']);
 Route::get('qualifications', [DoctorBookingController::class,'getQualifications']);
+Route::get('gender', [DoctorBookingController::class,'getGender']);
+Route::get('relationship', [DoctorBookingController::class,'getRelationship']);
+Route::get('blood-group', [DoctorBookingController::class,'getBloodGroup']);
+
 
 Route::middleware(['auth:api'])->group(function () {   
 // Consultation

@@ -64,19 +64,20 @@ class DashboardController extends Controller
             $currentTime = date('H:i:s');
 
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
-                ->whereIn('booking_status_id', [87, 88])
-                ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
-                ->join('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
-                ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-                ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'mst_master_values.master_value', 'mst_timeslots.time_from')
-                ->where(function ($query) use ($currentDate, $currentTime) {
-                    $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
-                        ->orWhere(function ($query) use ($currentDate, $currentTime) {
-                            $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
-                                ->where('mst_timeslots.time_to', '>', $currentTime);
-                        });
-                })
-                ->get();
+            ->whereIn('booking_status_id', [87, 88])
+            ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+            ->join('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
+            ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'mst_master_values.master_value', 'mst_timeslots.time_from')
+            ->where(function ($query) use ($currentDate, $currentTime) {
+                $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
+                    ->orWhere(function ($query) use ($currentDate, $currentTime) {
+                        $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
+                            ->where('mst_timeslots.time_to', '>', $currentTime);
+                    });
+            })
+            ->orderBy('trn_consultation_bookings.booking_date', 'asc') // Order by booking_date in ascending order
+            ->get();
 
 
             foreach ($consultationDetails as $consultation) {
@@ -95,6 +96,7 @@ class DashboardController extends Controller
             $data['message'] = "Data fetched";
             $data['data'] = array(
                 'patient_name' => $patient->patient_name,
+                'patient_email' => $patient->patient_email,
                 'membership_status' => $membership_status,
                 'membership_details' => $membership_details,
                 'upcoming_bookings' => $upcoming_bookings
