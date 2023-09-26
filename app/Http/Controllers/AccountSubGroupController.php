@@ -17,7 +17,7 @@ class AccountSubGroupController extends Controller
             $account_sub_groups = Mst_Account_Sub_Head::get();
             return view('account_sub_group.index', compact('pageTitle', 'account_sub_groups'));
         } catch (QueryException $e) {
-            return redirect()->route('account.sub.group.index')->with('error', 'Something went wrong');
+            return redirect()->route('home')->with('error', 'Something went wrong');
         }
     }
 

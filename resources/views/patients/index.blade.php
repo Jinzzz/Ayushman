@@ -114,7 +114,6 @@
                         </form>
                      </td>
                      <td>
-<<<<<<< HEAD
                         <a class="btn btn-primary" href="{{ route('patients.edit', $patient->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                         <a class="btn btn-secondary" href="{{ route('patients.show', $patient->id) }}">
                            <i class="fa fa-eye" aria-hidden="true"></i> View </a>
