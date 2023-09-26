@@ -26,7 +26,7 @@ class MstLeaveTypeController extends Controller
     public function create()
     {
         try {
-            $pageTitle = "Add Leave Types";
+            $pageTitle = "Create Leave Types";
             return view('leave_types.create', compact('pageTitle'));
         } catch (QueryException $e) {
             return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
@@ -41,10 +41,12 @@ class MstLeaveTypeController extends Controller
                 [
                     'leave_types' => ['required'],
                     'is_active' => ['required'],
+                    'is_dedactable' => ['required'],
                 ],
                 [
                     'leave_types.required' => 'Medicine dosage field is required',
                     'is_active.required' => 'Medicine dosage status is required',
+                    'is_dedactable.required' => 'Deductable status is required',
                 ]
             );
 
@@ -53,6 +55,7 @@ class MstLeaveTypeController extends Controller
                     Mst_Leave_Type::where('leave_type_id', $request->hidden_id)->update([
                         'name' => $request->leave_types,
                         'is_active' => $request->is_active,
+                        'is_dedactable' => $request->is_dedactable,
                         'updated_by' => Auth::id(),
                         'updated_at' => Carbon::now(),
                     ]);
@@ -65,6 +68,7 @@ class MstLeaveTypeController extends Controller
                         Mst_Leave_Type::create([
                             'name' => $request->leave_types,
                             'is_active' => $request->is_active,
+                            'is_dedactable' => $request->is_dedactable,
                             'created_by' => Auth::id(),
                             'updated_by' => Auth::id(),
                             'created_at' => Carbon::now(),
@@ -114,6 +118,18 @@ class MstLeaveTypeController extends Controller
         try {
             $leave_types = Mst_Leave_Type::findOrFail($id);
             $leave_types->is_active = !$leave_types->is_active;
+            $leave_types->save();
+            return 1;
+        } catch (QueryException $e) {
+            return redirect()->route('leave.type.index')->with('error', 'Something went wrong');
+        }
+    }
+
+    public function changeDeductible($id)
+    {
+        try {
+            $leave_types = Mst_Leave_Type::findOrFail($id);
+            $leave_types->is_dedactable = !$leave_types->is_dedactable;
             $leave_types->save();
             return 1;
         } catch (QueryException $e) {

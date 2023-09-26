@@ -48,8 +48,8 @@
       </div>
       <div class="card-body">
          <a href="{{ route('patients.create') }}" class="btn btn-block btn-info">
-         <i class="fa fa-plus"></i>
-         Create Patient
+            <i class="fa fa-plus"></i>
+            Create Patient
          </a>
          <div class="table-responsive">
             <table id="example" class="table table-striped table-bordered text-nowrap w-100">
@@ -104,18 +104,25 @@
                         <form action="{{ route('patients.changeStatus', $patient->id) }}" method="POST">
                            @csrf
                            @method('PATCH')
-                           <button type="submit"
-                              onclick="return confirm('Do you want to Change status?');"
-                              class="btn btn-sm @if($patient->is_active == 0) btn-danger @else btn-success @endif">
-                           @if($patient->is_active == 0)
-                           InActive
-                           @else
-                           Active
-                           @endif
+                           <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($patient->is_active == 0) btn-danger @else btn-success @endif">
+                              @if($patient->is_active == 0)
+                              InActive
+                              @else
+                              Active
+                              @endif
                            </button>
                         </form>
                      </td>
                      <td>
+<<<<<<< HEAD
+                        <a class="btn btn-primary" href="{{ route('patients.edit', $patient->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
+                        <a class="btn btn-secondary" href="{{ route('patients.show', $patient->id) }}">
+                           <i class="fa fa-eye" aria-hidden="true"></i> View </a>
+                        <form style="display: inline-block" action="{{ route('patients.destroy', $patient->id) }}" method="post">
+                           @csrf
+                           @method('delete')
+                           <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+=======
                         <a class="btn btn-primary btn-sm edit-custom"
                            href="{{ route('patients.edit', $patient->id) }}"><i
                            class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
@@ -125,9 +132,15 @@
                            action="{{ route('patients.destroy', $patient->id) }}" method="post">
                            @csrf
                            @method('delete')
+<<<<<<< HEAD
                            <button type="button" onclick="deleteData({{ $patient->id }})"class="btn-danger btn-sm">
                               <i class="fa fa-trash" aria-hidden="true"></i> Delete
                           </button>
+=======
+                           <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
+                              aria-hidden="true"></i>Delete</button>
+>>>>>>> b1d728f6546d129fd9a94b3ccdf41babb1291503
+>>>>>>> ce91f8e63764c0f5d1fb8ed2d5ade76eca5f9e25
                         </form>
                      </td>
                   </tr>

@@ -6,21 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Mst_Tax extends Model
+
+class Mst_Account_Ledger extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table = 'mst_taxes';
-    protected $primaryKey = 'id';
-    protected $dates = ['deleted_at'];
+    protected $table ='mst__account__ledgers';
+
     protected $fillable = [
-        'tax_name',
-        'tax_rate',
-        'tax_type',
-        'is_active',
+        'account_sub_group_id',
+        'ledger_code',
+        'ledger_name',
         'created_by',
         'updated_by',
         'deleted_by',
-        'deleted_at',
     ];
-
 }

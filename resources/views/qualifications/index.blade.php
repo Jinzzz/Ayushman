@@ -107,6 +107,11 @@
                         success: function(response) {
                             if (response == '1') {
                                 $("#qualificationRow_" + qualificationId).remove();
+                                i = 0;
+                                $("#example tbody tr").each(function() {
+                                    i++;
+                                    $(this).find("td:first").text(i);
+                                });
                                 flashMessage('s', 'Data deleted successfully');
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
