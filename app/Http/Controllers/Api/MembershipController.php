@@ -25,15 +25,16 @@ class MembershipController extends Controller
             $patient_id = Auth::id();
             $accountHolder = Mst_Patient::find($patient_id);
             $joined_membership_package_id = "";
-
-            if ($accountHolder->available_membership !=  0) {
+            // Checking if the user is currently enrolled in any active memberships. If yes, getting that particular package id
+            if ($accountHolder->available_membership ==  1) {
                 $booked_details = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
                     ->where('membership_expiry_date', '>=', Carbon::now())
                     ->where('is_active', 1)
                     ->first();
-                $joined_membership_package_id = $booked_details ? $booked_details->membership_patient_id : null;
+                $joined_membership_package_id = $booked_details ? $booked_details->membership_package_id : null;
             }
 
+            // Getting all active memberships 
             $memberships = Mst_Membership_Package::where('is_active', 1)->get();
             $membership_packages = [];
 
@@ -48,11 +49,13 @@ class MembershipController extends Controller
                             return $matches[1];
                         });
 
+                    // Verifying if the incoming package ID matches the active membership.
                     $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
 
                     $membership_packages[] = [
                         'membership_package_id' => $membership->membership_package_id,
                         'package_title' => $membership->package_title,
+                        'package_color' => $membership->package_color,
                         'package_duration' => $membership->package_duration . " days",
                         'package_price' => $membership->package_price,
                         'is_joined' => $is_joined,
@@ -64,6 +67,7 @@ class MembershipController extends Controller
                 $data['message'] = "Data Fetched";
                 $data['data'] = $membership_packages;
             } else {
+                // There is n active membership packages 
                 $data['status'] = 0;
                 $data['message'] = "Currently, no memberships are available";
             }
@@ -97,22 +101,31 @@ class MembershipController extends Controller
 
                     $package_details = Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)->where('is_active', 1)->first();
 
+                    $package_description = strip_tags($package_details->package_description);
+
                     $membership_package_details[] = [
                         'membership_package_id' => $package_details->membership_package_id,
                         'package_title' => $package_details->package_title,
+                        'package_color' => $package_details->package_color,
                         'package_duration' => $package_details->package_duration . " days",
                         'package_price' => $package_details->package_price,
-                        'package_description' => $package_details->package_description,
+                        'package_description' => $package_description,
                     ];
-                    $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)->where('is_active', 1)->pluck('title');
 
+
+                    // $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)->where('is_active', 1)->pluck('title');
+                    $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)
+                        ->where('is_active', 1)
+                        ->pluck('title')
+                        ->map(function ($benefit) {
+                            preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
+                            return $matches[1];
+                        });
                     $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
                         ->where('mst__membership__package__wellnesses.package_id', $request->membership_package_id)
                         ->where('mst__membership__package__wellnesses.is_active', 1)
                         ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst_wellness.wellness_inclusions')
                         ->get();
-
-
 
                     $data['status'] = 1;
                     $data['message'] = "Data Fetched";
@@ -144,29 +157,37 @@ class MembershipController extends Controller
     {
         $data = array();
         try {
-            $is_membership = Mst_Patient::where('id', Auth::id())->value('available_membership');
-
-            if ($is_membership != 0) {
+            // Whether the last active membership package has expired or not, we always need the details of the most recent active membership package as the current membership information
+            $is_membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->first();
+            if ($is_membership) {
+                // Retrieving the most recent membership booking
                 $latest_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                    ->where('membership_expiry_date', '>=', Carbon::now())
-                    ->where('is_active', 1)
-                    ->first();
+                    ->where('is_active', 1)->orderBy('created_at', 'desc')->first();
 
                 $package_details = Mst_Membership_Package::where('membership_package_id', $latest_membership_booking->membership_package_id)
                     ->first();
 
-                $targetDate = Carbon::parse($latest_membership_booking->membership_expiry_date);
-                $membership_booking_date = $latest_membership_booking->start_date->format('d-m-Y');
-                $membership_expiry_date = $targetDate->format('d-m-Y');
-                $days_left = Carbon::now()->diffInDays($targetDate) . " days";
+                // getting membership_booking_date 
+                $carbonStartingDate = Carbon::parse($latest_membership_booking->start_date);
+                $membership_booking_date = $carbonStartingDate->format('d-m-Y');
 
+                // getting membership_expiry_date 
+                $targetDate = Carbon::parse($latest_membership_booking->membership_expiry_date);
+                $membership_expiry_date = $targetDate->format('d-m-Y');
+
+                $days_left = "0 days";
+                if ($targetDate >= Carbon::now()) {
+                    $days_left = Carbon::now()->diffInDays($targetDate) . " days";
+                }
+
+                // Retrieving that particular membership package including wellnesses.
                 $membership_wellnesses = Trn_Patient_Wellness_Sessions::where('membership_patient_id', $latest_membership_booking->membership_patient_id)
                     ->distinct()
                     ->pluck('wellness_id');
 
-                // If you want to convert the result to an array, you can use ->toArray()
                 $membership_wellnesses = $membership_wellnesses->toArray();
 
+                // Fetching completed sessions and remainingSessions.
                 $completedSessions = [];
                 $remainingSessions = [];
 
@@ -185,7 +206,7 @@ class MembershipController extends Controller
                     }
                 }
 
-                $membership_data = [
+                $current_membership_details = [
                     'package_id' => $package_details->membership_package_id,
                     'package_title' => $package_details->package_title,
                     'membership_booking_date' => $membership_booking_date,
@@ -195,18 +216,47 @@ class MembershipController extends Controller
                     'remaining_sessions' => $remainingSessions,
                 ];
 
-                $data[] = $membership_data;
+                // Getting old membership details - History 
+                $previous_membership_details = [];
+                $old_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->get();
+                foreach ($old_membership_bookings as $old_membership_booking) {
+                    if ($old_membership_booking->membership_patient_id != $latest_membership_booking->membership_patient_id) {
 
+                        // getting previous starting date
+                        $previousStartingDate = Carbon::parse($old_membership_booking->start_date);
+                        $previous_membership_booking_date = $previousStartingDate->format('d-m-Y');
+
+                        // getting previous expiry date
+                        $previosExpiryDate = Carbon::parse($old_membership_booking->membership_expiry_date);
+                        $previous_membership_expiry_date = $previosExpiryDate->format('d-m-Y');
+
+                        $previous_package_details = Mst_Membership_Package::where('membership_package_id', $old_membership_booking->membership_package_id)->first();
+
+                        $previous_membership_details[] = [
+                            'package_id' => $old_membership_booking->membership_package_id,
+                            'package_title' => $previous_package_details->package_title,
+                            'membership_booking_date' => $previous_membership_booking_date,
+                            'membership_expiry_date' => $previous_membership_expiry_date,
+                        ];
+                    }
+                }
+
+                $data = [];
+
+                $data = [
+                    'current_membership_details' => $current_membership_details,
+                    'previous_membership_details' => $previous_membership_details
+                ];
                 if (!empty($data)) {
                     $response = [
                         'status' => 1,
                         'message' => "Data Fetched",
-                        'current_membership_details' => $data,
+                        'data' => $data,
                     ];
                 } else {
                     $response = [
                         'status' => 0,
-                        'message' => "No active membership bookings found",
+                        'message' => "No membership information available.",
                     ];
                 }
             } else {
@@ -248,7 +298,7 @@ class MembershipController extends Controller
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($start_date->year > $currentYear + 1) { 
+                    if ($start_date->year > $currentYear + 1) {
                         $data['status'] = 0;
                         $data['message'] = "Starting date cannot be more than 1 year in the future.";
                         return response($data);
@@ -260,26 +310,41 @@ class MembershipController extends Controller
                         return response($data);
                     }
 
-                    $is_membership = Mst_Patient::where('id', Auth::id())->value('available_membership');
+                    $is_membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->first();
                     $package_details = Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)
                         ->where('is_active', 1)
                         ->first();
 
                     $package_duration = $package_details->package_duration; // Number of days to add
 
-                    if ($is_membership == 1) {
+                    if ($is_membership) {
                         // Checking all membership booking in this package_id? if yes taking last inserted row 
                         $last_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                            ->where('membership_expiry_date', '>=', Carbon::now())
+                            ->where('is_active', 1)
                             ->orderBy('created_at', 'desc')
                             ->first();
 
                         if (!empty($last_membership_booking)) {
-                            // print_r($last_membership_booking->membership_expiry_date);die();
-                            $is_active = 0;
-                            $expiry_date = Carbon::parse($last_membership_booking->membership_expiry_date)->addDays($package_duration);
+                            if ($last_membership_booking->membership_expiry_date >= Carbon::now()) {
+                                // "Sorry, you cannot purchase a new membership at this time. You are already an active member, and our policy allows for only one active membership at a time."
+                                $data['status'] = 0;
+                                $data['message'] = "Sorry,our policy allows for only one active membership at a time.";
+                                return response()->json($data);
+                            } else {
+                                // renew membership package
+                                $updatePatientCode = Mst_Patient::where('id', Auth::id())->update([
+                                    'updated_at' => Carbon::now(),
+                                    'available_membership' => 1
+                                ]);
+                                $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
+                                $is_active = 1;
+                            }
                         } else {
                             // If no previous membership booking is found, set the expiry_date based on the current date
+                            $updatePatientCode = Mst_Patient::where('id', Auth::id())->update([
+                                'updated_at' => Carbon::now(),
+                                'available_membership' => 1
+                            ]);
                             $is_active = 1;
                             $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
                         }
@@ -289,7 +354,7 @@ class MembershipController extends Controller
                             'updated_at' => Carbon::now(),
                             'available_membership' => 1
                         ]);
-                        $expiry_date =Carbon::parse($request->start_date)->addDays($package_duration);
+                        $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
                         $is_active = 1;
                     }
 
