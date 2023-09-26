@@ -10,6 +10,15 @@ class Mst_External_Doctor extends Model
     use HasFactory;
     protected $table = 'mst_external_doctors';
 
+    protected $fillable=[
+        'doctor_name',
+        'contact_no',
+        'contact_email',
+        'address',
+        'commission',
+        'remarks',
+    ];
+
 
     public function branch()
     {

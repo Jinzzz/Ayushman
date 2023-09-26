@@ -25,9 +25,8 @@ class MstExternalDoctorController extends Controller
         $request->validate([
             'doctor_name' => 'required',
             'contact_no' => 'required|numeric|digits:10',
-            // 'contact_email' => 'required|email',
-            'address' => 'required',
-            'remarks' => 'required',
+            'contact_email' => 'nullable|email',
+            'commission' => 'nullable|numeric|between:0,100',
             'is_active' => 'required',
         ]);
         
@@ -39,6 +38,7 @@ class MstExternalDoctorController extends Controller
         $doctor->contact_email = $request->input('contact_email');
         $doctor->address = $request->input('address');
         $doctor->remarks = $request->input('remarks');
+        $doctor->commission = $request->input('commission');
         $doctor->is_active = $is_active; 
         $doctor->save();
     
@@ -57,8 +57,8 @@ class MstExternalDoctorController extends Controller
         $request->validate([
             'doctor_name' => 'required',
             'contact_no' => 'required',
-            // 'contact_email' => 'required',
-            'address' => 'required',
+            'contact_email' => 'nullable|email',
+            'commission' => 'nullable|numeric|between:0,100',
            
         ]);
         
@@ -70,6 +70,7 @@ class MstExternalDoctorController extends Controller
         $doctor->contact_email = $request->input('contact_email');
         $doctor->address = $request->input('address');
         $doctor->remarks = $request->input('remarks');
+        $doctor->commission = $request->input('commission');
         $doctor->is_active = $is_active; 
         $doctor->save();
     
@@ -87,6 +88,7 @@ class MstExternalDoctorController extends Controller
     {
         $doctor =  Mst_External_Doctor::findOrFail($id);
         $doctor->delete();
+        return 1;
 
         return redirect()->route('externaldoctors.index')->with('success','External doctor deleted successfully');
     }

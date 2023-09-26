@@ -117,7 +117,7 @@
                                      <td>{{ $staff->staff_code}}</td>
                                     <td>{{ $staff->staffType->master_value }}</td>
                                     <td>{{ $staff->staff_name}}</td>
-                                    <td>{{ $staff->branch->branch_name}}</td>
+                                    <td>{{ $staff->branch->branch_name ?? ''}}</td>
                                     <td>{{ $staff->staff_contact_number }}</td>
                                     <td>{{ $staff->staff_qualification}}</td>
                                      
@@ -150,7 +150,7 @@
                                             action="{{ route('staffs.destroy', $staff->staff_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="button" onclick="deleteData({{ $staff->staff_id }})" class="btn btn-danger">
+                                            <button type="button" onclick="deleteData({{ $staff->staff_id }})"class="btn-danger btn-sm">
                                                 <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                             </button>
                                         </form>
@@ -209,7 +209,7 @@
                             }
                         },
                         error: function() {
-                            alert('An error occurred while deleting the qualification.');
+                            alert('An error occurred while deleting the staff.');
                         },
                     });
                 } else {

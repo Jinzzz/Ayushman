@@ -50,7 +50,7 @@ Auth::routes();
 Route::get('/home', [DashboardController::class, 'index'])->name('home');
 //Manage-Branches:
 
-Route::middleware('web')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
 Route::get('/branches/create', [MstBranchController::class, 'create'])->name('branches.create');
 Route::post('/branches/store', [MstBranchController::class, 'store'])->name('branches.store');
@@ -119,9 +119,7 @@ Route::patch('/patients/{id}/toggle-otp-verification', [MstPatientController::cl
 Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class,'toggleApproval'])->name('patients.toggleApproval');
 
 
-// membership 
-Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembership'])->name('patients.membership');
-Route::post('/patients/membership/store', [MstPatientController::class, 'patientMembershipStore'])->name('patients.membership.store');
+
 
 //Manage-Therapy-Rooms:
 Route::get('/therapyrooms/index', [MstTherapyRoomController::class, 'index'])->name('therapyrooms.index');
@@ -302,3 +300,9 @@ Route::patch('manufacturer/change-status/{id}', [MstManufacturerController::clas
 Route::get('/staff-branch-transfer', [EmployeeBranchTransferController::class, 'index'])->name('branchTransfer.index');
 Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::class, 'store'])->name('branchTransfer.store');
 Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');
+
+
+// patient-membership 
+Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembershipIndex'])->name('patients.membership');
+Route::post('/patients/membership/store/{id}', [MstPatientController::class, 'patientMembershipStore'])->name('patientsMembership.store');
+Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class ,'getWellnessDetails'])->name('getwellness.details');

@@ -65,6 +65,18 @@
                      <input type="text" class="form-control"  name="branch_admin_contact_number" value="{{ $branch->branch_admin_contact_number }}" placeholder="Branch Admin Contact Number">
                   </div>
                </div>
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label class="form-label">Latitude*</label>
+                     <input type="text" class="form-control" required name="latitude" value="{{ $branch->latitude }}" placeholder="Latitude">
+                  </div>
+               </div>
+               <div class="col-md-6">
+                  <div class="form-group">
+                     <label class="form-label">Longitude*</label>
+                     <input type="text" class="form-control" required name="longitude" value="{{ $branch->longitude }}" placeholder="Longitude">
+                  </div>
+               </div>
               
                <div class="col-md-6">
                   <div class="form-group">

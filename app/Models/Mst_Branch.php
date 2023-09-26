@@ -21,6 +21,8 @@ class Mst_Branch extends Model
         'branch_email',
         'branch_admin_name',
         'branch_admin_contact_number',
+        'latitude',
+        'longitude',
         'created_by',
     ];
 

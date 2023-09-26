@@ -1,23 +1,152 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="container">
-    <h3>Wellness Details</h3>
-    
-    <div class="show-container">
-    
-            <p><strong>Wellness Name:</strong> {{$show->wellness_name}}</p>
-            <p><strong>Wellness Description:</strong> {{ $show->wellness_description}}</p>
-            <p><strong>Wellness Inclusions:</strong> {{ $show->wellness_inclusions}}</p>
-            <p><strong>Terms and Conditions:</strong> {{ $show->wellness_terms_conditions}}</p>
-            <p><strong>Branch:</strong> {{ $show->branch->branch_name }}</p>
-            <p><strong>Wellness Cost:</strong> {{ $show->wellness_cost}}</p>
-            <p><strong>Wellness Duration:</strong> {{ $show->wellness_duration}}</p>
-            <p><strong>Remarks:</strong> {{ $show->remarks}}</p>
-           
-            
-           <a class="btn btn-secondary ml-2" href="{{ route('wellness.index') }}"><i class="fa fa-times" aria-hidden="true"></i>Back</a>
-       
+   <div class="row" style="min-height: 70vh;">
+      <div class="col-md-12">
+         <div class="card">
+            <div class="card-header">
+               <h3 class="mb-0 card-title">View Wellness</h3>
+            </div>
+         
+            <div class="col-lg-12" style="background-color: #fff;">
+               @if ($errors->any())
+               <div class="alert alert-danger">
+                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <ul>
+                     @foreach ($errors->all() as $error)
+                     <li>{{ $error }}</li>
+                     @endforeach
+                  </ul>
+               </div>
+               @endif
+             
+                  
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Wellness Name</label>
+                           <input type="text" class="form-control" readonly name="wellness_name" value="{{$show->wellness_name}}" placeholder="Wellness Name">
+                        </div>
+                     </div>
+
+ <div class="col-md-6">
+    <div class="form-group">
+        <label class="form-label">Wellness Description*</label>
+        <textarea class="form-control" readonly name="wellness_description"  placeholder="Wellness Description">{{ $show->wellness_description }}</textarea>
+    </div>
 </div>
+
+
+                     <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Wellness Inclusions*</label>
+                                    <input type="text" class="form-control" name="wellness_inclusions" readonly name="wellness_inclusions"
+                                        value="{{ $show->wellness_inclusions}}" placeholder="Wellness Inclusions">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Wellness T&C*</label>
+                                    <textarea class="form-control" name="wellness_terms_conditions" readonly name="wellness_terms_conditions"
+                                        placeholder="Wellness T&C">{{$show->wellness_terms_conditions}}</textarea>
+                                </div>
+                            </div>
+
+
+                      <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Wellness Cost</label>
+                           <input type="text" class="form-control" readonly name="wellness_cost" value="{{$show->wellness_cost}}" placeholder="Wellness Cost">
+                        </div>
+                     </div>
+
+                     <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Wellness Duration*</label>
+                                    <input type="text" class="form-control" readonly name="wellness_duration" required
+                                        value="{{$show->wellness_duration}}" placeholder="Wellness Duration">
+                                </div>
+                            </div>
+                     
+
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Remarks</label>
+                           <input type="text" class="form-control" readonly name="remarks" value="{{$show->remarks}}" placeholder="Remarks">
+                        </div>
+                     </div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <label for="branch_id" class="form-label">Branch*</label>
+        <select class="form-control" readonly name="branch" id="branch_id">
+            <option value="">Choose Branch</option>
+            @foreach($show as $id => $branchName)
+                <option value="{{ $id }}"{{ $id == $show->branch_id ? ' selected' : '' }}>
+                    {{ $branchName }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+</div>
+
+
+  <!-- ... -->
+                      
+<div class="col-md-6">
+    <div class="form-group">
+        <div class="form-label">Status</div>
+        <label class="custom-switch">
+            <input type="checkbox" id="is_active" readonly name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($show->is_active) checked @endif>
+            <span id="statusLabel" class="custom-switch-indicator"></span>
+            <span id="statusText" class="custom-switch-description">
+                @if($show->is_active)
+                    Active
+                @else
+                    Inactive
+                @endif
+            </span>
+        </label>
+    </div>
+</div>
+
+
+<!-- ... -->
+
+                  
+
+                   <div class="col-md-12">
+                        <div class="form-group">
+                           <center>
+                         
+                         
+                           <a class="btn btn-danger" href="{{route('wellness.index')}}">Back</a>
+                           </center>
+                        </div>
+                     </div>
+                  </div>
+
+               </form>
+
+      </div>
+   </div>
+</div>
+
+
+@endsection
+@section('js')
+<script>
+    function toggleStatus(checkbox) {
+        if (checkbox.checked) {
+            $("#statusText").text('Active');
+            $("input[name=is_active]").val(1); // Set the value to 1 when checked
+        } else {
+            $("#statusText").text('Inactive');
+            $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+        }
+    }
+</script>
+
 
 @endsection

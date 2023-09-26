@@ -63,16 +63,23 @@
                                                                     <tr>
 																		<td><strong>Branch Contact Number:</strong>{{ $show->branch_contact_number}}</td>
 																	</tr>
-																</tbody>
-																<tbody class="col-lg-12 col-xl-6 p-0">
 																	<tr>
 																		<td><strong>Branch Email :</strong>{{ $show->branch_email }}</td>
 																	</tr>
+																</tbody>
+																<tbody class="col-lg-12 col-xl-6 p-0">
+																	
 																	<tr>
 																		<td><strong>Branch Admin Name:</strong>{{ $show->branch_admin_name}}</td>
 																	</tr>
 																	<tr>
 																		<td><strong>Branch Admin Contact Number :</strong> {{ $show->branch_admin_contact_number}}</td>
+																	</tr>
+																	<tr>
+																		<td><strong>Latitude :</strong>{{ $show->latitude }}</td>
+																	</tr>
+																	<tr>
+																		<td><strong>Longitude :</strong>{{ $show->longitude }}</td>
 																	</tr>
                                                                     
 																</tbody>

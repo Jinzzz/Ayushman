@@ -5,7 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use App\Models\Mst_Membership;
+use App\Models\Mst_Membership_Package;
+use App\Models\Mst_Membership_Package_Wellness;
+use App\Models\Mst_Patient_Membership_Booking;
+use App\Models\Mst_Membership_Benefit;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -166,6 +172,7 @@ class MstPatientController extends Controller
     { 
         $patient = Mst_Patient::findOrFail($id);
         $patient->delete();
+        return 1;
 
         return redirect()->route('patients.index')->with('success','Patient deleted successfully');
     }
@@ -197,5 +204,74 @@ class MstPatientController extends Controller
 
       return redirect()->back()->with('success','Approval status updated successfully');
     }
+
+
+    //adding membership to a particular patient:
+
+    public function addMembershipIndex($id)
+    {
+        $pageTitle = "Membership details";
+        $memberships = Mst_Membership_Package::pluck('package_title', 'membership_package_id','package_duration','package_description','package_price','is_active');
+        // $wellnessDetails = Mst_Membership_Package_Wellness::where('mst__membership__package__wellnesses.package_id', $membershipId);
+        return view('patients.membership_details', compact('pageTitle', 'memberships','id'));
+    }
+
+    public function getWellnessDetails($membershipId)
+    {
+        if (isset($membershipId)) {
+         
+            $package_details = Mst_Membership_Package::where('membership_package_id', $membershipId)->first();
     
+            // Retrieve benefits based on the $membershipId
+            $benefits = Mst_Membership_Benefit::where('package_id', $membershipId)->first();
+    
+            // Retrieve wellness details based on the $membershipId
+            $wellnessDetails = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
+                ->where('mst__membership__package__wellnesses.package_id', $membershipId)
+                ->where('mst__membership__package__wellnesses.is_active', 1)
+                ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst__membership__package__wellnesses.is_active, mst_wellness.wellness_inclusions')
+                ->get();
+                return response()->json(['wellnessDetails'=> $wellnessDetails , 'benefits'=> $benefits ,'package_details' => $package_details ]);
+    }
+}
+
+//storing patient membership details in table mst__patient__membership__bookings:
+     
+    public function patientMembershipStore(Request $request,$id)
+    {
+        
+        try{
+        $request->validate([
+           
+            'payment_type' => 'required',
+            'start_date' => 'required',
+
+        ]);
+        $membershipId = $request->input('membership');
+        $patientId = $id;
+        $selectedMembership = Mst_Membership_Package::findOrFail($membershipId);    
+        $startDate = Carbon::parse($request->input('start_date')); 
+        $membershipDuration = $selectedMembership->package_duration;
+        $expiryDate = $startDate->addDays($membershipDuration); // Calculate expiry date
+
+        $booking = new Mst_Patient_Membership_Booking();
+        $booking->patient_id = $patientId;
+        $booking->membership_package_id = $membershipId;
+        $booking->start_date = $request->input('start_date');
+        $booking->payment_type = $request->input('payment_type');
+
+      
+        $booking->payment_amount = $selectedMembership->package_price;
+        $booking->membership_expiry_date = $expiryDate;
+        $booking->is_active = $selectedMembership->is_active;
+        $booking->save();
+
+        return redirect()->route('patients.index')->with('success', 'Membership added successfully');
+        
+    }
+    catch (QueryException $e) {
+    return redirect()->route('home')->with('error', 'Something went wrong');
+    }
+ 
+    }
 }

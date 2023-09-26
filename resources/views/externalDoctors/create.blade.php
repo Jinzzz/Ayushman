@@ -48,19 +48,24 @@
                        
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Address*</label>
-                                    <textarea class="form-control" required name="address" placeholder="Address">{{ old('address') }}</textarea>
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control"  name="address" placeholder="Address">{{ old('address') }}</textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Remarks*</label>
-                                    <textarea class="form-control" required name="remarks" placeholder="Remarks">{{ old('remarks') }}</textarea>
+                                    <label class="form-label">Remarks</label>
+                                    <textarea class="form-control"  name="remarks" placeholder="Remarks">{{ old('remarks') }}</textarea>
                                 </div>
                             </div>
-                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Commission(%)</label>
+                                    <input type="text" class="form-control"  required name ="commission" value="{{ old('commision') }}" placeholder="Commission">
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">

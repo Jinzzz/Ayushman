@@ -56,13 +56,14 @@
                                             @foreach($employees as $employee)
                                             <tr>
                                                 <td style="vertical-align:top;">
-                                                    <input type="checkbox" name="selected_staff[]" value="{{ $employee->id }}">
+                                                    <input type="checkbox" name="selected_staff[]" >
                                                 </td>
                                                 <td style="padding-top:3px;">
-                                                    {{ $employee->staff_name }}
+                                                    
                                                 </td>
                                             </tr>
-                                            @endforeach
+                                        @endforeach
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -148,8 +149,8 @@
 
                 // Append the fetched employees to the list
                 $.each(data, function(index, employee) {
-                    // console.log(employee);
-                    var checkbox = $('<input type="checkbox" class="chck_btn" style="display:inline;">');
+                    console.log(employee);
+                    var checkbox = $('<input type="checkbox" onclick="AddEmployee('+employee.staff_name+')" class="chck_btn" style="display:inline;">');
                     var label = $('<label class="ng-binding" style="display:inline;">').text(employee.staff_name);
                     var row = $('<tr>').append($('<td>').append(checkbox, label));
                     $("#employee_list").append(row);
@@ -161,27 +162,31 @@
         });
         $("#transferred_employee_list").empty();
     }
-
+   
 
     function transferEmployees() {
-        // Get the selected employees from the "From Branch" container
-        var selectedEmployees = [];
-        $("input[type=checkbox]:checked").each(function () {
-            selectedEmployees.push($(this).closest('tr')); // Store the whole row
-        });
+    // Get the selected employees from the "From Branch" container
+    var selectedEmployees = [];
+    $("input[type=checkbox]:checked", "#employee_list").each(function () {
+        var checkboxValue = $(this).val();
+        var labelText = $(this).closest('tr').find('label').text();
         
-        // Append the selected employees to the "To Branch" container
-        $.each(selectedEmployees, function(index, employeeRow) {
-            var checkbox = $('<input type="checkbox" class="chck_btn" style="display:inline;">').val(employeeRow.find('input[type=checkbox]').val());
-            var label = $('<label class="ng-binding" style="display:inline;">').text(employeeRow.find('label').text());
-                alert(checkbox);
-            var row = $('<tr>').append($('<td>').append(checkbox, label));
-            $("#transferred_employee_list").append(row);
+        selectedEmployees.push({ value: checkboxValue, label: labelText });
 
-            // Remove the selected employee row from the "From Branch" container
-            employeeRow.remove();
-        });
-    }
+        // Remove the selected employee row from the "From Branch" container
+        $(this).closest('tr').remove();
+    });
+
+    // Append the selected employees to the "To Branch" container
+    $.each(selectedEmployees, function(index, employee) {
+        var checkbox = $('<input type="checkbox" class="chck_btn" style="display:inline;">').val(employee.value);
+        var label = $('<label class="ng-binding" style="display:inline;">').text(employee.label);
+
+        var row = $('<tr>').append($('<td>').append(checkbox, label));
+        $("#transferred_employee_list").append(row);
+    });
+}
+
 
 
     function transferEmployeesBack() {

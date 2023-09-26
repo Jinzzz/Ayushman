@@ -60,6 +60,18 @@
                            <p class="error-message" style="color: green; display: none;">Only numbers are allowed.</p>
                         </div>
                      </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Latitude*</label>
+                           <input type="text" class="form-control" required name="latitude" value="{{old('latitude')}}" placeholder="Latitude">
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Longitude*</label>
+                           <input type="text" class="form-control" required name="longitude" value="{{old('longitude')}}" placeholder="Longitude">
+                        </div>
+                     </div>
                      <!-- ... -->
                      <div class="col-md-6">
                         <div class="form-group">

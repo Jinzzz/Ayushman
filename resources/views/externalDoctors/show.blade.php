@@ -60,6 +60,12 @@
                         <textarea class="form-control" readonly name="remarks" placeholder="Remarks">{{ $show->remarks }}</textarea>
                      </div>
                   </div>
+                  <div class="col-md-6">
+                     <div class="form-group">
+                         <label class="form-label">Commission(%)</label>
+                         <input type="text" class="form-control"  readonly name ="commission" value="{{ $show->commission }}" placeholder="Commission">
+                     </div>
+                 </div>
                </div>
             
             <div class="row">

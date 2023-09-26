@@ -65,6 +65,7 @@ class MstTimeSlotController extends Controller
     {
         $timeslot = Mst_Master_Value::findOrFail($id);
         $timeslot->delete();
+        return 1;
         return redirect()->route('timeslot.index')->with('success','Timeslot deleted successfully');
     }
 

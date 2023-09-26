@@ -22,16 +22,16 @@
             
             <div class="col-md-3 d-flex align-items-end">
                 <div>
-                    <button type="submit" class="btn btn-secondary">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fa fa-filter" aria-hidden="true"></i> Filter
                     </button>
-                    <a class="btn btn-secondary ml-2" href="{{ route('wellness.index') }}">
+                    <a class="btn btn-primary" href="{{ route('wellness.index') }}">
                         <i class="fa fa-times" aria-hidden="true"></i> Reset
                     </a>
                 </div>
                 </div>
             </div>
-        </div>
+        </div> 
     </form>
 </div>
 
@@ -98,16 +98,16 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary"
+                                        <a class="btn btn-primary btn-sm edit-custom"
                                             href="{{ route('wellness.edit', $wellnes->wellness_id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                        <a class="btn btn-secondary" href="{{ route('wellness.show', $wellnes->wellness_id) }}">
+                                        <a class="btn btn-secondary btn-sm" href="{{ route('wellness.show', $wellnes->wellness_id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                         <form style="display: inline-block"
                                             action="{{ route('wellness.destroy', $wellnes->wellness_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash"
+                                            <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn-danger btn-sm"><i class="fa fa-trash"
                                                     aria-hidden="true"></i>Delete</button>
                                         </form>
                                     </td>

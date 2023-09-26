@@ -43,7 +43,7 @@
                       <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a></li>
-                      <li><a class="slide-item" href="{{ url('/therapyroom-assigning/index')}}">{{ __('Therapy Room Assigning') }}</a></li>
+                   
                       <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
                       <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>

@@ -6,11 +6,13 @@ use App\Models\Mst_Branch;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Staff_Transfer_Log;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class EmployeeBranchTransferController extends Controller
 {
     public function index()
     {
+      
         $pageTitle = "Employee branch transfer";
         $branch = Mst_Branch::pluck('branch_name','branch_id');
         $employees = Mst_Staff::pluck('staff_name','staff_id');
@@ -25,6 +27,7 @@ class EmployeeBranchTransferController extends Controller
 
    public function store(Request $request)
 {
+    print_r($request->all());die();
      // Validate the request data
      $request->validate([
         'from_branch' => 'required|exists:mst_branches,branch_id',
@@ -44,6 +47,8 @@ class EmployeeBranchTransferController extends Controller
             'staff_id' => $staffId,
             'from_branch_id' => $fromBranchId,
             'to_branch_id' => $toBranchId,
+            'transfer_date' => carbon::now(),
+            'created_by' => auth()->id(),
         ]);
 
        //update the staff's branch in the 'mst_staff' table

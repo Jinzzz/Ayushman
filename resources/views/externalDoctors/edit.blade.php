@@ -56,7 +56,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Address</label>
-                                    <textarea class="form-control" required name="address" placeholder="Address">{{ $doctor->address }}</textarea>
+                                    <textarea class="form-control"  name="address" placeholder="Address">{{ $doctor->address }}</textarea>
                                 </div>
                             </div>
                         </div>  
@@ -64,7 +64,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Remarks</label>
-                                    <textarea class="form-control" required name="remarks" placeholder="Remarks">{{ $doctor->remarks }}</textarea>
+                                    <textarea class="form-control"  name="remarks" placeholder="Remarks">{{ $doctor->remarks }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Commission(%)</label>
+                                    <input type="text" class="form-control"  required name ="commission" value="{{ $doctor->commission }}" placeholder="Commission">
                                 </div>
                             </div>
                         

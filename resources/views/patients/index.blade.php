@@ -72,7 +72,7 @@
                   $i = 0;
                   @endphp
                   @foreach($patients as $patient)
-                  <tr>
+                  <tr id="dataRow_{{$patient->id }}">
                      <td>{{ ++$i }}</td>
                      <td>{{ $patient->patient_code }}</td>
                      <td>{{ $patient->patient_name }}</td>
@@ -81,7 +81,7 @@
                      <td>{{ $patient->emergency_contact}}</td>
                        <td>
                                         <a class="btn btn-sm  btn-outline-success "
-                                            href="{{ route('membership.index', $patient->id) }}"><i
+                                            href="{{ route('patients.membership', $patient->id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i>Membership</a>
                                                 </td>
                                     
@@ -91,7 +91,7 @@
                            @method('PATCH')
                            <button type="submit"
                               onclick="return confirm('Do you want to change otp verification status?');"
-                              class="btn btn-sm @if($patient->is_otp_verified == 0) btn-outline-danger @else btn-outline-success @endif">
+                              class="btn btn-sm  btn-outline-success @if($patient->is_otp_verified == 0) btn-outline-danger @else btn-outline-success @endif">
                            @if($patient->is_otp_verified == 0)
                            Not Verified
                            @else
@@ -125,8 +125,9 @@
                            action="{{ route('patients.destroy', $patient->id) }}" method="post">
                            @csrf
                            @method('delete')
-                           <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
-                              aria-hidden="true"></i>Delete</button>
+                           <button type="button" onclick="deleteData({{ $patient->id }})"class="btn-danger btn-sm">
+                              <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                          </button>
                         </form>
                      </td>
                   </tr>
@@ -142,3 +143,43 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script>
+   function deleteData(dataId) {
+       swal({
+               title: "Delete selected data?",
+               text: "Are you sure you want to delete this data",
+               type: "warning",
+               showCancelButton: true,
+               confirmButtonColor: "#DD6B55",
+               confirmButtonText: "Yes",
+               cancelButtonText: "No",
+               closeOnConfirm: true,
+               closeOnCancel: true
+           },
+           function(isConfirm) {
+               if (isConfirm) {
+                   $.ajax({
+                       url: "{{ route('patients.destroy', '') }}/" + dataId,
+                       type: "DELETE",
+                       data: {
+                           _token: "{{ csrf_token() }}",
+                       },
+                       success: function(response) {
+                           // Handle the success response, e.g., remove the row from the table
+                           if (response == '1') {
+                               $("#dataRow_" + dataId).remove();
+                               flashMessage('s', 'Data deleted successfully');
+                           } else {
+                               flashMessage('e', 'An error occured! Please try again later.');
+                           }
+                       },
+                       error: function() {
+                           alert('An error occurred while deleting the patient.');
+                       },
+                   });
+               } else {
+                   return;
+               }
+           });
+   }
+   </script>

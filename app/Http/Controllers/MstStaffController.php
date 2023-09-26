@@ -72,12 +72,13 @@ class MstStaffController extends Controller
             'staff_contact_number' => 'required',
             'staff_address' => 'required',
             'staff_qualification' => 'required',
-            'staff_specialization' => 'required', 
+           // 'staff_specialization' => 'required', 
             // 'staff_commission_type' => 'required',
             'staff_commission' => 'required|numeric', 
-            // 'staff_booking_fee' => 'required|numeric',
+            'staff_booking_fee' => 'nullable|numeric',
+            'max_discount_value' => 'nullable|numeric|between:0,100',
             'salary_type' => 'required',
-            'salary_amount' => 'required',
+            'salary_amount' => 'required|numeric',
             'is_active' => 'required', 
 
          ]);
@@ -104,6 +105,7 @@ class MstStaffController extends Controller
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
             'staff_booking_fee' => $request->staff_booking_fee,
+            'max_discount_value' =>  $request->max_discount_value,
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
@@ -177,6 +179,7 @@ class MstStaffController extends Controller
             'staff_commission_type' => $request->staff_commission_type,
             'staff_commission' => $request->staff_commission,
             'staff_booking_fee' => $request->staff_booking_fee,
+            'max_discount_value' =>  $request->max_discount_value,
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
         ]);

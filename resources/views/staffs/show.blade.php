@@ -63,39 +63,39 @@
                         <table class="table row table-borderless">
                            <tbody class="col-lg-12 col-xl-6 p-0">
                               <tr>
-                                 <td><strong>Staff Code :</strong>{{$show->staff_code}}</td>
+                                 <td><strong>Staff Code :</strong>{{$show->staff_code ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Type:</strong>{{ $show->staffType->master_value}}</td>
+                                 <td><strong>Staff Type:</strong>{{ $show->staffType->master_value ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Employment Type :</strong> {{ $show->employmemntType->master_value}}</td>
+                                 <td><strong>Employment Type :</strong> {{ $show->employmemntType->master_value ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Username :</strong> {{ $show->staff_username}}</td>
+                                 <td><strong>Staff Username :</strong> {{ $show->staff_username ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Name :</strong> {{ $show->staff_name}}</td>
+                                 <td><strong>Staff Name :</strong> {{ $show->staff_name ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Gender :</strong> {{ $show->Gender->master_value}}</td>
+                                 <td><strong>Gender :</strong> {{ $show->Gender->master_value ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Branch :</strong> {{ $show->branch->branch_name}}</td>
+                                 <td><strong>Branch :</strong> {{ $show->branch->branch_name ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Date Of Birth :</strong> {{\Carbon\Carbon::parse($show->date_of_birth)->format('d/m/Y')}}</td>
+                                 <td><strong>Date Of Birth :</strong> {{\Carbon\Carbon::parse($show->date_of_birth)->format('d/m/Y') ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Email :</strong> {{ $show->staff_email}}</td>
+                                 <td><strong>Staff Email :</strong> {{ $show->staff_email ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Contact Number :</strong> {{ $show->staff_contact_number}}</td>
+                                 <td><strong>Staff Contact Number :</strong> {{ $show->staff_contact_number ??''}}</td>
                               </tr>
                            </tbody>
                            <tbody class="col-lg-12 col-xl-6 p-0">
                               <tr>
-                                 <td><strong>Staff Address:</strong>{{ $show->staff_address}}</td>
+                                 <td><strong>Staff Address:</strong>{{ $show->staff_address ??''}}</td>
                               </tr>
                           
                               <tr>
@@ -103,24 +103,29 @@
                              </tr>
                              
                               <tr>
-                                 <td><strong>Salary Amount:</strong>{{ $show->salary_amount}}</td>
+                                 <td><strong>Salary Amount:</strong>{{ $show->salary_amount ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Qualification :</strong>  {{ $show->staff_qualification}}</td>
+                                 <td><strong>Qualification :</strong>  {{ $show->staff_qualification ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Specialization :</strong>  {{ $show->staff_specialization}}</td>
+                                 <td><strong>Specialization :</strong>  {{ $show->staff_specialization ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Work Experience :</strong>  {{ $show->staff_work_experience}}</td>
+                                 <td><strong>Work Experience :</strong>  {{ $show->staff_work_experience ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Commission Type :</strong>  {{ $show->staff_commission_type}}</td>
+                                 <td><strong>Commission Type :</strong>  {{ $show->staff_commission_type ??''}}</td>
                               </tr>
                               <tr>
-                                 <td><strong>Staff Commission :</strong>{{ $show->staff_commission}}</td>
+                                 <td><strong>Staff Commission :</strong>{{ $show->staff_commission ??''}}</td>
                               </tr>
                               <!-- Check if staff_booking_fee has a value before displaying the field -->
+                              @if (!empty($show->max_discount_value))
+                              <tr>
+                                 <td><strong>Max Discount Value :</strong> {{ $show->max_discount_value }}</td>
+                              </tr>
+                              @endif
                               @if (!empty($show->staff_booking_fee))
                               <tr>
                                  <td><strong>Booking Fee :</strong> {{ $show->staff_booking_fee }}</td>

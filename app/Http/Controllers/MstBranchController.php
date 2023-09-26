@@ -40,6 +40,8 @@ public function index(Request $request)
         // 'branch_email' => 'sometimes|email',
         // 'branch_admin_name' => 'required',
         // 'branch_admin_contact_number' => 'sometimes|numeric|digits:10',
+        'latitude' => 'required',
+        'longitude' => 'required',
         'is_active' => 'required',
     ]);
 
@@ -49,6 +51,8 @@ public function index(Request $request)
     'branch_code' => rand(50, 100),
     'branch_name' => $request->branch_name,
     'branch_address' => $request->branch_address,
+    'latitude' => $request->latitude,
+    'longitude' => $request->longitude,
     'branch_contact_number' => $request->branch_contact_number,
     'branch_email' => $request->branch_email,
     'branch_admin_name' => $request->branch_admin_name,
@@ -87,6 +91,8 @@ public function update(Request $request, $id)
     $request->validate([
         'branch_name' => 'required',
         'branch_address' => 'required',
+        'latitude' =>'required',
+        'longitude' => 'required',
         // 'branch_contact_number' => 'required|numeric|digits:10',
         // 'branch_email' => 'required|email',
         // 'branch_admin_name' => 'required',
@@ -100,6 +106,8 @@ public function update(Request $request, $id)
     $update->update([
         'branch_name' => $request->branch_name,
         'branch_address' => $request->branch_address,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
         'branch_contact_number' => $request->branch_contact_number,
         'branch_email' => $request->branch_email,
         'branch_admin_name' => $request->branch_admin_name,
@@ -114,7 +122,7 @@ public function destroy($id)
 {
     $branch = Mst_Branch::findOrFail($id);
     $branch->delete();
-
+    return 1;
     return redirect()->route('branches')->with('success', 'Branch deleted successfully');
 }
 
@@ -124,6 +132,7 @@ public function changeStatus(Request $request, $id)
 
     $branch->is_active = !$branch->is_active;
     $branch->save();
+    return 1;
 
     return redirect()->back()->with('success','Status changed successfully');
 }

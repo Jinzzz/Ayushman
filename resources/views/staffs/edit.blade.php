@@ -26,7 +26,7 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Staff Type</label>
-                        <select class="form-control" name="staff_type" id="staff_type">
+                        <select class="form-control" name="staff_type" id="staff_type" onchange="toggleBookingFeeField()">
                            <option value="">Select Staff Type</option>
                            @foreach($stafftype as $masterId => $masterValue)
                            <option value="{{ $masterId }}"
@@ -72,7 +72,9 @@
                      </div>
                   </div>
                </div>
+            
                <div class="row">
+                  @if($staffs->branch_id!=null)
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Branch</label>
@@ -86,6 +88,7 @@
                         </select>
                      </div>
                   </div>
+                  @endif
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Date Of Birth</label>
@@ -185,8 +188,19 @@
                <div class="row" id="booking_fee_field" >
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Booking Fee*</label>
+                        <label class="form-label">Booking Fee</label>
                         <input type="text" class="form-control"  name="staff_booking_fee" value="{{$staffs->staff_booking_fee}}" placeholder="Booking Fee">
+                     </div>
+                  </div>
+               </div>
+               @endif
+
+               @if($staffs->max_discount_value!=null)
+               <div class="row" id="max_discount_field" >
+                  <div class="col-md-6">
+                     <div class="form-group">
+                        <label class="form-label">Max Discount Value</label>
+                        <input type="text" class="form-control"  name="max_discount_value" value="{{$staffs->max_discount_value}}" placeholder="Max Discount Value">
                      </div>
                   </div>
                </div>
@@ -290,14 +304,31 @@
    
    // Function to toggle the visibility of the Booking Fee field based on the selected Staff Type
    function toggleBookingFeeField() {
-      var staffTypeSelect = document.getElementById('staff_type');
-      var bookingFeeField = document.getElementById('booking_fee_field');
+       var staffTypeSelect = document.getElementById('staff_type');
+       var bookingFeeField = document.getElementById('booking_fee_field');
+       var branchField = document.getElementById('branch_field');
+       var branchLabel = document.getElementById('branchLabel');
+       var maxDiscountField = document.getElementById('max_discount_field');
    
-      // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
-      if (staffTypeSelect.value === '20') {
-          bookingFeeField.style.display = 'block'; // Show the Booking Fee field
-      } else {
-          bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
+       // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
+       if (staffTypeSelect.value === '20') {
+           bookingFeeField.style.display = 'block'; // Show the Booking Fee field
+       } else {
+           bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
+       }
+       //hide branch field if the selected staff type is an accountant:
+       if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123') {
+         branchField.style.display = 'none';// hide the Branch field
+         branchLabel.style.display = 'none';
+      }else{
+         branchField.style.display = 'block'; // Show the Branch field
+         branchLabel.style.display = 'block'; 
+      }
+
+      if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123'||staffTypeSelect.value === '18'){
+         maxDiscountField.style.display = 'block';
+      }else{
+         maxDiscountField.style.display = 'none';
       }
    }
    // function for password eye icon:

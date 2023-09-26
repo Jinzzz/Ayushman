@@ -125,7 +125,7 @@
                      <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Specialization</label>
-                        <input type="text" class="form-control" required name="staff_specialization" placeholder="Specialization">
+                        <input type="text" class="form-control"  name="staff_specialization" placeholder="Specialization">
                      </div>
                     </div>
                     <div class="col-md-6">
@@ -185,6 +185,14 @@
                         <div class="form-group">
                            <label class="form-label">Booking Fee*</label>
                            <input type="text" class="form-control"  name="staff_booking_fee" value="{{ old('staff_booking_fee') }}" placeholder="Booking Fee">
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row" id="max_discount_field" style="display: none;">
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Max Discount Value(%)</label>
+                           <input type="text" class="form-control"  name="max_discount_value" value="{{ old('max_discount_value') }}" placeholder="Max Discount Value">
                         </div>
                      </div>
                   </div>
@@ -292,7 +300,7 @@
        var bookingFeeField = document.getElementById('booking_fee_field');
        var branchField = document.getElementById('branch_field');
        var branchLabel = document.getElementById('branchLabel');
-
+       var maxDiscountField = document.getElementById('max_discount_field');
    
        // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
        if (staffTypeSelect.value === '20') {
@@ -301,12 +309,18 @@
            bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
        }
        //hide branch field if the selected staff type is an accountant:
-       if(staffTypeSelect.value === '21') {
+       if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123') {
          branchField.style.display = 'none';// hide the Branch field
          branchLabel.style.display = 'none';
       }else{
          branchField.style.display = 'block'; // Show the Branch field
          branchLabel.style.display = 'block'; 
+      }
+
+      if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123'||staffTypeSelect.value === '18'){
+         maxDiscountField.style.display = 'block';
+      }else{
+         maxDiscountField.style.display = 'none';
       }
    }
 

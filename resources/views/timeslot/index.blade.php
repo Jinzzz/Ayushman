@@ -65,7 +65,7 @@
                             $i = 0;
                             @endphp
                             @foreach($timeslots as $timeslot)
-                            <tr>
+                            <tr id="dataRow_{{ $timeslot->id}}">
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $timeslot->master_value }}</td>
                                 <td>
@@ -92,8 +92,9 @@
                                         action="{{ route('timeslot.destroy', $timeslot->id) }}" method="post">
                                         @csrf
                                         @method('delete')
-                                        <button type="submit" onclick="return confirm('Do you want to delete it?');"
-                                            class="btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                                        <button type="button" onclick="deleteData({{ $timeslot->id }})"class="btn-danger btn-sm">
+                                            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -106,3 +107,44 @@
     </div>
 </div>
 @endsection
+<script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ url('timeslot', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the timeslot.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    </script>
+

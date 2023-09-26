@@ -53,7 +53,7 @@ class MstMedicineController extends Controller
         // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
         $Manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
         // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
-        $taxes = Mst_Tax::pluck('tax_title','id');
+        $taxes = Mst_Tax::pluck('tax_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
         return view('medicine.create', compact('pageTitle','taxes','itemType','medicineType','Manufacturer','units'));
@@ -108,7 +108,7 @@ class MstMedicineController extends Controller
        // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
         $manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
         //$branches = Mst_Branch::pluck('branch_name','branch_id'); 
-        $taxes = Mst_Tax::pluck('tax_title','id');
+        $taxes = Mst_Tax::pluck('tax_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
         return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','manufacturer','units'));
