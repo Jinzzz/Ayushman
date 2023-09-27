@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Trn_Patient_Family_Member extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'trn_patient_family_member';
+
+    protected $primaryKey = 'id';
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'patient_id',
@@ -22,5 +26,6 @@ class Trn_Patient_Family_Member extends Model
         'mobile_number',
         'email_address',
         'relationship_id',
+        'deleted_at',
     ];
 }

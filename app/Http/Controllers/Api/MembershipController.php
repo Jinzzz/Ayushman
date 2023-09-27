@@ -55,7 +55,8 @@ class MembershipController extends Controller
                     $membership_packages[] = [
                         'membership_package_id' => $membership->membership_package_id,
                         'package_title' => $membership->package_title,
-                        'package_color' => $membership->package_color,
+                        'gradient_start' => $membership->gradient_start,
+                        'gradient_end' => $membership->gradient_end,
                         'package_duration' => $membership->package_duration . " days",
                         'package_price' => $membership->package_price,
                         'is_joined' => $is_joined,
@@ -106,7 +107,8 @@ class MembershipController extends Controller
                     $membership_package_details[] = [
                         'membership_package_id' => $package_details->membership_package_id,
                         'package_title' => $package_details->package_title,
-                        'package_color' => $package_details->package_color,
+                        'gradient_start' => $package_details->gradient_start,
+                        'gradient_end' => $package_details->gradient_end,
                         'package_duration' => $package_details->package_duration . " days",
                         'package_price' => $package_details->package_price,
                         'package_description' => $package_description,
@@ -209,6 +211,8 @@ class MembershipController extends Controller
                 $current_membership_details = [
                     'package_id' => $package_details->membership_package_id,
                     'package_title' => $package_details->package_title,
+                    'gradient_start' => $package_details->gradient_start,
+                    'gradient_end' => $package_details->gradient_end,
                     'membership_booking_date' => $membership_booking_date,
                     'membership_expiry_date' => $membership_expiry_date,
                     'days_left' => $days_left,

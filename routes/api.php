@@ -53,6 +53,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/add_member', [FamilyController::class,'addMember']);
     Route::post('patient/member/otp_verification', [FamilyController::class,'otpVerification']);
     Route::post('patient/member/resend_otp', [FamilyController::class,'reSendOtp']);
+    Route::post('patient/member/edit', [FamilyController::class,'editFamilyMember']);
+    Route::post('patient/member/update', [FamilyController::class,'updateFamilyMember']);
+    Route::post('patient/member/delete', [FamilyController::class,'deleteFamilyMember']);
 
     // Manage consultation Bookings 
     Route::get('patient/my_bookings', [MyBookingsController::class,'myBookings']);
