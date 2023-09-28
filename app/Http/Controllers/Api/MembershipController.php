@@ -42,13 +42,20 @@ class MembershipController extends Controller
                 foreach ($memberships as $membership) {
 
                     $benefits = Mst_Membership_Benefit::where('package_id', $membership->membership_package_id)
-                        ->where('is_active', 1)
-                        ->pluck('title')
-                        ->map(function ($benefit) {
-                            preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
-                            return $matches[1];
-                        });
-
+                    ->where('is_active', 1)
+                    ->pluck('title')
+                    ->map(function ($benefit) {
+                        preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
+                        return $matches[1];
+                    })
+                    ->flatten() // Flatten the nested arrays
+                    ->map(function ($item) {
+                        return ['benefit' => $item];
+                    })
+                    ->values();
+                
+                // If needed, you can convert it to a simple array using toArray()
+                $benefits = $benefits->toArray();
                     // Verifying if the incoming package ID matches the active membership.
                     $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
 
