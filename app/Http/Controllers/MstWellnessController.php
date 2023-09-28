@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mst_Branch;
 use App\Models\Mst_Wellness;
+use App\Models\Trn_Wellness_Branch;
 use Illuminate\Http\Request;
 
 class MstWellnessController extends Controller
@@ -43,25 +44,41 @@ class MstWellnessController extends Controller
             'wellness_description' => 'required',
             'wellness_inclusions' => 'required',
             'wellness_terms_conditions' => 'required',
-            'branch' => 'required',
+            'branch' => 'required|array',
             'wellness_cost' => 'required|numeric',
             'wellness_duration' => 'required',
             'is_active' => 'required',
         ]);
         $is_active = $request->input('is_active') ? 1 : 0;
-    
+       
        
         $wellness = new Mst_Wellness();
         $wellness->wellness_name = $request->input('wellness_name');
         $wellness->wellness_description = $request->input('wellness_description');
         $wellness->wellness_inclusions = $request->input('wellness_inclusions');
         $wellness->wellness_terms_conditions = $request->input('wellness_terms_conditions');
-        $wellness->branch_id = $request->input('branch');
+      
         $wellness->wellness_cost = $request->input('wellness_cost');
         $wellness->wellness_duration = $request->input('wellness_duration');
         $wellness->remarks = $request->input('remarks');
         $wellness->is_active = $is_active;
         $wellness->save();
+
+         // Check if 'branch' is an array 
+        if (is_array($request->input('branch'))) {
+        // Iterate through the selected branches and store them in trn_wellness_branches
+        foreach ($request->input('branch') as $branchId) {
+            Trn_Wellness_Branch::create([
+                'wellness_id' => $wellness->wellness_id, // Link to the newly created wellness record
+                'branch_id' => $branchId,
+            ]);
+        }
+    } else {
+        // If 'branch' is a single value, store it in Mst_Wellness table 
+        $wellness->branch_id = $request->input('branch');
+        $wellness->save();
+    }
+
     
         return redirect()->route('wellness.index')->with('success','Wellness added successfully');
     }
@@ -115,6 +132,7 @@ class MstWellnessController extends Controller
     {
         $wellness = Mst_Wellness::findOrFail($wellness_id);
         $wellness->delete();
+        return 1;
 
         return redirect()->route('wellness.index')->with('success','Wellness deleted successfully');
     }

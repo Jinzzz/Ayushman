@@ -36,11 +36,11 @@ class CreateTrnMedicinePurchaseInvoicesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            $table->foreign('supplier_id')->references('id')->on('mst_suppliers')->onDelete('cascade');
-            $table->foreign('branch_id')->references('branch_id')->on('mst_branches')->onDelete('cascade');
-            $table->foreign('created_by')->references('user_id')->on('mst_users')->onDelete('cascade');
-            $table->foreign('updated_by')->references('user_id')->on('mst_users')->onDelete('cascade');
-            $table->foreign('deleted_by')->references('user_id')->on('mst_users')->onDelete('set null');
+            // $table->foreign('supplier_id')->references('supplier_id')->on('mst_suppliers')->onDelete('cascade');
+            // $table->foreign('branch_id')->references('branch_id')->on('mst_branches')->onDelete('cascade');
+            // $table->foreign('created_by')->references('user_id')->on('mst_users')->onDelete('cascade');
+            // $table->foreign('updated_by')->references('user_id')->on('mst_users')->onDelete('cascade');
+            // $table->foreign('deleted_by')->references('user_id')->on('mst_users')->onDelete('set null');
         });
     }
 

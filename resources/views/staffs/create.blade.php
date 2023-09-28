@@ -102,7 +102,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Contact Number*</label>
-                           <input type="text" class="form-control" required name="staff_contact_number" value="{{old('staff_contact_number')}}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateInput(this)">
+                           <input type="text" class="form-control" required name="staff_contact_number" value="{{old('staff_contact_number')}}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateContact(this)" >
                            <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
                         </div>
                      </div>
@@ -117,7 +117,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Qualification</label>
-                           <input type="text" class="form-control" required name="staff_qualification" placeholder="Qualification">
+                           <input type="text" class="form-control" required name="staff_qualification" value="{{ old('staff_qualification') }}" placeholder="Qualification">
                         </div>
                      </div>
                   </div>
@@ -125,7 +125,7 @@
                      <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Specialization</label>
-                        <input type="text" class="form-control"  name="staff_specialization" placeholder="Specialization">
+                        <input type="text" class="form-control"  name="staff_specialization" value="{{ old('staff_specialization') }}" placeholder="Specialization">
                      </div>
                     </div>
                     <div class="col-md-6">
@@ -192,7 +192,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Max Discount Value(%)</label>
-                           <input type="text" class="form-control"  name="max_discount_value" value="{{ old('max_discount_value') }}" placeholder="Max Discount Value">
+                           <input type="number" class="form-control"  name="max_discount_value" value="{{ old('max_discount_value') }}" min="0" max="100" placeholder="Max Discount Value" oninput="validateInput(this)">
                         </div>
                      </div>
                   </div>
@@ -281,6 +281,7 @@
 </div>
 </div>
 @endsection
+
 <script>
    // Function to toggle the visibility of the Username, Password, and Confirm Password fields based on the "Is Login" checkbox
    function toggleLoginFields() {
@@ -374,4 +375,49 @@ function validatePassword() {
             passwordError.style.display = "none";
         }
     }
+
+ // to restrict characters and min,max  in max discount value
+    function validateInput(input) {
+        // Remove any non-numeric characters from the input
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        // Ensure the value is within the min and max limits
+        var numericValue = parseInt(input.value, 10);
+        if (isNaN(numericValue)) {
+            input.value = ''; // Clear the input if it's not a valid number
+        } else if (numericValue < 0) {
+            input.value = '0'; // Set to the minimum value (0) if it's below 0
+        } else if (numericValue > 100) {
+            input.value = '100'; // Set to the maximum value (100) if it's above 100
+        }
+    }
+
+   
+    function validateContact(input) {
+        var inputValue = input.value;
+
+        // Remove any non-numeric characters from the input
+        var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+        // Ensure the input does not exceed 10 characters
+        if (numericValue.length > 10) {
+            // Truncate the input to the first 10 digits
+            numericValue = numericValue.slice(0, 10);
+        }
+
+        // Update the input value with the numeric value
+        input.value = numericValue;
+
+        // Check if the resulting value has exactly 10 digits
+        if (numericValue.length !== 10) {
+            input.setCustomValidity("Please enter exactly 10-digit numbers.");
+            input.parentNode.querySelector('.error-message').style.display = 'block';
+        } else {
+            input.setCustomValidity("");
+            input.parentNode.querySelector('.error-message').style.display = 'none';
+        }
+    }
+
+
+
 </script>

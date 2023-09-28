@@ -37,14 +37,15 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Contact Number</label>
-                           <input type="text" class="form-control"  name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateInput(this)">
+                           <input type="text" class="form-control"  name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" pattern="[0-9]{10}" title="Please enter digits only" oninput="validateInput(this)">
                            <p class="error-message" style="color: green; display: none;">Only numbers are allowed.</p>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Email</label>
-                           <input type="email" class="form-control"  name="branch_email" value="{{old('branch_email')}}" placeholder="Branch Email">
+                           <input type="email" class="form-control"  name="branch_email"  id="contact_email" value="{{old('branch_email')}}" placeholder="Branch Email">
+                           <div class="text-danger" id="email-error"></div>
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -63,13 +64,15 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Latitude*</label>
-                           <input type="text" class="form-control" required name="latitude" value="{{old('latitude')}}" placeholder="Latitude">
+                           <input type="text" class="form-control" required name="latitude" value="{{old('latitude')}}" placeholder="Latitude"  oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
+                           pattern="[0-9]+(\.[0-9]+)?" >
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Longitude*</label>
-                           <input type="text" class="form-control" required name="longitude" value="{{old('longitude')}}" placeholder="Longitude">
+                           <input type="text" class="form-control" required name="longitude" value="{{old('longitude')}}" placeholder="Longitude"   oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
+                           pattern="[0-9]+(\.[0-9]+)?" >
                         </div>
                      </div>
                      <!-- ... -->
@@ -116,16 +119,47 @@
 </script>
 <script>
    function validateInput(input) {
-      var inputValue = input.value;
-      var numberPattern = /^[0-9]*$/;
-   
-      if (!numberPattern.test(inputValue)) {
-         input.setCustomValidity("Only numbers are allowed.");
-         input.parentNode.querySelector('.error-message').style.display = 'block';
-      } else {
-         input.setCustomValidity("");
-         input.parentNode.querySelector('.error-message').style.display = 'none';
-      }
+       var inputValue = input.value;
+
+       // Remove any non-numeric characters from the input
+       var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+       // Ensure the input does not exceed 10 characters
+       if (numericValue.length > 10) {
+           // Truncate the input to the first 10 digits
+           numericValue = numericValue.slice(0, 10);
+       }
+
+       // Update the input value with the numeric value
+       input.value = numericValue;
+
+       // Check if the resulting value has exactly 10 digits
+       if (numericValue.length !== 10) {
+           input.setCustomValidity("Please enter exactly 10-digit numbers.");
+           input.parentNode.querySelector('.error-message').style.display = 'block';
+       } else {
+           input.setCustomValidity("");
+           input.parentNode.querySelector('.error-message').style.display = 'none';
+       }
    }
+</script>
+<script>
+   $(document).ready(function() {
+       $('#contact_email').on('input', function() {
+           var emailInput = $(this).val();
+           var emailErrorDiv = $('#email-error');
+           
+           if (emailInput.trim() === '' || isValidEmail(emailInput)) {
+               emailErrorDiv.text('');
+           } else {
+               emailErrorDiv.text('Please enter a valid email address.');
+           }
+       });
+       
+       function isValidEmail(email) {
+           var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+           return emailRegex.test(email);
+       }
+   });
 </script>
 @endsection

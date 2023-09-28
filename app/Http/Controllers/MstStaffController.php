@@ -9,6 +9,7 @@ use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Staff_Commission_Log;
 use App\Models\Trn_Staff_Salary_History;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -164,7 +165,7 @@ class MstStaffController extends Controller
         $update->update([
             'staff_type' => $request->staff_type,
             'employment_type' => $request->employment_type,
-            'staff_username' => $is_login ? $request->staff_username : null,
+           
             'staff_name' => $request->staff_name,
             'gender' => $request->gender,
             'is_active' => $is_active,
@@ -183,6 +184,11 @@ class MstStaffController extends Controller
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
         ]);
+        if($request->has('staff_username') && !empty($request->staff_username)){
+            $update->update([
+                'staff_username' => $request->staff_username,
+            ]);
+        }
     
         if ($request->has('password') && !empty($request->password)) {
             // Hash and update the password only if a new password is provided
@@ -229,10 +235,15 @@ class MstStaffController extends Controller
 
     public function show($id)
     {
-        $pageTitle = "View staff details";
-        $show = Mst_Staff::findOrFail($id);
-        return view('staffs.show',compact('pageTitle','show'));
+        try{
+            $pageTitle = "View staff details";
+            $show = Mst_Staff::findOrFail($id);
+            return view('staffs.show',compact('pageTitle','show'));
+        }catch (QueryException $e) {
+            return redirect()->route('branches')->with('error', 'Something went wrong.');
+          }
     }
+      
 
     public function destroy($staff_id)
     {

@@ -32,7 +32,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Contact No*</label>
-                                    <input type="text" class="form-control" required name="contact_no" value="{{ old('contact_no') }}" placeholder="Contact No">
+                                    <input type="text" class="form-control" required name="contact_no" value="{{ old('contact_no') }}" placeholder="Contact No"  pattern="[0-9]{10}" title="Please enter digits only" oninput="validateInput(this)">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                         </div>
@@ -63,7 +64,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Commission(%)</label>
-                                    <input type="text" class="form-control"  required name ="commission" value="{{ old('commision') }}" placeholder="Commission">
+                                    <input type="number" class="form-control"  required name ="commission" value="{{ old('commision') }}" placeholder="Commission">
                                 </div>
                             </div>
                         </div>
@@ -117,6 +118,34 @@
             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
         }
-    });
+    }); 
 </script>
+<script>
+    function validateInput(input) {
+        var inputValue = input.value;
+
+        // Remove any non-numeric characters from the input
+        var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+        // Ensure the input does not exceed 10 characters
+        if (numericValue.length > 10) {
+            // Truncate the input to the first 10 digits
+            numericValue = numericValue.slice(0, 10);
+        }
+
+        // Update the input value with the numeric value
+        input.value = numericValue;
+
+        // Check if the resulting value has exactly 10 digits
+        if (numericValue.length !== 10) {
+            input.setCustomValidity("Please enter exactly 10-digit numbers.");
+            input.parentNode.querySelector('.error-message').style.display = 'block';
+        } else {
+            input.setCustomValidity("");
+            input.parentNode.querySelector('.error-message').style.display = 'none';
+        }
+    }
+</script>
+
+
 @endsection

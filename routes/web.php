@@ -110,6 +110,7 @@ Route::patch('therapies/{id}/change-status', [MstTherapyController::class, 'chan
 Route::resource('timeslot', MstTimeSlotController::class);
 Route::patch('timeslot/{id}/change-status', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
 Route::get('/timeslot/show/{id}', [MstTimeSlotController::class, 'show'])->name('timeslot.show');
+Route::delete('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
 //Manage-Patients:
 Route::get('/patients/index', [MstPatientController::class, 'index'])->name('patients.index');
 Route::get('/patients/create', [MstPatientController::class, 'create'])->name('patients.create');

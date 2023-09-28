@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <!-- ROW-1 OPEN -->
+
 <div class="row" id="user-profile">
 <div class="col-lg-12">
    <div class="card">
@@ -123,7 +124,7 @@
                               <!-- Check if staff_booking_fee has a value before displaying the field -->
                               @if (!empty($show->max_discount_value))
                               <tr>
-                                 <td><strong>Max Discount Value :</strong> {{ $show->max_discount_value }}</td>
+                                 <td><strong>Max Discount Value :</strong> {{ $show->max_discount_value }}%</td>
                               </tr>
                               @endif
                               @if (!empty($show->staff_booking_fee))
@@ -148,8 +149,8 @@
                      <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                         <div class="card">
                            <div class="card-body text-center">
-                              <h4 class="h4 mb-0 mt-3">{{ $show->staff_name}}</h4>
-                              <p class="card-text">{{ $show->staff_qualification}}</p>
+                              <h4 class="h4 mb-0 mt-3">{{ $show->staff_name??''}}</h4>
+                              <p class="card-text">{{ $show->staff_qualification??''}}</p>
                            </div>
                         </div>
                      </li>
@@ -163,8 +164,8 @@
                   <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                      <div class="card">
                         <div class="card-body text-center">
-                           <h4 class="h5 mb-0 mt-3">{{ $show->salaryType->salary_type}}</h4>
-                           <p class="card-text">₹{{ $show->salary_amount}}</p>
+                           <h4 class="h5 mb-0 mt-3">{{ $show->salaryType->salary_type ?? ''}}</h4>
+                           <p class="card-text">₹{{ $show->salary_amount ?? ''}}</p>
                         </div>
                      </div>
                   </li>
@@ -237,5 +238,6 @@
    </div>
    <!-- COL-END -->
 </div>
+
 <!-- ROW-1 CLOSED -->
 @endsection
