@@ -121,15 +121,19 @@ class MembershipController extends Controller
                         'package_description' => $package_description,
                     ];
 
-
-                    // $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)->where('is_active', 1)->pluck('title');
                     $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)
-                        ->where('is_active', 1)
-                        ->pluck('title')
-                        ->map(function ($benefit) {
-                            preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
-                            return $matches[1];
-                        });
+                    ->where('is_active', 1)
+                    ->pluck('title')
+                    ->map(function ($benefit) {
+                        preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
+                        return $matches[1];
+                    })
+                    ->flatten() // Flatten the nested arrays
+                    ->map(function ($item) {
+                        return ['benefit' => $item];
+                    })
+                    ->values();
+                    
                     $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
                         ->where('mst__membership__package__wellnesses.package_id', $request->membership_package_id)
                         ->where('mst__membership__package__wellnesses.is_active', 1)
