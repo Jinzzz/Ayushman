@@ -202,7 +202,6 @@ class MembershipController extends Controller
 
                 $membership_wellnesses = $membership_wellnesses->toArray();
 
-                // Fetching completed sessions and remainingSessions.
                 $completedSessions = [];
                 $remainingSessions = [];
 
@@ -214,12 +213,17 @@ class MembershipController extends Controller
 
                     $wellness_name = Mst_Wellness::where('wellness_id', $membership_wellness)->value('wellness_name');
 
+                    $sessionEntry = [
+                        'wellness_name' => $wellness_name,
+                    ];
+
                     if (!empty($sessionDetails)) {
-                        $remainingSessions[] = $wellness_name;
+                        $remainingSessions[] = $sessionEntry;
                     } else {
-                        $completedSessions[] = $wellness_name;
+                        $completedSessions[] = $sessionEntry;
                     }
                 }
+
 
                 $current_membership_details = [
                     'package_id' => $package_details->membership_package_id,
