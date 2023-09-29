@@ -192,7 +192,7 @@ class MembershipController extends Controller
 
                 $days_left = "0 days";
                 if ($targetDate >= Carbon::now()) {
-                    $days_left = Carbon::now()->diffInDays($targetDate) . " days";
+                    $days_left = Carbon::now()->diffInDays($targetDate);
                 }
 
                 // Retrieving that particular membership package including wellnesses.
@@ -229,11 +229,12 @@ class MembershipController extends Controller
                     'membership_booking_id' => $latest_membership_booking->membership_patient_id,
                     'package_id' => $package_details->membership_package_id,
                     'package_title' => $package_details->package_title,
+                    'package_validity' => $package_details->package_duration.' days',
                     'gradient_start' => $package_details->gradient_start,
                     'gradient_end' => $package_details->gradient_end,
                     'membership_booking_date' => $membership_booking_date,
                     'membership_expiry_date' => $membership_expiry_date,
-                    'days_left' => $days_left,
+                    'days_left' => $days_left.' days left',
                     'completed_sessions' => $completedSessions,
                     'remaining_sessions' => $remainingSessions,
                 ];
