@@ -226,6 +226,7 @@ class MembershipController extends Controller
 
 
                 $current_membership_details = [
+                    'membership_booking_id' => $latest_membership_booking->membership_patient_id,
                     'package_id' => $package_details->membership_package_id,
                     'package_title' => $package_details->package_title,
                     'gradient_start' => $package_details->gradient_start,
@@ -239,7 +240,7 @@ class MembershipController extends Controller
 
                 // Getting old membership details - History 
                 $previous_membership_details = [];
-                $old_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->get();
+                $old_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->orderBy('created_at', 'desc')->get();
                 foreach ($old_membership_bookings as $old_membership_booking) {
                     if ($old_membership_booking->membership_patient_id != $latest_membership_booking->membership_patient_id) {
 
@@ -254,7 +255,7 @@ class MembershipController extends Controller
                         $previous_package_details = Mst_Membership_Package::where('membership_package_id', $old_membership_booking->membership_package_id)->first();
 
                         $previous_membership_details[] = [
-                            'package_id' => $old_membership_booking->membership_package_id,
+                            'membership_booking_id' => $old_membership_booking->membership_patient_id,
                             'package_title' => $previous_package_details->package_title,
                             'membership_booking_date' => $previous_membership_booking_date,
                             'membership_expiry_date' => $previous_membership_expiry_date,
