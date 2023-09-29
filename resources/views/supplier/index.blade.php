@@ -12,7 +12,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="form-label">Supplier Type</label>
-                        <select class="form-control" required name="supplier_type_id" id="supplier_type_id">
+                        <select class="form-control"  name="supplier_type_id" id="supplier_type_id">
                             <option value="">Select Supplier Type</option>
                             <option value="1">Individual</option>
                             <option value="2">Business</option>
@@ -88,7 +88,7 @@
                                 $i = 0;
                                 @endphp
                                 @foreach($suppliers as $supplier)
-                                <tr>
+                                <tr id="dataRow_{{$supplier->supplier_id}}">
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $supplier->supplier_code }}</td>
                                     <td>{{ $supplier->supplier_name }}</td>
@@ -144,6 +144,46 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+ <script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('supplier.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the staff.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    </script>
 
 
 

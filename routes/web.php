@@ -11,6 +11,7 @@ use App\Http\Controllers\MstPatientController;
 use App\Http\Controllers\MstTherapyRoomController;
 use App\Http\Controllers\MstMembershipController;
 use App\Http\Controllers\MstWellnessController;
+
 use App\Http\Controllers\MstUnitController;
 use App\Http\Controllers\MstTaxController;
 use App\Http\Controllers\MstMedicineController;
@@ -61,8 +62,8 @@ Route::get('reset-password/{token}/{email}', [ForgotPasswordController::class, '
 Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
 // test ends 
 
-Route::middleware('web')->group(function () {
-    Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
+Route::middleware('auth')->group(function () {
+ Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
 Route::get('/branches/create', [MstBranchController::class, 'create'])->name('branches.create');
 Route::post('/branches/store', [MstBranchController::class, 'store'])->name('branches.store');
 Route::get('/branches/edit/{branch_id}', [MstBranchController::class, 'edit'])->name('branches.edit');
@@ -117,6 +118,7 @@ Route::patch('therapies/{id}/change-status', [MstTherapyController::class, 'chan
 Route::resource('timeslot', MstTimeSlotController::class);
 Route::patch('timeslot/{id}/change-status', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
 Route::get('/timeslot/show/{id}', [MstTimeSlotController::class, 'show'])->name('timeslot.show');
+Route::delete('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
 //Manage-Patients:
 Route::get('/patients/index', [MstPatientController::class, 'index'])->name('patients.index');
 Route::get('/patients/create', [MstPatientController::class, 'create'])->name('patients.create');
@@ -131,9 +133,7 @@ Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class,'tog
 Route::get('/patients/{id}/membership-assigning', [MstPatientController::class,'patientMembershipAssigning'])->name('patients.membership.assigning');
 
 
-// membership 
-Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembership'])->name('patients.membership');
-Route::post('/patients/membership/store', [MstPatientController::class, 'patientMembershipStore'])->name('patients.membership.store');
+
 
 //Manage-Therapy-Rooms:
 Route::get('/therapyrooms/index', [MstTherapyRoomController::class, 'index'])->name('therapyrooms.index');
@@ -348,3 +348,8 @@ Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class
 // Medicine Purchase
 Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');
 Route::get('/medicine-purchase/create', [MedicinePurchaseController::class, 'create'])->name('medicine.purchase.create');
+
+// patient-membership 
+Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembershipIndex'])->name('patients.membership');
+Route::post('/patients/membership/store/{id}', [MstPatientController::class, 'patientMembershipStore'])->name('patientsMembership.store');
+Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class ,'getWellnessDetails'])->name('getwellness.details');

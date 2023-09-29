@@ -26,7 +26,7 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Staff Type</label>
-                        <select class="form-control" name="staff_type" id="staff_type">
+                        <select class="form-control" name="staff_type" id="staff_type" onchange="toggleBookingFeeField()">
                            <option value="">Select Staff Type</option>
                            @foreach($stafftype as $masterId => $masterValue)
                            <option value="{{ $masterId }}"
@@ -72,7 +72,9 @@
                      </div>
                   </div>
                </div>
+            
                <div class="row">
+                  @if($staffs->branch_id!=null)
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Branch</label>
@@ -86,6 +88,7 @@
                         </select>
                      </div>
                   </div>
+                  @endif
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Date Of Birth</label>
@@ -106,8 +109,9 @@
                      <div class="form-group">
                         <label class="form-label">Contact Number</label>
                         <input type="text" class="form-control" required name="staff_contact_number"
-                           value="{{$staffs->staff_contact_number}}">
-                     </div>
+                           value="{{$staffs->staff_contact_number}}" pattern="[0-9]+" title="Please enter digits only" oninput="validateContact(this)">
+                           <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
+                        </div>
                   </div>
                </div>
                <div class="row">
@@ -185,8 +189,19 @@
                <div class="row" id="booking_fee_field" >
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Booking Fee*</label>
+                        <label class="form-label">Booking Fee</label>
                         <input type="text" class="form-control"  name="staff_booking_fee" value="{{$staffs->staff_booking_fee}}" placeholder="Booking Fee">
+                     </div>
+                  </div>
+               </div>
+               @endif
+
+               @if($staffs->max_discount_value!=null)
+               <div class="row" id="max_discount_field" >
+                  <div class="col-md-6">
+                     <div class="form-group">
+                        <label class="form-label">Max Discount Value</label>
+                        <input type="number" class="form-control"  name="max_discount_value" value="{{$staffs->max_discount_value}}" min="0" max="100" placeholder="Max Discount Value" oninput="validateInput(this)">
                      </div>
                   </div>
                </div>
@@ -202,13 +217,13 @@
                     <div class="row">
                        <div class="col-md-6">
                           <div class="form-group">
-                             <label class="form-label">Username*</label>
+                             <label class="form-label">Username</label>
                              <input type="text" class="form-control"  name="staff_username" value="{{ $staffs->staff_username }}" placeholder="Staff Username">
                           </div>
                        </div>
                        <div class="col-md-6">
                           <div class="form-group">
-                             <label class="form-label">Password*</label>
+                             <label class="form-label">Password</label>
                              <div class="input-group">
                                 <input type="password" class="form-control"  name="password" id="password" value="" placeholder="Password">
                                 <div class="input-group-append">
@@ -225,7 +240,7 @@
                     <div class="row">
                        <div class="col-md-6">
                           <div class="form-group">
-                             <label class="form-label">Confirm Password*</label>
+                             <label class="form-label">Confirm Password</label>
                              <div class="input-group">
                                 <input type="password" class="form-control"  name="confirm_password" value="{{$staffs->confirm_password}}" placeholder="Confirm Password" id="confirmPassword" onkeyup="validatePassword()">
                                 <div class="input-group-append">
@@ -290,14 +305,31 @@
    
    // Function to toggle the visibility of the Booking Fee field based on the selected Staff Type
    function toggleBookingFeeField() {
-      var staffTypeSelect = document.getElementById('staff_type');
-      var bookingFeeField = document.getElementById('booking_fee_field');
+       var staffTypeSelect = document.getElementById('staff_type');
+       var bookingFeeField = document.getElementById('booking_fee_field');
+       var branchField = document.getElementById('branch_field');
+       var branchLabel = document.getElementById('branchLabel');
+       var maxDiscountField = document.getElementById('max_discount_field');
    
-      // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
-      if (staffTypeSelect.value === '20') {
-          bookingFeeField.style.display = 'block'; // Show the Booking Fee field
-      } else {
-          bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
+       // Check if the selected staff type is doctor or therapist (IDs 20 and 21)
+       if (staffTypeSelect.value === '20') {
+           bookingFeeField.style.display = 'block'; // Show the Booking Fee field
+       } else {
+           bookingFeeField.style.display = 'none'; // Hide the Booking Fee field
+       }
+       //hide branch field if the selected staff type is an accountant:
+       if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123') {
+         branchField.style.display = 'none';// hide the Branch field
+         branchLabel.style.display = 'none';
+      }else{
+         branchField.style.display = 'block'; // Show the Branch field
+         branchLabel.style.display = 'block'; 
+      }
+
+      if(staffTypeSelect.value === '21' || staffTypeSelect.value === '122'||staffTypeSelect.value === '123'||staffTypeSelect.value === '18'){
+         maxDiscountField.style.display = 'block';
+      }else{
+         maxDiscountField.style.display = 'none';
       }
    }
    // function for password eye icon:
@@ -345,4 +377,48 @@
            passwordError.style.display = "none";
        }
    }
+
+
+   // to restrict characters and min,max  in max discount value
+   function validateInput(input) {
+        // Remove any non-numeric characters from the input
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        // Ensure the value is within the min and max limits
+        var numericValue = parseInt(input.value, 10);
+        if (isNaN(numericValue)) {
+            input.value = ''; // Clear the input if it's not a valid number
+        } else if (numericValue < 0) {
+            input.value = '0'; // Set to the minimum value (0) if it's below 0
+        } else if (numericValue > 100) {
+            input.value = '100'; // Set to the maximum value (100) if it's above 100
+        }
+    }
+
+//validate contact number:
+
+    function validateContact(input) {
+        var inputValue = input.value;
+
+        // Remove any non-numeric characters from the input
+        var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+        // Ensure the input does not exceed 10 characters
+        if (numericValue.length > 10) {
+            // Truncate the input to the first 10 digits
+            numericValue = numericValue.slice(0, 10);
+        }
+
+        // Update the input value with the numeric value
+        input.value = numericValue;
+
+        // Check if the resulting value has exactly 10 digits
+        if (numericValue.length !== 10) {
+            input.setCustomValidity("Please enter exactly 10-digit numbers.");
+            input.parentNode.querySelector('.error-message').style.display = 'block';
+        } else {
+            input.setCustomValidity("");
+            input.parentNode.querySelector('.error-message').style.display = 'none';
+        }
+    }
 </script>

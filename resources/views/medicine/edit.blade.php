@@ -99,6 +99,17 @@
                </div>
                <div class="col-md-6">
                   <div class="form-group">
+                      <label for="tax_id">Unit*</label>
+                      <select class="form-control" name="unit_id" id="unit_id">
+                          <option value="">Choose Unit</option>
+                          @foreach($units as $unit_id => $unit)
+                              <option value="{{ $unit_id }}"{{ old('unit_id') == $unit_id ? 'selected' : '' }}>{{ $unit }}</option>
+                          @endforeach
+                      </select>
+                  </div>
+              </div>
+               <div class="col-md-6">
+                  <div class="form-group">
                      <label class="form-label">Reorder Limit</label>
                      <input type="text" class="form-control"  name="reorder_limit" value="{{$medicine->reorder_limit}}" placeholder="Reorder Limit">
                   </div>

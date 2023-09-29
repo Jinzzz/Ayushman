@@ -14,7 +14,7 @@
                </div>
                @endif
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -45,22 +45,7 @@
 </div>
 
 
-                     <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Wellness Inclusions*</label>
-                                    <input type="text" class="form-control" name="wellness_inclusions" required name="wellness_inclusions"
-                                        value="{{ $wellness->wellness_inclusions}}" placeholder="Wellness Inclusions">
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Wellness T&C*</label>
-                                    <textarea class="form-control" name="wellness_terms_conditions" required name="wellness_terms_conditions"
-                                        placeholder="Wellness T&C">{{$wellness->wellness_terms_conditions}}</textarea>
-                                </div>
-                            </div>
-
+                    
 
                       <div class="col-md-6">
                         <div class="form-group">
@@ -98,6 +83,22 @@
         </select>
     </div>
 </div>
+<div class="col-md-6">
+    <div class="form-group">
+        <label class="form-label">Wellness Inclusions*</label>
+        <textarea class="form-control" name="wellness_inclusions" id="wellnessInclusion"  required name="wellness_inclusions"
+             placeholder="Wellness Inclusions">{{$wellness->wellness_inclusions}}</textarea>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <label class="form-label">Wellness T&C*</label>
+        <textarea class="form-control" name="wellness_terms_conditions" id="termsandCondition" required name="wellness_terms_conditions"
+            placeholder="Wellness T&C">{{$wellness->wellness_terms_conditions}}</textarea>
+    </div>
+</div>
+
 
 
   <!-- ... -->
@@ -145,16 +146,38 @@
 
 @endsection
 @section('js')
-<script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        CKEDITOR.replace('wellnessInclusion', {
+            removePlugins: 'image',
+           
+        });
+
+        $(document).ready(function() {
+        CKEDITOR.replace('termsandCondition', {
+            removePlugins: 'image',
+           
+        });
+
+      });
+
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
             $("#statusText").text('Active');
-            $("input[name=is_active]").val(1); // Set the value to 1 when checked
+            $("input[name=is_active]").val(1);
         } else {
             $("#statusText").text('Inactive');
-            $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+            $("input[name=is_active]").val(0);
         }
+
+        $(document).ready(function() {
+        $('select').selectpicker();
+    });
     }
+});
+    
 </script>
 
 

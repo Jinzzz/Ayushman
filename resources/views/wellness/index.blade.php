@@ -22,16 +22,16 @@
             
             <div class="col-md-3 d-flex align-items-end">
                 <div>
-                    <button type="submit" class="btn btn-secondary">
+                    <button type="submit" class="btn btn-primary">
                         <i class="fa fa-filter" aria-hidden="true"></i> Filter
                     </button>
-                    <a class="btn btn-secondary ml-2" href="{{ route('wellness.index') }}">
+                    <a class="btn btn-primary" href="{{ route('wellness.index') }}">
                         <i class="fa fa-times" aria-hidden="true"></i> Reset
                     </a>
                 </div>
                 </div>
             </div>
-        </div>
+        </div> 
     </form>
 </div>
 
@@ -75,10 +75,10 @@
                                 $i = 0;
                                 @endphp
                                 @foreach($wellness as $wellnes)
-                                <tr>
+                                <tr id="dataRow_{{$wellnes->wellness_id }}">
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $wellnes->wellness_name }}</td>
-                                    <td>{{ $wellnes->branch->branch_name}}</td>
+                                    <td>{{ $wellnes->branch->branch_name ??''}}</td>
                                     <td>{{ $wellnes->wellness_cost }}</td>
                                  
 
@@ -98,17 +98,18 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary"
+                                        <a class="btn btn-primary btn-sm edit-custom"
                                             href="{{ route('wellness.edit', $wellnes->wellness_id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                        <a class="btn btn-secondary" href="{{ route('wellness.show', $wellnes->wellness_id) }}">
+                                        <a class="btn btn-secondary btn-sm" href="{{ route('wellness.show', $wellnes->wellness_id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View</a>
                                         <form style="display: inline-block"
                                             action="{{ route('wellness.destroy', $wellnes->wellness_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash"
-                                                    aria-hidden="true"></i>Delete</button>
+                                            <button type="button" onclick="deleteData({{$wellnes->wellness_id }})"class="btn-danger btn-sm">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -125,6 +126,46 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('wellness.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the wellness.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+    </script>
 
 
 

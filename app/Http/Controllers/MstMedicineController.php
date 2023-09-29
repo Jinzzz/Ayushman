@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Mst_Medicine;
-use App\Models\Mst_Medicine_Category;
+use App\Models\Mst_Tax_Group;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Tax;
@@ -53,7 +53,7 @@ class MstMedicineController extends Controller
         // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
         $Manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
         // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
-        $taxes = Mst_Tax::pluck('tax_title','id');
+        $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
         return view('medicine.create', compact('pageTitle','taxes','itemType','medicineType','Manufacturer','units'));
@@ -108,7 +108,7 @@ class MstMedicineController extends Controller
        // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
         $manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
         //$branches = Mst_Branch::pluck('branch_name','branch_id'); 
-        $taxes = Mst_Tax::pluck('tax_title','id');
+        $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
         return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','manufacturer','units'));

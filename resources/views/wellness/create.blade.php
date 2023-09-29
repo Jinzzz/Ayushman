@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container">
     <div class="row" style="min-height: 70vh;">
         <div class="col-md-12">
@@ -8,14 +9,8 @@
                 <div class="card-header">
                     <h3 class="mb-0 card-title">Create Wellness</h3>
                 </div>
-                <div class="card-body">
-                    @if ($message = Session::get('status'))
-                    <div class="alert alert-success">
-                        <p>{{ $message }}</p>
-                    </div>
-                    @endif
-                </div>
-                <div class="col-lg-12">
+               
+                <div class="col-lg-12" style="background-color: #fff;">
                     @if ($errors->any())
                     <div class="alert alert-danger">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -43,20 +38,7 @@
                                         placeholder="Wellness Description">{{ old('wellness_description') }}</textarea>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Wellness Inclusions*</label>
-                                    <input type="text" class="form-control" name="wellness_inclusions" required name="wellness_inclusions"
-                                        value="{{ old('wellness_inclusions') }}" placeholder="Wellness Inclusions">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Wellness T&C*</label>
-                                    <textarea class="form-control" name="wellness_terms_conditions" required name="wellness_terms_conditions"
-                                        placeholder="Wellness T&C">{{ old('wellness_terms_conditions') }}</textarea>
-                                </div>
-                            </div>
+                           
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Wellness Cost*</label>
@@ -79,16 +61,32 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="">
                                     <label for="branch_id" class="form-label">Branch*</label>
-                                    <select class="form-control" name="branch" id="branch_id">
-                                        <option value="">Choose Branch</option>
+                                    <select class="form-control select2" multiple name="branch[]" style="width: 100%;">
                                         @foreach($branch as $id => $branchName)
-                                        <option value="{{ $id }}">{{ $branchName }}</option>
+                                            <option value="{{ $id }}">{{ $branchName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Wellness Inclusions*</label>
+                                    <textarea class="form-control" name="wellness_inclusions" id="wellnessInclusion" required name="wellness_inclusions"
+                                         placeholder="Wellness Inclusions">{{ old('wellness_inclusions') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Wellness T&C*</label>
+                                    <textarea class="form-control" name="wellness_terms_conditions" id="termsandCondition" required name="wellness_terms_conditions"
+                                        placeholder="Wellness T&C">{{ old('wellness_terms_conditions') }}</textarea>
+                                </div>
+                            </div>
+
+                          
+                            
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
@@ -120,7 +118,23 @@
 @endsection
 
 @section('js')
-<script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        CKEDITOR.replace('wellnessInclusion', {
+            removePlugins: 'image',
+           
+        });
+
+        $(document).ready(function() {
+        CKEDITOR.replace('termsandCondition', {
+            removePlugins: 'image',
+           
+        });
+
+      });
+
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
             $("#statusText").text('Active');
@@ -129,6 +143,18 @@
             $("#statusText").text('Inactive');
             $("input[name=is_active]").val(0);
         }
+
+        $(document).ready(function() {
+        $('select').selectpicker();
+    });
     }
+});
+ //js for dropdown:
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+
+    
 </script>
-@endsection
+
+

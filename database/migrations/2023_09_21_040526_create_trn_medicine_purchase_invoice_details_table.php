@@ -35,13 +35,12 @@ class CreateTrnMedicinePurchaseInvoiceDetailsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('invoice_id')->references('purchase_invoice_id')->on('trn_medicine_purchase_invoices')->onDelete('cascade');
-            $table->foreign('created_by')->references('user_id')->on('mst_users')->onDelete('cascade');
-            $table->foreign('updated_by')->references('user_id')->on('mst_users')->onDelete('cascade');
-            $table->foreign('deleted_by')->references('user_id')->on('mst_users')->onDelete('set null');
+            // $table->foreign('invoice_id')->references('purchase_invoice_id')->on('trn_medicine_purchase_invoices')->onDelete('cascade');
+            // $table->foreign('created_by')->references('user_id')->on('mst_users')->onDelete('cascade');
+            // $table->foreign('updated_by')->references('user_id')->on('mst_users')->onDelete('cascade');
+            // $table->foreign('deleted_by')->references('user_id')->on('mst_users')->onDelete('set null');
         });     
     }
-
     /**
      * Reverse the migrations.
      *

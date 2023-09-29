@@ -77,6 +77,12 @@
                </div>
                <div class="col-md-6">
                   <div class="form-group">
+                     <label for="tax_id">Unit</label>
+                      <input type="text" class="form-control" readonly name="unit_id" value="{{$show->unit_id }}" placeholder=" Tax">
+                  </div>
+               </div>
+               <div class="col-md-6">
+                  <div class="form-group">
                      <label class="form-label">Reorder Limit</label>
                      <input type="text" class="form-control" readonly name="reorder_limit" value="{{$show->reorder_limit}}" placeholder="Reorder Limit">
                   </div>

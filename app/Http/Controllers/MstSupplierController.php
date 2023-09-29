@@ -10,10 +10,17 @@ class MstSupplierController extends Controller
     {
         $pageTitle = "Suppliers";
         $query = Mst_Supplier::query();
-        // Apply filters if provided
+      
+  
     if ($request->has('supplier_type_id')) {
-        $query->where('supplier_type_id', 'LIKE', "%{$request->supplier_type_id}%");
+    $supplierTypeId = $request->input('supplier_type_id');
+    
+    // Check if the selected supplier type is not empty
+    if (!empty($supplierTypeId)) {
+        $query->where('supplier_type_id', $supplierTypeId);
     }
+}
+
 
     if ($request->has('supplier_code')) {
         $query->where('supplier_code', 'LIKE', "%{$request->supplier_code}%");
@@ -174,6 +181,7 @@ class MstSupplierController extends Controller
     {
         $supplier = Mst_Supplier::findOrFail($id);
         $supplier->delete();
+       
 
         return redirect()->route('supplier.index')->with('success', 'Supplier deleted successfully');
     }

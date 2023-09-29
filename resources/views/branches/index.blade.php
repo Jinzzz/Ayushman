@@ -76,7 +76,7 @@
                                 $i = 0;
                                 @endphp
                                 @foreach($branches as $branch)
-                                <tr>
+                                <tr id="dataRow_{{ $branch->branch_id }}">
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $branch->branch_code }}</td>
                                     <td>{{ $branch->branch_name }}</td>
@@ -84,19 +84,15 @@
                                     <td>{{ $branch->branch_admin_name }}</td>
                                     <td>{{ $branch->branch_admin_contact_number }}</td>
                                     <td>
-                                        <form action="{{ route('branches.changeStatus', $branch->branch_id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                            <button type="submit"
-                                                onclick="return confirm('Do you want to change status?');"
-                                                class="btn btn-sm @if($branch->is_active == 0) btn-danger @else btn-success @endif">
-                                                @if($branch->is_active == 0)
-                                                InActive
-                                                @else
-                                                Active
-                                                @endif
-                                            </button>
-                                        </form>
+                                       
+                                        <button type="button" onclick="changeStatus({{ $branch->branch_id }})" class="btn btn-sm @if($branch->is_active == 0) btn-danger @else btn-success @endif">
+                                            @if($branch->is_active == 0)
+                                            InActive
+                                            @else
+                                            Active
+                                            @endif
+                                        </button>
+                                       
                                     </td>
                                     <td>
                                         <a class="btn btn-primary btn-sm edit-custom"
@@ -108,8 +104,9 @@
                                             action="{{ route('branches.destroy', $branch->branch_id) }}" method="post">
                                             @csrf
                                             @method('delete')
-                                            <button type="submit" onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
-                                                    aria-hidden="true"></i>Delete</button>
+                                            <button type="button" onclick="deleteData({{ $branch->branch_id }})"class="btn-danger btn-sm">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -126,6 +123,91 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script>
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('branches.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                flashMessage('s', 'Data deleted successfully');
+                            } else {
+                                flashMessage('e', 'An error occured! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the branch.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+
+
+      // Change status 
+      function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('branches.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the branch status.');
+                        },
+                    });
+                }
+            });
+    }
+    </script>
 
 
 
