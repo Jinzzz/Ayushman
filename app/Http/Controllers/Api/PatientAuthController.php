@@ -26,7 +26,7 @@ class PatientAuthController extends Controller
                 [
                     'patient_name'      => 'required',
                     'patient_email'     => 'required|email|unique:mst_patients,patient_email',
-                    'patient_mobile'    => ['required', 'regex:/^[0-9]{10}$/','unique:mst_patients,patient_mobile'],
+                    'patient_mobile'    => ['required', 'regex:/^[0-9]{10}$/', 'unique:mst_patients,patient_mobile'],
                     'patient_address'      => 'required',
                     'patient_gender'      => 'required',
                     'patient_dob'      => 'required',
@@ -50,19 +50,19 @@ class PatientAuthController extends Controller
                 ]
             );
 
-                if (!$validator->fails()) {
-                    $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
+            if (!$validator->fails()) {
+                $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
                     ->orWhere('patient_email', $request->patient_email)
                     ->first();
 
-                    if($request->patient_gender){
-                        $patient_gender_id = $request->patient_gender;
-                    }
+                if ($request->patient_gender) {
+                    $patient_gender_id = $request->patient_gender;
+                }
 
-                    $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
+                $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
 
-                    if (!$patients) {
-                        $lastInsertedId = Mst_Patient::insertGetId([
+                if (!$patients) {
+                    $lastInsertedId = Mst_Patient::insertGetId([
                         'patient_name'      => $request->patient_name,
                         'patient_email'     => $request->patient_email,
                         'patient_address'   => $request->patient_address,
@@ -75,60 +75,57 @@ class PatientAuthController extends Controller
                         'available_membership'  => 0,
                         'patient_code'         => rand(50, 100),
                         'created_at'         => Carbon::now(),
-                        ]);
+                    ]);
 
-                        $verification_otp = rand(100000, 999999);
-                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                        $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
+                    $verification_otp = rand(100000, 999999);
+                    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                    $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
 
-                        $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
+                    $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
                         'updated_at' => Carbon::now(),
                         'patient_code' => $newPatientCode
-                        ]);
+                    ]);
 
-                        $otpCreate = Trn_Patient_Otp::create([
-                            'patient_id' => $lastInsertedId,
-                            'otp' => $verification_otp,
-                            'otp_type' => 1,
-                            'verified' => 0,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                            'otp_expire_at' => Carbon::now()->addMinutes(10),
-                        ]);
+                    $otpCreate = Trn_Patient_Otp::create([
+                        'patient_id' => $lastInsertedId,
+                        'otp' => $verification_otp,
+                        'otp_type' => 1,
+                        'verified' => 0,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                        'otp_expire_at' => Carbon::now()->addMinutes(10),
+                    ]);
 
-                        if (isset($request->device_token) && isset($request->device_type)) {
-                            Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
-    
-                            $pdt = new Trn_Patient_Device_Tocken;
-                            $pdt->patient_id =$lastInsertedId;
-                            $pdt->patient_device_token = $request->device_token;
-                            $pdt->patient_device_type = $request->device_type;
-                            $pdt->created_at = Carbon::now();
-                            $pdt->updated_at = Carbon::now();
-                            $pdt->save();
-                        }
-                       
-                        $data['status'] = 1;
-                        $data['otp']=$verification_otp;
-                        $data['otp_type']=1;
-                        $data['patient_id']=$lastInsertedId;
-                        $data['message'] = "OTP sent successfully.";
-                        return response($data);
-                    } else {
-                       
-                        $data['status'] = 0;
-                        $data['message'] = "Mobile number or Email address is already in use.";
-                        return response($data);
+                    if (isset($request->device_token) && isset($request->device_type)) {
+                        Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
+
+                        $pdt = new Trn_Patient_Device_Tocken;
+                        $pdt->patient_id = $lastInsertedId;
+                        $pdt->patient_device_token = $request->device_token;
+                        $pdt->patient_device_type = $request->device_type;
+                        $pdt->created_at = Carbon::now();
+                        $pdt->updated_at = Carbon::now();
+                        $pdt->save();
                     }
 
-                } else {
-                    $data['status'] = 0;
-                    $data['errors'] = $validator->errors();
-                    $data['message'] = "Validation errors";
+                    $data['status'] = 1;
+                    $data['otp'] = $verification_otp;
+                    $data['otp_type'] = 1;
+                    $data['patient_id'] = $lastInsertedId;
+                    $data['message'] = "OTP sent successfully.";
                     return response($data);
-                    
+                } else {
+
+                    $data['status'] = 0;
+                    $data['message'] = "Mobile number or Email address is already in use.";
+                    return response($data);
                 }
-           
+            } else {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
         } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
@@ -140,9 +137,8 @@ class PatientAuthController extends Controller
 
     public function patientLogin(Request $request)
     {
-        $data=array();
-        try
-        {
+        $data = array();
+        try {
             $mobile = $request->input('patient_mobile');
             $passChk = $request->input('password');
             $validator = Validator::make(
@@ -158,70 +154,55 @@ class PatientAuthController extends Controller
                 ]
             );
 
-            if (!$validator->fails()) 
-            {
-                $patient=Mst_Patient::where('patient_mobile',$mobile)->first();
-                if(!$patient)
-                {
+            if (!$validator->fails()) {
+                $patient = Mst_Patient::where('patient_mobile', $mobile)->first();
+                if (!$patient) {
                     $data['status'] = 0;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
-
                 }
-                if (Hash::check($passChk, $patient->password)) 
-                {
-                    $check_array=['patient_mobile' => request('patient_mobile'), 'password' => request('password')];
-                    if ($check_array) 
-                    {
+                if (Hash::check($passChk, $patient->password)) {
+                    $check_array = ['patient_mobile' => request('patient_mobile'), 'password' => request('password')];
+                    if ($check_array) {
                         $data['token'] =  $patient->createToken('Patient Token', ['patient']);
                         $data['status'] = 1;
                         $data['message'] = "Login Success";
-                        $data['name']=$patient->patient_name;
-                        $data['patient_id']=$patient->id;
-                        $data['patient_mobile']=$patient->patient_mobile;
-                        $data['email_address']=$patient->patient_email;
+                        $data['name'] = $patient->patient_name;
+                        $data['patient_id'] = $patient->id;
+                        $data['patient_mobile'] = $patient->patient_mobile;
+                        $data['email_address'] = $patient->patient_email;
                         return response($data);
-
-                    }
-                    else
-                    {
+                    } else {
                         $data['status'] = 0;
                         $data['message'] = "Invalid Login Details";
                         return response($data);
                     }
-                }
-                else
-                {
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
-        } 
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    
 
-    public function otpVerification(Request $request){
-        $data=array();
-        try
-        {
+
+    public function otpVerification(Request $request)
+    {
+        $data = array();
+        try {
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -238,90 +219,81 @@ class PatientAuthController extends Controller
                 ]
             );
 
-            if (!$validator->fails()) 
-            {
-                if(isset($request->patient_id, $request->otp_type, $request->otp)){
+            if (!$validator->fails()) {
+                if (isset($request->patient_id, $request->otp_type, $request->otp)) {
                     $patient_id = $request->input('patient_id');
-                    $patient=Mst_Patient::find($patient_id);
-                    if(!$patient)
-                    {
-                    $data['status'] = 0;
-                    $data['message'] = "User does not exist.";
-                    return response($data);
+                    $patient = Mst_Patient::find($patient_id);
+                    if (!$patient) {
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist.";
+                        return response($data);
                     }
 
                     $lastInsertedRow = Trn_Patient_Otp::where('otp_type', $request->otp_type)
-                    ->where('patient_id', $patient_id)
-                    ->where('otp', $request->otp)
-                    ->latest('otp_id')
-                    ->first();
+                        ->where('patient_id', $patient_id)
+                        ->where('otp', $request->otp)
+                        ->latest('otp_id')
+                        ->first();
 
-                    if ($lastInsertedRow && $lastInsertedRow->otp == $request->otp) 
-                    {   
-                    if( Carbon::now()->lessThanOrEqualTo($lastInsertedRow->otp_expire_at)){
+                    if ($lastInsertedRow && $lastInsertedRow->otp == $request->otp) {
+                        if (Carbon::now()->lessThanOrEqualTo($lastInsertedRow->otp_expire_at)) {
 
-                        Trn_Patient_Otp::where('otp_id', $lastInsertedRow->otp_id)->update([
-                            'updated_at' => Carbon::now(),
-                            'verified' => 1,
+                            Trn_Patient_Otp::where('otp_id', $lastInsertedRow->otp_id)->update([
+                                'updated_at' => Carbon::now(),
+                                'verified' => 1,
                             ]);
 
                             // is_otp_verified
 
-                            if($request->otp_type == 1){
-                                Mst_Patient::where('id',$patient_id)->update([
+                            if ($request->otp_type == 1) {
+                                Mst_Patient::where('id', $patient_id)->update([
                                     'updated_at' => Carbon::now(),
                                     'is_otp_verified' => 1,
-                                    ]);
+                                ]);
                             }
 
 
-                        $data['status'] = 1;
-                        $data['message'] = "Registration completed successfully";
-                        if($request->otp_type == 2){
-                            $data['message'] = "OTP verified successfully";
+                            $data['status'] = 1;
+                            $data['message'] = "Registration completed successfully";
+                            if ($request->otp_type == 2) {
+                                $data['message'] = "OTP verified successfully";
+                            }
+                            return response($data);
+                        } else {
+
+                            $data['status'] = 0;
+                            $data['message'] = "OTP Expired";
+                            return response($data);
                         }
-                        return response($data);
-
-                    }else{
-
+                    } else {
                         $data['status'] = 0;
-                        $data['message'] = "OTP Expired";
+                        $data['message'] = "OTP doesn't match";
                         return response($data);
                     }
-                    
-                    }else{
-                    $data['status'] = 0;
-                    $data['message'] = "OTP doesn't match";
-                    return response($data);
-                    }
-                }else{
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "Patient id / Otp type / Otp is required";
                     return response($data);
                 }
-                
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    public function reSendOtp(Request $request){
-        $data=array();
-        try{
+    public function reSendOtp(Request $request)
+    {
+        $data = array();
+        try {
             $patient_id = $request->input('patient_id');
 
             $validator = Validator::make(
@@ -334,11 +306,9 @@ class PatientAuthController extends Controller
                 ]
             );
 
-            if (!$validator->fails()) 
-            {
-                $patient=Mst_Patient::where('id',$patient_id)->first();
-                if(!$patient)
-                {
+            if (!$validator->fails()) {
+                $patient = Mst_Patient::where('id', $patient_id)->first();
+                if (!$patient) {
                     $data['status'] = 0;
                     $data['message'] = "User does not exist.";
                     return response($data);
@@ -348,7 +318,7 @@ class PatientAuthController extends Controller
                     ->latest('otp_id')
                     ->first();
 
-                if($lastInsertedRow){
+                if ($lastInsertedRow) {
                     $verification_otp = rand(100000, 999999);
                     $resendOtp = Trn_Patient_Otp::where('otp_id', $lastInsertedRow->otp_id)->update([
                         'updated_at' => Carbon::now(),
@@ -357,44 +327,39 @@ class PatientAuthController extends Controller
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
 
-                    if($lastInsertedRow->otp_type == 1){
-                        Mst_Patient::where('id',$patient_id)->update([
+                    if ($lastInsertedRow->otp_type == 1) {
+                        Mst_Patient::where('id', $patient_id)->update([
                             'updated_at' => Carbon::now(),
                             'is_otp_verified' => 0,
-                            ]);
+                        ]);
                     }
-                    
+
                     $data['status'] = 1;
-                    $data['otp']=$verification_otp;
-                    $data['otp_type']= $lastInsertedRow->otp_type;
-                    $data['patient_id']=$patient_id;
+                    $data['otp'] = $verification_otp;
+                    $data['otp_type'] = $lastInsertedRow->otp_type;
+                    $data['patient_id'] = $patient_id;
                     $data['message'] = "OTP resent successfully.";
                     return response($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        } 
-
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-        
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    public function forgotPassword(Request $request){
-        $data=array();
-        try
-        {
+    public function forgotPassword(Request $request)
+    {
+        $data = array();
+        try {
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -406,12 +371,10 @@ class PatientAuthController extends Controller
                 ]
             );
 
-            if (!$validator->fails()) 
-            {
+            if (!$validator->fails()) {
                 $patient_mobile = $request->input('patient_mobile');
-                $patient=Mst_Patient::where('patient_mobile',$patient_mobile)->first();
-                if($patient)
-                {
+                $patient = Mst_Patient::where('patient_mobile', $patient_mobile)->first();
+                if ($patient) {
                     $verification_otp = rand(100000, 999999);
                     $otpCreate = Trn_Patient_Otp::create([
                         'patient_id' => $patient->id,
@@ -422,39 +385,36 @@ class PatientAuthController extends Controller
                         'updated_at' => Carbon::now(),
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
-                       
+
                     $data['status'] = 1;
-                    $data['otp']=$verification_otp;
-                    $data['otp_type']=2;
-                    $data['patient_id']=$patient->id;
+                    $data['otp'] = $verification_otp;
+                    $data['otp_type'] = 2;
+                    $data['patient_id'] = $patient->id;
                     $data['message'] = "Otp sent successfully.";
                     return response($data);
-                }else{
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "User doesn't exist.";
                     return response($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    public function resetPassword(Request $request){
-        $data=array();
+    public function resetPassword(Request $request)
+    {
+        $data = array();
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -470,65 +430,58 @@ class PatientAuthController extends Controller
                     'confirm_password.same'          => 'Passwords do not match',
                 ]
             );
-            if (!$validator->fails()) 
-            {
-                $patient=Mst_Patient::where('id',$request->patient_id)->first();
-                if($patient)
-                {
-                    if(!Hash::check($request->password, $patient->password)){
+            if (!$validator->fails()) {
+                $patient = Mst_Patient::where('id', $request->patient_id)->first();
+                if ($patient) {
+                    if (!Hash::check($request->password, $patient->password)) {
                         $patient->password = Hash::make($request->password);
                         $patient->updated_at = Carbon::now();
                         $patient->save();
                         $data['status'] = 1;
                         $data['message'] = "Password reset sussessfully.";
                         return response($data);
-                    }else{
+                    } else {
                         $data['status'] = 0;
                         $data['message'] = "Your new password is similar to the current Password. Please try another password.";
                         return response($data);
                     }
-                }
-                else{
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "User does not exist.";
                     return response($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    public function updateDetails(Request $request){
-        $data=array();
-        try{
+    public function updateDetails(Request $request)
+    {
+        $data = array();
+        try {
             $patient_id = Auth::id();
-            if($patient_id){
+            if ($patient_id) {
 
                 $currentData = Mst_Patient::where('id', $patient_id)->first();
 
-                if($request->patient_blood_group){
+                if ($request->patient_blood_group) {
                     $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
-
                 }
-                if($request->patient_gender){
+                if ($request->patient_gender) {
                     $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
                 }
 
-                if($request->patient_dob){
+                if ($request->patient_dob) {
                     $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
                 }
 
@@ -545,24 +498,23 @@ class PatientAuthController extends Controller
                 $data['status'] = 1;
                 $data['message'] = "Profile updated successfully";
                 return response($data);
-            }else{
+            } else {
                 $data['status'] = 0;
                 $data['message'] = "User does not exist";
                 return response($data);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
         }
     }
 
-    public function changePassword(Request $request){
-        $data=array();
+    public function changePassword(Request $request)
+    {
+        $data = array();
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -578,51 +530,43 @@ class PatientAuthController extends Controller
                     'confirm_password.same'          => 'new passwords and confirm password does not match',
                 ]
             );
-            if (!$validator->fails()) 
-            {
+            if (!$validator->fails()) {
                 if (isset($request->old_password) && isset($request->new_password) && isset($request->confirm_password))
-                $patient_id = Auth::id();
-                $patient=Mst_Patient::where('id',$patient_id)->first();
-                if($patient)
-                {
-                    if(Hash::check($request->old_password, $patient->password)){
-                        if(!Hash::check($request->new_password, $patient->password)){
+                    $patient_id = Auth::id();
+                $patient = Mst_Patient::where('id', $patient_id)->first();
+                if ($patient) {
+                    if (Hash::check($request->old_password, $patient->password)) {
+                        if (!Hash::check($request->new_password, $patient->password)) {
                             $patient->password = Hash::make($request->new_password);
                             $patient->updated_at = Carbon::now();
                             $patient->save();
                             $data['status'] = 1;
                             $data['message'] = "Password changed sussessfully.";
                             return response($data);
-                        }else{
+                        } else {
                             $data['status'] = 0;
                             $data['message'] = "Your new password is similar to the old Password. Please try another password.";
                             return response($data);
                         }
-                    }else{
+                    } else {
                         $data['status'] = 0;
                         $data['message'] = "Old password is incorrect.";
                         return response($data);
                     }
-                    
-                }
-                else{
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "User does not exist.";
                     return response($data);
                 }
-            }
-            else
-            {
+            } else {
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
                 return response($data);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
-            
         } catch (\Throwable $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
@@ -631,11 +575,11 @@ class PatientAuthController extends Controller
 
     public function logout()
     {
-    $user = Auth::user();
-    $user->tokens->each(function ($token, $key) {
-        $token->delete();
-    });
+        $user = Auth::user();
+        $user->tokens->each(function ($token, $key) {
+            $token->delete();
+        });
 
-    return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

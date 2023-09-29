@@ -12,6 +12,7 @@ use App\Models\Mst_Patient;
 use App\Models\Trn_Family_Member_Otp;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use DB;
 
 class FamilyController extends Controller
 {
@@ -92,7 +93,8 @@ class FamilyController extends Controller
                         'relationship_id' => $relationship_id,
                         'address' => $request->member_address,
                         'created_by' => $patient_id,
-                        'is_active' => 1,
+                        'is_active' => 0,
+                        'verified' => 0,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
@@ -111,9 +113,10 @@ class FamilyController extends Controller
 
                     $data['status'] = 1;
                     $data['otp'] = $verification_otp;
+                    $data['mobile_number'] = $request->member_mobile;
                     $data['patient_id'] = $patient_id;
                     $data['family_member_id'] = $addFamilyMember->id;
-                    $data['message'] = "Plese enter the otp that send to your registered mobile number.";
+                    $data['message'] = "Plese enter the otp that send to your mobile number.";
                     return response($data);
                 } else {
                     $data['status'] = 0;
@@ -144,12 +147,16 @@ class FamilyController extends Controller
                 [
                     'otp' => ['required', 'numeric', 'digits:6'],
                     'family_member_id' => ['required'],
+                    'status' => ['required'],
+                    'mobile_number' => ['required'],
                 ],
                 [
                     'otp.required' => 'OTP required',
                     'otp.numeric' => 'OTP must be numeric',
                     'otp.digits' => 'OTP must be 6 digits',
-                    'family_member_id.required' => 'Family member required',
+                    'family_member_id.required' => 'Family member is required',
+                    'status.required' => 'status is required',
+                    'mobile_number.required' => 'mobile_number is required',
                 ]
             );
 
@@ -183,6 +190,23 @@ class FamilyController extends Controller
                                 'updated_at' => Carbon::now(),
                                 'verified' => 1,
                             ]);
+
+                            if ($request->status == 1) {
+                                Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                                    'updated_at' => Carbon::now(),
+                                    'is_active' => 1,
+                                    'verified' => 1,
+                                ]);
+                            }
+
+                            if ($request->status == 3) {
+                                Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                                    'mobile_number' => $request->mobile_number,
+                                    'is_active' => 1,
+                                    'verified' => 1,
+                                    'updated_at' => Carbon::now(),
+                                ]);
+                            }
 
                             $data['status'] = 1;
                             $data['message'] = "OTP Verified successfully";
@@ -227,9 +251,11 @@ class FamilyController extends Controller
                 $request->all(),
                 [
                     'family_member_id' => ['required'],
+                    'status' => ['required'],
                 ],
                 [
                     'family_member_id.required' => 'Family member required',
+                    'status.required' => 'Status required',
                 ]
             );
 
@@ -248,6 +274,15 @@ class FamilyController extends Controller
                     return response($data);
                 }
 
+                // If the status is 1, the OTP is sent to $member->mobile_number; if the status is 2, the OTP is sent to $member->mobile_number_new.
+                if ($request->status == 1) {
+                    $mobile_number = $member->mobile_number;
+                }
+                if ($request->status == 3) {
+                    $mobile_number = $member->mobile_number_new;
+                }
+
+
                 $lastInsertedRow = Trn_Family_Member_Otp::where('patient_id', $patient_id)
                     ->where('family_member_id', $request->family_member_id)
                     ->latest('id')
@@ -262,10 +297,27 @@ class FamilyController extends Controller
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
 
-                    $data['status'] = 1;
+                    if ($request->status == 1) {
+                        Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                            'updated_at' => Carbon::now(),
+                            'is_active' => 0,
+                            'verified' => 0,
+                        ]);
+                    }
+                    if ($request->status == 3) {
+                        Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                            'updated_at' => Carbon::now(),
+                            'is_active' => 1,
+                            'verified' => 0,
+                        ]);
+                    }
+                    
+
+                    $data['status'] = intval($request->status);
                     $data['otp'] = $verification_otp;
+                    $data['mobile_number'] = $mobile_number;
                     $data['patient_id'] = $patient_id;
-                    $data['family_member_id'] = $request->family_member_id;
+                    $data['family_member_id'] = intval($request->family_member_id);
                     $data['message'] = "OTP resent successfully.";
                     return response($data);
                 }
@@ -305,10 +357,20 @@ class FamilyController extends Controller
                     $family_member_details = array();
                     // Fetching that family member's details 
                     $member = Trn_Patient_Family_Member::join('mst_patients', 'trn_patient_family_member.patient_id', 'mst_patients.id')
-                        ->join('mst_master_values as gender', 'trn_patient_family_member.gender_id', '=', 'gender.id')
-                        ->join('mst_master_values as blood_group', 'trn_patient_family_member.blood_group_id', '=', 'blood_group.id')
-                        ->join('mst_master_values as relationship', 'trn_patient_family_member.relationship_id', '=', 'relationship.id')
-                        ->select('trn_patient_family_member.id', 'trn_patient_family_member.family_member_name', 'trn_patient_family_member.email_address', 'trn_patient_family_member.mobile_number', 'gender.master_value as gender_name','blood_group.master_value as blood_group', 'trn_patient_family_member.date_of_birth','trn_patient_family_member.address', 'relationship.master_value as relationship')
+                        ->leftJoin('mst_master_values as gender', 'trn_patient_family_member.gender_id', '=', 'gender.id')
+                        ->leftJoin('mst_master_values as blood_group', 'trn_patient_family_member.blood_group_id', '=', 'blood_group.id')
+                        ->leftJoin('mst_master_values as relationship', 'trn_patient_family_member.relationship_id', '=', 'relationship.id')
+                        ->select(
+                            'trn_patient_family_member.id',
+                            'trn_patient_family_member.family_member_name',
+                            'trn_patient_family_member.email_address',
+                            'trn_patient_family_member.mobile_number',
+                            'gender.master_value as gender_name',
+                            'blood_group.master_value as blood_group',
+                            'trn_patient_family_member.date_of_birth',
+                            'trn_patient_family_member.address',
+                            DB::raw('relationship.master_value as relationship')
+                        )
                         ->where('trn_patient_family_member.id', $family_member_id)
                         ->where('trn_patient_family_member.patient_id', $patient_id)
                         ->where('trn_patient_family_member.is_active', 1)
@@ -395,6 +457,7 @@ class FamilyController extends Controller
             );
 
             if (!$validator->fails()) {
+                // checking the validity
                 if (isset($request->family_member_id) && isset($request->member_name) && isset($request->member_email) && isset($request->member_mobile) && isset($request->member_address) && isset($request->member_gender) && isset($request->member_dob) && isset($request->member_blood_group) && isset($request->relationship)) {
                     $patient_id = Auth::id();
                     $member_dob = PatientHelper::dateFormatDb($request->member_dob);
@@ -403,10 +466,13 @@ class FamilyController extends Controller
                     $blood_group_id =  $request->member_blood_group;
                     $relationship_id = $request->relationship;
 
-                    $addFamilyMember = Trn_Patient_Family_Member::where('id',$request->family_member_id)->update([
+                    // Retrieve the current mobile number from the database
+                    $currentMobileNumber = Trn_Patient_Family_Member::where('id', $request->family_member_id)->value('mobile_number');
+
+                    $addFamilyMember = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
                         'patient_id' => $patient_id,
                         'family_member_name' => $request->member_name,
-                        'mobile_number' => $request->member_mobile,
+                        'mobile_number' => $currentMobileNumber,
                         'email_address' => $request->member_email,
                         'gender_id' => $member_gender_id,
                         'blood_group_id' => $blood_group_id,
@@ -415,12 +481,46 @@ class FamilyController extends Controller
                         'address' => $request->member_address,
                         'created_by' => $patient_id,
                         'is_active' => 1,
-                        'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
 
-                    $data['status'] = 1;
-                    $data['message'] = "Family member details updated successfully.";
+                    // Check if the mobile number has changed
+                    $isChangedMobileNumber = ($currentMobileNumber != $request->member_mobile) ? 1 : 0;
+
+                    if ($isChangedMobileNumber == 1) {
+                        // Generating an OTP for verification as they are attempting to update their mobile number.
+
+                        $save_new_mobile_number = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                            'updated_at' => Carbon::now(),
+                            'mobile_number_new' => $request->member_mobile,
+                            'verified' => 0,
+                        ]);
+
+                        $verificationOtp = rand(100000, 999999);
+
+                        $otpCreate = Trn_Family_Member_Otp::create([
+                            'patient_id' => $patient_id,
+                            'family_member_id' => $request->family_member_id,
+                            'otp' => $verificationOtp,
+                            // 'mobile_number' => $request->member_mobile,
+                            'verified' => 0,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                            'otp_expire_at' => Carbon::now()->addMinutes(10),
+                        ]);
+
+                        $data = [
+                            'status' => 3,
+                            'otp' => $verificationOtp,
+                            'mobile_number' => $request->member_mobile,
+                            'patient_id' => $patient_id,
+                            'family_member_id' => intval($request->family_member_id),
+                            'message' => "Please enter the OTP that was sent to the mobile number.",
+                        ];
+                    } else {
+                        $data['status'] = 1;
+                        $data['message'] = "Family member details updated successfully.";
+                    }
                     return response($data);
                 } else {
                     $data['status'] = 0;
@@ -465,7 +565,7 @@ class FamilyController extends Controller
                     $trn_family_member->delete();
 
                     $data['status'] = 1;
-                    $data['message'] = "Deleted successfully";       
+                    $data['message'] = "Deleted successfully";
                     return response($data);
                 } else {
                     $data['status'] = 0;

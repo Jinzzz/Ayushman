@@ -22,67 +22,66 @@ use App\Http\Controllers\Api\WellnessController;
 |
 */
 
-Route::post('patient/register', [PatientAuthController::class,'patientRegister']);
-Route::post('patient/login', [PatientAuthController::class,'patientLogin']);
-Route::post('patient/otp_verification', [PatientAuthController::class,'otpVerification']);
-Route::post('patient/resend_otp', [PatientAuthController::class,'reSendOtp']);
-Route::post('patient/forgot_password', [PatientAuthController::class,'forgotPassword']);
-Route::post('patient/reset_password', [PatientAuthController::class,'resetPassword']);
+Route::post('patient/register', [PatientAuthController::class, 'patientRegister']);
+Route::post('patient/login', [PatientAuthController::class, 'patientLogin']);
+Route::post('patient/otp_verification', [PatientAuthController::class, 'otpVerification']);
+Route::post('patient/resend_otp', [PatientAuthController::class, 'reSendOtp']);
+Route::post('patient/forgot_password', [PatientAuthController::class, 'forgotPassword']);
+Route::post('patient/reset_password', [PatientAuthController::class, 'resetPassword']);
 
-Route::post('patient/membership_packages_details', [MembershipController::class,'membershipPackageDetails']);
+Route::post('patient/membership_packages_details', [MembershipController::class, 'membershipPackageDetails']);
 
-Route::get('branches', [DoctorBookingController::class,'getBranches']);
-Route::get('qualifications', [DoctorBookingController::class,'getQualifications']);
-Route::get('gender', [DoctorBookingController::class,'getGender']);
-Route::get('relationship', [DoctorBookingController::class,'getRelationship']);
-Route::get('blood-group', [DoctorBookingController::class,'getBloodGroup']);
+Route::get('branches', [DoctorBookingController::class, 'getBranches']);
+Route::get('qualifications', [DoctorBookingController::class, 'getQualifications']);
+Route::get('gender', [DoctorBookingController::class, 'getGender']);
+Route::get('relationship', [DoctorBookingController::class, 'getRelationship']);
+Route::get('blood-group', [DoctorBookingController::class, 'getBloodGroup']);
 
 
-Route::middleware(['auth:api'])->group(function () {   
-// Consultation
-    Route::get('patient/home', [DashboardController::class,'homePage']);
-    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class,'doctorsList']);
-    Route::post('patient/consultation/doctors_details', [DoctorBookingController::class,'doctorsDetails']);
-    Route::post('patient/consultation/doctor_availability', [DoctorBookingController::class,'doctorsAvailability']);
-    Route::post('patient/consultation/booking_details', [DoctorBookingController::class,'bookingDetails']);
-    Route::post('patient/consultation/booking_summary', [DoctorBookingController::class,'bookingSummary']);
-    Route::post('patient/consultation/booking_confirmation', [DoctorBookingController::class,'bookingConfirmation']);
+Route::middleware(['auth:api'])->group(function () {
+    // Consultation
+    Route::get('patient/home', [DashboardController::class, 'homePage']);
+    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
+    Route::post('patient/consultation/doctors_details', [DoctorBookingController::class, 'doctorsDetails']);
+    Route::post('patient/consultation/doctor_availability', [DoctorBookingController::class, 'doctorsAvailability']);
+    Route::post('patient/consultation/booking_details', [DoctorBookingController::class, 'bookingDetails']);
+    Route::post('patient/consultation/booking_summary', [DoctorBookingController::class, 'bookingSummary']);
+    Route::post('patient/consultation/booking_confirmation', [DoctorBookingController::class, 'bookingConfirmation']);
 
     // Add family member
-    Route::get('patient/my_family', [FamilyController::class,'myFamily']);
-    Route::post('patient/add_member', [FamilyController::class,'addMember']);
-    Route::post('patient/member/otp_verification', [FamilyController::class,'otpVerification']);
-    Route::post('patient/member/resend_otp', [FamilyController::class,'reSendOtp']);
-    Route::post('patient/member/edit', [FamilyController::class,'editFamilyMember']);
-    Route::post('patient/member/update', [FamilyController::class,'updateFamilyMember']);
-    Route::post('patient/member/delete', [FamilyController::class,'deleteFamilyMember']);
+    Route::get('patient/my_family', [FamilyController::class, 'myFamily']);
+    Route::post('patient/add_member', [FamilyController::class, 'addMember']);
+    Route::post('patient/member/otp_verification', [FamilyController::class, 'otpVerification']);
+    Route::post('patient/member/resend_otp', [FamilyController::class, 'reSendOtp']);
+    Route::post('patient/member/edit', [FamilyController::class, 'editFamilyMember']);
+    Route::post('patient/member/update', [FamilyController::class, 'updateFamilyMember']);
+    Route::post('patient/member/delete', [FamilyController::class, 'deleteFamilyMember']);
 
     // Manage consultation Bookings 
-    Route::get('patient/my_bookings', [MyBookingsController::class,'myBookings']);
-    Route::post('patient/my_booking_details', [MyBookingsController::class,'myBookingDetails']);
-    Route::post('patient/cancel_booking', [MyBookingsController::class,'cancelBooking']);
+    Route::get('patient/my_bookings', [MyBookingsController::class, 'myBookings']);
+    Route::post('patient/my_booking_details', [MyBookingsController::class, 'myBookingDetails']);
+    Route::post('patient/cancel_booking', [MyBookingsController::class, 'cancelBooking']);
 
     // Consultation booking history
-    Route::get('patient/my_booking_history', [BookingHistoryController::class,'myBookingHistory']);
-    Route::post('patient/booking_history_details', [BookingHistoryController::class,'bookingHistoryDetails']);
+    Route::get('patient/my_booking_history', [BookingHistoryController::class, 'myBookingHistory']);
+    Route::post('patient/booking_history_details', [BookingHistoryController::class, 'bookingHistoryDetails']);
 
     // Profile 
-    Route::post('patient/update_details', [PatientAuthController::class,'updateDetails']);
-    Route::post('patient/change_password', [PatientAuthController::class,'changePassword']);
-    Route::get('patient/logout', [PatientAuthController::class,'logout']);
+    Route::post('patient/update_details', [PatientAuthController::class, 'updateDetails']);
+    Route::post('patient/change_password', [PatientAuthController::class, 'changePassword']);
+    Route::get('patient/logout', [PatientAuthController::class, 'logout']);
 
     // Membership
-    Route::get('patient/membership_packages', [MembershipController::class,'membershipPackages']);
-    Route::post('patient/membership_packages_details', [MembershipController::class,'membershipPackageDetails']);
-    Route::post('patient/purchase_membership_package', [MembershipController::class,'purchaseMembershipPackage']);
-    Route::get('patient/current_membership_details', [MembershipController::class,'currentMembershipDetails']);
+    Route::get('patient/membership_packages', [MembershipController::class, 'membershipPackages']);
+    Route::post('patient/membership_packages_details', [MembershipController::class, 'membershipPackageDetails']);
+    Route::post('patient/purchase_membership_package', [MembershipController::class, 'purchaseMembershipPackage']);
+    Route::get('patient/current_membership_details', [MembershipController::class, 'currentMembershipDetails']);
 
-    
+
 
     // Wellness 
-    Route::post('patient/wellness/search_list', [WellnessController::class,'wellnessSearchList']);
-    Route::post('patient/wellness/details', [WellnessController::class,'wellnessDetails']);
-    Route::post('patient/wellness/booking_summary', [WellnessController::class,'wellnessSummary']);
-    Route::post('patient/wellness/booking_confirmation', [WellnessController::class,'wellnessConfirmation']);
-
-}); 
+    Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
+    Route::post('patient/wellness/details', [WellnessController::class, 'wellnessDetails']);
+    Route::post('patient/wellness/booking_summary', [WellnessController::class, 'wellnessSummary']);
+    Route::post('patient/wellness/booking_confirmation', [WellnessController::class, 'wellnessConfirmation']);
+});

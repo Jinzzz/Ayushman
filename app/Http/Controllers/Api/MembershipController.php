@@ -42,20 +42,22 @@ class MembershipController extends Controller
                 foreach ($memberships as $membership) {
 
                     $benefits = Mst_Membership_Benefit::where('package_id', $membership->membership_package_id)
-                    ->where('is_active', 1)
-                    ->pluck('title')
-                    ->map(function ($benefit) {
-                        preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
-                        return $matches[1];
-                    })
-                    ->flatten() // Flatten the nested arrays
-                    ->map(function ($item) {
-                        return ['benefit' => $item];
-                    })
-                    ->values();
-                
-                // If needed, you can convert it to a simple array using toArray()
-                $benefits = $benefits->toArray();
+                        ->where('is_active', 1)
+                        ->pluck('title')
+                        ->map(function ($benefit) {
+                            preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
+                            return $matches[1];
+                        })
+                        ->flatten() // Flatten the nested arrays
+                        ->map(function ($item) {
+                            return ['benefit' => $item];
+                        })
+                        ->take(5) // Limit to a maximum of 5 items
+                        ->values();
+
+
+                    // If needed, you can convert it to a simple array using toArray()
+                    $benefits = $benefits->toArray();
                     // Verifying if the incoming package ID matches the active membership.
                     $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
 
@@ -65,7 +67,7 @@ class MembershipController extends Controller
                         'gradient_start' => $membership->gradient_start,
                         'gradient_end' => $membership->gradient_end,
                         'package_duration' => $membership->package_duration . " days",
-                        'package_price' => $membership->package_price,
+                        'package_price' => intval($membership->package_price),
                         'is_joined' => $is_joined,
                         'benefits' => $benefits,
                     ];
@@ -117,23 +119,23 @@ class MembershipController extends Controller
                         'gradient_start' => $package_details->gradient_start,
                         'gradient_end' => $package_details->gradient_end,
                         'package_duration' => $package_details->package_duration . " days",
-                        'package_price' => $package_details->package_price,
+                        'package_price' => intval($package_details->package_price),
                         'package_description' => $package_description,
                     ];
 
                     $benefits = Mst_Membership_Benefit::where('package_id', $request->membership_package_id)
-                    ->where('is_active', 1)
-                    ->pluck('title')
-                    ->map(function ($benefit) {
-                        preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
-                        return $matches[1];
-                    })
-                    ->flatten() // Flatten the nested arrays
-                    ->map(function ($item) {
-                        return ['benefit' => $item];
-                    })
-                    ->values();
-                    
+                        ->where('is_active', 1)
+                        ->pluck('title')
+                        ->map(function ($benefit) {
+                            preg_match_all('/<li>(.*?)<\/li>/', $benefit, $matches);
+                            return $matches[1];
+                        })
+                        ->flatten() // Flatten the nested arrays
+                        ->map(function ($item) {
+                            return ['benefit' => $item];
+                        })
+                        ->values();
+
                     $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
                         ->where('mst__membership__package__wellnesses.package_id', $request->membership_package_id)
                         ->where('mst__membership__package__wellnesses.is_active', 1)

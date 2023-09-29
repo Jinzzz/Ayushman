@@ -615,7 +615,25 @@ class DoctorBookingController extends Controller
                         $data['message'] = "Booking date is older than the current date.";
                         return response($data);
                     }
+
                     $patient_id = Auth::id();
+                    $accountHolder = Mst_Patient::where('id', $patient_id)->first();
+                    if (!$accountHolder) {
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist";
+                        return response($data);
+                    }
+
+                    // checking already booked or not 
+                    $booking_date_db_format = PatientHelper::dateFormatDb($request->booking_date);
+                    $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', $patient_id)->where('booking_date', $booking_date_db_format)->where('time_slot_id', $request->slot_id)->where('family_member_id', $request->family_member_id)->first();
+
+                    if ($checkAlreadyBooked) {
+                        $data['status'] = 0;
+                        $data['message'] = $accountHolder->patient_name . ", you've already booked this slot";
+                        return response($data);
+                    }
+
                     $slotDetails = Mst_TimeSlot::find($request->slot_id);
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));;
@@ -647,7 +665,7 @@ class DoctorBookingController extends Controller
                     $patientDetails = [];
 
                     if ($request->yourself == 1) {
-                        $accountHolder = Mst_Patient::where('id', $patient_id)->first();
+                        // $accountHolder = Mst_Patient::where('id', $patient_id)->first();
                         $gender_name = Mst_Master_Value::where('id', $accountHolder->patient_gender)->value('master_value');
                         $patientDetails[] = [
                             'member_id' => $patient_id,
@@ -818,12 +836,20 @@ class DoctorBookingController extends Controller
                             }
                         }
 
+                        $accountHolder = Mst_Patient::where('id', $patient_id)->first();
+                        if (!$accountHolder) {
+                            $data['status'] = 0;
+                            $data['message'] = "User does not exist";
+                            return response($data);
+                        }
+
+                        // checking already booked or not 
                         // $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', Auth::id())->where('booking_date', $newRecordData['booking_date'])->where('time_slot_id', $newRecordData['time_slot_id'])->where('family_member_id', $newRecordData['family_member_id'])->where('doctor_id', $newRecordData['doctor_id'])->first();
                         $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', Auth::id())->where('booking_date', $newRecordData['booking_date'])->where('time_slot_id', $newRecordData['time_slot_id'])->where('family_member_id', $newRecordData['family_member_id'])->first();
 
                         if ($checkAlreadyBooked) {
                             $data['status'] = 0;
-                            $data['message'] = "Already booked";
+                            $data['message'] = $accountHolder->patient_name . ", you've already booked this slot";
                             return response($data);
                         }
 
@@ -879,7 +905,7 @@ class DoctorBookingController extends Controller
                             ];
 
                             $data['status'] = 1;
-                            $data['message'] = "Booking Confirmed";
+                            $data['message'] = $accountHolder->patient_name . ", your booking has been confirmed.";
                             $data['booking_details'] = $booking_details;
                             return response($data);
                         } else {

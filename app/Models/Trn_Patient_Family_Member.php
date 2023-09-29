@@ -22,6 +22,8 @@ class Trn_Patient_Family_Member extends Model
         'date_of_birth',
         'created_by',
         'is_active',
+        'verified',
+        'mobile_number_new',
         'address',
         'mobile_number',
         'email_address',
