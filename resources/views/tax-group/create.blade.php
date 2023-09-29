@@ -35,15 +35,18 @@
                         </div>
                      </div>
                   </div>
+                  <p><span>Total Tax Rate:</span> <span id="totalTaxRate" style="color: green;">0%</span></p>
+
                   <h6><b>Include taxes*</b></h6>
                   <div class="row">
                      @foreach($taxes as $tax)
                      <div class="col-md-3">
                         <div class="form-check">
-                           <input type="checkbox" class="form-check-input" name="included_tax[]" id="included_tax{{ $tax->id }}" value="{{ $tax->id }}">
-                           <label class="form-check-label" for="included tax{{ $tax->id }}">{{ $tax->tax_name }}</label>
+                           <input type="checkbox" class="form-check-input" name="included_tax[]" id="included_tax{{ $tax->id }}" value="{{ $tax->id }}" data-tax-rate="{{ $tax->tax_rate }}">
+                           <label class="form-check-label" for="included_tax{{ $tax->id }}">{{ $tax->tax_name }} - {{ $tax->tax_rate }}%</label>
                         </div>
                      </div>
+
                      @if($loop->iteration % 4 == 0)
                   </div>
                   <div class="row">
@@ -73,6 +76,29 @@
       @endsection
       @section('js')
       <script>
+         $(document).ready(function() {
+            // Initialize the total tax rate
+            let totalTaxRate = 0;
+
+            // Add an event listener to the checkboxes
+            $('input[name="included_tax[]"]').on('change', function() {
+               // Reset the total tax rate
+               totalTaxRate = 0;
+
+               // Loop through all checked checkboxes and add their tax rates to the total
+               $('input[name="included_tax[]"]:checked').each(function() {
+                  // Extract the tax rate from the data attribute (e.g., data-tax-rate="5.00")
+                  const taxRate = parseFloat($(this).data('tax-rate'));
+
+                  // Add the tax rate to the total
+                  totalTaxRate += taxRate;
+               });
+
+               // Update the total tax rate in the <span> element
+               $('#totalTaxRate').text(totalTaxRate.toFixed(2) + '%');
+            });
+         });
+
          function toggleStatus(checkbox) {
             if (checkbox.checked) {
                $("#statusText").text('Active');

@@ -35,9 +35,12 @@
                     <thead>
                         <tr>
                             <th class="wd-15p">SL.NO</th>
-                            <th class="wd-20p">Qualification</th>
-                            <th class="wd-15p">Status</th>
-                            <th class="wd-15p">Action</th>
+                            <th class="wd-15p">Invoice Number</th>
+                            <th class="wd-15p">Date</th>
+                            <th class="wd-20p">Supplier</th>
+                            <th class="wd-15p">Branch</th>
+                            <th class="wd-15p">Settled/Not</th>
+                            <th class="wd-15p">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,16 +48,16 @@
                         $i = 0;
                         @endphp
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td>ceeq
-                            </td>
-
+                            <td>Dummy data</td>
+                            <td>Dummy data</td>
+                            <td>Dummy data</td>
+                            <td>Dummy data</td>
+                            <td>Dummy data</td>
+                            <td>Dummy data</td>
                             <td>
                                 <a class="btn btn-primary" href="">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
-
                                 <button type="button" onclick="deleteQualification()" class="btn btn-danger">
                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                 </button>

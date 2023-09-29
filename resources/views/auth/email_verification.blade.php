@@ -79,6 +79,9 @@
                                 {{ Session::get('status') }}
                             </div>
                             @endif
+                            @if(isset($response))
+                            print_r($response);
+                            @endif
                         </div>
                         <div class="row justify-content-center">
                             <div class="col-md-12">
@@ -104,10 +107,10 @@
                                             </ul>
                                         </div>
                                         @endif
-                                        <form class="login100-form" method="POST" action="{{ route('verify.email') }}">
+                                        <form class="login100-form" method="POST" action="{{ route('password.email.send') }}">
                                             @csrf
                                             <div class="wrap-input100 validate-input">
-                                                <input class="input100" type="text" name="user_email_address" required placeholder="Enter email address" value="{{ old('user_email_address') }}">
+                                                <input class="input100" type="text" name="email" required placeholder="Enter email address" value="{{ old('user_email_address') }}">
                                                 <span class="focus-input100"></span>
                                                 <span class="symbol-input100">
                                                     <i class="zmdi zmdi-email" aria-hidden="true"></i>

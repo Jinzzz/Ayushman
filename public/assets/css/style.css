@@ -25360,7 +25360,7 @@ textarea.form-control {
 .login-img {
 	background: #f1f3f4;
 	/* background: url(../images/login-bg.jpg) no-repeat; */
-	background: url(../images/loginbg.png) no-repeat;
+	background: url(../images/loginbg.jpg) no-repeat;
 	background-size: cover;
 	background-position: center;
 }
@@ -25557,6 +25557,7 @@ aside.app-sidebar {
 .side-menu {
 	margin-bottom: 0;
 	padding: 0 15px 10px 15px !important;
+	padding-bottom: 0 !important;
 }
 
 img.zero-op {
@@ -25571,6 +25572,7 @@ img.zero-op {
 ul.side-menu li {
 	display: block;
 	margin: 10px 0 !important;
+	margin-bottom: 0!important;
 }
 
 .side-menu__item,
@@ -25581,6 +25583,7 @@ ul.side-menu li {
 
 .side-menu .side-menu__icon {
 	color: #efefef !important;
+	color: #68798b !important;
 }
 
 .side-menu__item.active,
@@ -26261,5 +26264,18 @@ color: #fff!important;
 .status-custom{
 	font-size: 0.65rem !important;
     margin-right: 0;
+}
+.slide.is-expanded .slide-menu{
+	max-height: none !important;
+}
+
+.side-header{
+	justify-content: center;
+}
+
+.app-sidebar__toggle{
+	position: absolute;
+    right: 22px;
+    top: 42px;
 }
 /* End */

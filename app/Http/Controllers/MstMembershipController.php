@@ -32,7 +32,7 @@ class MstMembershipController extends Controller
 
     public function store(Request $request)
     {
-
+        print_r($request->all());die();
         $validator = Validator::make(
             $request->all(),
             [
@@ -174,8 +174,9 @@ class MstMembershipController extends Controller
                     }
                     return redirect()->route('membership.edit', ['id' => $id, 'active_tab' => 2])->with($status, $message);
                 } else {
+
                     $checkExists = Mst_Membership_Benefit::where('package_id', $id)->first();
-                    if(!empty($checkExists)){
+                    if($checkExists && !empty($checkExists->title)){
                         $html1 = $checkExists->title;
 
                         $html2 = $request->benefit_title;
@@ -195,7 +196,7 @@ class MstMembershipController extends Controller
                             $mergedHtml .= "<li>$item</li>";
                         }
                         $mergedHtml .= '</ul>';
-    
+
                         if ($mergedHtml) {
                             $updateMembershipBenefits = Mst_Membership_Benefit::where('package_id', $id)->update([
                                 'title' => $mergedHtml,
@@ -247,40 +248,43 @@ class MstMembershipController extends Controller
             if ($checkExists->isEmpty()) {
                 // No matching records found, safe to delete
                 $membership = Mst_Membership_Package::where('membership_package_id', $id)->delete();
-                return redirect()->route('membership.index')->with('success', 'Deleted successfully');
+                return 1;
+                // return redirect()->route('membership.index')->with('success', 'Deleted successfully');
             } else {
-                return redirect()->route('membership.index')->with('error', 'Cannot delete this item because it is already in use by some users.');
+                return 2;
+                // return redirect()->route('membership.index')->with('error', 'Cannot delete this item because it is already in use by some users.');
             }
         }
-        return redirect()->route('membership.index')->with('success', 'Something went wrong');
+        return 3;
+        // return redirect()->route('membership.index')->with('success', 'Something went wrong');
     }
 
     public function deleteWellness($id)
     {
         $data = Mst_Membership_Package_Wellness::where('package_wellness_id', $id)->first();
-
         if ($data) {
             $checkExists = Mst_Patient_Membership_Booking::where('membership_package_id', $data->package_id)
                 ->where('membership_expiry_date', '>=', Carbon::now())
                 ->where('created_at', '>=', $data->created_at)
                 ->get();
-
             if ($checkExists->isEmpty()) {
                 // No matching records found, safe to delete
                 $membership = Mst_Membership_Package_Wellness::where('package_wellness_id', $id)->delete();
-                return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 2])->with('success', 'Deleted successfully');
+                    return 1;
+                // return redirect()->route('membership.edit')->with('success', 'Deleted successfully');
             } else {
-                return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 2])->with('error', 'Cannot delete this item because it is already in use by some users.');
+                return 2;
+                // return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 2])->with('error', 'Cannot delete this item because it is already in use by some users.');
             }
         }
-        return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 2])->with('success', 'Something went wrong');
+        return 3;
+        // return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 2])->with('success', 'Something went wrong');
     }
 
     public function deleteBenefit($id)
     {
 
         $data = Mst_Membership_Benefit::where('membership_benefits_id', $id)->first();
-
         if ($data) {
             $checkExists = Mst_Patient_Membership_Booking::where('membership_package_id', $data->package_id)
                 ->where('membership_expiry_date', '>=', Carbon::now())
@@ -290,12 +294,15 @@ class MstMembershipController extends Controller
             if ($checkExists->isEmpty()) {
                 // No matching records found, safe to delete
                 $membership = Mst_Membership_Benefit::where('membership_benefits_id', $id)->delete();
-                return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('success', 'Deleted successfully');
+                return 1;
+                // return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('success', 'Deleted successfully');
             } else {
-                return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('error', 'Cannot delete this item because it is already in use by some users.');
+                return 2;
+                // return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('error', 'Cannot delete this item because it is already in use by some users.');
             }
         }
-        return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('success', 'Something went wrong');
+        return 3;
+        // return redirect()->route('membership.edit', ['id' => $data->package_id, 'active_tab' => 3])->with('success', 'Something went wrong');
     }
 
 

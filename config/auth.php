@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => 'mst_users_guard',
-        'passwords' => 'users',
+        'passwords' => 'mst_users',
     ],
 
     /*
@@ -93,8 +93,8 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+        'mst_users' => [
+            'provider' => 'mst_users',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

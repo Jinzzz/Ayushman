@@ -45,6 +45,7 @@ class MstAuthController extends Controller
         return view('auth.email_verification');
     }
 
+    
     public function verifyEmail(Request $request)
     {
         try {

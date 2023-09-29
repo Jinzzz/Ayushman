@@ -32,6 +32,8 @@ use App\Http\Controllers\AccountSubGroupController;
 use App\Http\Controllers\AccountLedgerController;
 use App\Http\Controllers\EmployeeBranchTransferController;
 use App\Http\Controllers\MedicinePurchaseController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,12 @@ Auth::routes();
 
 Route::get('/home', [DashboardController::class, 'index'])->name('home');
 //Manage-Branches:
+// test 
+Route::get('forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('password.email.send');
+Route::get('reset-password/{token}/{email}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
+// test ends 
 
 Route::middleware('web')->group(function () {
     Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
@@ -226,7 +234,7 @@ Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_log
 Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
 Route::match(['get', 'post'],'/logout', [MstAuthController::class, 'logout'])->name('logout');
 Route::get('/verification-request', [MstAuthController::class, 'verificationRequest'])->name('verification.request');
-Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
+// Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
 Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->name('reset.password');
 
 //Manage-Specialization:

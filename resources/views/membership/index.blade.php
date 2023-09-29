@@ -13,6 +13,8 @@
             <p>{{$message}}</p>
         </div>
         @endif
+        <p id="error-message" class="alert alert-danger" style="display: none;"></p>
+
         <div class="card-header">
             <h3 class="card-title">{{$pageTitle}}</h3>
         </div>
@@ -40,7 +42,7 @@
                         $i = 0;
                         @endphp
                         @foreach($memberships as $membership)
-                        <tr>
+                        <tr id="dataRow_{{ $membership->membership_package_id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $membership->package_title }}</td>
                             <td>{{ $membership->package_duration }} days</td>
@@ -69,11 +71,9 @@
                                 <a class="btn btn-secondary" href="{{ route('membership.edit', ['id' => $membership->membership_package_id, 'active_tab' => 1]) }}">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
-                                <form style="display: inline-block" action="{{ route('membership.destroy', $membership->membership_package_id) }}" method="post">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                </form>
+                                <button type="button" onclick="deleteData({{ $membership->membership_package_id }})" class="btn btn-danger">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -88,4 +88,59 @@
 </div>
 </div>
 <!-- ROW-1 CLOSED -->
+@endsection
+@section('js')
+<script type="text/javascript">
+    // deleteData
+    function deleteData(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('membership.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                i = 0;
+                                $("#example tbody tr").each(function() {
+                                    i++;
+                                    $(this).find("td:first").text(i);
+                                });
+                                $active_tab = 2;
+                                $('#basic-details-button').removeClass('active');
+                                $('#included-wellnesses-button').addClass('active');
+
+                            } else if (response == '2') {
+                                $('#error-message').text('Cannot delete this item because it is already in use by some users.').toggle(true);
+                            } else if (response == '3') {
+                                $('#error-message').text('Something went wrong').toggle(true);
+                            } else {
+                                $('#error-message').text('An error occured! Please try again later.').toggle(true);
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+</script>
 @endsection

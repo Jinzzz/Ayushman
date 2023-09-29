@@ -26,6 +26,7 @@
                     </ul>
                 </div>
                 @endif
+                <p id="error-message" class="alert alert-danger" style="display: none;"></p>
                 <input type="hidden" id="active_tab" value="{{$active_tab}}">
                 <div class="card-header">
                     <h3 class="mb-0 card-title">Edit Membership Packages</h3>
@@ -73,7 +74,7 @@
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Discount Price*</label>
+                                                <label class="form-label">Offer Price*</label>
                                                 <input type="number" class="form-control" required name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Discount Price">
                                             </div>
                                         </div>
@@ -143,20 +144,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- <div class="col-md-1">
-                                            <div class="form-group">
-                                                <label class="form-label">Status</label>
-                                                <label class="custom-switch d-flex flex-column align-items-center">
-                                                    <input type="hidden" name="membership_wellness_active" value="1"> -->
-                                                    <!-- Hidden field for false value -->
-                                                    <!-- <input type="checkbox" id="membership_wellness_active" value="1" name="membership_wellness_active" onchange="toggleWellnessStatus(this)" class="custom-switch-input" checked>
-                                                    <span id="statusLabel" class="custom-switch-indicator"></span>
-                                                    <span id="statusText" class="custom-switch-description mt-1">Active</span>
-                                                </label>
-                                            </div>
-                                        </div> -->
-
-
                                         <div class="col-md-3 text-center"> <!-- Added "text-center" class -->
                                             <div class="form-group">
                                                 <label class="form-label">Actions</label>
@@ -174,7 +161,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered text-nowrap w-100">
+                                    <table id="exampleWellness" class="table table-striped table-bordered text-nowrap w-100">
                                         <thead>
                                             <tr>
                                                 <th class="wd-15p">SL.NO</th>
@@ -189,7 +176,7 @@
                                             $i = 0;
                                             @endphp
                                             @foreach($included_wellness as $wellness)
-                                            <tr>
+                                            <tr id="dataRow_{{ $wellness->package_wellness_id }}">
                                                 <td>{{ ++$i }}</td>
                                                 <td>{{ $wellness->wellness_name }}</td>
                                                 <td>{{ $wellness->maximum_usage_limit }} times</td>
@@ -200,11 +187,9 @@
                                                         @endif </span>
                                                 </td>
                                                 <td>
-                                                    <form style="display: inline-block" action="{{ route('membership.destroy.wellness',$wellness->package_wellness_id) }}" method="post">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                                    </form>
+                                                    <button type="button" onclick="deleteWellness({{ $wellness->package_wellness_id }})" class="btn btn-danger">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                    </button>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -224,34 +209,12 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-11">
-                                        <label class="form-label">Include other benefits</label>
+                                            <label class="form-label">Include other benefits</label>
                                             <!-- <h6 class="mb-0 card-title" style="margin-left:15px;">Include other benefits</h6><br> -->
                                             <div class="form-group">
                                                 <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefit_title" placeholder="Include other benefits">{{ old('package_description') }}</textarea>
                                             </div>
                                         </div>
-
-                                        <!-- <div class="col-md-8">
-                                            <div class="form-group">
-                                                <label class="form-label">Add benefit*</label>
-                                                <input type="text" class="form-control" required name="benefit_title" placeholder="Include other benefits">
-                                            </div>
-                                        </div> -->
-
-
-                                        <!-- <div class="col-md-1">
-                                            <div class="form-group">
-                                                <label class="form-label">Status</label>
-                                                <label class="custom-switch d-flex flex-column align-items-center">
-                                                    <input type="hidden" name="membership_benefit_active" value="1"> -->
-                                        <!-- Hidden field for false value -->
-                                        <!-- <input type="checkbox" id="membership_benefit_active" value="1" name="membership_benefit_active" onchange="toggleBenefitStatus(this)" class="custom-switch-input" checked>
-                                                    <span id="statusLabel" class="custom-switch-indicator"></span>
-                                                    <span id="statusText" class="custom-switch-description mt-1">Active</span>
-                                                </label>
-                                            </div>
-                                        </div> -->
-
 
                                         <div class="col-md-1 text-center"> <!-- Added "text-center" class -->
                                             <div class="form-group">
@@ -283,7 +246,7 @@
                                             $i = 0;
                                             @endphp
                                             @foreach($included_benefits as $benefit)
-                                            <tr>
+                                            <tr id="dataRow_{{ $benefit->membership_benefits_id }}">
                                                 <td>{{ ++$i }}</td>
                                                 <td>{!! $benefit->title !!}</td>
                                                 <td>
@@ -293,11 +256,9 @@
                                                 </td>
 
                                                 <td>
-                                                    <form style="display: inline-block" action="{{ route('membership.destroy.benefit',$benefit->membership_benefits_id) }}" method="post">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                                                    </form>
+                                                    <button type="button" onclick="deleteBenefit({{ $benefit->membership_benefits_id }})" class="btn btn-danger">
+                                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                                    </button>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -433,6 +394,110 @@
             $("#statusText").text('Inactive');
             $('[name="membership_benefit_active"]').val(0);
         }
+    }
+    // deleteWellness 
+    function deleteWellness(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('membership.destroy.wellness', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                i = 0;
+                                $("#exampleWellness tbody tr").each(function() {
+                                    i++;
+                                    $(this).find("td:first").text(i);
+                                });
+                                $active_tab = 2;
+                                $('#basic-details-button').removeClass('active');
+                                $('#included-wellnesses-button').addClass('active');
+
+                            } else if (response == '2') {
+                                $('#error-message').text('Cannot delete this item because it is already in use by some users.').toggle(true);
+                            } else if (response == '3') {
+                                $('#error-message').text('Something went wrong').toggle(true);
+                            } else {
+                                $('#error-message').text('An error occured! Please try again later.').toggle(true);
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
+    }
+
+    // deleteBenefit 
+    function deleteBenefit(dataId) {
+        swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('membership.destroy.benefit', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            // Handle the success response, e.g., remove the row from the table
+                            if (response == '1') {
+                                $("#dataRow_" + dataId).remove();
+                                i = 0;
+                                $("#example tbody tr").each(function() {
+                                    i++;
+                                    $(this).find("td:first").text(i);
+                                });
+                                $active_tab = 3;
+                                $('#basic-details-button').removeClass('active');
+                                $('#included-wellnesses-button').removeClass('active');
+                                $('#included-benefits-button').addClass('active');
+
+                            } else if (response == '2') {
+                                $('#error-message').text('Cannot delete this item because it is already in use by some users.').toggle(true);
+                            } else if (response == '3') {
+                                $('#error-message').text('Something went wrong').toggle(true);
+                            } else {
+                                $('#error-message').text('An error occured! Please try again later.').toggle(true);
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the qualification.');
+                        },
+                    });
+                } else {
+                    return;
+                }
+            });
     }
 </script>
 @endsection
