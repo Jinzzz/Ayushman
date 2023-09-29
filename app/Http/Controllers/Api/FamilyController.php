@@ -317,7 +317,7 @@ class FamilyController extends Controller
                     $data['otp'] = $verification_otp;
                     $data['mobile_number'] = $mobile_number;
                     $data['patient_id'] = $patient_id;
-                    $data['family_member_id'] = intval($request->family_member_id);
+                    $data['family_member_id'] = $request->family_member_id;
                     $data['message'] = "OTP resent successfully.";
                     return response($data);
                 }
@@ -514,7 +514,7 @@ class FamilyController extends Controller
                             'otp' => $verificationOtp,
                             'mobile_number' => $request->member_mobile,
                             'patient_id' => $patient_id,
-                            'family_member_id' => intval($request->family_member_id),
+                            'family_member_id' => $request->family_member_id,
                             'message' => "Please enter the OTP that was sent to the mobile number.",
                         ];
                     } else {
