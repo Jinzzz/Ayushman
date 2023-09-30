@@ -84,14 +84,12 @@ class MstMedicineController extends Controller
          $medicines->medicine_type = $request->input('medicine_type');
          $medicines->Hsn_code = $request->input('Hsn_code');
          $medicines->tax_id = $request->input('tax_id');
-         //$medicines->dosage_form = $request->input('dosage_form');
          $medicines->manufacturer = $request->input('manufacturer');
          $medicines->unit_price = $request->input('unit_price');
          $medicines->description = $request->input('description');
          $medicines->unit_id = $request->input('unit_id');
          $medicines->is_active =  $is_active ;
          $medicines->reorder_limit = $request->input('reorder_limit');
-       //  $medicines->branch_id = $request->input('branch_id');
          $medicines->created_by = auth()->id();
          $medicines->save();
        
@@ -166,6 +164,7 @@ class MstMedicineController extends Controller
     {
         $medicine = Mst_Medicine::findOrFail($id);
         $medicine->delete();
+        return 1;
 
         return redirect()->route('medicine.index')->with('success','Medicine deleted successfully');
     }
@@ -176,7 +175,7 @@ class MstMedicineController extends Controller
     
         $medicine->is_active = !$medicine->is_active;
         $medicine->save();
-    
+        return 1;
         return redirect()->back()->with('success','Status changed successfully');
     }
 

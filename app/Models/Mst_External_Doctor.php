@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_External_Doctor extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_external_doctors';
 
     protected $fillable=[
@@ -17,6 +18,7 @@ class Mst_External_Doctor extends Model
         'address',
         'commission',
         'remarks',
+        'deleted_at',
     ];
 
 

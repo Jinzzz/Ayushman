@@ -62,7 +62,7 @@
                             <div class="col-md-6">
                             <div class="form-group">
                                     <label class="form-label">Room Name*</label>
-                                    <input type="text" class="form-control" required name="room_name" value="{{old('room_name')}}" placeholder="Room Name">
+                                    <input type="text" class="form-control" required name="room_name" maxlength="50" value="{{old('room_name')}}" placeholder="Room Name">
                                 </div>
                                 <!-- <div class="form-group">
                                     <label class="form-label">Room Type*</label>

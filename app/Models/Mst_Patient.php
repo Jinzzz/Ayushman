@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Patient extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_patients';
 
     protected $fillable = [
@@ -29,6 +30,7 @@ class Mst_Patient extends Model
         'password',
         'whatsapp_number',
         'is_active',
+        'deleted_at',
 
     ];
 

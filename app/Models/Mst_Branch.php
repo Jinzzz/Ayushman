@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Branch extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table ='mst_branches';
 
 
@@ -24,6 +25,7 @@ class Mst_Branch extends Model
         'latitude',
         'longitude',
         'created_by',
+        'deleted_at',
     ];
 
     protected $attributes = [

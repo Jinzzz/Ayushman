@@ -50,19 +50,34 @@
                   <input type="text" class="form-control" readonly name="remarks" value="{{$show->remarks}}" placeholder="Remarks">
                </div>
             </div>
-            <div class="col-md-6">
+            {{-- <div class="col-md-6">
                <div class="form-group">
                   <label for="branch_id" class="form-label">Branch*</label>
-                  <select class="form-control" readonly name="branch" id="branch_id">
-                     <option value="">Choose Branch</option>
+                  <select  class="multi-select"  readonly name="branch[]" multiple style="width: 100%;" id="branch_id">
+                     
                      @foreach($show as $id => $branchName)
-                     <option value="{{ $id }}"{{ $id == $show->branch_id ? ' selected' : '' }}>
-                     {{ $branchName }}
-                     </option>
+                     <option value="{{ $id }}" {{ in_array($id, $show->branches->pluck('branch_id')->toArray()) ? 'selected' : '' }}>
+                        {{ $branchName }}
+                    </option>
                      @endforeach
                   </select>
                </div>
-            </div>
+            </div> --}}
+
+            <div class="col-md-6">
+               <div class="form-group checkbox">
+                   <label for="branch_id" class="form-label">Branch*</label>
+                   <select class="multi-select" disabled="branch[]" multiple style="width: 100%;">
+                       @foreach($branch as $id => $branchName)
+                           <option value="{{ $id }}" {{ in_array($id, $show->branches->pluck('branch_id')->toArray()) ? 'selected' : '' }}>
+                               {{ $branchName }}
+                           </option>
+                       @endforeach
+                   </select>
+               </div>
+           </div>
+           
+           
             <div class="col-md-6">
                <div class="form-group">
                   <label class="form-label">Wellness Inclusions*</label>

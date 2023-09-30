@@ -187,7 +187,7 @@
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(6)');
 
                                 if (cell.find('.btn-success').length) {
                                     cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');

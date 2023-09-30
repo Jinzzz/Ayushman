@@ -36,13 +36,13 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Item Type</label>
-                   <input type="text" class="form-control" readonly name="item_type" value="{{ $show->item_type}}" placeholder="Item Type">
+                   <input type="text" class="form-control" readonly name="item_type" value="{{ $show->itemType->master_value}}" placeholder="Item Type">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Medicine Type</label>
-                      <input type="text" class="form-control" readonly name="medicine_type" value="{{ $show->medicine_type}}" placeholder="Medicine Type">
+                      <input type="text" class="form-control" readonly name="medicine_type" value="{{ $show->medicineType->master_value}}" placeholder="Medicine Type">
                   </div>
                </div>
                <div class="col-md-6">
@@ -54,13 +54,13 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label for="tax_id">Tax</label>
-                      <input type="text" class="form-control" readonly name="tax_id" value="{{$show->tax_id }}" placeholder=" Tax">
+                      <input type="text" class="form-control" readonly name="tax_id" value="{{$show->tax->tax_name }}" placeholder=" Tax">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Manufacturer</label>
-                  <input type="text" class="form-control" readonly name="Manufacturer" value="{{$show->manufacturer}}" placeholder=" Manufacturer">
+                  <input type="text" class="form-control" readonly name="Manufacturer" value="{{$show->Manufacturer->master_value}}" placeholder=" Manufacturer">
                   </div>
                </div>
                <div class="col-md-6">
@@ -78,7 +78,7 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label for="tax_id">Unit</label>
-                      <input type="text" class="form-control" readonly name="unit_id" value="{{$show->unit_id }}" placeholder=" Tax">
+                      <input type="text" class="form-control" readonly name="unit_id" value="{{$show->unit->unit_name }}" placeholder=" Tax">
                   </div>
                </div>
                <div class="col-md-6">

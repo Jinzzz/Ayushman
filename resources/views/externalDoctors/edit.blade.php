@@ -33,7 +33,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Doctor Name</label>
-                                    <input type="text" class="form-control" required name="doctor_name" value="{{ $doctor->doctor_name }}" placeholder="Doctor Name">
+                                    <input type="text" class="form-control" required name="doctor_name" maxlength="100" value="{{ $doctor->doctor_name }}" placeholder="Doctor Name">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -48,7 +48,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Email</label>
-                                     <input type="email" class="form-control"  name="contact_email" id="contact_email" value="{{ $doctor->contact_email }}" placeholder="Email">
+                                     <input type="email" class="form-control"  name="contact_email" maxlength="100" id="contact_email" value="{{ $doctor->contact_email }}" placeholder="Email">
                                       <div class="text-danger" id="email-error"></div>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Commission(%)</label>
-                                    <input type="number" class="form-control"  required name ="commission" value="{{ $doctor->commission }}" placeholder="Commission">
+                                    <input type="text" class="form-control"  required name ="commission" value="{{ $doctor->commission }}" placeholder="Commission" maxlength="3" oninput="validateCommission(this);">
                                 </div>
                             </div>
                         
@@ -154,6 +154,21 @@
         } else {
             input.setCustomValidity("");
             input.parentNode.querySelector('.error-message').style.display = 'none';
+        }
+    }
+
+    function validateCommission(input) {
+        // Remove any non-numeric characters from the input
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        // Ensure the value is within the min and max limits
+        var numericValue = parseInt(input.value, 10);
+        if (isNaN(numericValue)) {
+            input.value = ''; // Clear the input if it's not a valid number
+        } else if (numericValue < 0) {
+            input.value = '0'; // Set to the minimum value (0) if it's below 0
+        } else if (numericValue > 100) {
+            input.value = '100'; // Set to the maximum value (100) if it's above 100
         }
     }
 </script>

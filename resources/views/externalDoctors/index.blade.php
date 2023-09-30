@@ -8,7 +8,7 @@
    @endif
    @if ($message = Session::get('error'))
    <div class="alert alert-danger">
-      <p></p>
+      <p>{{$message}}</p>
    </div>
    @endif
    <div class="card-header">
@@ -42,19 +42,13 @@
                   <td>{{ $doctor->contact_no }}</td>
                   <td>{{ $doctor->contact_email }}</td>
                   <td>
-                     <form action="{{ route('externaldoctors.changeStatus', $doctor->id) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit"
-                           onclick="return confirm('Do you want to change status?');"
-                           class="btn btn-sm @if($doctor->is_active == 0) btn-danger @else btn-success @endif">
+                     <button type="button" onclick="changeStatus({{$doctor->id }})" class="btn btn-sm @if($doctor->is_active == 0) btn-danger @else btn-success @endif">
                         @if($doctor->is_active == 0)
                         InActive
                         @else
                         Active
                         @endif
-                        </button>
-                     </form>
+                    </button>
                   </td>
                   <td>
                      <a class="btn btn-primary btn-sm edit-custom"
@@ -123,4 +117,48 @@
                }
            });
    }
+   
+      // Change status 
+      function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('externaldoctors.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the branch status.');
+                        },
+                    });
+                }
+            });
+    }
    </script>

@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Supplier extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_suppliers';
     protected $primaryKey = 'supplier_id';
 
@@ -36,5 +37,6 @@ class Mst_Supplier extends Model
        'account_ledger_id',
        'terms_and_conditions',
        'opening_balance_date',
+       'deleted_at',
     ];
 }

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <div class="container">
     <div class="row" style="min-height: 70vh;">
         <div class="col-md-12">
@@ -28,7 +28,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Wellness Name*</label>
                                     <input type="text" class="form-control" required name="wellness_name"
-                                        value="{{ old('wellness_name') }}" placeholder="Wellness Name">
+                                        value="{{ old('wellness_name') }}" placeholder="Wellness Name" maxlength="100">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -43,14 +43,14 @@
                                 <div class="form-group">
                                     <label class="form-label">Wellness Cost*</label>
                                     <input type="text" class="form-control" required name="wellness_cost"
-                                        value="{{ old('wellness_cost') }}" placeholder="Wellness Cost">
+                                        value="{{ old('wellness_cost') }}" placeholder="Wellness Cost" oninput="validateDecimalInput(this)">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Wellness Duration*</label>
                                     <input type="text" class="form-control" name="wellness_duration" required
-                                        value="{{ old('wellness_duration') }}" placeholder="Wellness Duration">
+                                        value="{{ old('wellness_duration') }}" placeholder="Wellness Duration" maxlength="10">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -61,9 +61,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="">
+                                <div class="form-group checkbox">
                                     <label for="branch_id" class="form-label">Branch*</label>
-                                    <select class="form-control select2" multiple name="branch[]" style="width: 100%;">
+                                    <select class="multi-select"  name="branch[]" multiple style="width: 100%;">
+                                      
                                         @foreach($branch as $id => $branchName)
                                             <option value="{{ $id }}">{{ $branchName }}</option>
                                         @endforeach
@@ -117,9 +118,12 @@
 </div>
 @endsection
 
+
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
         CKEDITOR.replace('wellnessInclusion', {
@@ -144,17 +148,26 @@
             $("input[name=is_active]").val(0);
         }
 
-        $(document).ready(function() {
-        $('select').selectpicker();
-    });
     }
 });
  //js for dropdown:
-    $(document).ready(function() {
-        $('.select2').select2();
-    });
+ $(document).ready(function() {
+    //alert(1);
+   
+    $('.select2').select2();
+});
 
     
+</script>
+<script>
+    function validateDecimalInput(input) {
+        var numericValue = input.value.replace(/[^0-9.]/g, '').slice(0, 13);
+        input.value = numericValue;
+
+        var isValid = /^\d{1,10}(\.\d{1,2})?$/.test(numericValue);
+        input.setCustomValidity(isValid ? '' : 'Please enter a valid decimal number (up to 10 digits before the decimal point and up to 2 digits after).');
+        input.parentNode.querySelector('.error-message').style.display = isValid ? 'none' : 'block';
+    }
 </script>
 
 

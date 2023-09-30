@@ -3,16 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Medicine extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_medicines';
 
 
     protected $fillable = [
-        'medicine_name'
+        'medicine_name',
+        'generic_name',
+        'item_type',
+        'medicine_type',
+        'Hsn_code',
+        'tax_id',
+        'manufacturer',
+        'unit_price',
+        'description',
+        'unit_id',
+        'is_active',
+        'reorder_limit',
+        'created_by',
+        'deleted_at',
     ];
 
     

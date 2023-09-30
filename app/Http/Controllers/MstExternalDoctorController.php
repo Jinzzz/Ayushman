@@ -137,6 +137,7 @@ class MstExternalDoctorController extends Controller
 
         $doctor->is_active = !$doctor->is_active;
         $doctor->save();
+        return 1;
     
         return redirect()->back()->with('success','Status changed successfully');
     }catch (QueryException $e) {

@@ -25,14 +25,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Name*</label>
-                                    <input type="text" class="form-control" required name="patient_name"
+                                    <input type="text" class="form-control" required name="patient_name" maxlength="100"
                                         value="{{ old('patient_name') }}" placeholder="Patient Name">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Email</label>
-                                    <input type="email" class="form-control" value="{{ old('patient_email') }}"
+                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200"
                                         name="patient_email" placeholder="Patient Email">
                                 </div>
                             </div>
@@ -41,14 +41,15 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Mobile*</label>
-                                    <input type="text" class="form-control" required name="patient_mobile"
+                                    <input type="text" class="form-control" required name="patient_mobile"  maxlength="10" oninput="validateInput(this)"
                                         value="{{ old('patient_mobile') }}" placeholder="Patient Mobile">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Address</label>
-                                    <textarea class="form-control" name="patient_address"
+                                    <textarea class="form-control" name="patient_address" 
                                         placeholder="Patient Address">{{ old('patient_address') }}</textarea>
                                 </div>
                             </div>
@@ -89,7 +90,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Emergency Contact Person</label>
-                                    <input type="text" class="form-control" name="emergency_contact_person"
+                                    <input type="text" class="form-control" name="emergency_contact_person" maxlength="100"
                                         placeholder="Emergency Contact Person">
                                 </div>
                             </div>
@@ -98,8 +99,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Emergency Contact</label>
-                                    <input type="text" class="form-control" name="emergency_contact"
+                                    <input type="text" class="form-control" name="emergency_contact"  maxlength="10" oninput="validateInput(this)"
                                         placeholder="Emergency Contact">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -129,8 +131,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Whatsapp Number</label>
-                                    <input type="text" class="form-control" value="{{ old('whatsapp_number') }}"
+                                    <input type="text" class="form-control" value="{{ old('whatsapp_number') }}"  maxlength="10" oninput="validateInput(this)"
                                         name="whatsapp_number" placeholder="Whatsapp Number">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                         </div>
@@ -214,4 +217,31 @@
         }
     });
 </script>
+<script>
+    function validateInput(input) {
+        var inputValue = input.value;
+
+        // Remove any non-numeric characters from the input
+        var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+        // Ensure the input does not exceed 10 characters
+        if (numericValue.length > 10) {
+            // Truncate the input to the first 10 digits
+            numericValue = numericValue.slice(0, 10);
+        }
+
+        // Update the input value with the numeric value
+        input.value = numericValue;
+
+        // Check if the resulting value has exactly 10 digits
+        if (numericValue.length !== 10) {
+            input.setCustomValidity("Please enter exactly 10-digit numbers.");
+            input.parentNode.querySelector('.error-message').style.display = 'block';
+        } else {
+            input.setCustomValidity("");
+            input.parentNode.querySelector('.error-message').style.display = 'none';
+        }
+    }
+</script>
+
 

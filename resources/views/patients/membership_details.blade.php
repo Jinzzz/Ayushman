@@ -50,11 +50,13 @@
                               <a href="{{ URL::previous() }}" class="btn btn-secondary">Back</a>
                            </div>
                         </div>
-                        <div class="card-body">
-                           <div class="col-md-12">
+                        
+                     <div class="card-body">
+                        <div class="row">
+                           <div class="col-md-6">
                               <div class="form-group">
                                  <label for="branch_id" class="form-label">Membership</label>
-                                 <select id="membership"  class="form-control" name="membership" onchange="loadWellness()">
+                                 <select id="membership"  class="form-control" name="membership" >
                                     <option value="">Choose Membership</option>
                                     @foreach($memberships as $membershipId => $packageTitle)
                                     <option value="{{ $membershipId }}">
@@ -64,6 +66,12 @@
                                  </select>
                               </div>
                            </div>
+                           <div class="col-md-6">
+                              <button type="button" class="btn btn-primary" id="viewDetails" onclick="loadWellness()">View Details</button>
+                              <div id="wellness-details" class="row"></div>
+                              <div id="packageDetails"></div>
+                           </div>
+                        </div>
                            <div class="row">
                               <div class="col-md-6">
                                  <div class="form-group">
@@ -71,18 +79,9 @@
                                     <input type="date" class="form-control" required name="start_date" placeholder="Start Date">
                                  </div>
                               </div>
-                              <div class="col-md-6">
-                                 <div class="form-group">
-                                    <label for="payment-type" class="form-label">Payment Type</label>
-                                    <select class="form-control" required name="payment_type" placeholder="Payment Type">
-                                       <option value="">Choose Payment Type</option>
-                                       <option value="1">Cash</option>
-                                       <option value="2">Liquid</option>
-                                    </select>
-                                 </div>
-                              </div>
+                             
                            </div>
-                           <div id="packageDetails">
+                           <div id="packageDetails1">
                               {{-- 
                               <h2 class="package-title"></h2>
                               <ul class="package-info">
@@ -98,12 +97,28 @@
                               </ul>
                               <p class="package-description"></p>
                            </div>
+                     <div class="row">
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label for="payment-type" class="form-label">Payment Type</label>
+                              <select class="form-control" required name="payment_type" placeholder="Payment Type">
+                                 <option value="">Choose Payment Type</option>
+                                 <option value="1">Cash</option>
+                                 <option value="2">Liquid</option>
+                              </select>
+                           </div>
                         </div>
                      </div>
                   </div>
+               </div>
+               <div class="row">
+               <div class="col-md-3">
                   <button type="submit" class="btn btn-raised btn-primary">
                   <i class="fa fa-check-square-o"></i> Add Membership
                   </button>
+               </div>
+               
+               </div>
                </div>
             </div>
             <div class="border-top">
@@ -111,8 +126,8 @@
                   <div class="tab-menu-heading">
                      <div class="tabs-menu1">
                         <ul class="nav">
-                           <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Included wellnesses</a></li>
-                           <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li>
+                           <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Membership History</a></li>
+                           {{-- <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li> --}}
                         </ul>
                      </div>
                   </div>
@@ -126,10 +141,11 @@
                      <div class="tab-pane active show" id="tab-51">
                         <div id="profile-log-switch">
                            <div class="media-heading">
-                              <h5><strong>Included wellnesses and their details</strong></h5>
+                              <h5><strong>Patient Membership History</strong></h5>
                            </div>
                            <div class="container">
-                              <div id="wellness-details" class="row">
+                              <strong>Duration:</strong> wafs<br>
+                              {{-- <div id="wellness-details1" class="row"> --}}
                                  {{-- @foreach($wellnessDetails as $wellness)
                                  <div class="col-lg-6 mb-3">
                                     <div class="card">
@@ -153,7 +169,7 @@
                         <div id="profile-log-switch">
                            <div class="media-heading">
                               <div class="container">
-                                 <div class="row" >
+                                 <div class="row">
                                     <div class="col-lg-6 mb-3" id="benefitDiv">
                                        {{-- {!! $benefits->title !!} --}}
                                     </div>
@@ -261,10 +277,11 @@
    }
    
    // Attach an event listener to the #membership dropdown
-   $("#membership").change(function() {
-       // Call the loadWellness function when the dropdown value changes
-       loadWellness();
-   });
+   // $("#viewDetails").click(function() {
+   //     // Call the loadWellness function when the dropdown value changes
+   //     alert("tes");
+   //     loadWellness();
+   // });
    
    // Trigger the loadWellness function on page load (if needed)
    $(document).ready(function() {

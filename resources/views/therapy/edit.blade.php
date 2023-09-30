@@ -26,7 +26,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Therapy Name*</label>
-                           <input type="text" class="form-control" required name="therapy_name" value="{{$therapy->therapy_name}}" placeholder="Therapy Name">
+                           <input type="text" class="form-control" required name="therapy_name" maxlength="100" value="{{$therapy->therapy_name}}" placeholder="Therapy Name">
                         </div>
                      </div>
 
@@ -34,7 +34,8 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Therapy Cost</label>
-                           <input type="text" class="form-control" required name="therapy_cost" value="{{$therapy->therapy_cost}}" placeholder="Therapy Cost">
+                           <input type="text" class="form-control" required name="therapy_cost" maxlength="14" value="{{$therapy->therapy_cost}}" placeholder="Therapy Cost"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');"d>
                         </div>
                      </div>
 
@@ -42,7 +43,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Remarks</label>
-                           <input type="textfield" class="form-control" required name="remarks" value="{{$therapy->remarks}}" placeholder="Remarks">
+                           <textarea class="form-control" required name="remarks"  placeholder="Remarks">{{$therapy->remarks}}</textarea>
                         </div>
                      </div>
                      <!-- ... -->

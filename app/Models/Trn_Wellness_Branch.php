@@ -14,4 +14,10 @@ class Trn_Wellness_Branch extends Model
         'wellness_id',
         'branch_id',
     ];
+
+    public function wellness()
+{
+    return $this->belongsTo(Mst_Wellness::class, 'wellness_id');
+}
+
 }

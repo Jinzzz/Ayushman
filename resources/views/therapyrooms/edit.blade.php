@@ -27,7 +27,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Room Name</label>
-                                    <input type="text" class="form-control" required name="room_name" value="{{ $therapyroom->room_name }}" placeholder="Room Name">
+                                    <input type="text" class="form-control" required name="room_name" maxlength="50" value="{{ $therapyroom->room_name }}" placeholder="Room Name">
                                 </div>
                             </div>
                             <div class="col-md-6">

@@ -25,13 +25,13 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Name*</label>
-                           <input type="text" class="form-control" required name="branch_name" value="{{old('branch_name')}}" placeholder="Branch Name">
+                           <input type="text" class="form-control" required name="branch_name" value="{{old('branch_name')}}" maxlength="100" placeholder="Branch Name">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Address*</label>
-                           <textarea class="form-control" required name="branch_address" placeholder="Branch Address">{{old('branch_address')}}</textarea>
+                           <textarea class="form-control" required name="branch_address"  placeholder="Branch Address">{{old('branch_address')}}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -44,14 +44,14 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Email</label>
-                           <input type="email" class="form-control"  name="branch_email"  id="contact_email" value="{{old('branch_email')}}" placeholder="Branch Email">
+                           <input type="email" class="form-control"  name="branch_email"  id="contact_email" maxlength="100" value="{{old('branch_email')}}" placeholder="Branch Email">
                            <div class="text-danger" id="email-error"></div>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Admin Name</label>
-                           <input type="text" class="form-control"  name="branch_admin_name" value="{{old('branch_admin_name')}}" placeholder="Branch Admin Name">
+                           <input type="text" class="form-control"  name="branch_admin_name" value="{{old('branch_admin_name')}}" maxlength="100" placeholder="Branch Admin Name">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -63,18 +63,18 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Latitude*</label>
-                           <input type="text" class="form-control" required name="latitude" value="{{old('latitude')}}" placeholder="Latitude"  oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
-                           pattern="[0-9]+(\.[0-9]+)?" >
+                            <label class="form-label">Latitude*</label>
+                            <input type="text" class="form-control" required name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" 
+                                oninput="validateNumericInput(this, 10);">
                         </div>
-                     </div>
-                     <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Longitude*</label>
-                           <input type="text" class="form-control" required name="longitude" value="{{old('longitude')}}" placeholder="Longitude"   oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
-                           pattern="[0-9]+(\.[0-9]+)?" >
+                            <label class="form-label">Longitude*</label>
+                            <input type="text" class="form-control" required name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" 
+                                oninput="validateNumericInput(this, 10);">
                         </div>
-                     </div>
+                    </div>
                      <!-- ... -->
                      <div class="col-md-6">
                         <div class="form-group">
@@ -162,4 +162,16 @@
        }
    });
 </script>
+<script>
+   function validateNumericInput(input, maxLength) {
+       // Remove non-numeric characters and multiple periods using regular expression
+       input.value = input.value.replace(/[^0-9.]+/g, '');
+
+       // Check if the input length exceeds the maxLength
+       if (input.value.length > maxLength) {
+           input.value = input.value.slice(0, maxLength); // Truncate to maxLength
+       }
+   }
+</script>
+
 @endsection

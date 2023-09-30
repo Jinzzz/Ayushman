@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Staff extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_staffs';
 
     protected $primaryKey = 'staff_id';
@@ -37,6 +38,7 @@ class Mst_Staff extends Model
         'max_discount_value',
         'salary_type',
         'salary_amount',
+        'deleted_at',
     ];
 
 

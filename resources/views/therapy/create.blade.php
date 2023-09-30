@@ -7,14 +7,8 @@
             <div class="card-header">
                <h3 class="mb-0 card-title">Create Therapy</h3>
             </div>
-            <div class="card-body">
-               @if ($message = Session::get('status'))
-               <div class="alert alert-success">
-                  <p></p>
-               </div>
-               @endif
-            </div>
-            <div class="col-lg-12">
+           
+            <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -32,7 +26,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Therapy Name*</label>
-                           <input type="text" class="form-control" required name="therapy_name" value="{{old('therapy_name')}}" placeholder="Therapy Name">
+                           <input type="text" class="form-control" required name="therapy_name" maxlength="100" value="{{old('therapy_name')}}" placeholder="Therapy Name">
                         </div>
                      </div>
                    
@@ -40,7 +34,8 @@
                    <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Therapy Cost*</label>
-                           <input type="number" class="form-control" required name="therapy_cost"  placeholder="Therapy Cost">
+                           <input type="text" class="form-control" required name="therapy_cost" maxlength="14"  placeholder="Therapy Cost"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
                         </div>
                      </div>
 
@@ -48,7 +43,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Remarks</label>
-                           <textarea class="form-control" placeholder="Remarks"></textarea>
+                           <textarea class="form-control" name="remarks" placeholder="Remarks"></textarea>
                         </div>
                      </div>
   <!-- ... -->

@@ -26,19 +26,20 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Patient Name</label>
-                     <input type="text" class="form-control" required name="patient_name"  value="{{$patient->patient_name}}" placeholder="Patient Name">
+                     <input type="text" class="form-control" required name="patient_name" maxlength="100" value="{{$patient->patient_name}}" placeholder="Patient Name">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Patient Email</label>
-                     <input type="email" class="form-control" name="patient_email" value="{{$patient->patient_email}}"  placeholder="Patient Email">
+                     <input type="email" class="form-control" name="patient_email" maxlength="200" value="{{$patient->patient_email}}"  placeholder="Patient Email">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Patient Mobile</label>
-                     <input type="text" class="form-control" required name="patient_mobile" value="{{$patient->patient_mobile}}"  placeholder="Patient Mobile">
+                     <input type="text" class="form-control" required name="patient_mobile" value="{{$patient->patient_mobile}}"  placeholder="Patient Mobile"  maxlength="10" oninput="validateInput(this)">
+                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                   </div>
                </div>
                <div class="col-md-6">
@@ -80,7 +81,7 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Emergency Contact Person*</label>
-                     <input type="text" class="form-control" name="emergency_contact_person" required name="emergency_contact_person" value="{{$patient->emergency_contact_person}}" >
+                     <input type="text" class="form-control" name="emergency_contact_person" required name="emergency_contact_person" maxlength="100" value="{{$patient->emergency_contact_person}}" >
                   </div>
                </div>
             </div>
@@ -88,13 +89,14 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Emergency Contact *</label>
-                     <input type="text" class="form-control" name="emergency_contact"  required name="emergency_contact" value="{{$patient->emergency_contact}}" >
+                     <input type="text" class="form-control" name="emergency_contact"  required name="emergency_contact" value="{{$patient->emergency_contact}}"  maxlength="10" oninput="validateInput(this)">
+                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Marital Status</label>
-                     <select class="form-control" name="maritial_status" id="maritial_status">
+                     <select class="form-control" name="marital_status" id="marital_status">
                         <option value="">Choose Maritial Status</option>
                         @foreach($maritialstatus as $masterId => $masterValue)
                         <option value="{{ $masterId }}"{{ $masterId == $patient->maritial_status ? ' selected' : '' }}>{{ $masterValue }}</option>
@@ -119,7 +121,8 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Whatsapp Number</label>
-                     <input type="text" class="form-control" name="whatsapp_number" value="{{$patient->whatsapp_number}}" placeholder="Whatsapp Number">
+                     <input type="text" class="form-control" name="whatsapp_number" value="{{$patient->whatsapp_number}}" placeholder="Whatsapp Number"  maxlength="10" oninput="validateInput(this)">
+                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                   </div>
                </div>
             </div>
@@ -202,4 +205,30 @@
        }
    }
 </script>
-@endsection
+<script>
+   function validateInput(input) {
+       var inputValue = input.value;
+
+       // Remove any non-numeric characters from the input
+       var numericValue = inputValue.replace(/[^0-9]/g, '');
+
+       // Ensure the input does not exceed 10 characters
+       if (numericValue.length > 10) {
+           // Truncate the input to the first 10 digits
+           numericValue = numericValue.slice(0, 10);
+       }
+
+       // Update the input value with the numeric value
+       input.value = numericValue;
+
+       // Check if the resulting value has exactly 10 digits
+       if (numericValue.length !== 10) {
+           input.setCustomValidity("Please enter exactly 10-digit numbers.");
+           input.parentNode.querySelector('.error-message').style.display = 'block';
+       } else {
+           input.setCustomValidity("");
+           input.parentNode.querySelector('.error-message').style.display = 'none';
+       }
+   }
+</script>
+
