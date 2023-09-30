@@ -68,7 +68,7 @@ class DashboardController extends Controller
             ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
             ->join('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
             ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'mst_master_values.master_value', 'mst_timeslots.time_from')
+            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'trn_consultation_bookings.id', 'mst_master_values.master_value', 'mst_timeslots.time_from')
             ->where(function ($query) use ($currentDate, $currentTime) {
                 $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
                     ->orWhere(function ($query) use ($currentDate, $currentTime) {
@@ -85,6 +85,7 @@ class DashboardController extends Controller
                 $time_from = Carbon::parse($consultation->time_from)->format('h:i A');
 
                 $upcoming_bookings[] = [
+                    'booking_id' => $consultation->id,
                     'doctor_name' => $consultation->staff_name,
                     'booking_date' => $booking_date,
                     'booking_type' => $consultation->master_value,
