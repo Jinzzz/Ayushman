@@ -80,7 +80,7 @@
                             </div>
                             @endif
                         </div>
-                        <form class="login100-form validate-form" method="post" action="{{route('login')}}">
+                        <form class="login100-form validate-form" method="post" action="{{route('mst_login')}}">
                             {{ csrf_field() }}
                             <span class="login100-form-title">
                                 Login
@@ -170,6 +170,8 @@
     @include('admin.common.sweat-alert')--}}
     <script>
         $("document").ready(function() {
+            $("#eye").show();
+            $("#eye").show();
             setTimeout(function() {
                 $(".status").remove();
             }, 5000); // 5 secs

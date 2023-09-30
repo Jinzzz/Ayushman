@@ -1,6 +1,9 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+<link rel="stylesheet" type="text/css" href="{{ asset('plugins/date-picker/spectrum.css') }}">
+<script src="{{ asset('js/form-elements.js') }}"></script>
+
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
          <div class="card">
@@ -24,7 +27,7 @@
             <div class="card-header">
                <h3 class="mb-0 card-title">Create Membership Packages</h3>
             </div>
-            <div  class="col-lg-12" style="background-color:#fff">
+            <div class="col-lg-12" style="background-color:#fff">
                <form action="{{ route('membership.store') }}" method="POST" enctype="multipart/form-data">
                   <input type="hidden" id="checking_benefits" value="{{ isset($benefits) ? 1 : 0 }}">
                   @csrf
@@ -59,6 +62,21 @@
                               <input type="number" class="form-control" required name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Discount Price">
                            </div>
                         </div>
+
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label class="form-label">Gradient start*</label>
+                              <input type="text" class="form-control colorPicker" name="gradient_start" placeholder="Regular Price Color">
+                           </div>
+                        </div>
+
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label class="form-label">Gradient end*</label>
+                              <input type="text" class="form-control colorPicker" name="gradient_end" placeholder="Offer Price Color">
+                           </div>
+                        </div>
+
 
                         <div class="col-md-11">
                            <div class="form-group">
@@ -121,26 +139,38 @@
 
 
 @section('js')
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
 
 <script type="text/javascript">
    $(document).ready(function() {
-      CKEDITOR.replace('benefitsDescription', {
-      removePlugins: 'image',
-      toolbar: [
-         {
-            name: 'basicstyles',
-            items: ['Bold', 'Italic', 'Underline']
-         },
-         {
-            name: 'paragraph',
-            items: ['BulletedList']
-         },
-      ]
-   });
+      $(".colorPicker").spectrum({
+            preferredFormat: "hex",
+            showInput: true,
+            showPalette: true,
+            palette: ["#ff0000", "#00ff00", "#0000ff"] // Example palette
+         });
 
-   CKEDITOR.replace('benefitsEditor', {
-      toolbar : []
-   });
+      CKEDITOR.replace('benefitsDescription', {
+         removePlugins: 'image',
+         toolbar: [{
+               name: 'basicstyles',
+               items: ['Bold', 'Italic', 'Underline']
+            },
+            {
+               name: 'paragraph',
+               items: ['BulletedList']
+            },
+         ]
+      });
+
+      // Initialize the color pickers
+      
+
+
+      CKEDITOR.replace('benefitsEditor', {
+         toolbar: []
+      });
 
 
 
@@ -218,6 +248,7 @@
          $(this).closest('.row').find('.selected_cost').text(cost);
       });
    }
+
    function toggleStatus(checkbox) {
       if (checkbox.checked) {
          $("#statusText").text('Active');

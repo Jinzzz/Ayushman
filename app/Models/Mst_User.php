@@ -16,7 +16,7 @@ class Mst_User extends Authenticatable
     protected $fillable = [
         'username',
         'password',
-        'user_email',
+        'email',
         'user_type_id',
         'is_active',
         'last_login_time',

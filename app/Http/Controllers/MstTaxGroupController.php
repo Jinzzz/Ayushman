@@ -39,7 +39,7 @@ class MstTaxGroupController extends Controller
     {
         try {
             $pageTitle = "Create Tax Groups";
-            $taxes = Mst_Tax::get();
+            $taxes = Mst_Tax::where('is_active',1)->get();
             return view('tax-group.create', compact('pageTitle', 'taxes'));
         } catch (QueryException $e) {
             return redirect()->route('tax.group.index')->with('error', 'Something went wrong');

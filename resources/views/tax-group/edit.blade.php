@@ -36,25 +36,22 @@
                         </div>
                      </div>
                   </div>
+                  <p><span>Total Tax Rate:</span> <span id="totalTaxRate" style="color: green;">0%</span></p>
+
                   <h6><b>Include taxes*</b></h6>
                   <div class="row">
                      @foreach($taxes as $tax)
                      <div class="col-md-3">
                         <div class="form-check">
                            @php
-                           $isChecked = false;
-                           foreach($included_tax_ids as $included_tax_id) {
-                           if ($included_tax_id == $tax->id) {
-                           $isChecked = true;
-                           break;
-                           }
-                           }
+                           $isChecked = in_array($tax->id, $included_tax_ids);
                            @endphp
-                           <input type="checkbox" {{ $isChecked ? 'checked' : '' }} class="form-check-input" name="included_tax[]" value="{{ $tax->id }}">
-                           <label class="form-check-label" for="included tax{{ $tax->id }}">{{ $tax->tax_name }}</label>
+                           <input type="checkbox" {{ $isChecked ? 'checked' : '' }} class="form-check-input" name="included_tax[]" id="included_tax{{ $tax->id }}" value="{{ $tax->id }}" data-tax-rate="{{ $tax->tax_rate }}">
+                           <label class="form-check-label" for="included tax{{ $tax->id }}">{{ $tax->tax_name }} - {{ $tax->tax_rate }}%</label>
                         </div>
                      </div>
                      @endforeach
+
 
                   </div>
 
@@ -78,6 +75,34 @@
       @endsection
       @section('js')
       <script>
+         $(document).ready(function() {
+            // Function to calculate and update the total tax rate
+            function updateTotalTaxRate() {
+               let totalTaxRate = 0;
+
+               // Iterate through checked checkboxes and add their tax rates
+               $('input[name="included_tax[]"]:checked').each(function() {
+                  // Extract the tax rate from the data attribute (e.g., data-tax-rate="5.00")
+                  const taxRate = parseFloat($(this).data('tax-rate'));
+
+                  // Add the tax rate to the total
+                  totalTaxRate += taxRate;
+               });
+
+               // Update the total tax rate in the <span> element
+               $('#totalTaxRate').text(totalTaxRate.toFixed(2) + '%');
+            }
+
+            // Initialize the total tax rate when the page loads
+            updateTotalTaxRate();
+
+            // Add an event listener to the checkboxes
+            $('input[name="included_tax[]"]').on('change', function() {
+               // Update the total tax rate when checkboxes change
+               updateTotalTaxRate();
+            });
+         });
+
          function toggleStatus(checkbox) {
             if (checkbox.checked) {
                $("#statusText").text('Active');

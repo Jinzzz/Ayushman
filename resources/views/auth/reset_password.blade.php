@@ -112,7 +112,7 @@
                                         @endif
 
 
-                                        <form class="login100-form" method="POST" action="{{ route('reset.password') }}">
+                                        <form class="login100-form" method="POST" action="{{ route('password.update') }}">
                                             @csrf
                                             <div class="wrap-input100 validate-input">
                                                 <input class="input100" type="text" name="user_email_address" placeholder="Email Address" required value="{{ old('user_email_address') }}">
