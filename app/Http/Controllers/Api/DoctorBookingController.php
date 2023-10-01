@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Mst_Branch;
-use App\Models\Mst_TimeSlot;
+use App\Models\Mst_Staff_Timeslot;
 use App\Models\Trn_Staff_Leave;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Consultation_Booking;
@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
 {
+    // to get all active qualifications , value fetching from mst_master_values table.
     public function getQualifications()
     {
         $data = [];
@@ -48,7 +49,7 @@ class DoctorBookingController extends Controller
         }
     }
 
-    // get all genders
+    // get all genders, value fetching from mst_master_values table.
     public function getGender()
     {
         $data = [];
@@ -76,7 +77,7 @@ class DoctorBookingController extends Controller
         }
     }
 
-    // get all relationships 
+    // get all relationships , value fetching from mst_master_values table.
     public function getRelationship()
     {
         $data = [];
@@ -104,7 +105,7 @@ class DoctorBookingController extends Controller
         }
     }
 
-    // get all relationships 
+    // get all blood groups , value fetching from mst_master_values table.
     public function getBloodGroup()
     {
         $data = [];
@@ -132,7 +133,7 @@ class DoctorBookingController extends Controller
         }
     }
 
-    // get all branches 
+    // get all branches , value fetching from mst_branches table.
 
     public function getBranches()
     {
@@ -157,6 +158,7 @@ class DoctorBookingController extends Controller
         }
     }
 
+
     public function doctorsList(Request $request)
     {
         $data = [];
@@ -179,17 +181,21 @@ class DoctorBookingController extends Controller
             );
 
             if (!$validator->fails()) {
+
                 if (isset($request->branch_id) && !empty($request->booking_date)) {
+
                     $bookingDate = Carbon::parse($request->booking_date);
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 2 years in the future
+                    // Allow up to 1 years in the future
+                    if ($bookingDate->year > $currentYear + 1) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date cannot be more than 1 year in the future.";
                         return response($data);
                     }
 
+                    // Check if the booking date is in the past and not the same day as the current date
                     if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
@@ -199,19 +205,9 @@ class DoctorBookingController extends Controller
                         $doctorONLeave = Trn_Staff_Leave::where('leave_date', $request->booking_date)->where('leave_duration', 83)->pluck('user_id')->toArray();
                         $day_of_week = PatientHelper::getWeekDay($request->booking_date);
                         $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
-                        $allotted_doctors = Mst_TimeSlot::where('week_day', $weekDayId)->where('is_active', 1)->distinct()->pluck('staff_id')->toArray();
+                        $allotted_doctors = Mst_Staff_Timeslot::where('week_day', $weekDayId)->where('is_active', 1)->distinct()->pluck('staff_id')->toArray();
 
                         // getting the available doctors id as array 
-                        $doctorONLeaveCollection = collect($doctorONLeave);
-                        $allottedDoctorsCollection = collect($allotted_doctors);
-                        $filteredDoctors = $allottedDoctorsCollection->diff($doctorONLeaveCollection);
-                        $filteredDoctorsArray = $filteredDoctors->values()->all();
-
-                        $doctorONLeave = Trn_Staff_Leave::where('leave_date', $request->booking_date)->where('leave_duration', 83)->pluck('user_id')->toArray();
-                        $day_of_week = PatientHelper::getWeekDay($request->booking_date);
-                        $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
-                        $allotted_doctors = Mst_TimeSlot::where('week_day', $weekDayId)->where('is_active', 1)->distinct()->pluck('staff_id')->toArray();
-
                         $doctorONLeaveCollection = collect($doctorONLeave);
                         $allottedDoctorsCollection = collect($allotted_doctors);
                         $filteredDoctors = $allottedDoctorsCollection->diff($doctorONLeaveCollection);
@@ -224,14 +220,17 @@ class DoctorBookingController extends Controller
                             ->where('mst_staffs.branch_id', $request->branch_id)
                             ->whereIn('mst_staffs.staff_id', $filteredDoctorsArray);
 
+                        // Apply filtration based on user search criteria
+
+                        // Check if a doctor name is provided for searching
                         if (isset($request->search_doctor_name)) {
                             $queries = $queries->where('mst_staffs.staff_name', 'like', '%' . $request->search_doctor_name . '%');
                         }
-
+                        // Check if a branch name is provided for searching
                         if (isset($request->search_branch_name)) {
                             $queries = $queries->where('mst_branches.branch_name', 'like', '%' . $request->search_branch_name . '%');
                         }
-
+                        // Check if a specific qualification ID is provided for searching
                         if (isset($request->search_qualification_id) && $request->search_qualification_id != 0) {
                             $queries = $queries->where('mst_master_values.id', $request->search_qualification_id);
                         }
@@ -306,6 +305,7 @@ class DoctorBookingController extends Controller
             );
             if (!$validator->fails()) {
                 if (isset($request->doctor_id)) {
+                    // Retrieve doctor details by joining staff, branch, qualification, and specialization tables
                     $doctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                         ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                         ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
@@ -372,12 +372,13 @@ class DoctorBookingController extends Controller
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 2 years in the future
+                    // Allow up to 1 years in the future
+                    if ($bookingDate->year > $currentYear + 1) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date cannot be more than 1 year in the future.";
                         return response($data);
                     }
-
+                    // Check if the booking date is in the past and not the same day as the current date
                     if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
@@ -391,18 +392,21 @@ class DoctorBookingController extends Controller
 
                         $booking_date = PatientHelper::dateFormatDb($request->booking_date);
 
+                        // Check if the doctor is on leave on the specified booking date and retrieve the leave record
                         $doctorOnLeave = Trn_Staff_Leave::where('leave_date', $booking_date)
                             ->where('user_id', $request->doctor_id)
                             ->whereIn('leave_duration', [81, 82])
                             ->first();
 
-                        $timeSlotsQuery = Mst_TimeSlot::where('staff_id', $request->doctor_id)
-                            ->where('week_day', $weekDayId)
-                            ->where('is_active', 1);
+                        // Build a query to retrieve staff time slots for the specified doctor on the given week day
+                        $timeSlotsQuery = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')->where('staff_id', $request->doctor_id)
+                            ->where('mst__staff__timeslots.week_day', $weekDayId)
+                            ->where('mst__staff__timeslots.is_active', 1);
 
+                        // Adjust the time slot query based on the doctor's leave status full day/first half/second half.
                         if (!empty($doctorOnLeave)) {
                             $timeToCondition = $doctorOnLeave->leave_duration == 81 ? '>=' : '<=';
-                            $timeSlotsQuery->where('time_from', $timeToCondition, "12:00:00");
+                            $timeSlotsQuery->where('mst_timeslots.time_from', $timeToCondition, "12:00:00");
                         }
 
                         $timeSlots = $timeSlotsQuery->get();
@@ -515,31 +519,24 @@ class DoctorBookingController extends Controller
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 2 years in the future
+                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 years in the future
                         $data['status'] = 0;
                         $data['message'] = "Booking date cannot be more than 1 year in the future.";
                         return response($data);
                     }
+                    // Check if the booking date is in the past and not the same day as the current date
                     if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
                         return response($data);
                     } else {
                         $patient_id = Auth::id();
-                        // if ($request->reschedule_key == 1) {
-                        //     if (!$request->has('booking_id')) {
-                        //         $data['status'] = 0;
-                        //         $data['message'] = "Booking id is required";
-                        //         return response($data);
-                        //     } else {
-                        //         $booking_id = $request->booking_id;
-                        //     }
-                        // }
 
                         $family_details = array();
 
                         $family_details = PatientHelper::getFamilyDetails($patient_id);
 
+                        // Re check the availability of the specified time slot for booking on the given date and for the particular doctor
                         $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
 
                         if ($available_slots > 0) {
@@ -604,12 +601,12 @@ class DoctorBookingController extends Controller
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 2 years in the future
+                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 years in the future
                         $data['status'] = 0;
                         $data['message'] = "Booking date cannot be more than 1 year in the future.";
                         return response($data);
                     }
-
+                    // Check if the booking date is in the past and not the same day as the current date
                     if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
@@ -624,7 +621,7 @@ class DoctorBookingController extends Controller
                         return response($data);
                     }
 
-                    // checking already booked or not 
+                    // Checking already booked or not 
                     $booking_date_db_format = PatientHelper::dateFormatDb($request->booking_date);
                     $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', $patient_id)->where('booking_date', $booking_date_db_format)->where('time_slot_id', $request->slot_id)->where('family_member_id', $request->family_member_id)->first();
 
@@ -634,7 +631,10 @@ class DoctorBookingController extends Controller
                         return response($data);
                     }
 
-                    $slotDetails = Mst_TimeSlot::find($request->slot_id);
+                    $slotDetails = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
+                        ->where('mst__staff__timeslots.id', $request->slot_id)
+                        ->first();
+
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
                     $time_to = date('h:i A', strtotime($slotDetails->time_to));;
 
@@ -665,7 +665,7 @@ class DoctorBookingController extends Controller
                     $patientDetails = [];
 
                     if ($request->yourself == 1) {
-                        // $accountHolder = Mst_Patient::where('id', $patient_id)->first();
+
                         $gender_name = Mst_Master_Value::where('id', $accountHolder->patient_gender)->value('master_value');
                         $patientDetails[] = [
                             'member_id' => $patient_id,
@@ -772,12 +772,12 @@ class DoctorBookingController extends Controller
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 2 years in the future
+                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 years in the future
                         $data['status'] = 0;
                         $data['message'] = "Booking date cannot be more than 1 year in the future.";
                         return response($data);
                     }
-
+                    // Check if the booking date is in the past and not the same day as the current date
                     if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
@@ -794,17 +794,26 @@ class DoctorBookingController extends Controller
                             }
                         }
 
-                        $slotDetails = Mst_TimeSlot::find($request->slot_id);
+                        // Fetch details of the selected time slot for the booking
+                        $slotDetails = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
+                            ->where('mst__staff__timeslots.id', $request->slot_id)
+                            ->first();
+
+                        // Convert time format from database format to user-readable format
                         $time_from = date('h:i A', strtotime($slotDetails->time_from));
                         $time_to = date('h:i A', strtotime($slotDetails->time_to));
 
+                        // Fetch details of the selected doctor for the booking
                         $doctor = Mst_Staff::select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as doctor_name', 'mst_staffs.staff_booking_fee', 'mst_staffs.branch_id')
                             ->where('mst_staffs.staff_type', 20)
                             ->where('mst_staffs.staff_id', $request->doctor_id)
                             ->first();
 
+                        // Extract data from the request
                         $yourself = $request->yourself;
                         $booking_date = PatientHelper::dateFormatDb($request->booking_date);
+
+                        // Prepare data for creating a new booking record
                         $newRecordData = [
                             'booking_type_id' => 84,
                             'patient_id' => $patient_id,

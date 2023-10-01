@@ -4,10 +4,9 @@ namespace App\Helpers;
 
 use Illuminate\Http\Request;
 use App\Models\Mst_Patient;
-use App\Models\Mst_TimeSlot;
+use App\Models\Mst_Staff_Timeslot;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Trn_Patient_Family_Member;
-use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class PatientHelper
@@ -63,7 +62,8 @@ class PatientHelper
     {
 
         $booking_date = self::dateFormatDb($booking_date);
-        $timeSlot = Mst_TimeSlot::where('id', $slot_id)->where('is_active', 1)->first();
+        $timeSlot = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
+        ->where('mst__staff__timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)->where('time_slot_id', $slot_id)
             ->whereIn('booking_status_id', [87, 88])->count();
