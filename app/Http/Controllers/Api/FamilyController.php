@@ -209,7 +209,7 @@ class FamilyController extends Controller
                             }
 
                             $data['status'] = 1;
-                            $data['message'] = "OTP Verified successfully";
+                            $data['message'] = "Member added successfully";
                             return response($data);
                         } else {
 
@@ -562,7 +562,7 @@ class FamilyController extends Controller
                     $trn_family_member = Trn_Patient_Family_Member::findOrFail($id);
                     $trn_family_member->is_active = 0;
                     $trn_family_member->save();
-                    $trn_family_member->delete();
+                    // $trn_family_member->delete();
 
                     $data['status'] = 1;
                     $data['message'] = "Deleted successfully";
