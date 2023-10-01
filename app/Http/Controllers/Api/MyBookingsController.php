@@ -284,7 +284,7 @@ class MyBookingsController extends Controller
                     }
 
                     $data['status'] = 1;
-                    $data['message'] = "Booking cancelled successfuly";
+                    $data['message'] = "Booking cancelled successfully";
                     return response($data);
                 }else{
                     $data['status'] = 0;
