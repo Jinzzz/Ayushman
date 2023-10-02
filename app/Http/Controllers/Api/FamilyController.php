@@ -209,7 +209,12 @@ class FamilyController extends Controller
                             }
 
                             $data['status'] = 1;
-                            $data['message'] = "Member added successfully";
+                            if ($request->status == 1) {
+                                $data['message'] = "Member added successfully";
+                            }
+                            if ($request->status == 3) {
+                                $data['message'] = "Member details updated successfully";
+                            }
                             return response($data);
                         } else {
 
