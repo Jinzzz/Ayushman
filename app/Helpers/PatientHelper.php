@@ -63,7 +63,7 @@ class PatientHelper
 
         $booking_date = self::dateFormatDb($booking_date);
         $timeSlot = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
-        ->where('mst__staff__timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
+            ->where('mst__staff__timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)->where('time_slot_id', $slot_id)
             ->whereIn('booking_status_id', [87, 88])->count();
@@ -94,12 +94,16 @@ class PatientHelper
     // get all family members array using patient_id 
     public static function getFamilyDetails($patient_id)
     {
+        // Initialize an array to store family details
         $family_details = array();
+
+        // Retrieve details of the account holder
         $accountHolder = Mst_Patient::join('mst_master_values', 'mst_patients.patient_gender', '=', 'mst_master_values.id')
             ->where('mst_patients.id', $patient_id)
             ->select('mst_patients.*', 'mst_master_values.master_value as gender_name')
             ->first();
 
+        // Retrieve family members associated with the account holder
         $members = Trn_Patient_Family_Member::join('mst_patients', 'trn_patient_family_member.patient_id', 'mst_patients.id')
             ->join('mst_master_values as gender', 'trn_patient_family_member.gender_id', '=', 'gender.id')
             ->join('mst_master_values as relationship', 'trn_patient_family_member.relationship_id', '=', 'relationship.id')
@@ -108,11 +112,12 @@ class PatientHelper
             ->where('trn_patient_family_member.is_active', 1)
             ->get();
 
-
+        // Get the current year for age calculation
         $currentYear = Carbon::now()->year;
         $carbonDate = Carbon::parse($accountHolder->patient_dob);
         $year = $carbonDate->year;
 
+        // Extract account holder's details and add to family_details array
         $family_details[] = [
             'member_id' => $accountHolder->id,
             'family_member_id' => 0,
@@ -126,6 +131,7 @@ class PatientHelper
             'email_address' => $accountHolder->patient_email,
         ];
 
+        // Extract details of each family member and add to family_details array
         foreach ($members as $member) {
             $carbonDate = Carbon::parse($member->date_of_birth);
             $year = $carbonDate->year;
@@ -143,6 +149,7 @@ class PatientHelper
                 'email_address' => $member->email_address,
             ];
         }
+        // Return the family_details array
         return $family_details;
     }
 }

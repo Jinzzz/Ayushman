@@ -51,6 +51,7 @@ class PatientAuthController extends Controller
             );
 
             if (!$validator->fails()) {
+                // Check if a patient with the provided mobile number or email already exists
                 $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
                     ->orWhere('patient_email', $request->patient_email)
                     ->first();
@@ -62,6 +63,7 @@ class PatientAuthController extends Controller
                 $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
 
                 if (!$patients) {
+                    // Insert new patient record in the database
                     $lastInsertedId = Mst_Patient::insertGetId([
                         'patient_name'      => $request->patient_name,
                         'patient_email'     => $request->patient_email,
@@ -77,15 +79,18 @@ class PatientAuthController extends Controller
                         'created_at'         => Carbon::now(),
                     ]);
 
+                    // Generate OTP and update patient code
                     $verification_otp = rand(100000, 999999);
                     $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
                     $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
 
+                    // Update patient code
                     $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
                         'updated_at' => Carbon::now(),
                         'patient_code' => $newPatientCode
                     ]);
 
+                    // Create OTP record
                     $otpCreate = Trn_Patient_Otp::create([
                         'patient_id' => $lastInsertedId,
                         'otp' => $verification_otp,
@@ -96,6 +101,7 @@ class PatientAuthController extends Controller
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
 
+                    // Save patient device token
                     if (isset($request->device_token) && isset($request->device_type)) {
                         Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
 
@@ -108,6 +114,7 @@ class PatientAuthController extends Controller
                         $pdt->save();
                     }
 
+                    // Prepare response data
                     $data['status'] = 1;
                     $data['otp'] = $verification_otp;
                     $data['otp_type'] = 1;
@@ -155,14 +162,22 @@ class PatientAuthController extends Controller
             );
 
             if (!$validator->fails()) {
+                // Check if the patient with the provided mobile number exists
                 $patient = Mst_Patient::where('patient_mobile', $mobile)->first();
+
+                // If patient doesn't exist, return an error response
                 if (!$patient) {
                     $data['status'] = 0;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
                 }
+
+                // Check if the provided password matches the stored hashed password
                 if (Hash::check($passChk, $patient->password)) {
+                    // Create a token for the patient
                     $check_array = ['patient_mobile' => request('patient_mobile'), 'password' => request('password')];
+
+                    // If the token is created successfully, prepare and return the success response
                     if ($check_array) {
                         $data['token'] =  $patient->createToken('Patient Token', ['patient']);
                         $data['status'] = 1;
@@ -173,11 +188,13 @@ class PatientAuthController extends Controller
                         $data['email_address'] = $patient->patient_email;
                         return response($data);
                     } else {
+                        // If token creation fails, return an error response
                         $data['status'] = 0;
                         $data['message'] = "Invalid Login Details";
                         return response($data);
                     }
                 } else {
+                    // If password doesn't match, return an error response
                     $data['status'] = 0;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
@@ -221,30 +238,37 @@ class PatientAuthController extends Controller
 
             if (!$validator->fails()) {
                 if (isset($request->patient_id, $request->otp_type, $request->otp)) {
+                    // Retrieve the patient ID from the request
                     $patient_id = $request->input('patient_id');
+
+                    // Find the patient using the patient ID
                     $patient = Mst_Patient::find($patient_id);
+
+                    // If the patient does not exist, return an error response
                     if (!$patient) {
                         $data['status'] = 0;
                         $data['message'] = "User does not exist.";
                         return response($data);
                     }
 
+                    // Retrieve the latest inserted OTP row for the specified patient and OTP type
                     $lastInsertedRow = Trn_Patient_Otp::where('otp_type', $request->otp_type)
                         ->where('patient_id', $patient_id)
                         ->where('otp', $request->otp)
                         ->latest('otp_id')
                         ->first();
 
+                    // Check if the retrieved row exists and if the OTP matches
                     if ($lastInsertedRow && $lastInsertedRow->otp == $request->otp) {
+                        // Check if the OTP is not expired
                         if (Carbon::now()->lessThanOrEqualTo($lastInsertedRow->otp_expire_at)) {
-
+                            // Update the OTP row as verified
                             Trn_Patient_Otp::where('otp_id', $lastInsertedRow->otp_id)->update([
                                 'updated_at' => Carbon::now(),
                                 'verified' => 1,
                             ]);
 
-                            // is_otp_verified
-
+                            // Update patient's OTP verification status if the OTP type is 1 (Registration OTP)
                             if ($request->otp_type == 1) {
                                 Mst_Patient::where('id', $patient_id)->update([
                                     'updated_at' => Carbon::now(),
@@ -252,7 +276,7 @@ class PatientAuthController extends Controller
                                 ]);
                             }
 
-
+                            // Prepare and return a success response
                             $data['status'] = 1;
                             $data['message'] = "Registration completed successfully";
                             if ($request->otp_type == 2) {
@@ -260,12 +284,13 @@ class PatientAuthController extends Controller
                             }
                             return response($data);
                         } else {
-
+                            // Return an error response if the OTP is expired
                             $data['status'] = 0;
                             $data['message'] = "OTP Expired";
                             return response($data);
                         }
                     } else {
+                        // Return an error response if the OTP doesn't match
                         $data['status'] = 0;
                         $data['message'] = "OTP doesn't match";
                         return response($data);
@@ -307,19 +332,28 @@ class PatientAuthController extends Controller
             );
 
             if (!$validator->fails()) {
+                // Retrieve the patient using the provided patient ID
                 $patient = Mst_Patient::where('id', $patient_id)->first();
+
+                // If the patient does not exist, return an error response
                 if (!$patient) {
                     $data['status'] = 0;
                     $data['message'] = "User does not exist.";
                     return response($data);
                 }
 
+                // Retrieve the latest inserted OTP row for the specified patient
                 $lastInsertedRow = Trn_Patient_Otp::where('patient_id', $request->patient_id)
                     ->latest('otp_id')
                     ->first();
 
+                // Check if the retrieved row exists
                 if ($lastInsertedRow) {
+
+                    // Generate a new verification OTP
                     $verification_otp = rand(100000, 999999);
+
+                    // Update the existing OTP row with the new OTP and reset verification status
                     $resendOtp = Trn_Patient_Otp::where('otp_id', $lastInsertedRow->otp_id)->update([
                         'updated_at' => Carbon::now(),
                         'otp' => $verification_otp,
@@ -327,6 +361,7 @@ class PatientAuthController extends Controller
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
 
+                    // If the OTP type is for registration, reset the OTP verification status for the patient
                     if ($lastInsertedRow->otp_type == 1) {
                         Mst_Patient::where('id', $patient_id)->update([
                             'updated_at' => Carbon::now(),
@@ -334,6 +369,7 @@ class PatientAuthController extends Controller
                         ]);
                     }
 
+                    // Prepare and return a success response
                     $data['status'] = 1;
                     $data['otp'] = $verification_otp;
                     $data['otp_type'] = $lastInsertedRow->otp_type;
@@ -372,10 +408,19 @@ class PatientAuthController extends Controller
             );
 
             if (!$validator->fails()) {
+                // Retrieve patient mobile number from the request
                 $patient_mobile = $request->input('patient_mobile');
+
+                // Check if a patient with the provided mobile number exists
                 $patient = Mst_Patient::where('patient_mobile', $patient_mobile)->first();
+
+                // If a patient exists, generate a new verification OTP and create an OTP record
                 if ($patient) {
+
+                    // Generate a new verification OTP
                     $verification_otp = rand(100000, 999999);
+
+                    // Create a new OTP record for the patient
                     $otpCreate = Trn_Patient_Otp::create([
                         'patient_id' => $patient->id,
                         'otp' => $verification_otp,
@@ -386,6 +431,7 @@ class PatientAuthController extends Controller
                         'otp_expire_at' => Carbon::now()->addMinutes(10),
                     ]);
 
+                    // Prepare and return a success response
                     $data['status'] = 1;
                     $data['otp'] = $verification_otp;
                     $data['otp_type'] = 2;
@@ -393,6 +439,7 @@ class PatientAuthController extends Controller
                     $data['message'] = "Otp sent successfully.";
                     return response($data);
                 } else {
+                    // If no patient is found, return an error response
                     $data['status'] = 0;
                     $data['message'] = "User doesn't exist.";
                     return response($data);
@@ -431,21 +478,30 @@ class PatientAuthController extends Controller
                 ]
             );
             if (!$validator->fails()) {
+                // Retrieve patient information based on the provided patient ID
                 $patient = Mst_Patient::where('id', $request->patient_id)->first();
+
+                // Check if a patient with the provided ID exists
                 if ($patient) {
+                    // Check if the provided password is different from the current password
                     if (!Hash::check($request->password, $patient->password)) {
+                        // Update the patient's password and set the updated timestamp
                         $patient->password = Hash::make($request->password);
                         $patient->updated_at = Carbon::now();
                         $patient->save();
+
+                        // Prepare and return a success response
                         $data['status'] = 1;
                         $data['message'] = "Password reset sussessfully.";
                         return response($data);
                     } else {
+                        // If the new password is similar to the current password, return an error response
                         $data['status'] = 0;
                         $data['message'] = "Your new password is similar to the current Password. Please try another password.";
                         return response($data);
                     }
                 } else {
+                    // If no patient is found with the provided ID, return an error response
                     $data['status'] = 0;
                     $data['message'] = "User does not exist.";
                     return response($data);
@@ -469,11 +525,14 @@ class PatientAuthController extends Controller
     {
         $data = array();
         try {
+            // Get the authenticated patient's ID
             $patient_id = Auth::id();
+
+            // Check if a patient ID is available
             if ($patient_id) {
-
+                // Retrieve the current data of the authenticated patient
                 $currentData = Mst_Patient::where('id', $patient_id)->first();
-
+                // Check and update patient details based on the provided request data
                 if ($request->patient_blood_group) {
                     $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
                 }
@@ -485,6 +544,7 @@ class PatientAuthController extends Controller
                     $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
                 }
 
+                // Update patient profile with the provided or current data
                 Mst_Patient::where('id', $patient_id)->update([
                     'patient_name'      => $request->patient_name ?? $currentData->patient_name,
                     'patient_email'     => $request->patient_email ?? $currentData->patient_email,
@@ -495,10 +555,12 @@ class PatientAuthController extends Controller
                     'created_at'        => Carbon::now(),
                 ]);
 
+                // Prepare and return a success response
                 $data['status'] = 1;
                 $data['message'] = "Profile updated successfully";
                 return response($data);
             } else {
+                // If no patient ID is found, return an error response
                 $data['status'] = 0;
                 $data['message'] = "User does not exist";
                 return response($data);
@@ -531,31 +593,52 @@ class PatientAuthController extends Controller
                 ]
             );
             if (!$validator->fails()) {
-                if (isset($request->old_password) && isset($request->new_password) && isset($request->confirm_password))
+                // Check if the required password parameters are set in the request
+                if (isset($request->old_password) && isset($request->new_password) && isset($request->confirm_password)) {
+
+                    // Get the authenticated patient's ID
                     $patient_id = Auth::id();
-                $patient = Mst_Patient::where('id', $patient_id)->first();
-                if ($patient) {
-                    if (Hash::check($request->old_password, $patient->password)) {
-                        if (!Hash::check($request->new_password, $patient->password)) {
-                            $patient->password = Hash::make($request->new_password);
-                            $patient->updated_at = Carbon::now();
-                            $patient->save();
-                            $data['status'] = 1;
-                            $data['message'] = "Password changed sussessfully.";
-                            return response($data);
+
+                    // Find the patient with the given ID
+                    $patient = Mst_Patient::where('id', $patient_id)->first();
+
+                    // Check if the patient exists
+                    if ($patient) {
+                        // Check if the old password matches the stored password
+                        if (Hash::check($request->old_password, $patient->password)) {
+                            // Check if the new password is different from the old password
+                            if (!Hash::check($request->new_password, $patient->password)) {
+                                // Update the patient's password with the new hashed password
+                                $patient->password = Hash::make($request->new_password);
+                                $patient->updated_at = Carbon::now();
+                                $patient->save();
+
+                                // Prepare and return a success response
+                                $data['status'] = 1;
+                                $data['message'] = "Password changed sussessfully.";
+                                return response($data);
+                            } else {
+                                // If the new password is similar to the old password, return an error response
+                                $data['status'] = 0;
+                                $data['message'] = "Your new password is similar to the old Password. Please try another password.";
+                                return response($data);
+                            }
                         } else {
+                            // If the old password is incorrect, return an error response
                             $data['status'] = 0;
-                            $data['message'] = "Your new password is similar to the old Password. Please try another password.";
+                            $data['message'] = "Old password is incorrect.";
                             return response($data);
                         }
                     } else {
+                        // If the patient does not exist, return an error response
                         $data['status'] = 0;
-                        $data['message'] = "Old password is incorrect.";
+                        $data['message'] = "User does not exist.";
                         return response($data);
                     }
                 } else {
+                    // If the required parameters are not set, return an error response
                     $data['status'] = 0;
-                    $data['message'] = "User does not exist.";
+                    $data['message'] = "Invalid request parameters.";
                     return response($data);
                 }
             } else {
@@ -575,11 +658,23 @@ class PatientAuthController extends Controller
 
     public function logout()
     {
-        $user = Auth::user();
-        $user->tokens->each(function ($token, $key) {
-            $token->delete();
-        });
+        try {
+            // Get the authenticated user using Laravel's Auth facade
+            $user = Auth::user();
 
-        return response()->json(['message' => 'Logged out successfully']);
+            // Retrieve all tokens associated with the user and delete each token
+            $user->tokens->each(function ($token, $key) {
+                $token->delete();
+            });
+
+            // Prepare and return a JSON response indicating successful logout
+            return response()->json(['message' => 'Logged out successfully']);
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
     }
 }
