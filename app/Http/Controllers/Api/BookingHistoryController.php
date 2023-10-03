@@ -101,6 +101,14 @@ class BookingHistoryController extends Controller
                             $patient_name = $patient->patient_name;
                         }
 
+                        if ($booking->booking_type_id == 84) {
+                            $bookingType = 0;
+                         }
+ 
+                         if ($booking->booking_type_id == 85) {
+                             $bookingType = 1;
+                         }
+
                         if ($booking->booking_type_id == 85) {
                             $wellness = Mst_Wellness::find($booking->wellness_id);
                             $title = $wellness->wellness_name;
@@ -123,7 +131,7 @@ class BookingHistoryController extends Controller
                             'booking_date' => $booking_date,
                             'timeslot' => $time_from . '-' . $time_to,
                             'branch_name' => $booking->branch_name,
-                            'booking_type' => $booking->booking_type_name,
+                            'booking_type' => $bookingType,
                             'booked_for' => $patient_name,
                         ];
                     }
@@ -166,6 +174,14 @@ class BookingHistoryController extends Controller
                             $patient_name = $patient->patient_name;
                         }
 
+                        if ($booking->booking_type_id == 84) {
+                            $bookingType = 0;
+                         }
+ 
+                         if ($booking->booking_type_id == 85) {
+                             $bookingType = 1;
+                         }
+
                         if ($booking->booking_type_id == 85) {
                             $wellness = Mst_Wellness::find($booking->wellness_id);
                             $title = $wellness->wellness_name;
@@ -188,7 +204,7 @@ class BookingHistoryController extends Controller
                             'booking_date' => $booking_date,
                             'timeslot' => "",
                             'branch_name' => $booking->branch_name,
-                            'booking_type' => $booking->booking_type_name,
+                            'booking_type' => $bookingType,
                             'booked_for' => $patient_name,
                         ];
                     }

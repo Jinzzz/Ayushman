@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use App\Helpers\DeviceTockenHelper;
-use Illuminate\Support\Collection;
+use DB;
 use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
@@ -29,6 +29,33 @@ class DoctorBookingController extends Controller
 
         try {
             $qualifications = Mst_Master_Value::where('master_id', 6)->get(['id', 'master_value as name'])->toArray();
+
+            if ($qualifications) {
+                $data['status'] = 1;
+                $data['message'] = "Data fetched.";
+                $data['data'] = $qualifications;
+            } else {
+                $data['status'] = 0;
+                $data['message'] = "Qualifications not detected.";
+            }
+
+            return response($data);
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
+    // to get all active booking types , value fetching from mst_master_values table.
+    public function getBookingType()
+    {
+        $data = [];
+
+        try {
+            $qualifications = Mst_Master_Value::where('master_id', 21)->get(['id', 'master_value as name'])->toArray();
 
             if ($qualifications) {
                 $data['status'] = 1;
@@ -309,7 +336,16 @@ class DoctorBookingController extends Controller
                     $doctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                         ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                         ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
-                        ->select('mst_staffs.staff_id as doctor_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'qualification.master_value as qualification', 'specialization.master_value as specialization', 'mst_staffs.staff_image as profile_image', 'mst_staffs.staff_address as address')
+                        ->select(
+                            'mst_staffs.staff_id as doctor_id',
+                            'mst_staffs.staff_name as name',
+                            DB::raw('CAST(mst_staffs.staff_booking_fee AS SIGNED) as booking_fee'),  // Casting as integer
+                            'mst_branches.branch_name as branch_name',
+                            'qualification.master_value as qualification',
+                            'specialization.master_value as specialization',
+                            'mst_staffs.staff_image as profile_image',
+                            'mst_staffs.staff_address as address'
+                        )
                         ->where('mst_staffs.staff_type', 20)
                         ->where('mst_staffs.staff_id', $request->doctor_id)
                         ->first();
@@ -704,8 +740,8 @@ class DoctorBookingController extends Controller
                     }
 
                     $paymentDetails[] = [
-                        'consultation_fee' => "500",
-                        'total_amount' => "500",
+                        'consultation_fee' => intval($doctor->staff_booking_fee),
+                        'total_amount' => intval($doctor->staff_booking_fee),
                     ];
 
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);

@@ -36,7 +36,7 @@ Route::get('qualifications', [DoctorBookingController::class, 'getQualifications
 Route::get('gender', [DoctorBookingController::class, 'getGender']);
 Route::get('relationship', [DoctorBookingController::class, 'getRelationship']);
 Route::get('blood-group', [DoctorBookingController::class, 'getBloodGroup']);
-
+Route::get('booking_types', [DoctorBookingController::class, 'getBookingType']);
 
 Route::middleware(['auth:api'])->group(function () {
     // Consultation

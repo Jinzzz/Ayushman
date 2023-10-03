@@ -72,6 +72,14 @@ class MyBookingsController extends Controller
                             $patient_name = $patient->patient_name;
                         }
 
+                        if ($booking->booking_type_id == 84) {
+                           $bookingType = 0;
+                        }
+
+                        if ($booking->booking_type_id == 85) {
+                            $bookingType = 1;
+                        }
+
                         // Check booking type and set title accordingly
                         if ($booking->booking_type_id == 85) {
                             $wellness = Mst_Wellness::find($booking->wellness_id);
@@ -97,7 +105,7 @@ class MyBookingsController extends Controller
                             'booking_date' => $booking_date,
                             'timeslot' => $time_from . '-' . $time_to,
                             'branch_name' => $booking->branch_name,
-                            'booking_type' => $booking->booking_type,
+                            'booking_type' => $bookingType,
                             'booked_for' => $patient_name,
                         ];
                     }
