@@ -152,4 +152,36 @@ class PatientHelper
         // Return the family_details array
         return $family_details;
     }
+    // $fee = 100.10;
+    public static function amountDecimal($fee) {
+        $parts = explode('.', $fee);
+        // Check if there is a decimal point and digits after it
+        if (count($parts) == 2 && strlen($parts[1]) > 0) {
+            // Extract the first 3 digits after the decimal point
+            $decimalDigits = substr($parts[1], 0, 3);
+    
+            // Determine the third digit after the decimal point
+            $thirdDigit = (strlen($decimalDigits) >= 3) ? intval($decimalDigits[2]) : 0;
+    
+            // If the third digit is greater than or equal to 5, round up the second digit
+            if ($thirdDigit >= 5) {
+                $decimalDigits = substr($parts[1], 0, 2);
+                $secondDigit = (strlen($decimalDigits) >= 2) ? intval($decimalDigits[1]) : 0;
+                $secondDigit += 1;
+                $decimalDigits = $parts[1][0] . $secondDigit;
+            } else {
+                // If not, use the original two digits
+                $decimalDigits = rtrim(substr($parts[1], 0, 2), '0');
+            }
+    
+            // If there are remaining digits, use the whole part and remaining digits
+            $result = $parts[0] . ($decimalDigits !== '' ? '.' . $decimalDigits : '');
+        } else {
+            // No decimal point or digits after it, use the original value
+            $result = $fee;
+        }
+    
+        return $result;
+    }    
+        
 }

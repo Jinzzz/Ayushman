@@ -282,6 +282,7 @@ class BookingHistoryController extends Controller
                                         'trn_consultation_bookings.is_for_family_member',
                                         'trn_consultation_bookings.booking_type_id',
                                         'trn_consultation_bookings.family_member_id',
+                                        'mst_staffs.staff_booking_fee',
                                         'booking_type.master_value as booking_type_name',
                                         'mst_timeslots.time_from',
                                         'mst_timeslots.time_to',
@@ -316,11 +317,12 @@ class BookingHistoryController extends Controller
                                         'branch_name' => $booking_details->branch_name,
                                     ];
                                     // Populate other booking details array
+                                    $fee = PatientHelper::amountDecimal($booking_details->staff_booking_fee);
                                     $other_booking_details[] = [
                                         'booking_id' => $booking_details->id,
                                         'booking_reference_number' => $booking_details->booking_reference_number,
                                         'booking_status' => $booking_details->status_name,
-                                        'booking_fee' => "500",
+                                        'booking_fee' => $fee,
                                         'booking_date' => $booking_date,
                                         'timeslot' => $time_from . '-' . $time_to,
                                         'booked_for' => $patient_name,
@@ -467,11 +469,12 @@ class BookingHistoryController extends Controller
                                         // 'longitude' => $booking_details->longitude ?? 0,
                                     ];
                                     // Populate other booking details array
+                                    $fee = PatientHelper::amountDecimal($booking_details->booking_fee);
                                     $other_booking_details[] = [
                                         'booking_id' => $booking_details->id,
                                         'booking_reference_number' => $booking_details->booking_reference_number,
                                         'booking_status' => $booking_details->status_name,
-                                        'booking_fee' => $booking_details->booking_fee,
+                                        'booking_fee' => $fee,
                                         'booking_date' => $booking_date,
                                         'timeslot' => $time_from . '-' . $time_to,
                                         'booked_for' => $patient_name,
