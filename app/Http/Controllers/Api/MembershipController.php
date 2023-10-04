@@ -229,19 +229,23 @@ class MembershipController extends Controller
                     'membership_booking_id' => $latest_membership_booking->membership_patient_id,
                     'package_id' => $package_details->membership_package_id,
                     'package_title' => $package_details->package_title,
-                    'package_validity' => $package_details->package_duration.' days',
+                    'package_validity' => $package_details->package_duration . ' days',
                     'gradient_start' => $package_details->gradient_start,
                     'gradient_end' => $package_details->gradient_end,
                     'membership_booking_date' => $membership_booking_date,
                     'membership_expiry_date' => $membership_expiry_date,
-                    'days_left' => $days_left.' days left',
+                    'days_left' => $days_left . ' days left',
                     'completed_sessions' => $completedSessions,
                     'remaining_sessions' => $remainingSessions,
                 ];
 
                 // Getting old membership details - History 
                 $previous_membership_details = [];
-                $old_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->orderBy('created_at', 'desc')->get();
+                $old_membership_bookings = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
+                    ->orderBy('created_at', 'desc')
+                    ->skip(1) // Skip the latest membership booking
+                    ->take(5) // Take the last 5 membership bookings
+                    ->get();
                 foreach ($old_membership_bookings as $old_membership_booking) {
                     if ($old_membership_booking->membership_patient_id != $latest_membership_booking->membership_patient_id) {
 
