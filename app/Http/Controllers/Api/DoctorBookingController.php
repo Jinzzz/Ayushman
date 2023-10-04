@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Staff_Timeslot;
+use App\Models\Mst_TimeSlot;
 use App\Models\Trn_Staff_Leave;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Consultation_Booking;
@@ -333,13 +334,13 @@ class DoctorBookingController extends Controller
             if (!$validator->fails()) {
                 if (isset($request->doctor_id)) {
                     // Retrieve doctor details by joining staff, branch, qualification, and specialization tables
-                    $doctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
+                    $getDoctorDetails = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                         ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
                         ->join('mst_master_values AS specialization', 'mst_staffs.staff_specialization', '=', 'specialization.id')
                         ->select(
                             'mst_staffs.staff_id as doctor_id',
                             'mst_staffs.staff_name as name',
-                            DB::raw('CAST(mst_staffs.staff_booking_fee AS SIGNED) as booking_fee'),  // Casting as integer
+                            'mst_staffs.staff_booking_fee',
                             'mst_branches.branch_name as branch_name',
                             'qualification.master_value as qualification',
                             'specialization.master_value as specialization',
@@ -350,17 +351,30 @@ class DoctorBookingController extends Controller
                         ->where('mst_staffs.staff_id', $request->doctor_id)
                         ->first();
 
-                    if ($doctorDetails) {
-                        $doctorDetails->profile_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $doctorDetails->profile_image;
-                        $doctorDetails->description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
-                        $data['status'] = 1;
-                        $data['message'] = "Data fetched";
-                        $data['data'] = $doctorDetails;
-                    } else {
-                        $data['status'] = 0;
-                        $data['message'] = "No doctor found";
-                    }
+                        $doctorDetails = [];
 
+                        if ($getDoctorDetails) {
+                            $fee = PatientHelper::amountDecimal($getDoctorDetails->staff_booking_fee);
+                            $doctorDetails = (object)[
+                                'doctor_id' => $getDoctorDetails->doctor_id,
+                                'name' => $getDoctorDetails->name,
+                                'booking_fee' => $fee,
+                                'branch_name' => $getDoctorDetails->branch_name,
+                                'qualification' => $getDoctorDetails->qualification,
+                                'specialization' => $getDoctorDetails->specialization,
+                                'address' => $getDoctorDetails->address,
+                                'profile_image' => 'https://ayushman-patient.hexprojects.in/assets/uploads/doctor_profile/' . $getDoctorDetails->profile_image,
+                                'description' => "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                            ];
+                        
+                            $data['status'] = 1;
+                            $data['message'] = "Data fetched";
+                            $data['data'] = $doctorDetails;
+                        } else {
+                            $data['status'] = 0;
+                            $data['message'] = "No doctor found";
+                        }
+                        
                     return response($data);
                 } else {
                     $data['status'] = 0;
@@ -667,8 +681,7 @@ class DoctorBookingController extends Controller
                         return response($data);
                     }
 
-                    $slotDetails = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
-                        ->where('mst__staff__timeslots.id', $request->slot_id)
+                    $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)
                         ->first();
 
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
@@ -719,7 +732,7 @@ class DoctorBookingController extends Controller
                         $member = Trn_Patient_Family_Member::join('mst_patients', 'trn_patient_family_member.patient_id', 'mst_patients.id')
                             ->join('mst_master_values as gender', 'trn_patient_family_member.gender_id', 'gender.id')
                             ->join('mst_master_values as relationship', 'trn_patient_family_member.relationship_id', 'relationship.id')
-                            ->select('trn_patient_family_member.id', 'trn_patient_family_member.mobile_number', 'trn_patient_family_member.email_address', 'trn_patient_family_member.family_member_name', 'relationship.master_value as gender_name', 'trn_patient_family_member.date_of_birth', 'relationship.master_value as relationship')
+                            ->select('trn_patient_family_member.id', 'trn_patient_family_member.mobile_number', 'trn_patient_family_member.email_address', 'trn_patient_family_member.family_member_name', 'gender.master_value as gender_name', 'trn_patient_family_member.date_of_birth', 'relationship.master_value as relationship')
                             ->where('trn_patient_family_member.patient_id', $patient_id)
                             ->where('trn_patient_family_member.id', $request->family_member_id)
                             ->where('trn_patient_family_member.is_active', 1)
@@ -738,10 +751,11 @@ class DoctorBookingController extends Controller
                             'email_address' => $member->email_address,
                         ];
                     }
+                    $fee = PatientHelper::amountDecimal($doctor->staff_booking_fee);
 
                     $paymentDetails[] = [
-                        'consultation_fee' => intval($doctor->staff_booking_fee),
-                        'total_amount' => intval($doctor->staff_booking_fee),
+                        'consultation_fee' => $fee,
+                        'total_amount' => $fee,
                     ];
 
                     $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
@@ -831,9 +845,7 @@ class DoctorBookingController extends Controller
                         }
 
                         // Fetch details of the selected time slot for the booking
-                        $slotDetails = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
-                            ->where('mst__staff__timeslots.id', $request->slot_id)
-                            ->first();
+                        $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)->first();
 
                         // Convert time format from database format to user-readable format
                         $time_from = date('h:i A', strtotime($slotDetails->time_from));

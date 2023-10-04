@@ -69,6 +69,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('booking_history_details/wellness', [BookingHistoryController::class, 'wellnessBookingDetails']);
 
     // Profile 
+    Route::post('patient/edit_details', [PatientAuthController::class, 'editDetails']);
     Route::post('patient/update_details', [PatientAuthController::class, 'updateDetails']);
     Route::post('patient/change_password', [PatientAuthController::class, 'changePassword']);
     Route::get('patient/logout', [PatientAuthController::class, 'logout']);

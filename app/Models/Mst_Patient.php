@@ -16,13 +16,14 @@ class Mst_Patient extends Authenticatable
         'patient_name',
         'patient_email',
         'patient_mobile',
+        'patient_mobile_new',
         'patient_address',
         'patient_gender',
         'patient_dob',
         'username',
         'password',
         'is_active',
-
+        
     ];
 
     public function gender()

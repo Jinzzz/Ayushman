@@ -60,14 +60,14 @@ class MembershipController extends Controller
                     $benefits = $benefits->toArray();
                     // Verifying if the incoming package ID matches the active membership.
                     $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
-
+                    $fee = PatientHelper::amountDecimal($membership->package_price);
                     $membership_packages[] = [
                         'membership_package_id' => $membership->membership_package_id,
                         'package_title' => $membership->package_title,
                         'gradient_start' => $membership->gradient_start,
                         'gradient_end' => $membership->gradient_end,
                         'package_duration' => $membership->package_duration . " days",
-                        'package_price' => intval($membership->package_price),
+                        'package_price' => $fee,
                         'is_joined' => $is_joined,
                         'benefits' => $benefits,
                     ];
@@ -112,14 +112,14 @@ class MembershipController extends Controller
                     $package_details = Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)->where('is_active', 1)->first();
 
                     $package_description = strip_tags($package_details->package_description);
-
+                    $fee = PatientHelper::amountDecimal($package_details->package_price);
                     $membership_package_details[] = [
                         'membership_package_id' => $package_details->membership_package_id,
                         'package_title' => $package_details->package_title,
                         'gradient_start' => $package_details->gradient_start,
                         'gradient_end' => $package_details->gradient_end,
                         'package_duration' => $package_details->package_duration . " days",
-                        'package_price' => intval($package_details->package_price),
+                        'package_price' => $fee,
                         'package_description' => $package_description,
                     ];
 

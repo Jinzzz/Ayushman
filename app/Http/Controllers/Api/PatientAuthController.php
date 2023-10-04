@@ -276,10 +276,25 @@ class PatientAuthController extends Controller
                                 ]);
                             }
 
+                            if ($request->otp_type == 3) {
+                                $getData =  Mst_Patient::where('id', $patient_id)->first();
+                                if ($getData) {
+                                    Mst_Patient::where('id', $patient_id)->update([
+                                        'updated_at' => Carbon::now(),
+                                        'patient_mobile' => $getData->patient_mobile_new,
+                                        'is_otp_verified' => 1,
+                                    ]);
+                                } else {
+                                    $data['status'] = 0;
+                                    $data['message'] = "Something went wrong";
+                                    return response($data);
+                                }
+                            }
+
                             // Prepare and return a success response
                             $data['status'] = 1;
                             $data['message'] = "Registration completed successfully";
-                            if ($request->otp_type == 2) {
+                            if ($request->otp_type == 2 || 3) {
                                 $data['message'] = "OTP verified successfully";
                             }
                             return response($data);
@@ -521,6 +536,55 @@ class PatientAuthController extends Controller
         }
     }
 
+    public function editDetails(Request $request)
+    {
+        $data = array();
+        try {
+            // Get the authenticated patient's ID
+            $patient_id = Auth::id();
+
+            // Check if a patient ID is available
+            if ($patient_id) {
+                // Retrieve the current data of the authenticated patient
+                $accountHolder = Mst_Patient::join('mst_master_values as gender', 'mst_patients.patient_gender', '=', 'gender.id')
+                    ->join('mst_master_values as blood_group', 'mst_patients.patient_blood_group_id', '=', 'blood_group.id')
+                    ->where('mst_patients.id', $patient_id)
+                    ->select('mst_patients.*', 'gender.master_value as gender_name', 'blood_group.master_value as blood_group')
+                    ->first();
+
+                // Build an array with account holder details
+                $accountHolderDetails[] = [
+                    'patient_id' => $accountHolder->id,
+                    'patient_name' => $accountHolder->patient_name,
+                    'patient_dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
+                    'patient_gender' => $accountHolder->gender_name,
+                    'patient_mobile' => $accountHolder->patient_mobile,
+                    'patient_email' => $accountHolder->patient_email,
+                    'patient_address' => $accountHolder->patient_address,
+                    'blood_group' => $accountHolder->blood_group,
+                ];
+
+                // Prepare and return a success response
+                $data['status'] = 1;
+                $data['message'] = "Data fetched";
+                $data['data'] = $accountHolderDetails;
+
+                return response($data);
+            } else {
+                // If no patient ID is found, return an error response
+                $data['status'] = 0;
+                $data['message'] = "User does not exist";
+                return response($data);
+            }
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
     public function updateDetails(Request $request)
     {
         $data = array();
@@ -534,10 +598,11 @@ class PatientAuthController extends Controller
                 $currentData = Mst_Patient::where('id', $patient_id)->first();
                 // Check and update patient details based on the provided request data
                 if ($request->patient_blood_group) {
-                    $blood_group_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_blood_group . '%')->pluck('id')->first();
+                    $blood_group_id = $request->patient_blood_group;
                 }
+
                 if ($request->patient_gender) {
-                    $patient_gender_id = Mst_Master_Value::where('master_value', 'LIKE', '%' . $request->patient_gender . '%')->pluck('id')->first();
+                    $patient_gender_id = $request->patient_gender;
                 }
 
                 if ($request->patient_dob) {
@@ -548,6 +613,7 @@ class PatientAuthController extends Controller
                 Mst_Patient::where('id', $patient_id)->update([
                     'patient_name'      => $request->patient_name ?? $currentData->patient_name,
                     'patient_email'     => $request->patient_email ?? $currentData->patient_email,
+                    'patient_mobile'     => $currentData->patient_mobile,
                     'patient_address'   => $request->patient_address ?? $currentData->patient_address,
                     'patient_gender'    => $patient_gender_id ?? $currentData->patient_gender,
                     'patient_dob'       => $patient_dob ?? $currentData->patient_dob,
@@ -555,9 +621,44 @@ class PatientAuthController extends Controller
                     'created_at'        => Carbon::now(),
                 ]);
 
-                // Prepare and return a success response
-                $data['status'] = 1;
-                $data['message'] = "Profile updated successfully";
+                // Check if the mobile number has changed
+                $isChangedMobileNumber = ($currentData->patient_mobile != $request->patient_mobile) ? 1 : 0;
+
+                if ($isChangedMobileNumber == 1) {
+                    // Generating an OTP for verification as they are attempting to update their mobile number.
+
+                    $save_new_mobile_number = Mst_Patient::where('id', $patient_id)->update([
+                        'updated_at' => Carbon::now(),
+                        'patient_mobile_new' => $request->patient_mobile,
+                        'is_otp_verified' => 0,
+                    ]);
+
+                    $verificationOtp = rand(100000, 999999);
+
+                    // Create OTP record
+                    $otpCreate = Trn_Patient_Otp::create([
+                        'patient_id' => $patient_id,
+                        'otp' => $verificationOtp,
+                        'otp_type' => 3,
+                        'verified' => 0,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                        'otp_expire_at' => Carbon::now()->addMinutes(10),
+                    ]);
+
+                    $data = [
+                        'status' => 3,
+                        'otp' => $verificationOtp,
+                        'otp_type' => 3,
+                        'mobile_number' => $request->patient_mobile,
+                        'patient_id' => $patient_id,
+                        'message' => "Please enter the OTP that was sent to the mobile number.",
+                    ];
+                } else {
+                    // Prepare and return a success response
+                    $data['status'] = 1;
+                    $data['message'] = "Profile updated successfully";
+                }
                 return response($data);
             } else {
                 // If no patient ID is found, return an error response
