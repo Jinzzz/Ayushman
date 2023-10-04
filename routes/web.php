@@ -34,6 +34,7 @@ use App\Http\Controllers\AccountLedgerController;
 use App\Http\Controllers\EmployeeBranchTransferController;
 use App\Http\Controllers\MedicinePurchaseController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\MstUserController;
 
 
 /*
@@ -353,3 +354,14 @@ Route::get('/medicine-purchase/create', [MedicinePurchaseController::class, 'cre
 Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembershipIndex'])->name('patients.membership');
 Route::post('/patients/membership/store/{id}', [MstPatientController::class, 'patientMembershipStore'])->name('patientsMembership.store');
 Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class ,'getWellnessDetails'])->name('getwellness.details');
+
+
+//Manage-Users:
+Route::get('/user/index',[MstUserController::class,'index'])->name('user.index');
+Route::get('/user/create',[MstUserController::class,'create'])->name('user.create');
+Route::post('/user/store', [MstUserController::class, 'store'])->name('user.store');
+Route::get('/user/edit/{id}', [MstUserController::class, 'edit'])->name('user.edit');
+Route::put('/user/update/{id}', [MstUserController::class, 'update'])->name('user.update');
+Route::get('/user/show/{id}', [MstUserController::class, 'show'])->name('user.show');
+Route::delete('/user/destroy/{id}', [MstUserController::class, 'destroy'])->name('user.destroy');
+Route::patch('user/change-status/{id}', [MstUserController::class, 'changeStatus'])->name('user.changeStatus');

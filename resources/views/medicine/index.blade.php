@@ -18,8 +18,17 @@
                         <input type="text" id="generic-name" name="generic_name" class="form-control" value="{{ request('generic_name') }}">
                     </div>
                     <div class="col-md-4">
-                        <label for="medicine-type" class="form-label">Medicine Type:</label>
-                        <input type="text" id="medicine-type" name="medicine_type" class="form-control" value="{{ request('medicine_type') }}">
+                        <div class="form-group">
+                            <label class="form-label">Medicine Type</label>
+                            <select class="form-control" name="medicine_type" id="medicine_type">
+                                <option value="">Select Medicine Type</option>
+                                @foreach($medicineType as $masterId => $masterValue)
+                                    <option value="{{ $masterId }}"{{ request('medicine_type') == $masterId ? 'selected' : '' }}>
+                                        {{ $masterValue }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>    
                     <div class="col-md-3 d-flex align-items-end">

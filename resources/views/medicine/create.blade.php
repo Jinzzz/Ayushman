@@ -63,7 +63,7 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label for="tax_id">Tax*</label>
+                           <label class="form-label">Tax*</label>
                            <select class="form-control" name="tax_id" id="tax_id">
                               <option value="">Choose Tax</option>
                               @foreach($taxes as $tax_id => $tax)
@@ -86,7 +86,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Unit Price*</label>
-                           <input type="text" class="form-control" required name="unit_price" maxlength="14" value="{{ old('unit_price') }}" placeholder="Unit Price" oninput="validateNumericValue(this);">
+                           <input type="text" class="form-control" required name="unit_price" maxlength="10" value="{{ old('unit_price') }}" placeholder="Unit Price" oninput="validateNumericValue(this);">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -97,7 +97,7 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label for="tax_id">Unit*</label>
+                           <label class="form-label">Unit*</label>
                            <select class="form-control" name="unit_id" id="unit_id">
                               <option value="">Choose Unit</option>
                               @foreach($units as $unit_id => $unit)
@@ -109,7 +109,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Reorder Limit</label>
-                           <input type="text" class="form-control" name="reorder_limit" maxlength="14" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit" 
+                           <input type="text" class="form-control" name="reorder_limit" maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit" 
                            {{-- Add the numeric validation rule here --}}
                            min="0" max="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
                         </div>

@@ -212,13 +212,14 @@ class MstPatientController extends Controller
 
     public function addMembershipIndex($id)
     {
-        
         $pageTitle = "Membership details";
-        $memberships = Mst_Membership_Package::pluck('package_title', 'membership_package_id','package_duration','package_description','package_price','is_active');
-        $bookingDetails = Mst_Patient_Membership_Booking::pluck('membership_package_id','start_date','membership_expiry_date','payment_amount','is_active');
-        return view('patients.membership_details', compact('pageTitle', 'memberships','id','bookingDetails'));
+        $paymentType = Mst_Master_Value::where('master_id',25)->pluck('master_value','id');
+        $memberships = Mst_Membership_Package::pluck('package_title', 'membership_package_id', 'package_duration', 'package_description', 'package_price', 'is_active');
+        $patientMemberships = Mst_Patient_Membership_Booking::where('patient_id', $id)->get();
+ 
+        return view('patients.membership_details', compact('pageTitle', 'memberships', 'id', 'patientMemberships','paymentType'));
     }
-
+    
     public function getWellnessDetails($membershipId)
     {
         if (isset($membershipId)) {
@@ -227,6 +228,9 @@ class MstPatientController extends Controller
     
             // Retrieve benefits based on the $membershipId
             $benefits = Mst_Membership_Benefit::where('package_id', $membershipId)->first();
+
+            // Retrieve patient membership bookings
+            // $bookingDetails = Mst_Patient_Membership_Booking::findOrFail();
     
             // Retrieve wellness details based on the $membershipId
             $wellnessDetails = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
@@ -234,7 +238,7 @@ class MstPatientController extends Controller
                 ->where('mst__membership__package__wellnesses.is_active', 1)
                 ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst__membership__package__wellnesses.is_active, mst_wellness.wellness_inclusions')
                 ->get();
-                return response()->json(['wellnessDetails'=> $wellnessDetails , 'benefits'=> $benefits ,'package_details' => $package_details ]);
+                return response()->json(['wellnessDetails'=> $wellnessDetails , 'benefits'=> $benefits ,'package_details' => $package_details  ]);
     }
 }
 

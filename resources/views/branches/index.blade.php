@@ -12,11 +12,11 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="pat-code">Branch Code:</label>
+                            <label class="form-label">Branch Code:</label>
                             <input type="text" id="branch-code" name="branch_code" class="form-control" value="{{ request('branch_code') }}">
                         </div>
                         <div class="col-md-4">
-                            <label for="pat-name">Branch Name:</label>
+                            <label class="form-label">Branch Name:</label>
                             <input type="text" id="branch-name" name="branch_name" class="form-control" value="{{ request('branch_name') }}">
                         </div>
                        

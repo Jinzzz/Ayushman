@@ -12,6 +12,7 @@ class MstWellnessController extends Controller
     public function index(Request $request)
     {
         $pageTitle = "Wellness";
+        $branches = Mst_Branch::pluck('branch_name','branch_id');
         $query = Mst_Wellness::query();
 
         // Apply filters if provided
@@ -19,15 +20,12 @@ class MstWellnessController extends Controller
             $query->where('wellness_name', 'LIKE', "%{$request->wellness_name}%");
         }
     
-    
-        if ($request->filled('branch_id')) {
-            $query->whereHas('branch', function ($q) use ($request) {
-                $q->where('branch_name', 'like', '%' . $request->input('branch_id') . '%');
-            });
+        if ($request->has('branch_id')) {
+            $query->where('branch_id', 'LIKE', "%{$request->branch_id}%");
         }
     
         $wellness = $query->orderBy('updated_at', 'desc')->get();
-        return view('wellness.index',compact('pageTitle','wellness'));
+        return view('wellness.index',compact('pageTitle','wellness','branches'));
     }
 
     public function create()

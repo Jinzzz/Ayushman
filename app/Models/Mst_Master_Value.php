@@ -98,8 +98,9 @@ class Mst_Master_Value extends Model
     return $this->hasMany(Mst_Staff_Specialization::class, 'specialization', 'master_id');
     }
 
-
-
-
-
+    public function users()
+    {
+        return $this->hasMany(Mst_User::class, 'user_type_id', 'id');
+    }
+    
 }

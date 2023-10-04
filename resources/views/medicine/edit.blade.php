@@ -103,7 +103,7 @@
                       <select class="form-control" name="unit_id" id="unit_id">
                           <option value="">Choose Unit</option>
                           @foreach($units as $unit_id => $unit)
-                          <option value="{{ $unit_id }}"{{ $unit_id == $medicine->$unit_id ? 'selected' : '' }}>{{ $unit }}</option>
+                          <option value="{{ $unit_id }}"{{ $unit_id == $medicine->unit_id ? 'selected' : '' }}>{{ $unit }}</option>
                           @endforeach
                       </select>
                   </div>

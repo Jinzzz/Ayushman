@@ -80,4 +80,10 @@ class Mst_Staff extends Model
     {
         return $this->belongsTo(Mst_Master_Value::class,'staff_commission_type','id');
     }
+
+    public function users()
+    {
+    return $this->hasMany(Mst_User::class, 'staff_id', 'staff_id');
+    }
+
 }

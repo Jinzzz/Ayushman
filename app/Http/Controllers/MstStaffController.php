@@ -76,7 +76,7 @@ class MstStaffController extends Controller
            // 'staff_specialization' => 'required', 
             // 'staff_commission_type' => 'required',
             'staff_commission' => 'required|numeric', 
-            'staff_booking_fee' => 'nullable|numeric',
+            'staff_booking_fee' => 'nullable|numeric|gt:0',
             'max_discount_value' => 'nullable|numeric|between:0,100',
             'salary_type' => 'required',
             'salary_amount' => 'required|numeric',

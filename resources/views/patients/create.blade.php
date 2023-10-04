@@ -120,14 +120,12 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Registration Type</label>
-                                    <select class="form-control" name="patient_registration_type"
-                                        id="patient_registration_type" required>
-                                        <option value="">Choose Registration Type</option>
-                                        <option value="Self">Self</option>
-                                        <option value="Online">Online</option>
+                                    <select class="form-control" name="patient_registration_type" id="patient_registration_type" required>
+                                        <option value="self" selected>Self</option>
                                     </select>
                                 </div>
                             </div>
+                            
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Whatsapp Number</label>
