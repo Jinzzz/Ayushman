@@ -16,22 +16,63 @@ use DB;
 
 class FamilyController extends Controller
 {
-    public function myFamily()
+    public function myFamily(Request $request)
     {
         $data = array();
         try {
+            // Validating request parameters
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'limit' => ['integer'],
+                    'page_number' => ['integer'],
+                ],
+                [
+                    'limit.integer' => 'Limit must be an integer',
+                    'page_number.integer' => 'Page number must be an integer',
+                ]
+            );
+    
+            // If validation fails, return error response
+            if ($validator->fails()) {
+                $data['status'] = 0;
+                $data['message'] = $validator->errors()->first();
+                return response($data);
+            }
+    
             $patient_id = Auth::id();
             $family_details = array();
-
+    
+            // Fetch family details using your existing function
             $family_details = PatientHelper::getFamilyDetails($patient_id);
+    
             if ($family_details) {
+                // Paginate the family details
+                $limit = $request->input('limit', 5); // Default limit is 5
+                $page_number = $request->input('page_number', 1); // Default page number is 1
+    
+                $family_details_collection = collect($family_details);
+                $paginate_family_details = $family_details_collection->slice(($page_number - 1) * $limit, $limit)->all();
+    
+                // Prepare the success response with pagination details
                 $data['status'] = 1;
                 $data['message'] = "Data fetched";
-                $data['data'] = $family_details;
+                $data['data'] = array_values($paginate_family_details);
+                $data['pagination_details'] = [
+                    'current_page' => $page_number,
+                    'total_records' => count($family_details),
+                    'total_pages' => ceil(count($family_details) / $limit),
+                    'per_page' => $limit,
+                    'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
+                    'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($family_details) / $limit) . '&limit=' . $limit) : null,
+                    'next_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
+                    'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                ];
             } else {
                 $data['status'] = 0;
                 $data['message'] = "User does not exist";
             }
+    
             return response($data);
         } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
@@ -41,6 +82,7 @@ class FamilyController extends Controller
             return response($response);
         }
     }
+    
 
     public function addMember(Request $request)
     {
@@ -316,7 +358,7 @@ class FamilyController extends Controller
                             'verified' => 0,
                         ]);
                     }
-                    
+
 
                     $data['status'] = intval($request->status);
                     $data['otp'] = $verification_otp;
@@ -433,111 +475,73 @@ class FamilyController extends Controller
     {
         $data = array();
         try {
-            $validator = Validator::make(
-                $request->all(),
-                [
-                    'member_name'      => 'required',
-                    'member_email'     => 'required|email',
-                    'member_mobile'    => ['required', 'regex:/^[0-9]{10}$/'],
-                    'member_address'      => 'required',
-                    'member_gender'      => 'required',
-                    'member_dob'      => 'required',
-                    'member_blood_group'      => 'required',
-                    'relationship'      => 'required',
-                    'family_member_id'      => 'required',
-                ],
-                [
-                    'member_name.required'         => 'Name required',
-                    'member_email.required'        => 'Email address required',
-                    'member_email.email'           => 'Invalid email address',
-                    'member_mobile.required'       => 'Mobile number required',
-                    'member_mobile.regex'          => 'Invalid mobile number',
-                    'member_address.required'         => 'Address required',
-                    'member_gender.required'         => 'Gender required',
-                    'member_dob.required'         => 'Date of birth required',
-                    'member_blood_group.required'         => 'Blood Group required',
-                    'relationship.required'         => 'Relationship required',
-                    'family_member_id.required' => 'Family member id is required',
-                ]
-            );
+            $patient_id = Auth::id();
 
-            if (!$validator->fails()) {
-                // checking the validity
-                if (isset($request->family_member_id) && isset($request->member_name) && isset($request->member_email) && isset($request->member_mobile) && isset($request->member_address) && isset($request->member_gender) && isset($request->member_dob) && isset($request->member_blood_group) && isset($request->relationship)) {
-                    $patient_id = Auth::id();
-                    $member_dob = PatientHelper::dateFormatDb($request->member_dob);
-
-                    $member_gender_id = $request->member_gender;
-                    $blood_group_id =  $request->member_blood_group;
-                    $relationship_id = $request->relationship;
-
-                    // Retrieve the current mobile number from the database
-                    $currentMobileNumber = Trn_Patient_Family_Member::where('id', $request->family_member_id)->value('mobile_number');
-
-                    $addFamilyMember = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
-                        'patient_id' => $patient_id,
-                        'family_member_name' => $request->member_name,
-                        'mobile_number' => $currentMobileNumber,
-                        'email_address' => $request->member_email,
-                        'gender_id' => $member_gender_id,
-                        'blood_group_id' => $blood_group_id,
-                        'date_of_birth' => $member_dob,
-                        'relationship_id' => $relationship_id,
-                        'address' => $request->member_address,
-                        'created_by' => $patient_id,
-                        'is_active' => 1,
-                        'updated_at' => Carbon::now(),
-                    ]);
-
-                    // Check if the mobile number has changed
-                    $isChangedMobileNumber = ($currentMobileNumber != $request->member_mobile) ? 1 : 0;
-
-                    if ($isChangedMobileNumber == 1) {
-                        // Generating an OTP for verification as they are attempting to update their mobile number.
-
-                        $save_new_mobile_number = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
-                            'updated_at' => Carbon::now(),
-                            'mobile_number_new' => $request->member_mobile,
-                            'verified' => 0,
-                        ]);
-
-                        $verificationOtp = rand(100000, 999999);
-
-                        $otpCreate = Trn_Family_Member_Otp::create([
-                            'patient_id' => $patient_id,
-                            'family_member_id' => $request->family_member_id,
-                            'otp' => $verificationOtp,
-                            // 'mobile_number' => $request->member_mobile,
-                            'verified' => 0,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                            'otp_expire_at' => Carbon::now()->addMinutes(10),
-                        ]);
-
-                        $data = [
-                            'status' => 3,
-                            'otp' => $verificationOtp,
-                            'mobile_number' => $request->member_mobile,
-                            'patient_id' => $patient_id,
-                            'family_member_id' => $request->family_member_id,
-                            'message' => "Please enter the OTP that was sent to the mobile number.",
-                        ];
-                    } else {
-                        $data['status'] = 1;
-                        $data['message'] = "Family member details updated successfully.";
-                    }
-                    return response($data);
-                } else {
-                    $data['status'] = 0;
-                    $data['message'] = "Please fill mandatory fields";
-                    return response($data);
-                }
-            } else {
-                $data['status'] = 0;
-                $data['errors'] = $validator->errors();
-                $data['message'] = "Validation errors";
-                return response($data);
+            if($request->member_dob){
+                $member_dob = PatientHelper::dateFormatDb($request->member_dob);
             }
+
+            $member_gender_id = $request->member_gender;
+            $blood_group_id =  $request->member_blood_group;
+            $relationship_id = $request->relationship;
+
+            // Retrieve the current mobile number from the database
+            $currentDetails = Trn_Patient_Family_Member::where('id', $request->family_member_id)->first();
+            $addFamilyMember = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                'patient_id' => $patient_id,
+                'family_member_name' => $request->member_name ?? $currentDetails->family_member_name,
+                'mobile_number' => $currentDetails->mobile_number,
+                'email_address' => $request->member_email ?? $currentDetails->email_address,
+                'gender_id' => $member_gender_id ?? $currentDetails->gender_id,
+                'blood_group_id' => $blood_group_id ?? $currentDetails->blood_group_id,
+                'date_of_birth' => $member_dob ?? $currentDetails->date_of_birth,
+                'relationship_id' => $relationship_id ?? $currentDetails->relationship_id,
+                'address' => $request->member_address ?? $currentDetails->address,
+                'created_by' => $patient_id,
+                'is_active' => 1,
+                'updated_at' => Carbon::now(),
+            ]);
+
+            // Check if the mobile number has changed
+            $isChangedMobileNumber = 0;
+            if($request->member_mobile){
+                $isChangedMobileNumber = ($currentDetails->mobile_number != $request->member_mobile) ? 1 : 0;
+            }
+            if ($request->member_mobile && $isChangedMobileNumber == 1) {
+                // Generating an OTP for verification as they are attempting to update their mobile number.
+
+                $save_new_mobile_number = Trn_Patient_Family_Member::where('id', $request->family_member_id)->update([
+                    'updated_at' => Carbon::now(),
+                    'mobile_number_new' => $request->member_mobile,
+                    'verified' => 0,
+                ]);
+
+                $verificationOtp = rand(100000, 999999);
+
+                $otpCreate = Trn_Family_Member_Otp::create([
+                    'patient_id' => $patient_id,
+                    'family_member_id' => $request->family_member_id,
+                    'otp' => $verificationOtp,
+                    // 'mobile_number' => $request->member_mobile,
+                    'verified' => 0,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                    'otp_expire_at' => Carbon::now()->addMinutes(10),
+                ]);
+
+                $data = [
+                    'status' => 3,
+                    'otp' => $verificationOtp,
+                    'mobile_number' => $request->member_mobile,
+                    'patient_id' => $patient_id,
+                    'family_member_id' => $request->family_member_id,
+                    'message' => "Please enter the OTP that was sent to the mobile number.",
+                ];
+            } else {
+                $data['status'] = 1;
+                $data['message'] = "Family member details updated successfully.";
+            }
+            return response($data);
         } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);

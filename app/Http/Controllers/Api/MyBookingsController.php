@@ -20,10 +20,22 @@ use DB;
 
 class MyBookingsController extends Controller
 {
-    public function myBookings()
+    public function myBookings(Request $request)
     {
         $data = array();
         try {
+
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'limit' => ['integer'],
+                    'page_number' => ['integer'],
+                ],
+                [
+                    'limit.integer' => 'Limit must be an integer',
+                    'page_number.integer' => 'Page number must be an integer',
+                ]
+            );
             $patient_id = Auth::id();
             // return $patient_id;
             if ($patient_id) {
@@ -31,7 +43,7 @@ class MyBookingsController extends Controller
 
                 $all_bookings = [];
                 // Retrieve all consultation bookings for the given patient
-                $all_bookings = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                $queries = Trn_Consultation_Booking::where('patient_id', $patient_id)
                     ->whereIn('trn_consultation_bookings.booking_status_id', [87, 88])
                     ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
                     ->leftJoin('mst_master_values as booking_type_master', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type_master.id')
@@ -54,9 +66,34 @@ class MyBookingsController extends Controller
                         'booking_type_master.master_value as booking_type',
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
-                    )
-                    ->get();
+                    );
 
+                // sorting 
+                if (isset($request->sort_type)) {
+                    if ($request->sort_type == 0) {
+                        // Booking date wise ascending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'asc');
+                    }
+                    if ($request->sort_type == 1) {
+                        // Booking date wise descending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                    }
+                }else{
+                    $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                }                
+                // filter 
+                if (isset($request->search_booking_date)) {
+                    $booking_date = PatientHelper::dateFormatDb($request->search_booking_date);
+                    $queries = $queries->where('trn_consultation_bookings.booking_date', 'like', '%' . $booking_date . '%');
+                }
+                if (isset($request->search_booking_status)) {
+                    $queries = $queries->where('booking_status_master.master_value', 'like', '%' . $request->search_booking_status . '%');
+                }
+                if (isset($request->search_branch)) {
+                    $queries = $queries->where('mst_branches.branch_name', 'like', '%' . $request->search_branch . '%');
+                }
+
+                $all_bookings = $queries->get();
 
                 if ($all_bookings->isNotEmpty()) {
                     // Loop through all consultation bookings and prepare data for display
@@ -111,9 +148,29 @@ class MyBookingsController extends Controller
                         ];
                     }
 
+                    $limit = $request->input('limit', 5); // Default limit is 5
+                    $page_number = $request->input('page_number', 1); // Default page number is 1
+
+                    // Create a collection from the array
+                    $my_bookings_collection = collect($my_bookings);
+
+                    // Get a portion of the collection based on the pagination parameters
+                    $paginate_bookings = $my_bookings_collection->slice(($page_number - 1) * $limit, $limit)->all();
+
                     $data['status'] = 1;
                     $data['message'] = "Data fetched";
-                    $data['data'] = $my_bookings;
+                    $data['data'] = array_values($paginate_bookings);
+                    $data['pagination_details'] = [
+                        'current_page' => $page_number,
+                        'total_records' => count($my_bookings),
+                        'total_pages' => ceil(count($my_bookings) / $limit),
+                        'per_page' => $limit,
+                        'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
+                        'last_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($my_bookings) / $limit) . '&limit=' . $limit) : null,
+                        'next_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
+                        'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                    ];
+
                     return response($data);
                 } else {
                     $data['status'] = 0;

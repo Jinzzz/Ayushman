@@ -400,6 +400,7 @@ class MembershipController extends Controller
                         'start_date' => $starting_date,
                         'membership_expiry_date' => $expiry_date,
                         'payment_type' => 1,
+                        'payment_status_id' => 120,
                         'details' => "test",
                         'is_active' => $is_active,
                         'payment_amount' => $package_details->package_price,

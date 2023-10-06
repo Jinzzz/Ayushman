@@ -49,7 +49,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/consultation/booking_confirmation', [DoctorBookingController::class, 'bookingConfirmation']);
 
     // Add family member
-    Route::get('patient/my_family', [FamilyController::class, 'myFamily']);
+    Route::post('patient/my_family', [FamilyController::class, 'myFamily']);
     Route::post('patient/add_member', [FamilyController::class, 'addMember']);
     Route::post('patient/member/otp_verification', [FamilyController::class, 'otpVerification']);
     Route::post('patient/member/resend_otp', [FamilyController::class, 'reSendOtp']);
@@ -58,13 +58,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/member/delete', [FamilyController::class, 'deleteFamilyMember']);
 
     // Manage Bookings 
-    Route::get('patient/my_bookings', [MyBookingsController::class, 'myBookings']);
+    Route::post('patient/my_bookings', [MyBookingsController::class, 'myBookings']);
     Route::post('upcoming_booking_details/consultation', [MyBookingsController::class, 'consultationBookingDetails']);
     Route::post('upcoming_booking_details/wellness', [MyBookingsController::class, 'wellnessBookingDetails']);
     Route::post('patient/cancel_booking', [MyBookingsController::class, 'cancelBooking']);
 
     // booking history
-    Route::get('patient/my_booking_history', [BookingHistoryController::class, 'myBookingHistory']);
+    Route::post('patient/my_booking_history', [BookingHistoryController::class, 'myBookingHistory']);
     Route::post('booking_history_details/consultation', [BookingHistoryController::class, 'consultationBookingDetails']);
     Route::post('booking_history_details/wellness', [BookingHistoryController::class, 'wellnessBookingDetails']);
 

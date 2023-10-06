@@ -16,12 +16,33 @@ use App\Models\Trn_Patient_Family_Member;
 
 class BookingHistoryController extends Controller
 {
-    public function myBookingHistory()
+    public function myBookingHistory(Request $request)
     {
         $data = array();
         try {
+            // Validating request parameters
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'limit' => ['integer'],
+                    'page_number' => ['integer'],
+                ],
+                [
+                    'limit.integer' => 'Limit must be an integer',
+                    'page_number.integer' => 'Page number must be an integer',
+                ]
+            );
+
+            // If validation fails, return error response
+            if ($validator->fails()) {
+                $data['status'] = 0;
+                $data['message'] = $validator->errors()->first();
+                return response($data);
+            }
+
             // Get the authenticated patient's ID
             $patient_id = Auth::id();
+
             // Check if the patient exists
             if ($patient_id) {
                 // Get the current date and time
@@ -55,8 +76,8 @@ class BookingHistoryController extends Controller
                 $my_bookings = [];
 
                 // Get pending consultation bookings
-                $all_bookings_consultation = Trn_Consultation_Booking::where('patient_id', $patient_id)
-                    ->whereIn('trn_consultation_bookings.booking_type_id',[84, 85])
+                $queries = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                    ->whereIn('trn_consultation_bookings.booking_type_id', [84, 85])
                     ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
                     ->leftJoin('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
                     ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
@@ -84,8 +105,34 @@ class BookingHistoryController extends Controller
                         'booking_type.master_value as booking_type_name',
                         'mst_timeslots.time_from',
                         'mst_timeslots.time_to'
-                    )
-                    ->get();
+                    );
+
+                    // sorting 
+                if (isset($request->sort_type)) {
+                    if ($request->sort_type == 0) {
+                        // Booking date wise ascending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'asc');
+                    }
+                    if ($request->sort_type == 1) {
+                        // Booking date wise descending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                    }
+                }else{
+                    $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                }                
+                // filter 
+                if (isset($request->search_booking_date)) {
+                    $booking_date = PatientHelper::dateFormatDb($request->search_booking_date);
+                    $queries = $queries->where('trn_consultation_bookings.booking_date', 'like', '%' . $booking_date . '%');
+                }
+                if (isset($request->search_booking_status)) {
+                    $queries = $queries->where('booking_status.master_value', 'like', '%' . $request->search_booking_status . '%');
+                }
+                if (isset($request->search_branch)) {
+                    $queries = $queries->where('mst_branches.branch_name', 'like', '%' . $request->search_branch . '%');
+                }
+
+                $all_bookings_consultation = $queries->get();
 
                 // Process and add consultation bookings to the result array
                 if ($all_bookings_consultation->isNotEmpty()) {
@@ -138,11 +185,11 @@ class BookingHistoryController extends Controller
                 }
 
                 // Get pending wellness bookings
-                $all_bookings_wellness = Trn_Consultation_Booking::where('patient_id', $patient_id)
+                $queries = Trn_Consultation_Booking::where('patient_id', $patient_id)
                     ->where('booking_type_id', 85)
-                    ->join('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
-                    ->join('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
-                    ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
+                    ->leftJoin('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
+                    ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
+                    ->leftJoin('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
                     ->where('trn_consultation_bookings.booking_date', '<', $currentDate)
                     ->select(
                         'booking_status.master_value as booking_status_name',
@@ -156,9 +203,34 @@ class BookingHistoryController extends Controller
                         'trn_consultation_bookings.booking_type_id',
                         'trn_consultation_bookings.family_member_id',
                         'booking_type.master_value as booking_type_name'
-                    )
-                    ->get();
+                    );
 
+                    // sorting 
+                if (isset($request->sort_type)) {
+                    if ($request->sort_type == 0) {
+                        // Booking date wise ascending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'asc');
+                    }
+                    if ($request->sort_type == 1) {
+                        // Booking date wise descending order 
+                        $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                    }
+                }else{
+                    $queries = $queries->orderBy('trn_consultation_bookings.booking_date', 'desc');
+                }                
+                // filter 
+                if (isset($request->search_booking_date)) {
+                    $booking_date = PatientHelper::dateFormatDb($request->search_booking_date);
+                    $queries = $queries->where('trn_consultation_bookings.booking_date', 'like', '%' . $booking_date . '%');
+                }
+                if (isset($request->search_booking_status)) {
+                    $queries = $queries->where('booking_status.master_value', 'like', '%' . $request->search_booking_status . '%');
+                }
+                if (isset($request->search_branch)) {
+                    $queries = $queries->where('mst_branches.branch_name', 'like', '%' . $request->search_branch . '%');
+                }
+
+                $all_bookings_wellness = $queries->get();
 
                 // Process and add wellness bookings to the result array
                 if ($all_bookings_wellness->isNotEmpty()) {
@@ -209,10 +281,29 @@ class BookingHistoryController extends Controller
                         ];
                     }
                 }
-                // Prepare the success response
+
+                // Paginate the result array
+                $limit = $request->input('limit', 5); // Default limit is 5
+                $page_number = $request->input('page_number', 1); // Default page number is 1
+
+                $my_bookings_collection = collect($my_bookings);
+                $paginate_bookings = $my_bookings_collection->slice(($page_number - 1) * $limit, $limit)->all();
+
+                // Prepare the success response with pagination details
                 $data['status'] = 1;
                 $data['message'] = "Data fetched";
-                $data['data'] = $my_bookings;
+                $data['data'] = array_values($paginate_bookings);
+                $data['pagination_details'] = [
+                    'current_page' => $page_number,
+                    'total_records' => count($my_bookings),
+                    'total_pages' => ceil(count($my_bookings) / $limit),
+                    'per_page' => $limit,
+                    'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
+                    'last_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($my_bookings) / $limit) . '&limit=' . $limit) : null,
+                    'next_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
+                    'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                ];
+
                 return response($data);
             } else {
                 // Patient does not exist
@@ -228,6 +319,7 @@ class BookingHistoryController extends Controller
             return response($response);
         }
     }
+
 
     public function consultationBookingDetails(Request $request)
     {

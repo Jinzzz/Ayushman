@@ -15,6 +15,7 @@ class Mst_Patient_Membership_Booking extends Model
         'membership_package_id ',
         'membership_expiry_date',
         'payment_type',
+        'payment_status_id',
         'payment_amount',
         'details',
     ];

@@ -283,10 +283,10 @@ class DoctorBookingController extends Controller
                             'total_records' => $doctorsList->total(),
                             'total_pages' => $doctorsList->lastPage(),
                             'per_page' => $doctorsList->perPage(),
-                            'first_page_url' => $doctorsList->url(1),
-                            'last_page_url' => $doctorsList->url($doctorsList->lastPage()),
-                            'next_page_url' => $doctorsList->nextPageUrl(),
-                            'prev_page_url' => $doctorsList->previousPageUrl(),
+                            'first_page_number' => $this->getPageNumberFromUrl($doctorsList->url(1)),
+                            'last_page_number' => $this->getPageNumberFromUrl($doctorsList->url($doctorsList->lastPage())),
+                            'next_page_number' => $this->getPageNumberFromUrl($doctorsList->nextPageUrl()),
+                            'prev_page_number' => $this->getPageNumberFromUrl($doctorsList->previousPageUrl()),
                             'from' => $doctorsList->firstItem(),
                             'to' => $doctorsList->lastItem(),
                             // 'links' => $doctorsList->links(),
@@ -315,7 +315,12 @@ class DoctorBookingController extends Controller
         }
     }
 
-
+    private function getPageNumberFromUrl($url)
+    {
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $params);
+        return isset($params['page_number']) ? $params['page_number'] : null;
+    }
 
 
     public function doctorsDetails(Request $request)
@@ -470,6 +475,7 @@ class DoctorBookingController extends Controller
                             foreach ($timeSlots as $timeSlot) {
                                 $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
                                     ->where('time_slot_id', $timeSlot->id)
+                                    ->where('doctor_id', $request->doctor_id)
                                     ->whereIn('booking_status_id', [87, 88])
                                     ->count();
 
@@ -543,83 +549,108 @@ class DoctorBookingController extends Controller
     }
 
     public function bookingDetails(Request $request)
-    {
-        $data = array();
-        try {
-            $validator = Validator::make(
-                $request->all(),
-                [
-                    'doctor_id' => ['required'],
-                    'branch_id' => ['required'],
-                    'slot_id' => ['required'],
-                    'booking_date' => ['required'],
+{
+    $data = array();
+    try {
+        // Validating request parameters
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'doctor_id' => ['required'],
+                'branch_id' => ['required'],
+                'slot_id' => ['required'],
+                'booking_date' => ['required'],
+                'limit' => ['integer'],
+                'page_number' => ['integer'],
+            ],
+            [
+                'doctor_id.required' => 'Doctor required',
+                'branch_id.required' => 'Branch required',
+                'slot_id.required' => 'Slot required',
+                'booking_date.required' => 'Booking date required',
+                'limit.integer' => 'Limit must be an integer',
+                'page_number.integer' => 'Page number must be an integer',
+            ]
+        );
 
-                ],
-                [
-                    'doctor_id.required' => 'Doctor required',
-                    'branch_id.required' => 'Branch required',
-                    'slot_id.required' => 'Slot required',
-                    'booking_date.required' => 'Booking date required',
+        // If validation fails, return error response
+        if ($validator->fails()) {
+            $data['status'] = 0;
+            $data['errors'] = $validator->errors();
+            $data['message'] = "Validation errors";
+            return response($data);
+        }
 
-                ]
-            );
-            if (!$validator->fails()) {
-                if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id)) {
-                    $bookingDate = Carbon::parse($request->booking_date);
-                    $currentDate = Carbon::now();
-                    $currentYear = Carbon::now()->year;
+        if (isset($request->doctor_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id)) {
+            $bookingDate = Carbon::parse($request->booking_date);
+            $currentDate = Carbon::now();
+            $currentYear = Carbon::now()->year;
 
-                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 years in the future
-                        $data['status'] = 0;
-                        $data['message'] = "Booking date cannot be more than 1 year in the future.";
-                        return response($data);
-                    }
-                    // Check if the booking date is in the past and not the same day as the current date
-                    if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
-                        $data['status'] = 0;
-                        $data['message'] = "Booking date is older than the current date.";
-                        return response($data);
-                    } else {
-                        $patient_id = Auth::id();
-
-                        $family_details = array();
-
-                        $family_details = PatientHelper::getFamilyDetails($patient_id);
-
-                        // Re check the availability of the specified time slot for booking on the given date and for the particular doctor
-                        $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
-
-                        if ($available_slots > 0) {
-                            $data['status'] = 1;
-                            $data['message'] = "Data Fetched";
-                            $data['data'] = $family_details;
-                            // $data['booking_id'] = $booking_id ?? '';
-                            return response($data);
-                        } else {
-                            $data['status'] = 0;
-                            $data['message'] = "No slots available";
-                            return response($data);
-                        }
-                    }
-                } else {
-                    $data['status'] = 0;
-                    $data['message'] = "Please fill mandatory fields";
-                    return response($data);
-                }
-            } else {
+            if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 year in the future
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
-                $data['message'] = "Validation errors";
+                $data['message'] = "Booking date cannot be more than 1 year in the future.";
                 return response($data);
             }
-        } catch (\Exception $e) {
-            $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
-        } catch (\Throwable $e) {
-            $response = ['status' => '0', 'message' => $e->getMessage()];
-            return response($response);
+
+            // Check if the booking date is in the past and not the same day as the current date
+            if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
+                $data['status'] = 0;
+                $data['message'] = "Booking date is older than the current date.";
+                return response($data);
+            } else {
+                $patient_id = Auth::id();
+
+                $family_details = array();
+
+                $family_details = PatientHelper::getFamilyDetails($patient_id);
+
+                // Recheck the availability of the specified time slot for booking on the given date and for the particular doctor
+                $available_slots = PatientHelper::recheckAvailability($request->booking_date, $request->slot_id, $request->doctor_id);
+
+                if ($available_slots > 0) {
+                    // Pagination logic
+                    $limit = $request->input('limit', 5); // Default limit is 5
+                    $page_number = $request->input('page_number', 1); // Default page number is 1
+
+                    $family_details_collection = collect($family_details);
+                    $paginate_family_details = $family_details_collection->slice(($page_number - 1) * $limit, $limit)->all();
+
+                    // Prepare the success response with pagination details
+                    $data['status'] = 1;
+                    $data['message'] = "Data Fetched";
+                    $data['data'] = array_values($paginate_family_details);
+                    $data['pagination_details'] = [
+                        'current_page' => $page_number,
+                        'total_records' => count($family_details),
+                        'total_pages' => ceil(count($family_details) / $limit),
+                        'per_page' => $limit,
+                        'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
+                        'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($family_details) / $limit) . '&limit=' . $limit) : null,
+                        'next_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
+                        'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                    ];
+
+                    return response($data);
+                } else {
+                    $data['status'] = 0;
+                    $data['message'] = "No slots available";
+                    return response($data);
+                }
+            }
+        } else {
+            $data['status'] = 0;
+            $data['message'] = "Please fill mandatory fields";
+            return response($data);
         }
+    } catch (\Exception $e) {
+        $response = ['status' => '0', 'message' => $e->getMessage()];
+        return response($response);
+    } catch (\Throwable $e) {
+        $response = ['status' => '0', 'message' => $e->getMessage()];
+        return response($response);
     }
+}
+
 
     public function bookingSummary(Request $request)
     {

@@ -5,6 +5,7 @@ namespace App\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Mst_Patient;
 use App\Models\Mst_Staff_Timeslot;
+use App\Models\Mst_TimeSlot;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Trn_Patient_Family_Member;
 use Carbon\Carbon;
@@ -63,9 +64,11 @@ class PatientHelper
 
         $booking_date = self::dateFormatDb($booking_date);
         $timeSlot = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
-            ->where('mst__staff__timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
+            ->where('mst_timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
 
-        $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)->where('time_slot_id', $slot_id)
+        $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
+        ->where('doctor_id', $doctor_id)
+        ->where('time_slot_id', $slot_id)
             ->whereIn('booking_status_id', [87, 88])->count();
 
         $available_slots = $timeSlot->no_tokens - $booked_tokens;
@@ -153,16 +156,17 @@ class PatientHelper
         return $family_details;
     }
     // $fee = 100.10;
-    public static function amountDecimal($fee) {
+    public static function amountDecimal($fee)
+    {
         $parts = explode('.', $fee);
         // Check if there is a decimal point and digits after it
         if (count($parts) == 2 && strlen($parts[1]) > 0) {
             // Extract the first 3 digits after the decimal point
             $decimalDigits = substr($parts[1], 0, 3);
-    
+
             // Determine the third digit after the decimal point
             $thirdDigit = (strlen($decimalDigits) >= 3) ? intval($decimalDigits[2]) : 0;
-    
+
             // If the third digit is greater than or equal to 5, round up the second digit
             if ($thirdDigit >= 5) {
                 $decimalDigits = substr($parts[1], 0, 2);
@@ -173,15 +177,14 @@ class PatientHelper
                 // If not, use the original two digits
                 $decimalDigits = rtrim(substr($parts[1], 0, 2), '0');
             }
-    
+
             // If there are remaining digits, use the whole part and remaining digits
             $result = $parts[0] . ($decimalDigits !== '' ? '.' . $decimalDigits : '');
         } else {
             // No decimal point or digits after it, use the original value
             $result = $fee;
         }
-    
+
         return $result;
-    }    
-        
+    }
 }

@@ -51,85 +51,99 @@ class PatientAuthController extends Controller
             );
 
             if (!$validator->fails()) {
-                // Check if a patient with the provided mobile number or email already exists
-                $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
-                    ->orWhere('patient_email', $request->patient_email)
-                    ->first();
+                if (isset($request->patient_name) && isset($request->patient_email) && isset($request->patient_mobile) && isset($request->patient_address) && isset($request->patient_gender) && isset($request->patient_dob) && isset($request->password)) {
+                    // Check if a patient with the provided mobile number or email already exists
+                    $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
+                        ->orWhere('patient_email', $request->patient_email)
+                        ->first();
 
-                if ($request->patient_gender) {
-                    $patient_gender_id = $request->patient_gender;
-                }
-
-                $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
-
-                if (!$patients) {
-                    // Insert new patient record in the database
-                    $lastInsertedId = Mst_Patient::insertGetId([
-                        'patient_name'      => $request->patient_name,
-                        'patient_email'     => $request->patient_email,
-                        'patient_address'   => $request->patient_address,
-                        'patient_gender'    => $patient_gender_id,
-                        'patient_dob'       => $patient_dob,
-                        'patient_mobile'    => $request->patient_mobile,
-                        'password'          => Hash::make($request->password),
-                        'is_active'         => 1,
-                        'patient_blood_group_id' => 68,
-                        'available_membership'  => 0,
-                        'patient_code'         => rand(50, 100),
-                        'created_at'         => Carbon::now(),
-                    ]);
-
-                    // Generate OTP and update patient code
-                    $verification_otp = rand(100000, 999999);
-                    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                    $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
-
-                    // Update patient code
-                    $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
-                        'updated_at' => Carbon::now(),
-                        'patient_code' => $newPatientCode
-                    ]);
-
-                    // Create OTP record
-                    $otpCreate = Trn_Patient_Otp::create([
-                        'patient_id' => $lastInsertedId,
-                        'otp' => $verification_otp,
-                        'otp_type' => 1,
-                        'verified' => 0,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                        'otp_expire_at' => Carbon::now()->addMinutes(10),
-                    ]);
-
-                    // Save patient device token
-                    if (isset($request->device_token) && isset($request->device_type)) {
-                        Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
-
-                        $pdt = new Trn_Patient_Device_Tocken;
-                        $pdt->patient_id = $lastInsertedId;
-                        $pdt->patient_device_token = $request->device_token;
-                        $pdt->patient_device_type = $request->device_type;
-                        $pdt->created_at = Carbon::now();
-                        $pdt->updated_at = Carbon::now();
-                        $pdt->save();
+                    if ($request->patient_gender) {
+                        $patient_gender_id = $request->patient_gender;
                     }
 
-                    // Prepare response data
-                    $data['status'] = 1;
-                    $data['otp'] = $verification_otp;
-                    $data['otp_type'] = 1;
-                    $data['patient_id'] = $lastInsertedId;
-                    $data['message'] = "OTP sent successfully.";
-                    return response($data);
-                } else {
+                    if ($request->patient_blood_group) {
+                        $patient_blood_group_id = $request->patient_blood_group;
+                    }
 
-                    $data['status'] = 0;
-                    $data['message'] = "Mobile number or Email address is already in use.";
-                    return response($data);
+                    $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
+
+                    if (!$patients) {
+                        // Insert new patient record in the database
+                        $lastInsertedId = Mst_Patient::insertGetId([
+                            'patient_name'      => $request->patient_name,
+                            'patient_email'     => $request->patient_email,
+                            'patient_address'   => $request->patient_address,
+                            'patient_gender'    => $patient_gender_id,
+                            'patient_dob'       => $patient_dob,
+                            'patient_blood_group_id'  => $patient_blood_group_id ?? 47, // Use the null coalescing operator
+                            'patient_mobile'    => $request->patient_mobile,
+                            'password'          => Hash::make($request->password),
+                            'is_active'         => 1,
+                            // 'patient_blood_group_id' => 68,
+                            'available_membership'  => 0,
+                            'patient_code'         => rand(50, 100),
+                            'created_at'         => Carbon::now(),
+                        ]);
+
+                        // Generate OTP and update patient code
+                        $verification_otp = rand(100000, 999999);
+                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                        $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
+
+                        // Update patient code
+                        $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'patient_code' => $newPatientCode
+                        ]);
+
+                        // Create OTP record
+                        $otpCreate = Trn_Patient_Otp::create([
+                            'patient_id' => $lastInsertedId,
+                            'otp' => $verification_otp,
+                            'otp_type' => 1,
+                            'verified' => 0,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                            'otp_expire_at' => Carbon::now()->addMinutes(10),
+                        ]);
+
+                        // Save patient device token
+                        if (isset($request->device_token) && isset($request->device_type)) {
+                            Trn_Patient_Device_Tocken::where('patient_id', $lastInsertedId)->delete();
+
+                            $pdt = new Trn_Patient_Device_Tocken;
+                            $pdt->patient_id = $lastInsertedId;
+                            $pdt->patient_device_token = $request->device_token;
+                            $pdt->patient_device_type = $request->device_type;
+                            $pdt->created_at = Carbon::now();
+                            $pdt->updated_at = Carbon::now();
+                            $pdt->save();
+                        }
+
+                        // Prepare response data
+                        $data['status'] = 1;
+                        $data['otp'] = $verification_otp;
+                        $data['otp_type'] = 1;
+                        $data['patient_id'] = $lastInsertedId;
+                        $data['message'] = "OTP sent successfully.";
+                        return response($data);
+                    } else {
+
+                        $data['status'] = 0;
+                        $data['message'] = "Mobile number or Email address is already in use.";
+                        return response($data);
+                    }
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -201,7 +215,14 @@ class PatientAuthController extends Controller
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -317,7 +338,14 @@ class PatientAuthController extends Controller
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -394,7 +422,14 @@ class PatientAuthController extends Controller
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -461,7 +496,14 @@ class PatientAuthController extends Controller
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -523,7 +565,14 @@ class PatientAuthController extends Controller
                 }
             } else {
                 $data['status'] = 0;
-                $data['errors'] = $validator->errors();
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
                 $data['message'] = "Validation errors";
                 return response($data);
             }
@@ -605,7 +654,7 @@ class PatientAuthController extends Controller
                     $patient_gender_id = $request->patient_gender;
                 }
 
-                if ($request->patient_dob) {
+                if (isset($request->patient_dob)) {
                     $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
                 }
 
@@ -622,7 +671,10 @@ class PatientAuthController extends Controller
                 ]);
 
                 // Check if the mobile number has changed
-                $isChangedMobileNumber = ($currentData->patient_mobile != $request->patient_mobile) ? 1 : 0;
+                $isChangedMobileNumber = 0;
+                if ($request->patient_mobile) {
+                    $isChangedMobileNumber = ($currentData->patient_mobile != $request->patient_mobile) ? 1 : 0;
+                }
 
                 if ($isChangedMobileNumber == 1) {
                     // Generating an OTP for verification as they are attempting to update their mobile number.
