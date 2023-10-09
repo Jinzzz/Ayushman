@@ -59,17 +59,20 @@ class PatientHelper
 
     // rechecking whether the slot is available or not 
 
-    public static function recheckAvailability($booking_date, $slot_id, $doctor_id)
+    public static function recheckAvailability($booking_date, $weekDayId, $doctor_id, $slot_id)
     {
 
         $booking_date = self::dateFormatDb($booking_date);
         $timeSlot = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')
-            ->where('mst_timeslots.id', $slot_id)->where('mst__staff__timeslots.is_active', 1)->first();
+            ->where('mst__staff__timeslots.staff_id', $doctor_id)
+            ->where('mst__staff__timeslots.week_day', $weekDayId)
+            ->where('mst__staff__timeslots.timeslot', $slot_id)
+            ->where('mst__staff__timeslots.is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
         ->where('doctor_id', $doctor_id)
         ->where('time_slot_id', $slot_id)
-            ->whereIn('booking_status_id', [87, 88])->count();
+            ->whereIn('booking_status_id', [87, 88, 89])->count();
 
         $available_slots = $timeSlot->no_tokens - $booked_tokens;
         $currentDate = Carbon::now()->format('Y-m-d');
