@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Passport\HasApiTokens;
 
 class Mst_User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory,HasApiTokens;
     protected $table = 'mst_users';
 
     protected $primaryKey = 'user_id';
