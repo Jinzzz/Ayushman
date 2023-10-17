@@ -22,6 +22,7 @@ class Trn_Consultation_Booking extends Model
         'booking_status_id',
         'availability_id',
         'therapy_id',
+        'therapy_room_id',
         'wellness_id',
         'is_paid',
         'external_doctor_id',
@@ -29,5 +30,6 @@ class Trn_Consultation_Booking extends Model
         'discount',
         'is_for_family_member',
         'family_member_id',
+        'remaining_time',
     ];
 }

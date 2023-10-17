@@ -23,6 +23,34 @@ use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
 {
+    //Fetch marital status from master and master value table
+    public function maritalStatus()
+    {
+        $data = [];
+
+        try {
+
+            $maritalstatus = Mst_Master_Value::where('master_id', 27)->get(['id', 'master_value as name'])->toArray();
+
+            if ($maritalstatus) {
+                $data['status'] = 1;
+                $data['message'] = "Data fetched.";
+                $data['data'] = $maritalstatus;
+            } else {
+                $data['status'] = 0;
+                $data['message'] = "Marital Status not detected.";
+            }
+
+            return response($data);
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
     // to get all active qualifications , value fetching from mst_master_values table.
     public function getQualifications()
     {
@@ -50,7 +78,56 @@ class DoctorBookingController extends Controller
         }
     }
 
-    // to get all active booking types , value fetching from mst_master_values table.
+    // to get all active booking status , value fetching from mst_master_values table.
+    public function bookingStatus(Request $request)
+    {
+        $data = [];
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'booking_type'    => ['required'],
+                ],
+                [
+                    'booking_type.required'       => 'Booking type required',
+                ]
+            );
+
+            if (!$validator->fails()) {
+                if($request->booking_type == 0){
+                    $booking_status = Mst_Master_Value::whereIn('id', [87,88])->get(['id', 'master_value as name'])->toArray();
+                }elseif($request->booking_type == 1){
+                    $booking_status = Mst_Master_Value::whereIn('id', [89,90])->get(['id', 'master_value as name'])->toArray();
+                }else{
+                    $data['status'] = 0;
+                    $data['message'] = "Please provide valid booking type";
+                    return response($data);
+                }
+                if ($booking_status) {
+                    $data['status'] = 1;
+                    $data['message'] = "Data fetched.";
+                    $data['data'] = $booking_status;
+                } else {
+                    $data['status'] = 0;
+                    $data['message'] = "Status not detected.";
+                }
+
+                return response($data);
+            } else {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
     public function getBookingType()
     {
         $data = [];
@@ -719,7 +796,7 @@ class DoctorBookingController extends Controller
                         ->first();
 
                     $time_from = date('h:i A', strtotime($slotDetails->time_from));
-                    $time_to = date('h:i A', strtotime($slotDetails->time_to));;
+                    $time_to = date('h:i A', strtotime($slotDetails->time_to));
 
                     $doctor = Mst_Staff::join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
                         ->join('mst_master_values AS qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')

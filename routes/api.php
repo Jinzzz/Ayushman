@@ -21,7 +21,10 @@ use App\Http\Controllers\Api\WellnessController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+//Tablet Registration API for Patients
+Route::post('patient/tab_register', [PatientAuthController::class, 'patientTabRegister']); //new
 
+// All 
 Route::post('patient/register', [PatientAuthController::class, 'patientRegister']);
 Route::post('patient/login', [PatientAuthController::class, 'patientLogin']);
 Route::post('patient/otp_verification', [PatientAuthController::class, 'otpVerification']);
@@ -37,6 +40,13 @@ Route::get('gender', [DoctorBookingController::class, 'getGender']);
 Route::get('relationship', [DoctorBookingController::class, 'getRelationship']);
 Route::get('blood-group', [DoctorBookingController::class, 'getBloodGroup']);
 Route::get('booking_types', [DoctorBookingController::class, 'getBookingType']);
+Route::post('booking-status', [DoctorBookingController::class, 'bookingStatus']);
+Route::get('marital_status', [DoctorBookingController::class, 'maritalStatus']); //new
+
+Route::middleware('custom.auth.api')->group(function () {
+    Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
+
+});
 
 Route::middleware(['auth:api'])->group(function () {
     // Consultation
@@ -83,8 +93,11 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     // Wellness 
-    Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
+    // Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
     Route::post('patient/wellness/details', [WellnessController::class, 'wellnessDetails']);
+    Route::post('patient/wellness/availability', [WellnessController::class, 'wellnessAvailability']);
     Route::post('patient/wellness/booking_summary', [WellnessController::class, 'wellnessSummary']);
     Route::post('patient/wellness/booking_confirmation', [WellnessController::class, 'wellnessConfirmation']);
+    Route::post('patient/wellness/booking_reschedule', [WellnessController::class, 'wellnessReSchedule']);
+
 });

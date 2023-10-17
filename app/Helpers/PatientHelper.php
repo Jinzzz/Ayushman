@@ -5,9 +5,12 @@ namespace App\Helpers;
 use Illuminate\Http\Request;
 use App\Models\Mst_Patient;
 use App\Models\Mst_Staff_Timeslot;
+use App\Models\Mst_Wellness_Therapyrooms;
+use App\Models\Mst_Therapy_Room_Slot;
 use App\Models\Mst_TimeSlot;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\Trn_Patient_Family_Member;
+use App\Models\Mst_Wellness;
 use Carbon\Carbon;
 
 class PatientHelper
@@ -70,8 +73,8 @@ class PatientHelper
             ->where('mst__staff__timeslots.is_active', 1)->first();
 
         $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
-        ->where('doctor_id', $doctor_id)
-        ->where('time_slot_id', $slot_id)
+            ->where('doctor_id', $doctor_id)
+            ->where('time_slot_id', $slot_id)
             ->whereIn('booking_status_id', [87, 88, 89])->count();
 
         $available_slots = $timeSlot->no_tokens - $booked_tokens;
@@ -189,5 +192,239 @@ class PatientHelper
         }
 
         return $result;
+    }
+
+    public static function isWellnessAvailable($booking_date, $weekDayId, $branch_id, $wellness_id)
+    {
+        $checkAvailableSlots = 0;
+        $wellness_duration = Mst_Wellness::where('wellness_id', $wellness_id)->value('wellness_duration');
+
+        $assignedTherapyRooms = Mst_Wellness_Therapyrooms::where('branch_id', $branch_id)
+            ->where('wellness_id', $wellness_id)
+            ->get(['therapy_room_id'])
+            ->pluck('therapy_room_id')
+            ->toArray();
+
+        $weekDayTherapyRooms = Mst_Therapy_Room_Slot::where('week_day', $weekDayId)
+            ->whereIn('therapy_room_id', $assignedTherapyRooms)
+            ->distinct()
+            ->pluck('therapy_room_id')
+            ->toArray();
+
+        $isAnyBookings = Trn_Consultation_Booking::where('booking_date', $booking_date)
+            ->whereIn('booking_status_id', [87, 88, 89])
+            ->where('booking_type_id', '!=', 84)
+            ->count();
+
+        if ($isAnyBookings > 0) {
+            $booked_therapy_rooms = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                ->whereIn('therapy_room_id', $weekDayTherapyRooms)
+                ->where('booking_type_id', '!=', 84)
+                ->whereIn('booking_status_id', [87, 88, 89])
+                ->distinct()
+                ->pluck('therapy_room_id')
+                ->toArray();
+
+            // Remove booked_therapy_rooms from weekDayTherapyRooms. wellness is assigned for this therapy so there must be atleast 1 available slot, but still check slot.
+            $rest_therapy_rooms = array_diff($weekDayTherapyRooms, $booked_therapy_rooms);
+            if ($rest_therapy_rooms) {
+                foreach ($rest_therapy_rooms as $rest_therapy_room) {
+                    $rest_therapy_room_slots = Mst_Therapy_Room_Slot::where('week_day', $weekDayId)
+                        ->where('therapy_room_id', $rest_therapy_room)
+                        ->distinct()
+                        ->pluck('timeslot')
+                        ->toArray();
+                    foreach ($rest_therapy_room_slots as $rest_therapy_room_slot) {
+                        $slotDetails = Mst_TimeSlot::where('id', $rest_therapy_room_slot)
+                            ->first();
+
+                        $time_from = strtotime($slotDetails->time_from);
+                        $time_to = strtotime($slotDetails->time_to);
+
+                        // Calculate duration in minutes
+                        $duration_minutes = round(($time_to - $time_from) / 60);
+                        if ($duration_minutes >= $wellness_duration) {
+                            $checkAvailableSlots = 1;
+                            break 2;
+                        }
+                    }
+                }
+            }
+            if ($checkAvailableSlots == 0) {
+                foreach ($weekDayTherapyRooms as $weekDayTherapyRoom) {
+                    $booked_time_slots = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                        ->where('therapy_room_id', $weekDayTherapyRoom)
+                        ->where('booking_type_id', '!=', 84)
+                        ->whereIn('booking_status_id', [87, 88, 89])
+                        ->distinct()
+                        ->pluck('time_slot_id')
+                        ->toArray();
+
+                    foreach ($booked_time_slots as $booked_time_slot) {
+                        $lastInsertedBooking = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                            ->where('therapy_room_id', $weekDayTherapyRoom)
+                            ->where('time_slot_id', $booked_time_slot)
+                            ->whereIn('booking_status_id', [87, 88, 89])
+                            ->latest('created_at')
+                            ->first();
+
+                        if ($lastInsertedBooking->remaining_time > $wellness_duration) {
+                            $checkAvailableSlots = 1;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        } else {
+            $checkAvailableSlots = 1;
+        }
+        return $checkAvailableSlots;
+    }
+
+
+    public static function wellnessAvailability($booking_date, $weekDayId, $branch_id, $wellness_id)
+    {
+        $finalSlots = array();
+        $checkArray = array();
+
+        $wellness_duration = Mst_Wellness::where('wellness_id', $wellness_id)->value('wellness_duration');
+
+        $assignedTherapyRooms = Mst_Wellness_Therapyrooms::where('branch_id', $branch_id)
+            ->where('wellness_id', $wellness_id)
+            ->get(['therapy_room_id'])
+            ->pluck('therapy_room_id')
+            ->toArray();
+
+        $weekDayTherapyRooms = Mst_Therapy_Room_Slot::where('week_day', $weekDayId)
+            ->whereIn('therapy_room_id', $assignedTherapyRooms)
+            ->distinct()
+            ->pluck('therapy_room_id')
+            ->toArray();
+
+        // Condition except consultation - 84 (consultation)
+        $isAnyBookings = Trn_Consultation_Booking::where('booking_date', $booking_date)
+            ->whereIn('booking_status_id', [87, 88, 89])
+            ->where('booking_type_id', '!=', 84)
+            ->count();
+
+        if ($isAnyBookings > 0) {
+            $booked_therapy_rooms = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                ->whereIn('booking_status_id', [87, 88, 89])
+                ->where('booking_type_id', '!=', 84)
+                ->distinct()
+                ->pluck('therapy_room_id')
+                ->toArray();
+
+            foreach ($booked_therapy_rooms as $booked_therapy_room) {
+                $booked_time_slots = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                    ->where('therapy_room_id', $booked_therapy_room)
+                    ->where('booking_type_id', '!=', 84)
+                    ->whereIn('booking_status_id', [87, 88, 89])
+                    ->distinct()
+                    ->pluck('time_slot_id')
+                    ->toArray();
+
+                foreach ($booked_time_slots as $booked_time_slot) {
+                    $lastInsertedBooking = Trn_Consultation_Booking::where('booking_date', $booking_date)
+                        ->where('therapy_room_id', $booked_therapy_room)
+                        ->where('time_slot_id', $booked_time_slot)
+                        ->whereIn('booking_status_id', [87, 88, 89])
+                        ->latest('created_at')
+                        ->first();
+
+                    if ($lastInsertedBooking->remaining_time < $wellness_duration) {
+                        // Push values to $checkArray
+                        $checkArray[] = [
+                            'slot_id' => $booked_time_slot,
+                            'room_id' => $booked_therapy_room,
+                            'is_available' => 0,
+                        ];
+                    }
+                }
+            }
+
+            foreach ($weekDayTherapyRooms as $therapy_room) {
+                $availableTherapyRoomSlots = Mst_Therapy_Room_Slot::where('week_day', $weekDayId)
+                    ->where('therapy_room_id', $therapy_room)
+                    ->distinct()
+                    ->pluck('timeslot')
+                    ->toArray();
+
+                foreach ($availableTherapyRoomSlots as $availableTherapyRoomSlot) {
+                    $slotDetails = Mst_TimeSlot::where('id', $availableTherapyRoomSlot)
+                        ->first();
+
+                    $time_from = strtotime($slotDetails->time_from);
+                    $time_to = strtotime($slotDetails->time_to);
+
+                    // Calculate duration in minutes
+                    $duration_minutes = round(($time_to - $time_from) / 60);
+
+                    if ($duration_minutes >= $wellness_duration) {
+                        // Check if this slot is in $checkArray
+                        $found = false;
+                        foreach ($checkArray as $checkItem) {
+                            if ($checkItem['room_id'] == $therapy_room && $checkItem['slot_id'] == $availableTherapyRoomSlot) {
+                                $found = true;
+                                break; // exit the loop once found
+                            }
+                        }
+
+                        // If found, set 'is_available' to 0; otherwise, set it to 1
+                        $is_available = $found ? 0 : 1;
+
+                        $finalSlots[] = [
+                            'therapy_room_id' => $therapy_room,
+                            'timeslot' => $availableTherapyRoomSlot,
+                            'is_available' => $is_available,
+                        ];
+                    }
+                }
+            }
+        } else {
+            foreach ($weekDayTherapyRooms as $therapy_room) {
+                $availableTherapyRoomSlots = Mst_Therapy_Room_Slot::where('week_day', $weekDayId)
+                    ->where('therapy_room_id', $therapy_room)
+                    ->distinct()
+                    ->pluck('timeslot')
+                    ->toArray();
+
+                foreach ($availableTherapyRoomSlots as $timeslot) {
+                    $slotDetails = Mst_TimeSlot::find($timeslot);
+
+                    $duration_minutes = Carbon::parse($slotDetails->time_from)->diffInMinutes(Carbon::parse($slotDetails->time_to));
+
+                    if ($duration_minutes >= $wellness_duration) {
+                        $finalSlots[] = [
+                            'therapy_room_id' => $therapy_room,
+                            'timeslot' => $timeslot,
+                            'is_available' => 1,
+                        ];
+                    }
+                }
+            }
+        }
+        return array_values(array_unique($finalSlots, SORT_REGULAR));
+    }
+
+
+    public static function availableSlots($finalSlots)
+    {
+        $time_slots = array();
+        if ($finalSlots) {
+            foreach ($finalSlots as $timeSlot) {
+                $slot_details = Mst_TimeSlot::where('id', $timeSlot['timeslot'])->first();
+                $time_slots[] = [
+                    'time_slot_id' => $slot_details->id,
+                    'time_from' => Carbon::parse($slot_details->time_from)->format('h:i A'),
+                    'time_to' => Carbon::parse($slot_details->time_to)->format('h:i A'),
+                    'therapy_room_id' => $timeSlot['therapy_room_id'],
+                    'is_available' => $timeSlot['is_available'],
+                ];
+            }
+            return $time_slots;
+        } else {
+            return $time_slots;
+        }
     }
 }

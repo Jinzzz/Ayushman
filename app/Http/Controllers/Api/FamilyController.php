@@ -63,10 +63,11 @@ class FamilyController extends Controller
                     'total_records' => count($family_details),
                     'total_pages' => ceil(count($family_details) / $limit),
                     'per_page' => $limit,
-                    'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
-                    'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($family_details) / $limit) . '&limit=' . $limit) : null,
-                    'next_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
-                    'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                    'first_page_url' => $page_number > 1 ?$page_number=1: null,
+                    'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? (string) ceil(count($family_details) / $limit): null,
+                    'next_page_url' => $page_number < ceil(count($family_details) / $limit) ?(string) ($page_number + 1): null,
+                    'prev_page_url' => $page_number > 1 ?$page_number - 1: null,
+                    
                 ];
             } else {
                 $data['status'] = 0;

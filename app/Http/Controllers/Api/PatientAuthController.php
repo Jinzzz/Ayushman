@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use App\Models\Trn_Patient_Otp;
 use App\Models\Trn_Patient_Device_Tocken;
+use Illuminate\Support\Str;
 
 class PatientAuthController extends Controller
 {
@@ -607,10 +608,12 @@ class PatientAuthController extends Controller
                     'patient_name' => $accountHolder->patient_name,
                     'patient_dob' => Carbon::parse($accountHolder->patient_dob)->format('d-m-Y'),
                     'patient_gender' => $accountHolder->gender_name,
+                    'patient_gender_id' => $accountHolder->patient_gender,
                     'patient_mobile' => $accountHolder->patient_mobile,
                     'patient_email' => $accountHolder->patient_email,
                     'patient_address' => $accountHolder->patient_address,
                     'blood_group' => $accountHolder->blood_group,
+                    'blood_group_id' => $accountHolder->patient_blood_group_id,
                 ];
 
                 // Prepare and return a success response
@@ -822,6 +825,154 @@ class PatientAuthController extends Controller
 
             // Prepare and return a JSON response indicating successful logout
             return response()->json(['message' => 'Logged out successfully']);
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
+    //Tab registration
+    public function patientTabRegister(Request $request)
+    {
+        $data = array();
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'patient_name'      => 'required',
+                    'patient_email'     => 'nullable|unique:mst_patients,patient_email',
+                    'patient_mobile'    => ['required', 'regex:/^[0-9]{10}$/', 'unique:mst_patients,patient_mobile'],
+                    'patient_gender'      => 'required',
+                    'patient_dob'      => 'required',
+
+                ],
+                [
+                    'patient_name.required'         => 'Name required',
+
+                    'patient_email.email'           => 'Invalid email address',
+                    'patient_email.unique'          => 'Email address is already in use',
+                    'patient_mobile.required'       => 'Mobile number required',
+                    'patient_mobile.regex'          => 'Invalid mobile number',
+                    'patient_mobile.unique'         => 'Mobile number is already in use',
+                    'patient_gender.required'         => 'Gender required',
+                    'patient_dob.required'         => 'Date of birth required',
+                ]
+            );
+
+            if (!$validator->fails()) {
+                if (isset($request->patient_name) && isset($request->patient_mobile)  && isset($request->patient_gender) && isset($request->patient_dob)) {
+                    // Check if a patient with the provided mobile number or email already exists
+                    $patients = Mst_Patient::where('patient_mobile', $request->patient_mobile)
+                        //->orWhere('patient_email', $request->patient_email)
+                        ->first();
+
+                    if ($request->patient_gender) {
+                        $patient_gender_id = $request->patient_gender;
+                    }
+
+                    if ($request->patient_blood_group) {
+                        $patient_blood_group_id = $request->patient_blood_group;
+                    }
+
+                    if ($request->marital_status) {
+                        $marital_status = $request->marital_status;
+                    }
+
+                    if ($request->whatsapp_number) {
+                        $whatsapp_number = $request->whatsapp_number;
+                    }
+
+                    if ($request->emergency_contact_person) {
+                        $emergency_contact_person = $request->emergency_contact_person;
+                    }
+
+                    if ($request->emergency_contact) {
+                        $emergency_contact = $request->emergency_contact;
+                    }
+
+                    if ($request->patient_address) {
+                        $patient_address = $request->patient_address;
+                    }
+
+                    //Generate random Password
+                    $GenRandPassword = Str::random(8);
+                    $HashedPassword = Hash::make($GenRandPassword);
+
+                    $patient_dob = PatientHelper::dateFormatDb($request->patient_dob);
+
+                    if (!$patients) {
+                        // Insert new patient record in the database
+                        $lastInsertedId = Mst_Patient::insertGetId([
+                            'patient_name'      => $request->patient_name,
+                            'patient_email'     => $request->patient_email,
+                            'maritial_status'    => $request->marital_status,
+                            'whatsapp_number'    => $whatsapp_number ?? 'NULL',
+                            'emergency_contact_person'    => $emergency_contact_person ?? 'NULL',
+                            'emergency_contact' => $emergency_contact ?? 'NULL',
+                            'patient_address'   => $patient_address ?? 'NULL',
+                            'patient_gender'    => $patient_gender_id,
+                            'patient_dob'       => $patient_dob,
+                            'patient_blood_group_id'  => $patient_blood_group_id ?? 47, // Use the null coalescing operator
+                            'patient_mobile'    => $request->patient_mobile,
+                            'password'          => $HashedPassword,
+                            'is_active'         => 1,
+                            'available_membership'  => 0,
+                            'patient_code'         => rand(50, 100),
+                            'created_at'         => Carbon::now(),
+                        ]);
+
+                        // Generate OTP and update patient code
+                        $verification_otp = rand(100000, 999999);
+                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                        $newPatientCode = 'PAT' . $leadingZeros . $lastInsertedId;
+
+                        // Update patient code
+                        $updatePatientCode = Mst_Patient::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'patient_code' => $newPatientCode
+                        ]);
+
+                        // Create OTP record - Not used for tablet registration. These users will have to verify the OTP during login
+                        $otpCreate = Trn_Patient_Otp::create([
+                            'patient_id' => $lastInsertedId,
+                            'otp' => $verification_otp,
+                            'otp_type' => 1,
+                            'verified' => 0,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                            'otp_expire_at' => Carbon::now()->addMinutes(10),
+                        ]);
+
+                        //Send Mail and SMS if the registration is succesfull along with username and system generated password
+
+                        // Prepare response data
+                        $data['status'] = 1;
+                        $data['patient_id'] = $lastInsertedId;
+                        $data['message'] = "Registration Success";
+                        return response($data);
+                    } else {
+
+                        $data['status'] = 0;
+                        $data['message'] = "Mobile number or Email address is already in use.";
+                        return response($data);
+                    }
+                }
+            } else {
+                $data['status'] = 0;
+                $errors = $validator->errors();
+                $flattenedErrors = [];
+
+                foreach ($errors->messages() as $field => $messages) {
+                    $flattenedErrors[$field] = $messages[0];
+                }
+
+                $data['errors'] = $flattenedErrors;
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
         } catch (\Exception $e) {
             $response = ['status' => '0', 'message' => $e->getMessage()];
             return response($response);
