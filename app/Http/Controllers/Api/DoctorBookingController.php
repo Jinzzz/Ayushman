@@ -354,22 +354,17 @@ class DoctorBookingController extends Controller
 
                         $data['status'] = 1;
                         $data['message'] = "Data fetched";
-                        $data['data'] = [
+                        $data['data'] =  $formattedDoctorsList;
+                        $data['pagination_details'] = [
                             'current_page' => $doctorsList->currentPage(),
-                            'doctor_details' => $formattedDoctorsList,
                             'total_records' => $doctorsList->total(),
                             'total_pages' => $doctorsList->lastPage(),
                             'per_page' => $doctorsList->perPage(),
-                            'first_page_number' => $this->getPageNumberFromUrl($doctorsList->url(1)),
-                            'last_page_number' => $this->getPageNumberFromUrl($doctorsList->url($doctorsList->lastPage())),
-                            'next_page_number' => $this->getPageNumberFromUrl($doctorsList->nextPageUrl()),
-                            'prev_page_number' => $this->getPageNumberFromUrl($doctorsList->previousPageUrl()),
-                            'from' => $doctorsList->firstItem(),
-                            'to' => $doctorsList->lastItem(),
-                            // 'links' => $doctorsList->links(),
-                            // 'path' => $doctorsList->url($doctorsList->currentPage()),
-                        ];
-
+                            // 'first_page_url' => $doctorsList->currentPage() > 1 ? $this->getPageNumberFromUrl($doctorsList->url(1)) : null,
+                            // 'last_page_url' => $this->getPageNumberFromUrl($doctorsList->url($doctorsList->lastPage())),
+                            // 'next_page_url' => $this->getPageNumberFromUrl($doctorsList->nextPageUrl()),
+                            // 'prev_page_url' => $this->getPageNumberFromUrl($doctorsList->previousPageUrl()),
+                        ];                                               
                         return response($data);
                     }
                 } else {
@@ -1069,13 +1064,13 @@ class DoctorBookingController extends Controller
                             }
                             $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
                             $booking_details = [];
-
+                            $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                             $booking_details[] = [
                                 'booking_id' => $lastInsertedId,
                                 'member_name' => $accountHolder->patient_name,
                                 'booking_referance_number' => $bookingRefNo,
                                 'booking_to' => $doctor->doctor_name,
-                                'booking_date' => $request->booking_date,
+                                'booking_date' => $booking_date,
                                 'time_slot' => $time_from . ' - ' . $time_to,
                             ];
 

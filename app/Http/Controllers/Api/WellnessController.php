@@ -34,19 +34,17 @@ class WellnessController extends Controller
                     'booking_date' => ['required'],
                     'limit' => ['integer'],
                     'page_number' => ['integer'],
-                    'is_web' => ['required'],
                 ],
                 [
                     'branch_id.required' => 'Branch required',
                     'booking_date.required' => 'Booking date required',
                     'limit.integer' => 'Limit must be an integer',
                     'page_number.integer' => 'Page number must be an integer',
-                    'is_web.required' => 'Is web flag required',
                 ]
             );
 
             if (!$validator->fails()) {
-                if (isset($request->branch_id) && !empty($request->booking_date) && isset($request->is_web)) {
+                if (isset($request->branch_id) && !empty($request->booking_date)) {
                     $bookingDate = Carbon::parse($request->booking_date);
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
@@ -72,16 +70,28 @@ class WellnessController extends Controller
                         ->pluck('therapy_room_id')
                         ->toArray();
 
-                    $roomWellness = Mst_Wellness_Therapyrooms::where('branch_id', $request->branch_id)
-                        ->whereIn('therapy_room_id', $availableRooms)
-                        ->distinct('wellness_id')
-                        ->pluck('wellness_id')
-                        ->toArray();
+                    if (isset($request->search_wellness_branch) && !is_null($request->search_wellness_branch) && $request->search_wellness_branch != "null" && $request->search_wellness_branch != null) {
+                        $branch_name = Mst_Branch::where('branch_id', $request->search_wellness_branch)->where('is_active', 1)->value('branch_name');
+
+                        $roomWellness = Mst_Wellness_Therapyrooms::where('branch_id', $request->search_wellness_branch)
+                            ->whereIn('therapy_room_id', $availableRooms)
+                            ->distinct('wellness_id')
+                            ->pluck('wellness_id')
+                            ->toArray();
+                    } else {
+                        $branch_name = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_name');
+
+                        $roomWellness = Mst_Wellness_Therapyrooms::where('branch_id', $request->branch_id)
+                            ->whereIn('therapy_room_id', $availableRooms)
+                            ->distinct('wellness_id')
+                            ->pluck('wellness_id')
+                            ->toArray();
+                    }
 
                     $queries = Mst_Wellness::whereIn('wellness_id', $roomWellness)
                         ->where('is_active', 1);
 
-                    if (isset($request->search_wellness_name)) {
+                    if (isset($request->search_wellness_name) && !is_null($request->search_wellness_name) && $request->search_wellness_name != "null" && $request->search_wellness_name != null) {
                         $queries = $queries->where('wellness_name', 'like', '%' . $request->search_wellness_name . '%');
                     }
 
@@ -111,36 +121,38 @@ class WellnessController extends Controller
                             if (in_array($wellness->wellness_id, $allWellnessIds)) {
                                 $is_included = 1;
                             }
-                            $fee = PatientHelper::amountDecimal($wellness->wellness_cost);
+                            $wellness_price = PatientHelper::amountDecimal($wellness->wellness_cost);
+                            $wellness_offer_price = PatientHelper::amountDecimal($wellness->offer_price);
+                            $wellness_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/wellness_image/' . $wellness->wellness_image;
+                            $is_offer = ($wellness_price > $wellness_offer_price) ? 1 : 0;
 
                             $wellness_list[] = [
                                 'id' => $wellness->wellness_id,
                                 'wellness_name' => $wellness->wellness_name,
-                                'wellness_cost' => $fee,
+                                'wellness_price' => $wellness_price,
+                                'wellness_offer_price' => $wellness_offer_price,
+                                'is_offer' => $is_offer,
                                 'is_included' => $is_included,
+                                'wellness_image' => $wellness_image,
                             ];
                         }
-
-                        $branch_name = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_name');
-
+                        $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                         $data['status'] = 1;
                         $data['message'] = "Data fetched";
-                        $data['booking_date'] = $request->booking_date;
+                        $data['booking_date'] = $booking_date;
                         $data['branch_name'] = $branch_name;
-                        $data['data'] = [
+                        $data['data'] =  $wellness_list;
+                        $data['pagination_details'] = [
                             'current_page' => $all_wellness->currentPage(),
-                            'wellness_details' => $wellness_list,
                             'total_records' => $all_wellness->total(),
                             'total_pages' => $all_wellness->lastPage(),
                             'per_page' => $all_wellness->perPage(),
-                            'first_page_number' => $all_wellness->url(1),
-                            'last_page_number' => $all_wellness->url($all_wellness->lastPage()),
-                            'next_page_number' => $all_wellness->nextPageUrl(),
-                            'prev_page_number' => $all_wellness->previousPageUrl(),
-                            'from' => $all_wellness->firstItem(),
-                            'to' => $all_wellness->lastItem(),
+                            // 'first_page_url' => $all_wellness->currentPage() > 1 ? (string)1 : null,
+                            // 'last_page_url' => (string)$all_wellness->lastPage(),
+                            // 'next_page_url' => $all_wellness->nextPageUrl() ? (string)($all_wellness->currentPage() + 1) : null,
+                            // 'prev_page_url' => $all_wellness->previousPageUrl() ? (string)($all_wellness->currentPage() - 1) : null,
                         ];
-
+                        
                         return response()->json($data);
                     } else {
                         $data['status'] = 0;
@@ -207,6 +219,9 @@ class WellnessController extends Controller
                     $branch_wellness_id = Trn_Wellness_Branch::where('branch_id', $request->branch_id)->where('wellness_id', $request->wellness_id)->first();
                     if ($branch_wellness_id) {
                         $branch_name = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_name');
+                        $branch_address = Mst_Branch::where('branch_id', $request->branch_id)->where('is_active', 1)->value('branch_address');
+                        $branchAddress = str_replace("\r\n", "\n", $branch_address);
+                        $branchAddress = str_replace("\n", "", $branchAddress);
                         $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->first();
                         $booking_date = PatientHelper::dateFormatDb($request->booking_date);
 
@@ -217,24 +232,44 @@ class WellnessController extends Controller
 
                         $wellness_details = [];
                         if (!empty($wellness)) {
-                            $fee = PatientHelper::amountDecimal($wellness->wellness_cost);
+                            $wellness_price = PatientHelper::amountDecimal($wellness->wellness_cost);
+                            $wellness_offer_price = PatientHelper::amountDecimal($wellness->offer_price);
+                            $wellness_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/wellness_image/' . $wellness->wellness_image;
+                            $is_offer = ($wellness_price > $wellness_offer_price) ? 1 : 0;
+
+                            $inclusions = Mst_Wellness::where('wellness_id', $request->wellness_id)
+                                ->where('is_active', 1)
+                                ->pluck('wellness_inclusions')
+                                ->map(function ($inclusion) {
+                                    preg_match_all('/<li>(.*?)<\/li>/', $inclusion, $matches);
+                                    return $matches[1];
+                                })
+                                ->flatten() // Flatten the nested arrays
+                                ->map(function ($item) {
+                                    return ['inclusion' => $item];
+                                })
+                                ->values();
 
                             $wellness_details[] = [
                                 'id' => $wellness->wellness_id,
                                 'wellness_name' => $wellness->wellness_name,
                                 'wellness_description' => $wellness->wellness_description,
-                                'wellness_cost' => $fee,
-                                'wellness_inclusions' => strip_tags($wellness->wellness_inclusions),
+                                'wellness_price' => $wellness_price,
+                                'wellness_offer_price' => $wellness_offer_price,
+                                'is_offer' => $is_offer,
+                                'wellness_inclusions' => $inclusions,
                                 'wellness_terms_conditions' => strip_tags($wellness->wellness_terms_conditions),
                                 'is_available' => $is_available ?? 0,
+                                'wellness_image' => $wellness_image,
                             ];
 
-
+                            $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                             $data['status'] = 1;
                             $data['message'] = "Data fetched";
                             $data['branch_id'] = $request->branch_id;
                             $data['branch_name'] = $branch_name;
-                            $data['booking_date'] = $request->booking_date;
+                            $data['branch_address'] = $branchAddress;
+                            $data['booking_date'] = $booking_date;
                             $data['data'] = $wellness_details;
                             return response()->json($data);
                         } else {
@@ -791,13 +826,13 @@ class WellnessController extends Controller
 
 
                     $booking_details = [];
-
+                    $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                     $booking_details[] = [
                         'booking_id' => $lastInsertedId,
                         'member_name' => $accountHolder->patient_name,
                         'booking_referance_number' => $bookingRefNo,
                         'booking_for' => $wellness->wellness_name,
-                        'booking_date' => $request->booking_date,
+                        'booking_date' => $booking_date,
                     ];
 
                     $data['status'] = 1;
@@ -980,7 +1015,7 @@ class WellnessController extends Controller
                     $checkSameSlot = Trn_Consultation_Booking::where('patient_id', Auth::id())
                         ->where('booking_date', $newRecordData['booking_date'])
                         ->where('time_slot_id', $request->slot_id)
-                        ->where('id','!=',$request->booking_id)
+                        ->where('id', '!=', $request->booking_id)
                         ->where('family_member_id', $newRecordData['family_member_id'])
                         ->first();
 
@@ -989,7 +1024,7 @@ class WellnessController extends Controller
                         ->where('booking_date', $newRecordData['booking_date'])
                         ->where('wellness_id', $newRecordData['wellness_id'])
                         ->where('time_slot_id', '!=', $request->slot_id)
-                        ->where('id','!=',$request->booking_id)
+                        ->where('id', '!=', $request->booking_id)
                         ->where('family_member_id', $newRecordData['family_member_id'])
                         ->first();
 
@@ -1025,13 +1060,13 @@ class WellnessController extends Controller
                     }
 
                     $booking_details = [];
-
+                    $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                     $booking_details[] = [
                         'booking_id' => $lastInsertedId,
                         'member_name' => $accountHolder->patient_name,
                         'booking_referance_number' => $bookingRefNo,
                         'booking_for' => $wellness->wellness_name,
-                        'booking_date' => $request->booking_date,
+                        'booking_date' => $booking_date,
                     ];
 
                     $data['status'] = 1;

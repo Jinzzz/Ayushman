@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MyBookingsController;
 use App\Http\Controllers\Api\BookingHistoryController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\WellnessController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,13 +46,13 @@ Route::get('marital_status', [DoctorBookingController::class, 'maritalStatus']);
 
 Route::middleware('custom.auth.api')->group(function () {
     Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
-
+    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
 });
 
 Route::middleware(['auth:api'])->group(function () {
     // Consultation
     Route::get('patient/home', [DashboardController::class, 'homePage']);
-    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
+    // Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
     Route::post('patient/consultation/doctors_details', [DoctorBookingController::class, 'doctorsDetails']);
     Route::post('patient/consultation/doctor_availability', [DoctorBookingController::class, 'doctorsAvailability']);
     Route::post('patient/consultation/booking_details', [DoctorBookingController::class, 'bookingDetails']);
@@ -100,4 +101,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/wellness/booking_confirmation', [WellnessController::class, 'wellnessConfirmation']);
     Route::post('patient/wellness/booking_reschedule', [WellnessController::class, 'wellnessReSchedule']);
 
+    // Notifications 
+    Route::post('patient/notifications', [NotificationController::class, 'notifications']);
+    Route::post('patient/notifications/read_status', [NotificationController::class, 'read_status']);
+    Route::post('patient/notifications/device_token', [NotificationController::class, 'device_token']);
 });

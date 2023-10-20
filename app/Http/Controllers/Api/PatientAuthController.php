@@ -76,11 +76,10 @@ class PatientAuthController extends Controller
                             'patient_address'   => $request->patient_address,
                             'patient_gender'    => $patient_gender_id,
                             'patient_dob'       => $patient_dob,
-                            'patient_blood_group_id'  => $patient_blood_group_id ?? 47, // Use the null coalescing operator
+                            'patient_blood_group_id'  => $patient_blood_group_id ?? 68,
                             'patient_mobile'    => $request->patient_mobile,
                             'password'          => Hash::make($request->password),
                             'is_active'         => 1,
-                            // 'patient_blood_group_id' => 68,
                             'available_membership'  => 0,
                             'patient_code'         => rand(50, 100),
                             'created_at'         => Carbon::now(),
@@ -251,7 +250,7 @@ class PatientAuthController extends Controller
                 ],
                 [
                     'otp.required' => 'OTP required',
-                    'otp_type.required' => 'OTP required',
+                    'otp_type.required' => 'OTP type required',
                     'otp.numeric' => 'OTP must be numeric',
                     'otp.digits' => 'OTP must be 6 digits',
                     'patient_id.required' => 'Patient id required',
@@ -315,8 +314,15 @@ class PatientAuthController extends Controller
 
                             // Prepare and return a success response
                             $data['status'] = 1;
-                            $data['message'] = "Registration completed successfully";
-                            if ($request->otp_type == 2 || 3) {
+                            if ($request->otp_type == 1) {
+                                $data['message'] = "Registration completed successfully";
+                            }
+                            
+                            if ($request->otp_type == 2) {
+                                $data['message'] = "OTP verified successfully";
+                            }
+                            
+                            if ($request->otp_type == 3) {
                                 $data['message'] = "OTP verified successfully";
                             }
                             return response($data);

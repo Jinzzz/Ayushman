@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Helpers\PatientHelper;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Trn_Patient_Family_Member;
-use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Family_Member_Otp;
 use Carbon\Carbon;
@@ -67,7 +66,6 @@ class FamilyController extends Controller
                     'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? (string) ceil(count($family_details) / $limit): null,
                     'next_page_url' => $page_number < ceil(count($family_details) / $limit) ?(string) ($page_number + 1): null,
                     'prev_page_url' => $page_number > 1 ?$page_number - 1: null,
-                    
                 ];
             } else {
                 $data['status'] = 0;

@@ -18,18 +18,20 @@ class CustomAuthApi
      */
     public function handle(Request $request, Closure $next, $guard = null)
     {
+
+        // Check if is_web is 1, then skip authentication
         if ($request->is_web == 1) {
-            // If is_web is 1, skip authentication and token check
             return $next($request);
         }
 
-        if ($request->is_web == 0) {
-            // If is_web is 0, perform authentication and role check
-            if (Auth::check()) {
-                return $next($request);
-            }
+        // If is_web is 0, perform API authentication
+        if (Auth::guard('api')->check()) {
+            return $next($request);
         }
 
+        $data['status'] = 0;
+        $data['message'] = "The is_web flag is required for this request";
+        return response()->json($data);
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 }
