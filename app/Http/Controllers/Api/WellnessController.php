@@ -266,10 +266,10 @@ class WellnessController extends Controller
                             $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                             $data['status'] = 1;
                             $data['message'] = "Data fetched";
-                            // $data['branch_id'] = $request->branch_id;
+                            $data['branch_id'] = $request->branch_id;
                             $data['branch_name'] = $branch_name;
                             $data['branch_address'] = $branchAddress;
-                            // $data['booking_date'] = $booking_date;
+                            $data['booking_date'] = $booking_date;
                             $data['data'] = $wellness_details;
                             return response()->json($data);
                         } else {
