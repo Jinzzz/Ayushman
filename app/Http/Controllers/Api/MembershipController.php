@@ -143,7 +143,7 @@ class MembershipController extends Controller
                     $membership__package__wellnesses = Mst_Membership_Package_Wellness::join('mst_wellness', 'mst__membership__package__wellnesses.wellness_id', '=', 'mst_wellness.wellness_id')
                         ->where('mst__membership__package__wellnesses.package_id', $request->membership_package_id)
                         ->where('mst__membership__package__wellnesses.is_active', 1)
-                        ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit, mst_wellness.wellness_inclusions')
+                        ->selectRaw('mst_wellness.wellness_id, mst_wellness.wellness_name, CONCAT(mst_wellness.wellness_duration, " minutes") as wellness_duration, mst__membership__package__wellnesses.maximum_usage_limit')
                         ->get();
 
                     $data['status'] = 1;
