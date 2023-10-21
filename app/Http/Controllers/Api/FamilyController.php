@@ -93,7 +93,7 @@ class FamilyController extends Controller
                     'member_name'      => 'required',
                     'member_email'     => 'required|email',
                     'member_mobile'    => ['required', 'regex:/^[0-9]{10}$/'],
-                    'member_address'      => 'required',
+                    // 'member_address'      => 'required',
                     'member_gender'      => 'required',
                     'member_dob'      => 'required',
                     'member_blood_group'      => 'required',
@@ -106,7 +106,7 @@ class FamilyController extends Controller
                     'member_email.email'           => 'Invalid email address',
                     'member_mobile.required'       => 'Mobile number required',
                     'member_mobile.regex'          => 'Invalid mobile number',
-                    'member_address.required'         => 'Address required',
+                    // 'member_address.required'         => 'Address required',
                     'member_gender.required'         => 'Gender required',
                     'member_dob.required'         => 'Date of birth required',
                     'member_blood_group.required'         => 'Blood Group required',
@@ -115,7 +115,7 @@ class FamilyController extends Controller
             );
 
             if (!$validator->fails()) {
-                if (isset($request->member_name) && isset($request->member_email) && isset($request->member_mobile) && isset($request->member_address) && isset($request->member_gender) && isset($request->member_dob) && isset($request->member_blood_group) && isset($request->relationship)) {
+                if (isset($request->member_name) && isset($request->member_email) && isset($request->member_mobile) && isset($request->member_gender) && isset($request->member_dob) && isset($request->member_blood_group) && isset($request->relationship)) {
                     $patient_id = Auth::id();
                     $member_dob = PatientHelper::dateFormatDb($request->member_dob);
 
@@ -132,7 +132,7 @@ class FamilyController extends Controller
                         'blood_group_id' => $blood_group_id,
                         'date_of_birth' => $member_dob,
                         'relationship_id' => $relationship_id,
-                        'address' => $request->member_address,
+                        'address' => $request->member_address??"null",
                         'created_by' => $patient_id,
                         'is_active' => 0,
                         'verified' => 0,
