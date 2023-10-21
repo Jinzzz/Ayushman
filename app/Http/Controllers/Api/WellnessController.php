@@ -115,7 +115,7 @@ class WellnessController extends Controller
                         $allWellnessIds = $allWellnessIds->toArray();
                     }
 
-                    if (!$all_wellness->isEmpty()) {
+                    // if (!$all_wellness->isEmpty()) {
                         foreach ($all_wellness as $wellness) {
                             $is_included = 0;
                             if (in_array($wellness->wellness_id, $allWellnessIds)) {
@@ -154,11 +154,11 @@ class WellnessController extends Controller
                         ];
                         
                         return response()->json($data);
-                    } else {
-                        $data['status'] = 0;
-                        $data['message'] = "No wellness found";
-                        return response()->json($data);
-                    }
+                    // } else {
+                    //     $data['status'] = 0;
+                    //     $data['message'] = "No wellness found";
+                    //     return response()->json($data);
+                    // }
                 } else {
                     $data['status'] = 0;
                     $data['message'] = "Please fill mandatory fields";
