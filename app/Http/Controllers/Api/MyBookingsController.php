@@ -12,6 +12,7 @@ use App\Models\Mst_Wellness;
 use App\Models\Mst_Therapy;
 use App\Models\Mst_Staff;
 use App\Models\Trn_Patient_Device_Tocken;
+use App\Models\Trn_Notification;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use App\Helpers\DeviceTockenHelper;
@@ -536,25 +537,45 @@ class MyBookingsController extends Controller
                         'updated_at' => Carbon::now(),
                         'booking_status_id' => 90
                     ]);
-
                     // Retrieve the updated booking details
                     $updatedBooking = Trn_Consultation_Booking::find($request->booking_id);
 
                     // Get the name of the doctor associated with the booking
-                    $doctor_name = Mst_Staff::where('staff_id', $updatedBooking->doctor_id)->value('staff_name');
-
+                    $booking_type_name = Mst_Staff::where('staff_id', $updatedBooking->doctor_id)->value('staff_name');
+                    if ($updatedBooking->booking_type_id == 85) {
+                        $wellness_id = $updatedBooking->wellness_id;
+                        $booking_type_name = Mst_Wellness::where('wellness_id', $wellness_id)->value('wellness_name');
+                    }
+                    if ($updatedBooking->booking_type_id == 86) {
+                        $therapy_id = $updatedBooking->therapy_id;
+                        $booking_type_name = Mst_Therapy::where('id', $therapy_id)->value('therapy_name');
+                    }
                     // Retrieve the device tokens associated with the patient
                     $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', Auth::id())->get();
-                    // Iterate through each device token to send cancellation notification
-                    foreach ($patientDevice as $pdt) {
+
+                    if ($patientDevice) {
                         // Notification details
+                        $updatedBookingDate = PatientHelper::dateFormatUser($updatedBooking->booking_date);
                         $title = 'Booking Cancelled';
-                        $body = 'Your booking for ' . $doctor_name . ' on ' . $updatedBooking->booking_date . ' has been cancelled! . Please check and confirm';
+                        $body = 'Your booking for ' . $booking_type_name . ' on ' . $updatedBookingDate . ' has been cancelled!';
                         $clickAction = "PatientBookingCancelling";
-                        $type = "cancel";
-                        // Send notification to the patient's device
-                        $data['response'] =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                        $type = "Cancel";
+                        // Save notification to the patient's notification table
+                        $notificationCreate = Trn_Notification::create([
+                            'patient_id' => Auth::id(),
+                            'title' => $title,
+                            'content' => $body,
+                            'read_status' => 0,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                        // Iterate through each device token to send cancellation notification
+                        foreach ($patientDevice as $pdt) {
+                            // Send notification to the patient's device
+                            $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                        }
                     }
+
                     // Prepare the success response
                     $data['status'] = 1;
                     $data['message'] = "Booking cancelled successfully";

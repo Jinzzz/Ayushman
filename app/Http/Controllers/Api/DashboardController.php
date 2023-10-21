@@ -100,7 +100,8 @@ class DashboardController extends Controller
                 'patient_email' => $patient->patient_email,
                 'membership_status' => $membership_status,
                 'membership_details' => $membership_details,
-                'upcoming_bookings' => $upcoming_bookings
+                'upcoming_bookings' => $upcoming_bookings,
+                'default_image_url' => 'https://ayushman-patient.hexprojects.in/assets/uploads/default_image/logo-quare.png'
             );
             return response()->json($data);
         } catch (\Exception $e) {

@@ -187,8 +187,12 @@ class NotificationController extends Controller
 
                     // Save patient device token
                     if (isset($request->device_token)) {
-                        Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->delete();
-
+                        $checkExists = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->where('patient_device_token', $request->device_token)->first();
+                        if ($checkExists) {
+                            $data['status'] = 0;
+                            $data['message'] = "This device token is already exists.";
+                            return response($data);
+                        }
                         $pdt = new Trn_Patient_Device_Tocken;
                         $pdt->patient_id = $patient_id;
                         $pdt->patient_device_token = $request->device_token;

@@ -44,11 +44,6 @@ Route::get('booking_types', [DoctorBookingController::class, 'getBookingType']);
 Route::post('booking-status', [DoctorBookingController::class, 'bookingStatus']);
 Route::get('marital_status', [DoctorBookingController::class, 'maritalStatus']); //new
 
-Route::middleware('custom.auth.api')->group(function () {
-    Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
-    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
-});
-
 Route::middleware(['auth:api'])->group(function () {
     // Consultation
     Route::get('patient/home', [DashboardController::class, 'homePage']);
@@ -86,8 +81,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('patient/logout', [PatientAuthController::class, 'logout']);
 
     // Membership
-    Route::get('patient/membership_packages', [MembershipController::class, 'membershipPackages']);
-    Route::post('patient/membership_packages_details', [MembershipController::class, 'membershipPackageDetails']);
+    // Route::get('patient/membership_packages', [MembershipController::class, 'membershipPackages']);
+    // Route::post('patient/membership_packages_details', [MembershipController::class, 'membershipPackageDetails']);
     Route::post('patient/purchase_membership_package', [MembershipController::class, 'purchaseMembershipPackage']);
     Route::get('patient/current_membership_details', [MembershipController::class, 'currentMembershipDetails']);
 
@@ -105,4 +100,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('patient/notifications', [NotificationController::class, 'notifications']);
     Route::post('patient/notifications/read_status', [NotificationController::class, 'read_status']);
     Route::post('patient/notifications/device_token', [NotificationController::class, 'device_token']);
+});
+
+Route::middleware('custom.auth.api')->group(function () {
+    Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
+    Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
+    Route::post('patient/membership_packages', [MembershipController::class, 'membershipPackages']);
+    Route::post('patient/membership_packages_details', [MembershipController::class, 'membershipPackageDetails']);
 });

@@ -18,20 +18,32 @@ use App\Helpers\PatientHelper;
 
 class MembershipController extends Controller
 {
-    public function membershipPackages()
+    public function membershipPackages(Request $request)
     {
         $data = array();
         try {
-            $patient_id = Auth::id();
-            $accountHolder = Mst_Patient::find($patient_id);
+            $is_web = 0;
             $joined_membership_package_id = "";
-            // Checking if the user is currently enrolled in any active memberships. If yes, getting that particular package id
-            if ($accountHolder->available_membership ==  1) {
-                $booked_details = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
-                    ->where('membership_expiry_date', '>=', Carbon::now())
-                    ->where('is_active', 1)
-                    ->first();
-                $joined_membership_package_id = $booked_details ? $booked_details->membership_package_id : null;
+            if($request->is_web && isset($request->is_web)){
+                if($request->is_web != 1){
+                    $data['status'] = 0;
+                        $data['message'] = "Please provide a valid value for the 'is_web' flag";
+                        return response($data);
+                }
+                $is_web = 1;
+            }
+
+            if ($is_web == 0) {
+                $patient_id = Auth::id();
+                $accountHolder = Mst_Patient::find($patient_id);
+                // Checking if the user is currently enrolled in any active memberships. If yes, getting that particular package id
+                if ($accountHolder->available_membership ==  1) {
+                    $booked_details = Mst_Patient_Membership_Booking::where('patient_id', $patient_id)
+                        ->where('membership_expiry_date', '>=', Carbon::now())
+                        ->where('is_active', 1)
+                        ->first();
+                    $joined_membership_package_id = $booked_details ? $booked_details->membership_package_id : null;
+                }
             }
 
             // Getting all active memberships 
@@ -59,7 +71,10 @@ class MembershipController extends Controller
                     // If needed, you can convert it to a simple array using toArray()
                     $benefits = $benefits->toArray();
                     // Verifying if the incoming package ID matches the active membership.
-                    $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
+                    $is_joined = 0;
+                    if ($is_web == 0) {
+                        $is_joined = $joined_membership_package_id && $membership->membership_package_id === $joined_membership_package_id ? 1 : 0;
+                    }
                     $fee = PatientHelper::amountDecimal($membership->package_price);
                     $package_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/membership_image/' . $membership->package_image;
                     $membership_packages[] = [

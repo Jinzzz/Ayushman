@@ -14,6 +14,7 @@ class Trn_Notification extends Model
     protected $primaryKey = 'id';
     
     protected $fillable = [
+        'patient_id',
         'title',
         'content',
         'read_status',

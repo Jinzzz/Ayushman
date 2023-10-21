@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use App\Helpers\PatientHelper;
 use App\Helpers\DeviceTockenHelper;
 use DB;
+use App\Models\Trn_Notification;
 use Illuminate\Support\Facades\Auth;
 
 class DoctorBookingController extends Controller
@@ -94,11 +95,11 @@ class DoctorBookingController extends Controller
             );
 
             if (!$validator->fails()) {
-                if($request->booking_type == 0){
-                    $booking_status = Mst_Master_Value::whereIn('id', [87,88])->get(['id', 'master_value as name'])->toArray();
-                }elseif($request->booking_type == 1){
-                    $booking_status = Mst_Master_Value::whereIn('id', [89,90])->get(['id', 'master_value as name'])->toArray();
-                }else{
+                if ($request->booking_type == 0) {
+                    $booking_status = Mst_Master_Value::whereIn('id', [87, 88])->get(['id', 'master_value as name'])->toArray();
+                } elseif ($request->booking_type == 1) {
+                    $booking_status = Mst_Master_Value::whereIn('id', [89, 90])->get(['id', 'master_value as name'])->toArray();
+                } else {
                     $data['status'] = 0;
                     $data['message'] = "Please provide valid booking type";
                     return response($data);
@@ -364,7 +365,7 @@ class DoctorBookingController extends Controller
                             // 'last_page_url' => $this->getPageNumberFromUrl($doctorsList->url($doctorsList->lastPage())),
                             // 'next_page_url' => $this->getPageNumberFromUrl($doctorsList->nextPageUrl()),
                             // 'prev_page_url' => $this->getPageNumberFromUrl($doctorsList->previousPageUrl()),
-                        ];                                               
+                        ];
                         return response($data);
                     }
                 } else {
@@ -1037,18 +1038,53 @@ class DoctorBookingController extends Controller
                                         'updated_at' => Carbon::now(),
                                         'booking_reference_number' => $bookingRefNo
                                     ]);
+                                    $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                                    if ($patientDevice) {
+                                        $title = 'Consultation Booking';
+                                        $body = ' Here is a consultation booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '.';
+                                        $clickAction = "PatientConsultationBookingAgain";
+                                        $type = "Book Again";
+
+                                        // Save notification to the patient's notification table
+                                        $notificationCreate = Trn_Notification::create([
+                                            'patient_id' => Auth::id(),
+                                            'title' => $title,
+                                            'content' => $body,
+                                            'read_status' => 0,
+                                            'created_at' => Carbon::now(),
+                                            'updated_at' => Carbon::now(),
+                                        ]);
+                                        foreach ($patientDevice as $pdt) {
+                                            // Send notification to the patient's device
+                                            $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                        }
+                                    }
                                 } else {
                                     $updateRecord = Trn_Consultation_Booking::where('id', $booking_id)->update($newRecordData);
                                     $bookingRefNo = $bookingDetails->booking_reference_number;
                                     $lastInsertedId = intval($booking_id);
 
                                     $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
-                                    foreach ($patientDevice as $pdt) {
+
+                                    if ($patientDevice) {
                                         $title = 'Booking rescheduled';
-                                        $body = ' Rescheduled the booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '. Please check and confirm.';
-                                        $clickAction = "PatientBookingCancelling";
-                                        $type = "cancel";
-                                        $data['response'] =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                        $body = ' Rescheduled the booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '.';
+                                        $clickAction = "PatientBookingReschedule";
+                                        $type = "Reschedule";
+
+                                        // Save notification to the patient's notification table
+                                        $notificationCreate = Trn_Notification::create([
+                                            'patient_id' => Auth::id(),
+                                            'title' => $title,
+                                            'content' => $body,
+                                            'read_status' => 0,
+                                            'created_at' => Carbon::now(),
+                                            'updated_at' => Carbon::now(),
+                                        ]);
+                                        foreach ($patientDevice as $pdt) {
+                                            // Send notification to the patient's device
+                                            $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                        }
                                     }
                                 }
                             } else {
@@ -1061,6 +1097,28 @@ class DoctorBookingController extends Controller
                                     'updated_at' => Carbon::now(),
                                     'booking_reference_number' => $bookingRefNo
                                 ]);
+
+                                $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                                if ($patientDevice) {
+                                    $title = 'Consultation Booking';
+                                    $body = ' Here is a consultation booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '.';
+                                    $clickAction = "PatientConsultationBooking";
+                                    $type = "Consultation Booking";
+
+                                    // Save notification to the patient's notification table
+                                    $notificationCreate = Trn_Notification::create([
+                                        'patient_id' => Auth::id(),
+                                        'title' => $title,
+                                        'content' => $body,
+                                        'read_status' => 0,
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now(),
+                                    ]);
+                                    foreach ($patientDevice as $pdt) {
+                                        // Send notification to the patient's device
+                                        $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                    }
+                                }
                             }
                             $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
                             $booking_details = [];
