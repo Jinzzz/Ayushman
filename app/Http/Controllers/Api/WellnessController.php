@@ -116,44 +116,44 @@ class WellnessController extends Controller
                     }
 
                     // if (!$all_wellness->isEmpty()) {
-                        foreach ($all_wellness as $wellness) {
-                            $is_included = 0;
-                            if (in_array($wellness->wellness_id, $allWellnessIds)) {
-                                $is_included = 1;
-                            }
-                            $wellness_price = PatientHelper::amountDecimal($wellness->wellness_cost);
-                            $wellness_offer_price = PatientHelper::amountDecimal($wellness->offer_price);
-                            $wellness_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/wellness_image/' . $wellness->wellness_image;
-                            $is_offer = ($wellness_price > $wellness_offer_price) ? 1 : 0;
-
-                            $wellness_list[] = [
-                                'id' => $wellness->wellness_id,
-                                'wellness_name' => $wellness->wellness_name,
-                                'wellness_price' => $wellness_price,
-                                'wellness_offer_price' => $wellness_offer_price,
-                                'is_offer' => $is_offer,
-                                'is_included' => $is_included,
-                                'wellness_image' => $wellness_image,
-                            ];
+                    foreach ($all_wellness as $wellness) {
+                        $is_included = 0;
+                        if (in_array($wellness->wellness_id, $allWellnessIds)) {
+                            $is_included = 1;
                         }
-                        $booking_date = PatientHelper::dateFormatUser($request->booking_date);
-                        $data['status'] = 1;
-                        $data['message'] = "Data fetched";
-                        $data['booking_date'] = $booking_date;
-                        $data['branch_name'] = $branch_name;
-                        $data['data'] =  $wellness_list;
-                        $data['pagination_details'] = [
-                            'current_page' => $all_wellness->currentPage(),
-                            'total_records' => $all_wellness->total(),
-                            'total_pages' => $all_wellness->lastPage(),
-                            'per_page' => $all_wellness->perPage(),
-                            // 'first_page_url' => $all_wellness->currentPage() > 1 ? (string)1 : null,
-                            // 'last_page_url' => (string)$all_wellness->lastPage(),
-                            // 'next_page_url' => $all_wellness->nextPageUrl() ? (string)($all_wellness->currentPage() + 1) : null,
-                            // 'prev_page_url' => $all_wellness->previousPageUrl() ? (string)($all_wellness->currentPage() - 1) : null,
+                        $wellness_price = PatientHelper::amountDecimal($wellness->wellness_cost);
+                        $wellness_offer_price = PatientHelper::amountDecimal($wellness->offer_price);
+                        $wellness_image = 'https://ayushman-patient.hexprojects.in/assets/uploads/wellness_image/' . $wellness->wellness_image;
+                        $is_offer = ($wellness_price > $wellness_offer_price) ? 1 : 0;
+
+                        $wellness_list[] = [
+                            'id' => $wellness->wellness_id,
+                            'wellness_name' => $wellness->wellness_name,
+                            'wellness_price' => $wellness_price,
+                            'wellness_offer_price' => $wellness_offer_price,
+                            'is_offer' => $is_offer,
+                            'is_included' => $is_included,
+                            'wellness_image' => $wellness_image,
                         ];
-                        
-                        return response()->json($data);
+                    }
+                    $booking_date = PatientHelper::dateFormatUser($request->booking_date);
+                    $data['status'] = 1;
+                    $data['message'] = "Data fetched";
+                    $data['booking_date'] = $booking_date;
+                    $data['branch_name'] = $branch_name;
+                    $data['data'] =  $wellness_list;
+                    $data['pagination_details'] = [
+                        'current_page' => $all_wellness->currentPage(),
+                        'total_records' => $all_wellness->total(),
+                        'total_pages' => $all_wellness->lastPage(),
+                        'per_page' => $all_wellness->perPage(),
+                        // 'first_page_url' => $all_wellness->currentPage() > 1 ? (string)1 : null,
+                        // 'last_page_url' => (string)$all_wellness->lastPage(),
+                        // 'next_page_url' => $all_wellness->nextPageUrl() ? (string)($all_wellness->currentPage() + 1) : null,
+                        // 'prev_page_url' => $all_wellness->previousPageUrl() ? (string)($all_wellness->currentPage() - 1) : null,
+                    ];
+
+                    return response()->json($data);
                     // } else {
                     //     $data['status'] = 0;
                     //     $data['message'] = "No wellness found";
@@ -455,6 +455,132 @@ class WellnessController extends Controller
                 $data['status'] = 0;
                 $data['errors'] = $validator->errors();
                 $data['message'] = "Validation errors";
+                return response($data);
+            }
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+
+    // wellness_bookig_details 
+    public function wellnessBookingDetails(Request $request)
+    {
+        $data = array();
+        try {
+            // Validating request parameters
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'branch_id' => ['required'],
+                    'wellness_id' => ['required'],
+                    'booking_date' => ['required'],
+                    'slot_id' => ['required'],
+                    'limit' => ['integer'],
+                    'page_number' => ['integer'],
+                ],
+                [
+                    'wellness_id.required' => 'Wellness required',
+                    'branch_id.required' => 'Branch required',
+                    'slot_id.required' => 'Slot required',
+                    'booking_date.required' => 'Booking date required',
+                    'limit.integer' => 'Limit must be an integer',
+                    'page_number.integer' => 'Page number must be an integer',
+                ]
+            );
+
+            // If validation fails, return error response
+            if ($validator->fails()) {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
+
+            if (isset($request->wellness_id) && isset($request->branch_id) && isset($request->booking_date) && isset($request->slot_id)) {
+                $bookingDate = Carbon::parse($request->booking_date);
+                $currentDate = Carbon::now();
+                $currentYear = Carbon::now()->year;
+
+                if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 year in the future
+                    $data['status'] = 0;
+                    $data['message'] = "Booking date cannot be more than 1 year in the future.";
+                    return response($data);
+                }
+
+                // Check if the booking date is in the past and not the same day as the current date
+                if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
+                    $data['status'] = 0;
+                    $data['message'] = "Booking date is older than the current date.";
+                    return response($data);
+                } else {
+                    $patient_id = Auth::id();
+
+                    $family_details = array();
+
+                    $family_details = PatientHelper::getFamilyDetails($patient_id);
+
+                    $day_of_week = PatientHelper::getWeekDay($request->booking_date);
+                    $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
+
+                    // Recheck the availability of the specified time slot for booking on the given date and for the particular wellness
+                    $weekDayId = Mst_Master_Value::where('master_id', 3)->where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
+                    $booking_date = PatientHelper::dateFormatDb($request->booking_date);
+                    $finalSlots = PatientHelper::wellnessAvailability($booking_date, $weekDayId, $request->branch_id, $request->wellness_id);
+
+                    if (!$finalSlots) {
+                        $data['status'] = 0;
+                        $data['message'] = "Sorry, no slots available";
+                        return response($data);
+                    }
+                    $available_slots = PatientHelper::availableSlots($finalSlots, $booking_date, $weekDayId, $request->wellness_id);
+
+                    $is_available = 0;
+                    if ($available_slots) {
+                        foreach ($available_slots as $available_slot) {
+                            if ($available_slot['time_slot_id'] == $request->slot_id && $available_slot['is_available'] == 1) {
+                                $is_available = 1;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($is_available == 0) {
+                        // sorry no slots available 
+                        $data['status'] = 0;
+                        $data['message'] = "Sorry, no slots available";
+                        return response($data);
+                    }
+                    // Pagination logic
+                    $limit = $request->input('limit', 5); // Default limit is 5
+                    $page_number = $request->input('page_number', 1); // Default page number is 1
+
+                    $family_details_collection = collect($family_details);
+                    $paginate_family_details = $family_details_collection->slice(($page_number - 1) * $limit, $limit)->all();
+
+                    // Prepare the success response with pagination details
+                    $data['status'] = 1;
+                    $data['message'] = "Data Fetched";
+                    $data['data'] = array_values($paginate_family_details);
+                    $data['pagination_details'] = [
+                        'current_page' => intval($page_number),
+                        'total_records' => count($family_details),
+                        'total_pages' => ceil(count($family_details) / $limit),
+                        'per_page' => $limit,
+                        // 'first_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=1&limit=' . $limit) : null,
+                        // 'last_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ceil(count($family_details) / $limit) . '&limit=' . $limit) : null,
+                        // 'next_page_url' => $page_number < ceil(count($family_details) / $limit) ? url(request()->path() . '?page_number=' . ($page_number + 1) . '&limit=' . $limit) : null,
+                        // 'prev_page_url' => $page_number > 1 ? url(request()->path() . '?page_number=' . ($page_number - 1) . '&limit=' . $limit) : null,
+                    ];
+
+                    return response($data);
+                }
+            } else {
+                $data['status'] = 0;
+                $data['message'] = "Please fill mandatory fields";
                 return response($data);
             }
         } catch (\Exception $e) {

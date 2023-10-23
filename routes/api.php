@@ -92,6 +92,7 @@ Route::middleware(['auth:api'])->group(function () {
     // Route::post('patient/wellness/search_list', [WellnessController::class, 'wellnessSearchList']);
     Route::post('patient/wellness/details', [WellnessController::class, 'wellnessDetails']);
     Route::post('patient/wellness/availability', [WellnessController::class, 'wellnessAvailability']);
+    Route::post('patient/wellness/booking_details', [WellnessController::class, 'wellnessBookingDetails']);
     Route::post('patient/wellness/booking_summary', [WellnessController::class, 'wellnessSummary']);
     Route::post('patient/wellness/booking_confirmation', [WellnessController::class, 'wellnessConfirmation']);
     Route::post('patient/wellness/booking_reschedule', [WellnessController::class, 'wellnessReSchedule']);
