@@ -696,7 +696,7 @@ class DoctorBookingController extends Controller
                         $data['message'] = "Data Fetched";
                         $data['data'] = array_values($paginate_family_details);
                         $data['pagination_details'] = [
-                            'current_page' => $page_number,
+                            'current_page' => intval($page_number),
                             'total_records' => count($family_details),
                             'total_pages' => ceil(count($family_details) / $limit),
                             'per_page' => $limit,

@@ -413,6 +413,8 @@ class FamilyController extends Controller
                             'trn_patient_family_member.mobile_number',
                             'gender.master_value as gender_name',
                             'blood_group.master_value as blood_group',
+                            'trn_patient_family_member.gender_id',
+                            'trn_patient_family_member.blood_group_id',
                             'trn_patient_family_member.date_of_birth',
                             'trn_patient_family_member.address',
                             DB::raw('relationship.master_value as relationship')
@@ -437,7 +439,9 @@ class FamilyController extends Controller
                             'age' => $currentYear - $year,
                             'dob' => Carbon::parse($member->date_of_birth)->format('d-m-Y'),
                             'gender' => $member->gender_name,
+                            'gender_id' => $member->gender_id,
                             'blood_group' => $member->blood_group,
+                            'blood_group_id' => $member->blood_group_id,
                             'address' => $member->address,
                         ];
 
