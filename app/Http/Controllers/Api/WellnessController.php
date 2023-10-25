@@ -877,9 +877,15 @@ class WellnessController extends Controller
                     $patient_id = Auth::id();
                     $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->first();
 
-
+                    $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
+                    if (!$accountHolder) {
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist";
+                        return response($data);
+                    }
 
                     $yourself = $request->yourself;
+                    $booked_for = $accountHolder->patient_name;
                     $newRecordData = [
                         'booking_type_id' => 85,
                         'wellness_id' => $request->wellness_id,
@@ -904,7 +910,8 @@ class WellnessController extends Controller
                             ];
                             $newRecordData = $familyMemberData + $newRecordData;
 
-                            $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->member_id)->first();
+                            $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->family_member_id)->first();
+                            $booked_for = $bookedMemberDetails->family_member_name;
                         } else {
                             $data['status'] = 0;
                             $data['message'] = "Family member is required";
@@ -926,8 +933,6 @@ class WellnessController extends Controller
                         ->where('time_slot_id', '!=', $request->slot_id)
                         ->where('family_member_id', $newRecordData['family_member_id'])
                         ->first();
-
-                    $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
 
                     if ($checkSameSlot) {
                         $data['status'] = 0;
@@ -964,7 +969,8 @@ class WellnessController extends Controller
                         'booking_id' => $lastInsertedId,
                         'member_name' => $accountHolder->patient_name,
                         'booking_referance_number' => $bookingRefNo,
-                        'booking_for' => $wellness->wellness_name,
+                        'booking_to' => $wellness->wellness_name,
+                        'booking_for' => $booked_for,
                         'booking_date' => $booking_date,
                         'time_slot' => $time_from . ' - ' . $time_to,
                     ];
@@ -1112,7 +1118,15 @@ class WellnessController extends Controller
 
                     $patient_id = Auth::id();
                     $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->first();
+                    $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
+                    if (!$accountHolder) {
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist";
+                        return response($data);
+                    }
+
                     $yourself = $request->yourself;
+                    $booked_for = $accountHolder->patient_name;
                     $newRecordData = [
                         'booking_type_id' => 85,
                         'wellness_id' => $request->wellness_id,
@@ -1137,7 +1151,8 @@ class WellnessController extends Controller
                             ];
                             $newRecordData = $familyMemberData + $newRecordData;
 
-                            $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->member_id)->first();
+                            $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->family_member_id)->first();
+                            $booked_for = $bookedMemberDetails->family_member_name;
                         } else {
                             $data['status'] = 0;
                             $data['message'] = "Family member is required";
@@ -1206,7 +1221,8 @@ class WellnessController extends Controller
                         'booking_id' => $lastInsertedId,
                         'member_name' => $accountHolder->patient_name,
                         'booking_referance_number' => $bookingRefNo,
-                        'booking_for' => $wellness->wellness_name,
+                        'booking_to' => $wellness->wellness_name,
+                        'booking_for' => $booked_for,
                         'booking_date' => $booking_date,
                         'time_slot' => $time_from . ' - ' . $time_to,
                     ];

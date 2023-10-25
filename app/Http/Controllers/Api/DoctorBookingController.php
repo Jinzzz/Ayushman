@@ -955,6 +955,13 @@ class DoctorBookingController extends Controller
                             }
                         }
 
+                        $accountHolder = Mst_Patient::where('id', $patient_id)->first();
+                        if (!$accountHolder) {
+                            $data['status'] = 0;
+                            $data['message'] = "User does not exist";
+                            return response($data);
+                        }
+
                         // Fetch details of the selected time slot for the booking
                         $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)->first();
 
@@ -973,6 +980,7 @@ class DoctorBookingController extends Controller
                         $booking_date = PatientHelper::dateFormatDb($request->booking_date);
 
                         // Prepare data for creating a new booking record
+                        $booked_for = $accountHolder->patient_name;
                         $newRecordData = [
                             'booking_type_id' => 84,
                             'patient_id' => $patient_id,
@@ -995,20 +1003,13 @@ class DoctorBookingController extends Controller
                                     'family_member_id' => $request->family_member_id,
                                 ];
                                 $newRecordData = $familyMemberData + $newRecordData;
-
                                 $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $request->family_member_id)->first();
+                                $booked_for = $bookedMemberDetails->family_member_name;
                             } else {
                                 $data['status'] = 0;
                                 $data['message'] = "Member is required";
                                 return response($data);
                             }
-                        }
-
-                        $accountHolder = Mst_Patient::where('id', $patient_id)->first();
-                        if (!$accountHolder) {
-                            $data['status'] = 0;
-                            $data['message'] = "User does not exist";
-                            return response($data);
                         }
 
                         // checking already booked or not 
@@ -1128,6 +1129,7 @@ class DoctorBookingController extends Controller
                                 'member_name' => $accountHolder->patient_name,
                                 'booking_referance_number' => $bookingRefNo,
                                 'booking_to' => $doctor->doctor_name,
+                                'booking_for' => $booked_for,
                                 'booking_date' => $booking_date,
                                 'time_slot' => $time_from . ' - ' . $time_to,
                             ];
