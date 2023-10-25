@@ -650,6 +650,7 @@ class WellnessController extends Controller
                         $wellness_details[] = [
                             'id' => $wellness->wellness_id,
                             'wellness_name' => $wellness->wellness_name,
+                            'wellness_image' => 'https://ayushman-patient.hexprojects.in/assets/uploads/wellness_image/' . $wellness->wellness_image,
                             // 'wellness_description' => $wellness->wellness_description,
                             // 'wellness_cost' => $fee,
                             // 'wellness_inclusions' => strip_tags($wellness->wellness_inclusions),
@@ -950,6 +951,12 @@ class WellnessController extends Controller
                         'booking_reference_number' => $bookingRefNo
                     ]);
 
+                    // Fetch details of the selected time slot for the booking
+                    $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)->first();
+
+                    // Convert time format from database format to user-readable format
+                    $time_from = date('h:i A', strtotime($slotDetails->time_from));
+                    $time_to = date('h:i A', strtotime($slotDetails->time_to));
 
                     $booking_details = [];
                     $booking_date = PatientHelper::dateFormatUser($request->booking_date);
@@ -959,10 +966,11 @@ class WellnessController extends Controller
                         'booking_referance_number' => $bookingRefNo,
                         'booking_for' => $wellness->wellness_name,
                         'booking_date' => $booking_date,
+                        'time_slot' => $time_from . ' - ' . $time_to,
                     ];
 
                     $data['status'] = 1;
-                    $data['message'] = "Booking Confirmed";
+                    $data['message'] = $accountHolder->patient_name . ", your booking has been confirmed.";
                     $data['booking_details'] = $booking_details;
                     return response($data);
                 } else {
@@ -1185,6 +1193,13 @@ class WellnessController extends Controller
                         $lastInsertedId = intval($request->booking_id);
                     }
 
+                    // Fetch details of the selected time slot for the booking
+                    $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)->first();
+
+                    // Convert time format from database format to user-readable format
+                    $time_from = date('h:i A', strtotime($slotDetails->time_from));
+                    $time_to = date('h:i A', strtotime($slotDetails->time_to));
+
                     $booking_details = [];
                     $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                     $booking_details[] = [
@@ -1193,10 +1208,11 @@ class WellnessController extends Controller
                         'booking_referance_number' => $bookingRefNo,
                         'booking_for' => $wellness->wellness_name,
                         'booking_date' => $booking_date,
+                        'time_slot' => $time_from . ' - ' . $time_to,
                     ];
 
                     $data['status'] = 1;
-                    $data['message'] = "Booking Confirmed";
+                    $data['message'] = $accountHolder->patient_name . ", your booking has been confirmed.";
                     $data['booking_details'] = $booking_details;
                     return response($data);
                 } else {
