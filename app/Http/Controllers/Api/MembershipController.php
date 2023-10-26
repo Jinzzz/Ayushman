@@ -282,6 +282,7 @@ class MembershipController extends Controller
                         $previous_membership_details[] = [
                             'membership_booking_id' => $old_membership_booking->membership_patient_id,
                             'package_title' => $previous_package_details->package_title,
+                            'package_validity' => $previous_package_details->package_duration . ' days',
                             'membership_booking_date' => $previous_membership_booking_date,
                             'membership_expiry_date' => $previous_membership_expiry_date,
                         ];
