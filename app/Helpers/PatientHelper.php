@@ -41,6 +41,7 @@ class PatientHelper
     // to get timeslots
     public static function getTimeSlot($interval, $start_time, $end_time)
     {
+        // currently not in use 
         $start = new \DateTime($start_time);
         $end = new \DateTime($end_time);
         $startTime = $start->format('H:i');
@@ -81,20 +82,12 @@ class PatientHelper
         $currentDate = Carbon::now()->format('Y-m-d');
         $currentTime = Carbon::now()->format('H:i:s');
 
-        if ($available_slots <= 0 || ($timeSlot->time_to <= $currentTime && $booking_date == $currentDate)) {
+        if ($available_slots <= 0 || ($timeSlot->time_from <= $currentTime && $booking_date == $currentDate)) {
             $available_slots = 0;
-        } elseif ($booking_date == $currentDate && $timeSlot->time_from <= $currentTime && $timeSlot->time_to >= $currentTime) {
-
-            $slots = self::getTimeSlot($timeSlot->avg_time_patient, $timeSlot->time_from, $timeSlot->time_to);
-            $slots = array_slice($slots, $booked_tokens);
-
-            $available_slots = 0;
-            foreach ($slots as $slot) {
-                if ($slot['slot_start_time'] > $currentTime) {
-                    $available_slots++;
-                }
-            }
         } else {
+            if ($timeSlot->time_from < $currentTime) {
+                $available_slots = 0;
+            }
             $available_slots = ($available_slots < 0) ? 0 : $available_slots;
         }
         return $available_slots;
@@ -410,19 +403,36 @@ class PatientHelper
     }
 
 
-    public static function availableSlots($finalSlots)
+    public static function availableSlots($finalSlots, $booking_date)
     {
         $time_slots = array();
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $currentTime = Carbon::now()->format('H:i:s');
+        // dd($currentTime);
         if ($finalSlots) {
             foreach ($finalSlots as $timeSlot) {
+                $check_available = $timeSlot['is_available'];
                 $slot_details = Mst_TimeSlot::where('id', $timeSlot['timeslot'])->first();
-                $time_slots[] = [
-                    'time_slot_id' => $slot_details->id,
-                    'time_from' => Carbon::parse($slot_details->time_from)->format('h:i A'),
-                    'time_to' => Carbon::parse($slot_details->time_to)->format('h:i A'),
-                    'therapy_room_id' => $timeSlot['therapy_room_id'],
-                    'is_available' => $timeSlot['is_available'],
-                ];
+                if ($check_available <= 0 || ($slot_details->time_from <= $currentTime && $booking_date == $currentDate)) {
+                    $time_slots[] = [
+                        'time_slot_id' => $slot_details->id,
+                        'time_from' => Carbon::parse($slot_details->time_from)->format('h:i A'),
+                        'time_to' => Carbon::parse($slot_details->time_to)->format('h:i A'),
+                        'therapy_room_id' => $timeSlot['therapy_room_id'],
+                        'is_available' => 0,
+                    ];
+                } else {
+                    if ($slot_details->time_from < $currentTime) {
+                        $check_available = 0;
+                    }
+                    $time_slots[] = [
+                        'time_slot_id' => $slot_details->id,
+                        'time_from' => Carbon::parse($slot_details->time_from)->format('h:i A'),
+                        'time_to' => Carbon::parse($slot_details->time_to)->format('h:i A'),
+                        'therapy_room_id' => $timeSlot['therapy_room_id'],
+                        'is_available' => $check_available,
+                    ];
+                }
             }
             return $time_slots;
         } else {

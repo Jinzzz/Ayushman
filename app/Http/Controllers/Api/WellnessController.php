@@ -407,7 +407,7 @@ class WellnessController extends Controller
                         } else {
                             // Handle the case where $available_slots is not an array
                             $data['status'] = 0;
-                            $data['message'] = "Available slots did not return an array";
+                            $data['message'] = "Currently, No slots available";
                             return response()->json($data);
                         }
 

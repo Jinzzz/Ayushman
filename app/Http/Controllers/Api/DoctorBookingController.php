@@ -495,7 +495,7 @@ class DoctorBookingController extends Controller
                 ]
             );
             if (!$validator->fails()) {
-                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date)) {
+                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date)) {    
                     $bookingDate = Carbon::parse($request->booking_date);
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
@@ -527,7 +527,7 @@ class DoctorBookingController extends Controller
                             ->first();
 
                         // Build a query to retrieve staff time slots for the specified doctor on the given week day
-                        $timeSlotsQuery = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')->where('staff_id', $request->doctor_id)
+                        $timeSlotsQuery = Mst_Staff_Timeslot::join('mst_timeslots', 'mst__staff__timeslots.timeslot', 'mst_timeslots.id')->where('mst__staff__timeslots.staff_id', $request->doctor_id)
                             ->where('mst__staff__timeslots.week_day', $weekDayId)
                             ->where('mst__staff__timeslots.is_active', 1);
 
@@ -538,12 +538,12 @@ class DoctorBookingController extends Controller
                         }
 
                         $timeSlots = $timeSlotsQuery->get();
-
+                        
                         if ($timeSlots) {
 
                             $currentDate = Carbon::now()->format('Y-m-d');
                             $currentTime = Carbon::now()->format('H:i:s');
-
+                            // dd($currentTime);
                             $time_slots = [];
                             foreach ($timeSlots as $timeSlot) {
                                 $booked_tokens = Trn_Consultation_Booking::where('booking_date', $booking_date)
@@ -551,35 +551,24 @@ class DoctorBookingController extends Controller
                                     ->where('doctor_id', $request->doctor_id)
                                     ->whereIn('booking_status_id', [87, 88])
                                     ->count();
-
+                            
                                 $available_slots = $timeSlot->no_tokens - $booked_tokens;
-
-                                if ($available_slots <= 0 || ($timeSlot->time_to <= $currentTime && $request->booking_date == $currentDate)) {
+                            
+                                if ($available_slots <= 0 || ($timeSlot->time_from <= $currentTime && $request->booking_date == $currentDate)) {
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
                                         'time_to' => Carbon::parse($timeSlot->time_to)->format('h:i A'),
                                         'available_slots' => 0,
                                     ];
-                                } elseif ($request->booking_date == $currentDate && $timeSlot->time_from <= $currentTime && $timeSlot->time_to >= $currentTime) {
-                                    $slots = PatientHelper::getTimeSlot($timeSlot->avg_time_patient, $timeSlot->time_from, $timeSlot->time_to);
-                                    $slots = array_slice($slots, $booked_tokens);
-
-                                    $available_slots = 0;
-                                    foreach ($slots as $slot) {
-                                        if ($slot['slot_start_time'] > $currentTime) {
-                                            $available_slots++;
-                                        }
-                                    }
-
-                                    $time_slots[] = [
-                                        'time_slot_id' => $timeSlot->id,
-                                        'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
-                                        'time_to' => Carbon::parse($timeSlot->time_to)->format('h:i A'),
-                                        'available_slots' => $available_slots,
-                                    ];
                                 } else {
+                                    // Check if the current time exceeds the time slot end time
+                                    if ($timeSlot->time_from < $currentTime) {
+                                        $available_slots = 0;
+                                    }
+                            
                                     $available_slots = ($available_slots < 0) ? 0 : $available_slots;
+                                    
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
@@ -588,6 +577,7 @@ class DoctorBookingController extends Controller
                                     ];
                                 }
                             }
+                            
                             $data['status'] = 1;
                             $data['message'] = "Data fetched.";
                             $data['doctor_name'] = $doctor_name;
@@ -623,6 +613,7 @@ class DoctorBookingController extends Controller
 
     public function bookingDetails(Request $request)
     {
+        // Currently not in use 
         $data = array();
         try {
             // Validating request parameters
