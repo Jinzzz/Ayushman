@@ -68,12 +68,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('upcoming_booking_details/consultation', [MyBookingsController::class, 'consultationBookingDetails']);
     Route::post('upcoming_booking_details/wellness', [MyBookingsController::class, 'wellnessBookingDetails']);
     Route::post('patient/cancel_booking', [MyBookingsController::class, 'cancelBooking']);
+    Route::post('patient/my_booking_details', [MyBookingsController::class,'myBookingDetails']);
 
     // booking history
     Route::post('patient/my_booking_history', [BookingHistoryController::class, 'myBookingHistory']);
     Route::post('booking_history_details/consultation', [BookingHistoryController::class, 'consultationBookingDetails']);
     Route::post('booking_history_details/wellness', [BookingHistoryController::class, 'wellnessBookingDetails']);
-
+    Route::post('patient/booking_history_details', [BookingHistoryController::class,'bookingHistoryDetails']);
+    
     // Profile 
     Route::post('patient/edit_details', [PatientAuthController::class, 'editDetails']);
     Route::post('patient/update_details', [PatientAuthController::class, 'updateDetails']);

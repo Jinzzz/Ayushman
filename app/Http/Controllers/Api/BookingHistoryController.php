@@ -118,10 +118,10 @@ class BookingHistoryController extends Controller
                     $queries = $queries->where('trn_consultation_bookings.booking_date', 'like', '%' . $booking_date . '%');
                 }
                 if (isset($request->search_booking_status) && !is_null($request->search_booking_status) && $request->search_booking_status != "null" && $request->search_booking_status != null) {
-                    $queries = $queries->where('trn_consultation_bookings.booking_status_id',$request->search_booking_status);
+                    $queries = $queries->where('trn_consultation_bookings.booking_status_id', $request->search_booking_status);
                 }
                 if (isset($request->search_branch) && !is_null($request->search_branch) && $request->search_branch != "null" && $request->search_branch != null) {
-                    $queries = $queries->where('trn_consultation_bookings.branch_id',$request->search_branch);
+                    $queries = $queries->where('trn_consultation_bookings.branch_id', $request->search_branch);
                 }
 
                 $all_bookings_consultation = $queries->get();
@@ -192,10 +192,10 @@ class BookingHistoryController extends Controller
                     'total_records' => count($my_bookings),
                     'total_pages' => ceil(count($my_bookings) / $limit),
                     'per_page' => $limit,
-                    'first_page_url' => $page_number > 1 ? (string)($page_number=1) : null,
+                    'first_page_url' => $page_number > 1 ? (string)($page_number = 1) : null,
                     'last_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? (string) ceil(count($my_bookings) / $limit) : null,
                     'next_page_url' => $page_number < ceil(count($my_bookings) / $limit) ? (string) ($page_number + 1) : null,
-                    'prev_page_url' => $page_number > 1 ?(string) ($page_number - 1) : null,
+                    'prev_page_url' => $page_number > 1 ? (string) ($page_number - 1) : null,
                 ];
 
                 return response($data);
@@ -217,6 +217,7 @@ class BookingHistoryController extends Controller
 
     public function consultationBookingDetails(Request $request)
     {
+        // Currently not in use 
         $data = array();
         try {
             $validator = Validator::make(
@@ -368,6 +369,7 @@ class BookingHistoryController extends Controller
     // Historical booking details of wellness 
     public function wellnessBookingDetails(Request $request)
     {
+        // Currently not in use 
         $data = array();
         try {
             $validator = Validator::make(
@@ -482,6 +484,175 @@ class BookingHistoryController extends Controller
                                 // Booking type is not for a wellness
                                 $data['status'] = 0;
                                 $data['message'] = "Please provide a valid wellness booking ID.";
+                                return response($data);
+                            }
+                        } else {
+                            // No booking details found for the provided booking ID
+                            $data['status'] = 0;
+                            $data['message'] = "No booking details found for the provided booking ID.";
+                            return response($data);
+                        }
+                    } else {
+                        // User does not exist
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist";
+                        return response($data);
+                    }
+                } else {
+                    // Booking ID is not provided in the request
+                    $data['status'] = 0;
+                    $data['message'] = "Please fill mandatory fields";
+                    return response($data);
+                }
+            } else {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+    // common booking history details 
+    public function bookingHistoryDetails(Request $request)
+    {
+        $data = array();
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'booking_id' => ['required'],
+                ],
+                [
+                    'booking_id.required' => 'Booking refernce Id required',
+                ]
+            );
+            if (!$validator->fails()) {
+                // Check if booking_id is set in the request
+                if (isset($request->booking_id)) {
+                    // Get the authenticated patient's ID
+                    $patient_id = Auth::id();
+                    // Check if the patient exists
+                    if ($patient_id) {
+                        $currentDate = date('Y-m-d');
+                        // Check if the provided booking ID corresponds to a consultation booking for the given patient
+                        $is_exist = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
+                            ->where('patient_id', $patient_id)
+                            ->where('trn_consultation_bookings.booking_date', '<=', $currentDate)
+                            ->first();
+                        // If a consultation booking is found
+                        if ($is_exist) {
+                            // Check if the booking type is for a doctor consultation
+                            // Process for fetching the details of doctor consultation booking.
+                            // Fetch booking details for the specified booking_id and patient_id
+                            $booking_details = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
+                                ->where('patient_id', $patient_id)
+                                ->where('trn_consultation_bookings.booking_type_id', '!=', 86)
+                                ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+                                ->leftJoin('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
+                                ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+                                ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
+                                ->leftJoin('mst_master_values as qualification', 'mst_staffs.staff_qualification', '=', 'qualification.id')
+                                ->leftJoin('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
+                                ->select(
+                                    'mst_staffs.staff_name as doctor_name',
+                                    'booking_status.master_value as status_name',
+                                    'mst_branches.branch_name',
+                                    'mst_branches.branch_id as branch_id',
+                                    'trn_consultation_bookings.booking_date',
+                                    'trn_consultation_bookings.id',
+                                    'trn_consultation_bookings.wellness_id',
+                                    'trn_consultation_bookings.therapy_id',
+                                    'trn_consultation_bookings.booking_reference_number',
+                                    'trn_consultation_bookings.is_for_family_member',
+                                    'trn_consultation_bookings.booking_type_id',
+                                    'trn_consultation_bookings.family_member_id',
+                                    'mst_staffs.staff_booking_fee',
+                                    'booking_type.master_value as booking_type_name',
+                                    'trn_consultation_bookings.booking_fee',
+                                    'mst_timeslots.time_from',
+                                    'mst_timeslots.time_to',
+                                    'mst_staffs.staff_id as doctor_id',
+                                    'qualification.master_value as qualification'
+                                )->first();
+
+                            // Initialize arrays to store doctor and other booking details
+                            $doctor_details = [];
+                            $other_booking_details = [];
+
+                            // Check if booking details are fetched
+                            if ($booking_details) {
+                                // Determine the patient's name based on whether it's for a family member or not
+                                if ($booking_details->is_for_family_member == 1) {
+                                    $patient = Trn_Patient_Family_Member::find($booking_details->family_member_id);
+                                    $patient_name = $patient->family_member_name;
+                                } else {
+                                    $patient = Mst_Patient::find($patient_id);
+                                    $patient_name = $patient->patient_name;
+                                }
+                                // Format date and time
+                                $booking_date = PatientHelper::dateFormatUser($booking_details->booking_date);
+                                $time_from = Carbon::parse($booking_details->time_from)->format('h:i a');
+                                $time_to = Carbon::parse($booking_details->time_to)->format('h:i a');
+                                // Populate doctor details array
+                                if ($is_exist->booking_type_id == 84) {
+                                    $booking_type_details[] = [
+                                        'doctor_id' => $booking_details->doctor_id,
+                                        'doctor_name' => $booking_details->doctor_name,
+                                        'qualification' => $booking_details->qualification,
+                                        'branch_id' => $booking_details->branch_id,
+                                        'branch_name' => $booking_details->branch_name,
+                                    ];
+                                }
+                                if ($is_exist->booking_type_id == 85) {
+                                    $take_wellness = Mst_Wellness::where('wellness_id', $booking_details->wellness_id)->first();
+                                    $booking_type_details[] = [
+                                        'wellness_id' => $booking_details->booking_type_id,
+                                        'wellness_name' => $take_wellness->wellness_name,
+                                        'branch_id' => $booking_details->branch_id,
+                                        'branch_name' => $booking_details->branch_name,
+                                    ];
+                                }
+                                // Populate other_booking_details array with relevant information
+                                if ($is_exist->booking_type_id == 84) {
+                                    $fee = PatientHelper::amountDecimal($booking_details->staff_booking_fee);
+                                }
+                                if ($is_exist->booking_type_id == 85) {
+                                    $fee = PatientHelper::amountDecimal($booking_details->booking_fee);
+                                }
+                                // select booked for 
+                                if ($booking_details->is_for_family_member == 0) {
+                                    $booked_for = $patient_name;
+                                }
+                                if ($booking_details->is_for_family_member == 1) {
+                                    $bookedMemberDetails = Trn_Patient_Family_Member::where('id', $booking_details->family_member_id)->first();
+                                    $booked_for = $bookedMemberDetails->family_member_name;
+                                }
+                                $other_booking_details[] = [
+                                    'booking_id' => $booking_details->id,
+                                    'booking_reference_number' => $booking_details->booking_reference_number,
+                                    'booking_status' => $booking_details->status_name,
+                                    'booking_fee' => $fee,
+                                    'booking_date' => $booking_date,
+                                    'timeslot' => $time_from . '-' . $time_to,
+                                    'booked_for' => $booked_for,
+                                ];
+
+                                // Prepare success response
+                                $data['status'] = 1;
+                                $data['message'] = "Data fetched";
+                                $data['booking_type_details'] = $booking_type_details;
+                                $data['other_booking_details'] = $other_booking_details;
+                                return response($data);
+                            } else {
+                                // No booking details found
+                                $data['status'] = 0;
+                                $data['message'] = "No booking details";
                                 return response($data);
                             }
                         } else {
