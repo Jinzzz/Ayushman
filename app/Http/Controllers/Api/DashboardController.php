@@ -11,7 +11,7 @@ use App\Models\Trn_Consultation_Booking;
 use App\Models\Mst_User;
 use App\Models\Booking_Availability;
 use App\Models\Sys_Booking_Type;
-use App\Models\Mst_TimeSlot;
+use App\Models\Mst_Wellness;
 use App\Models\Mst_Membership_Package;
 use App\Models\Mst_Patient_Membership_Booking;
 use Carbon\Carbon;
@@ -51,7 +51,7 @@ class DashboardController extends Controller
                     if (isset($membership->membership_expiry_date)) {
                         $validity = Carbon::parse($membership->membership_expiry_date)->format('d-m-Y');
                     }
-                    
+
                     $membership_details[] = [
                         'membership_name' => $membership_name ?: "",
                         'validity' => $validity,
@@ -59,35 +59,49 @@ class DashboardController extends Controller
                 }
             }
 
-            
+
             $currentDate = date('Y-m-d');
             $currentTime = date('H:i:s');
 
             $consultationDetails = Trn_Consultation_Booking::where('patient_id', Auth::id())
-            ->whereIn('booking_status_id', [87, 88])
-            ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
-            ->join('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
-            ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-            ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'trn_consultation_bookings.id', 'mst_master_values.master_value', 'mst_timeslots.time_from')
-            ->where(function ($query) use ($currentDate, $currentTime) {
-                $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
-                    ->orWhere(function ($query) use ($currentDate, $currentTime) {
-                        $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
-                            ->where('mst_timeslots.time_to', '>', $currentTime);
-                    });
-            })
-            ->orderBy('trn_consultation_bookings.booking_date', 'asc') // Order by booking_date in ascending order
-            ->get();
+                ->whereIn('trn_consultation_bookings.booking_status_id', [87, 88])
+                ->where('trn_consultation_bookings.booking_type_id', '!=', 86)
+                ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+                ->leftJoin('mst_master_values', 'trn_consultation_bookings.booking_type_id', '=', 'mst_master_values.id')
+                ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+                ->select('mst_staffs.staff_name', 'trn_consultation_bookings.booking_date', 'trn_consultation_bookings.wellness_id', 'trn_consultation_bookings.booking_type_id', 'trn_consultation_bookings.id', 'mst_master_values.master_value', 'mst_timeslots.time_from')
+                ->where(function ($query) use ($currentDate, $currentTime) {
+                    $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
+                        ->orWhere(function ($query) use ($currentDate, $currentTime) {
+                            $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
+                                ->where('mst_timeslots.time_to', '>', $currentTime);
+                        });
+                })
+                ->orderBy('trn_consultation_bookings.booking_date', 'asc') // Order by booking_date in ascending order
+                ->take(10)
+                ->get();
 
 
             foreach ($consultationDetails as $consultation) {
+                if ($consultation->booking_type_id == 84) {
+                    // booking type => 0 , consultation
+                    $booking_type_id = 0;
+                    $booking_to = $consultation->staff_name;
+                }
+                if ($consultation->booking_type_id == 85) {
+                    // booking type => 1 , wellness
+                    $booking_type_id = 1;
+                        $wellness = Mst_Wellness::where('wellness_id', $consultation->wellness_id)->where('is_active', 1)->first();
+                    $booking_to = $wellness->wellness_name;
+                }
                 $booking_date = Carbon::parse($consultation->booking_date)->format('d-m-Y');
                 $time_from = Carbon::parse($consultation->time_from)->format('h:i A');
 
                 $upcoming_bookings[] = [
                     'booking_id' => $consultation->id,
-                    'doctor_name' => $consultation->staff_name,
+                    'booking_to' => $booking_to,
                     'booking_date' => $booking_date,
+                    'booking_type_id' => $booking_type_id,
                     'booking_type' => $consultation->master_value,
                     'time_from' => $time_from,
                 ];
