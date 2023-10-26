@@ -495,7 +495,7 @@ class DoctorBookingController extends Controller
                 ]
             );
             if (!$validator->fails()) {
-                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date)) {    
+                if (isset($request->branch_id) && isset($request->doctor_id) && isset($request->booking_date)) {
                     $bookingDate = Carbon::parse($request->booking_date);
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
@@ -538,7 +538,7 @@ class DoctorBookingController extends Controller
                         }
 
                         $timeSlots = $timeSlotsQuery->get();
-                        
+
                         if ($timeSlots) {
 
                             $currentDate = Carbon::now()->format('Y-m-d');
@@ -551,10 +551,9 @@ class DoctorBookingController extends Controller
                                     ->where('doctor_id', $request->doctor_id)
                                     ->whereIn('booking_status_id', [87, 88])
                                     ->count();
-                            
-                                $available_slots = $timeSlot->no_tokens - $booked_tokens;
-                            
-                                if ($available_slots <= 0 || ($timeSlot->time_from <= $currentTime && $request->booking_date == $currentDate)) {
+
+                                    $available_slots = $timeSlot->no_tokens - $booked_tokens;
+                                if ($timeSlot->time_from <= $currentTime && $booking_date == $currentDate) {
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
@@ -562,13 +561,8 @@ class DoctorBookingController extends Controller
                                         'available_slots' => 0,
                                     ];
                                 } else {
-                                    // Check if the current time exceeds the time slot end time
-                                    if ($timeSlot->time_from < $currentTime) {
-                                        $available_slots = 0;
-                                    }
-                            
-                                    $available_slots = ($available_slots < 0) ? 0 : $available_slots;
-                                    
+                                    $available_slots = ($available_slots <= 0) ? 0 : $available_slots;
+
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
@@ -577,7 +571,7 @@ class DoctorBookingController extends Controller
                                     ];
                                 }
                             }
-                            
+
                             $data['status'] = 1;
                             $data['message'] = "Data fetched.";
                             $data['doctor_name'] = $doctor_name;
@@ -1016,7 +1010,7 @@ class DoctorBookingController extends Controller
                         $day_of_week = PatientHelper::getWeekDay($request->booking_date);
                         $weekDayId = Mst_Master_Value::where('master_value', 'LIKE', '%' . $day_of_week . '%')->pluck('id')->first();
 
-                        $available_slots = PatientHelper::recheckAvailability($request->booking_date, $weekDayId, $request->doctor_id, $request->slot_id);
+                        $available_slots = PatientHelper::recheckAvailability($booking_date, $weekDayId, $request->doctor_id, $request->slot_id);
                         if ($available_slots >= 1) {
                             if (isset($booking_id)) {
                                 // Update existing data
@@ -1138,6 +1132,78 @@ class DoctorBookingController extends Controller
                 } else {
                     $data['status'] = 0;
                     $data['message'] = "Please fill mandatory fields";
+                    return response($data);
+                }
+            } else {
+                $data['status'] = 0;
+                $data['errors'] = $validator->errors();
+                $data['message'] = "Validation errors";
+                return response($data);
+            }
+        } catch (\Exception $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        } catch (\Throwable $e) {
+            $response = ['status' => '0', 'message' => $e->getMessage()];
+            return response($response);
+        }
+    }
+    // slot availability 
+    public function slotAvailability(Request $request)
+    {
+        $data = array();
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'booking_date' => ['required'],
+                    'slot_id' => ['required'],
+                ],
+                [
+                    'booking_date.required' => 'Booking date is required',
+                    'slot_id.required' => 'Slot is required',
+                ]
+            );
+            if (!$validator->fails()) {
+                if (isset($request->booking_date) && isset($request->slot_id)) {
+
+                    $bookingDate = Carbon::parse($request->booking_date);
+                    $currentDate = Carbon::now();
+                    $currentYear = Carbon::now()->year;
+
+                    if ($bookingDate->year > $currentYear + 1) { // Allow up to 1 years in the future
+                        $data['status'] = 0;
+                        $data['message'] = "Booking date cannot be more than 1 year in the future.";
+                        return response($data);
+                    }
+                    // Check if the booking date is in the past and not the same day as the current date
+                    if (!$bookingDate->isSameDay($currentDate) && $bookingDate->isPast()) {
+                        $data['status'] = 0;
+                        $data['message'] = "Booking date is older than the current date.";
+                        return response($data);
+                    }
+                    $currentDate = Carbon::now()->format('Y-m-d');
+                    $currentTime = Carbon::now()->format('H:i:s');
+                    $is_available = 1;
+                    $booking_date = PatientHelper::dateFormatDb($request->booking_date);
+
+                    if ($booking_date == $currentDate) {
+                        $slot_details = Mst_TimeSlot::where('id', $request->slot_id)->first();
+                        if ($slot_details->time_from <= $currentTime) {
+                            $is_available = 0;
+                        }
+                    }
+
+                    $booking_date = PatientHelper::dateFormatUser($request->booking_date);
+                    $data['status'] = 1;
+                    $data['message'] = "Data has been verified";
+                    $data['booking_date'] = $booking_date;
+                    $data['slot_id'] = $request->slot_id;
+                    $data['is_available'] = $is_available;
+                    return response($data);
+                } else {
+                    $data['status'] = 0;
+                    $data['message'] = "Please provide mandatory fields";
                     return response($data);
                 }
             } else {

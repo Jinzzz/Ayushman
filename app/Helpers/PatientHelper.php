@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\Request;
+
 use App\Models\Mst_Patient;
 use App\Models\Mst_Staff_Timeslot;
 use App\Models\Mst_Wellness_Therapyrooms;
@@ -85,10 +85,7 @@ class PatientHelper
         if ($available_slots <= 0 || ($timeSlot->time_from <= $currentTime && $booking_date == $currentDate)) {
             $available_slots = 0;
         } else {
-            if ($timeSlot->time_from < $currentTime) {
-                $available_slots = 0;
-            }
-            $available_slots = ($available_slots < 0) ? 0 : $available_slots;
+            $available_slots = ($available_slots <= 0) ? 0 : $available_slots;
         }
         return $available_slots;
     }
@@ -422,9 +419,7 @@ class PatientHelper
                         'is_available' => 0,
                     ];
                 } else {
-                    if ($slot_details->time_from < $currentTime) {
-                        $check_available = 0;
-                    }
+
                     $time_slots[] = [
                         'time_slot_id' => $slot_details->id,
                         'time_from' => Carbon::parse($slot_details->time_from)->format('h:i A'),

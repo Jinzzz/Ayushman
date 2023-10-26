@@ -356,7 +356,7 @@ class WellnessController extends Controller
                         }
 
                         $available_slots = PatientHelper::availableSlots($finalSlots, $booking_date, $weekDayId, $request->wellness_id);
-
+                        
                         // Check if $available_slots is an array before further processing
                         if (is_array($available_slots)) {
                             // Initialize an associative array to keep track of unique time_slot_ids

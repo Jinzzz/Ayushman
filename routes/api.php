@@ -47,12 +47,14 @@ Route::get('marital_status', [DoctorBookingController::class, 'maritalStatus']);
 Route::middleware(['auth:api'])->group(function () {
     // Consultation
     Route::get('patient/home', [DashboardController::class, 'homePage']);
+
     // Route::post('patient/consultation/doctors_list', [DoctorBookingController::class, 'doctorsList']);
     Route::post('patient/consultation/doctors_details', [DoctorBookingController::class, 'doctorsDetails']);
     Route::post('patient/consultation/doctor_availability', [DoctorBookingController::class, 'doctorsAvailability']);
     Route::post('patient/consultation/booking_details', [DoctorBookingController::class, 'bookingDetails']);
     Route::post('patient/consultation/booking_summary', [DoctorBookingController::class, 'bookingSummary']);
     Route::post('patient/consultation/booking_confirmation', [DoctorBookingController::class, 'bookingConfirmation']);
+    Route::post('patient/slot/availability', [DoctorBookingController::class, 'slotAvailability']);
 
     // Add family member
     Route::post('patient/my_family', [FamilyController::class, 'myFamily']);
