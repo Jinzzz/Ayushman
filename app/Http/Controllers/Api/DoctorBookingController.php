@@ -323,6 +323,7 @@ class DoctorBookingController extends Controller
                             ->join('mst_master_values', 'mst_staffs.staff_qualification', '=', 'mst_master_values.id')
                             ->select('mst_staffs.staff_id', 'mst_staffs.staff_name as name', 'mst_branches.branch_name as branch_name', 'mst_master_values.master_value as qualification', 'mst_staffs.staff_image as profile_image')
                             ->where('mst_staffs.staff_type', 20)
+                            ->where('mst_staffs.is_active', 1)
                             ->where('mst_staffs.branch_id', $request->branch_id)
                             ->whereIn('mst_staffs.staff_id', $filteredDoctorsArray);
 
