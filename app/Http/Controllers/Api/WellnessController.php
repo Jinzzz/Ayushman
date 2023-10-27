@@ -356,7 +356,7 @@ class WellnessController extends Controller
                         }
 
                         $available_slots = PatientHelper::availableSlots($finalSlots, $booking_date, $weekDayId, $request->wellness_id);
-                        
+
                         // Check if $available_slots is an array before further processing
                         if (is_array($available_slots)) {
                             // Initialize an associative array to keep track of unique time_slot_ids
@@ -923,6 +923,7 @@ class WellnessController extends Controller
                     $checkSameSlot = Trn_Consultation_Booking::where('patient_id', Auth::id())
                         ->where('booking_date', $newRecordData['booking_date'])
                         ->where('time_slot_id', $request->slot_id)
+                        ->where('trn_consultation_bookings.booking_status_id', '!=', 90)
                         ->where('family_member_id', $newRecordData['family_member_id'])
                         ->first();
 
@@ -931,6 +932,7 @@ class WellnessController extends Controller
                         ->where('booking_date', $newRecordData['booking_date'])
                         ->where('wellness_id', $newRecordData['wellness_id'])
                         ->where('time_slot_id', '!=', $request->slot_id)
+                        ->where('trn_consultation_bookings.booking_status_id', '!=', 90)
                         ->where('family_member_id', $newRecordData['family_member_id'])
                         ->first();
 

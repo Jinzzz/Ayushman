@@ -553,21 +553,23 @@ class DoctorBookingController extends Controller
                                     ->count();
 
                                     $available_slots = $timeSlot->no_tokens - $booked_tokens;
+                                    $available_slots = ($available_slots <= 0) ? 0 : $available_slots;
+
                                 if ($timeSlot->time_from <= $currentTime && $booking_date == $currentDate) {
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
                                         'time_to' => Carbon::parse($timeSlot->time_to)->format('h:i A'),
-                                        'available_slots' => 0,
+                                        'available_slots' => $available_slots,
+                                        'is_available' => 0,
                                     ];
                                 } else {
-                                    $available_slots = ($available_slots <= 0) ? 0 : $available_slots;
-
                                     $time_slots[] = [
                                         'time_slot_id' => $timeSlot->id,
                                         'time_from' => Carbon::parse($timeSlot->time_from)->format('h:i A'),
                                         'time_to' => Carbon::parse($timeSlot->time_to)->format('h:i A'),
                                         'available_slots' => $available_slots,
+                                        'is_available' => 1,
                                     ];
                                 }
                             }
@@ -999,7 +1001,7 @@ class DoctorBookingController extends Controller
 
                         // checking already booked or not 
                         // $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', Auth::id())->where('booking_date', $newRecordData['booking_date'])->where('time_slot_id', $newRecordData['time_slot_id'])->where('family_member_id', $newRecordData['family_member_id'])->where('doctor_id', $newRecordData['doctor_id'])->first();
-                        $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', Auth::id())->where('booking_date', $newRecordData['booking_date'])->where('time_slot_id', $newRecordData['time_slot_id'])->where('family_member_id', $newRecordData['family_member_id'])->first();
+                        $checkAlreadyBooked =  Trn_Consultation_Booking::where('patient_id', Auth::id())->where('booking_date', $newRecordData['booking_date'])->where('trn_consultation_bookings.booking_status_id', '!=', 90)->where('time_slot_id', $newRecordData['time_slot_id'])->where('family_member_id', $newRecordData['family_member_id'])->first();
 
                         if ($checkAlreadyBooked) {
                             $data['status'] = 0;
