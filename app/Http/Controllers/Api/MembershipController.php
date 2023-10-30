@@ -15,6 +15,9 @@ use App\Models\Mst_Patient_Membership_Booking;
 use App\Models\Trn_Patient_Wellness_Sessions;
 use App\Models\Mst_Wellness;
 use App\Helpers\PatientHelper;
+use App\Helpers\DeviceTockenHelper;
+use App\Models\Trn_Notification;
+use App\Models\Trn_Patient_Device_Tocken;
 
 class MembershipController extends Controller
 {
@@ -24,11 +27,11 @@ class MembershipController extends Controller
         try {
             $is_web = 0;
             $joined_membership_package_id = "";
-            if($request->is_web && isset($request->is_web)){
-                if($request->is_web != 1){
+            if ($request->is_web && isset($request->is_web)) {
+                if ($request->is_web != 1) {
                     $data['status'] = 0;
-                        $data['message'] = "Please provide a valid value for the 'is_web' flag";
-                        return response($data);
+                    $data['message'] = "Please provide a valid value for the 'is_web' flag";
+                    return response($data);
                 }
                 $is_web = 1;
             }
@@ -358,7 +361,7 @@ class MembershipController extends Controller
                         return response($data);
                     }
 
-                    $is_membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->first();
+                    $is_membership = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())->latest()->first();
                     $package_details = Mst_Membership_Package::where('membership_package_id', $request->membership_package_id)
                         ->where('is_active', 1)
                         ->first();
@@ -366,7 +369,7 @@ class MembershipController extends Controller
                     $package_duration = $package_details->package_duration; // Number of days to add
 
                     if ($is_membership) {
-                        // Checking all membership booking in this package_id? if yes taking last inserted row 
+                        // Checking all membership booking in this patient_id? if yes taking last inserted row 
                         $last_membership_booking = Mst_Patient_Membership_Booking::where('patient_id', Auth::id())
                             ->where('is_active', 1)
                             ->orderBy('created_at', 'desc')
@@ -386,6 +389,34 @@ class MembershipController extends Controller
                                 ]);
                                 $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
                                 $is_active = 1;
+
+                                $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', Auth::id())->get();
+                                if ($patientDevice) {
+                                    $title = 'Membership Purchase Complete';
+                                    $body = 'Congratulations! Your membership purchase has been successfully completed.';
+                                    $clickAction = "MembershipPurchase";
+                                    $type = "Membership Purchase";
+                                    if($last_membership_booking->membership_package_id == $request->membership_package_id){
+                                        $title = 'Membership Renewal Successful';
+                                        $body = 'Congratulations! Your membership renewal has been successfully completed.';
+                                        $clickAction = "MembershipRenewal";
+                                        $type = "Membership Renewal";
+                                    }
+
+                                    // Save notification to the patient's notification table
+                                    $notificationCreate = Trn_Notification::create([
+                                        'patient_id' => Auth::id(),
+                                        'title' => $title,
+                                        'content' => $body,
+                                        'read_status' => 0,
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now(),
+                                    ]);
+                                    foreach ($patientDevice as $pdt) {
+                                        // Send notification to the patient's device
+                                        $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                    }
+                                }
                             }
                         } else {
                             // If no previous membership booking is found, set the expiry_date based on the current date
@@ -395,6 +426,28 @@ class MembershipController extends Controller
                             ]);
                             $is_active = 1;
                             $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
+
+                            $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', Auth::id())->get();
+                            if ($patientDevice) {
+                                $title = 'Membership Purchase Complete';
+                                $body = 'Congratulations! Your membership purchase has been successfully completed.';
+                                $clickAction = "MembershipPurchase";
+                                $type = "Membership Purchase";
+
+                                // Save notification to the patient's notification table
+                                $notificationCreate = Trn_Notification::create([
+                                    'patient_id' => Auth::id(),
+                                    'title' => $title,
+                                    'content' => $body,
+                                    'read_status' => 0,
+                                    'created_at' => Carbon::now(),
+                                    'updated_at' => Carbon::now(),
+                                ]);
+                                foreach ($patientDevice as $pdt) {
+                                    // Send notification to the patient's device
+                                    $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                }
+                            }
                         }
                     } else {
                         // fresh booking updating patients table and find expiry date 
@@ -404,6 +457,28 @@ class MembershipController extends Controller
                         ]);
                         $expiry_date = Carbon::parse($request->start_date)->addDays($package_duration);
                         $is_active = 1;
+
+                        $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', Auth::id())->get();
+                        if ($patientDevice) {
+                            $title = 'Membership Purchase Complete';
+                            $body = 'Congratulations! Your membership purchase has been successfully completed.';
+                            $clickAction = "MembershipPurchase";
+                            $type = "Membership Purchase";
+
+                            // Save notification to the patient's notification table
+                            $notificationCreate = Trn_Notification::create([
+                                'patient_id' => Auth::id(),
+                                'title' => $title,
+                                'content' => $body,
+                                'read_status' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                            ]);
+                            foreach ($patientDevice as $pdt) {
+                                // Send notification to the patient's device
+                                $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                            }
+                        }
                     }
 
                     $membership_wellnesses = Mst_Membership_Package_Wellness::where('package_id', $request->membership_package_id)

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Sys_Blood_Group;
-use App\Models\Mst_Master_Value;
+use App\Helpers\DeviceTockenHelper;
+use App\Models\Trn_Notification;
 use App\Models\Mst_Patient;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -554,6 +554,27 @@ class PatientAuthController extends Controller
                         $patient->updated_at = Carbon::now();
                         $patient->save();
 
+                        $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient->id)->get();
+                                if ($patientDevice) {
+                                    $title = 'Password Reset Successfully';
+                                    $body = 'Your password has been reset successfully.';
+                                    $clickAction = "ChangePassword";
+                                    $type = "Change Password";
+
+                                    // Save notification to the patient's notification table
+                                    $notificationCreate = Trn_Notification::create([
+                                        'patient_id' => $patient->id,
+                                        'title' => $title,
+                                        'content' => $body,
+                                        'read_status' => 0,
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now(),
+                                    ]);
+                                    foreach ($patientDevice as $pdt) {
+                                        // Send notification to the patient's device
+                                        $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                    }
+                                }
                         // Prepare and return a success response
                         $data['status'] = 1;
                         $data['message'] = "Password reset sussessfully.";
@@ -775,6 +796,27 @@ class PatientAuthController extends Controller
                                 $patient->updated_at = Carbon::now();
                                 $patient->save();
 
+                                $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                                if ($patientDevice) {
+                                    $title = 'Password Changed Successfully';
+                                    $body = 'Your password has been changed successfully.';
+                                    $clickAction = "ChangePassword";
+                                    $type = "Change Password";
+
+                                    // Save notification to the patient's notification table
+                                    $notificationCreate = Trn_Notification::create([
+                                        'patient_id' => Auth::id(),
+                                        'title' => $title,
+                                        'content' => $body,
+                                        'read_status' => 0,
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now(),
+                                    ]);
+                                    foreach ($patientDevice as $pdt) {
+                                        // Send notification to the patient's device
+                                        $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                    }
+                                }
                                 // Prepare and return a success response
                                 $data['status'] = 1;
                                 $data['message'] = "Password changed sussessfully.";

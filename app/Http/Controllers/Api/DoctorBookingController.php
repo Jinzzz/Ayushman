@@ -1056,7 +1056,7 @@ class DoctorBookingController extends Controller
                                     $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
 
                                     if ($patientDevice) {
-                                        $title = 'Booking rescheduled';
+                                        $title = 'Booking Rescheduled';
                                         $body = ' Rescheduled the booking for ' . $doctor->doctor_name . ' on ' . $request->booking_date . '.';
                                         $clickAction = "PatientBookingReschedule";
                                         $type = "Reschedule";

@@ -20,6 +20,9 @@ use App\Models\Trn_Wellness_Branch;
 use App\Models\Trn_Patient_Wellness_Sessions;
 use Carbon\Carbon;
 use App\Helpers\PatientHelper;
+use App\Helpers\DeviceTockenHelper;
+use App\Models\Trn_Notification;
+use App\Models\Trn_Patient_Device_Tocken;
 
 class WellnessController extends Controller
 {
@@ -977,6 +980,28 @@ class WellnessController extends Controller
                         'time_slot' => $time_from . ' - ' . $time_to,
                     ];
 
+                    $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                    if ($patientDevice) {
+                        $title = 'Wellness Booking';
+                        $body = ' Here is a wellness booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                        $clickAction = "PatientWellnessBooking";
+                        $type = "Wellness Booking";
+
+                        // Save notification to the patient's notification table
+                        $notificationCreate = Trn_Notification::create([
+                            'patient_id' => Auth::id(),
+                            'title' => $title,
+                            'content' => $body,
+                            'read_status' => 0,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                        foreach ($patientDevice as $pdt) {
+                            // Send notification to the patient's device
+                            $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                        }
+                    }
+
                     $data['status'] = 1;
                     $data['message'] = $accountHolder->patient_name . ", your booking has been confirmed.";
                     $data['booking_details'] = $booking_details;
@@ -1204,10 +1229,56 @@ class WellnessController extends Controller
                             'updated_at' => Carbon::now(),
                             'booking_reference_number' => $bookingRefNo
                         ]);
+                        $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                        $booking_date = PatientHelper::dateFormatUser($request->booking_date);
+
+                        if ($patientDevice) {
+                            $title = 'Wellness Booking';
+                            $body = ' Here is a wellness booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                            $clickAction = "PatientWellnessBooking";
+                            $type = "Wellness Booking";
+
+                            // Save notification to the patient's notification table
+                            $notificationCreate = Trn_Notification::create([
+                                'patient_id' => Auth::id(),
+                                'title' => $title,
+                                'content' => $body,
+                                'read_status' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                            ]);
+                            foreach ($patientDevice as $pdt) {
+                                // Send notification to the patient's device
+                                $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                            }
+                        }
                     } else {
                         $updateRecord = Trn_Consultation_Booking::where('id', $request->booking_id)->update($newRecordData);
                         $bookingRefNo = $bookingDetails->booking_reference_number;
                         $lastInsertedId = intval($request->booking_id);
+                        $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                        $booking_date = PatientHelper::dateFormatUser($request->booking_date);
+
+                        if ($patientDevice) {
+                            $title = 'Wellness Booking Rescheduled';
+                            $body = ' Rescheduled the booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                            $clickAction = "PatientBookingReschedule";
+                            $type = "Reschedule";
+
+                            // Save notification to the patient's notification table
+                            $notificationCreate = Trn_Notification::create([
+                                'patient_id' => Auth::id(),
+                                'title' => $title,
+                                'content' => $body,
+                                'read_status' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                            ]);
+                            foreach ($patientDevice as $pdt) {
+                                // Send notification to the patient's device
+                                $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                            }
+                        }
                     }
 
                     // Fetch details of the selected time slot for the booking
