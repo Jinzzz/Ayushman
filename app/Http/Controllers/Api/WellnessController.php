@@ -782,6 +782,7 @@ class WellnessController extends Controller
                     'booking_date' => ['required'],
                     'yourself' => ['required'],
                     'branch_id' => ['required'],
+                    'reschedule_key' => ['required'],
                 ],
                 [
                     'wellness_id.required' => 'Wellness required',
@@ -790,6 +791,7 @@ class WellnessController extends Controller
                     'booking_date.required' => 'Booking date required',
                     'yourself.required' => 'Yourself required',
                     'branch_id.required' => 'Branch required',
+                    'reschedule_key.required' => 'Reschedule key required',
                 ]
             );
 
@@ -799,6 +801,14 @@ class WellnessController extends Controller
                     $bookingDate = Carbon::parse($request->booking_date);
                     $currentDate = Carbon::now();
                     $currentYear = Carbon::now()->year;
+
+                    $patient_id = Auth::id();
+                    $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
+                    if (!$accountHolder) {
+                        $data['status'] = 0;
+                        $data['message'] = "User does not exist";
+                        return response($data);
+                    }
 
                     if ($bookingDate->year > $currentYear + 1) {
                         $data['status'] = 0;
@@ -810,6 +820,16 @@ class WellnessController extends Controller
                         $data['status'] = 0;
                         $data['message'] = "Booking date is older than the current date.";
                         return response($data);
+                    }
+
+                    if ($request->reschedule_key == 1) {
+                        if (!$request->has('booking_id')) {
+                            $data['status'] = 0;
+                            $data['message'] = "Booking id is required";
+                            return response($data);
+                        } else {
+                            $booking_id = intval($request->booking_id);
+                        }
                     }
 
                     $wellness_duration = Mst_Wellness::where('wellness_id', $request->wellness_id)->value('wellness_duration');
@@ -877,15 +897,7 @@ class WellnessController extends Controller
                         return response($data);
                     }
 
-                    $patient_id = Auth::id();
                     $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)->where('is_active', 1)->first();
-
-                    $accountHolder = Mst_Patient::where('mst_patients.id', $patient_id)->first();
-                    if (!$accountHolder) {
-                        $data['status'] = 0;
-                        $data['message'] = "User does not exist";
-                        return response($data);
-                    }
 
                     $yourself = $request->yourself;
                     $booked_for = $accountHolder->patient_name;
@@ -952,15 +964,100 @@ class WellnessController extends Controller
                     }
 
                     // Create new data 
-                    $createdRecord = Trn_Consultation_Booking::create($newRecordData);
-                    $lastInsertedId = $createdRecord->id;
-                    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                    $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
-                    $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
-                        'updated_at' => Carbon::now(),
-                        'booking_reference_number' => $bookingRefNo
-                    ]);
+                    if (isset($booking_id)) {
+                        $bookingDetails = Trn_Consultation_Booking::where('id', $booking_id)->first();
+                        if ($bookingDetails->booking_status_id == 89 || ($bookingDetails->booking_status_id == 90 && $bookingDetails->booking_date < Carbon::now())) {
+                            $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                            $lastInsertedId = $createdRecord->id;
+                            $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                            $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                            $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                                'updated_at' => Carbon::now(),
+                                'booking_reference_number' => $bookingRefNo
+                            ]);
+                            $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                            $booking_date = PatientHelper::dateFormatUser($request->booking_date);
 
+                            if ($patientDevice) {
+                                $title = 'Wellness Booking';
+                                $body = ' Here is a wellness booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                                $clickAction = "PatientWellnessBooking";
+                                $type = "Wellness Booking";
+
+                                // Save notification to the patient's notification table
+                                $notificationCreate = Trn_Notification::create([
+                                    'patient_id' => Auth::id(),
+                                    'title' => $title,
+                                    'content' => $body,
+                                    'read_status' => 0,
+                                    'created_at' => Carbon::now(),
+                                    'updated_at' => Carbon::now(),
+                                ]);
+                                foreach ($patientDevice as $pdt) {
+                                    // Send notification to the patient's device
+                                    $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                }
+                            }
+                        } else {
+                            $updateRecord = Trn_Consultation_Booking::where('id', $request->booking_id)->update($newRecordData);
+                            $bookingRefNo = $bookingDetails->booking_reference_number;
+                            $lastInsertedId = intval($request->booking_id);
+                            $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                            $booking_date = PatientHelper::dateFormatUser($request->booking_date);
+
+                            if ($patientDevice) {
+                                $title = 'Wellness Booking Rescheduled';
+                                $body = ' Rescheduled the booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                                $clickAction = "PatientBookingReschedule";
+                                $type = "Reschedule";
+
+                                // Save notification to the patient's notification table
+                                $notificationCreate = Trn_Notification::create([
+                                    'patient_id' => Auth::id(),
+                                    'title' => $title,
+                                    'content' => $body,
+                                    'read_status' => 0,
+                                    'created_at' => Carbon::now(),
+                                    'updated_at' => Carbon::now(),
+                                ]);
+                                foreach ($patientDevice as $pdt) {
+                                    // Send notification to the patient's device
+                                    $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                                }
+                            }
+                        }
+                    } else {
+                        $createdRecord = Trn_Consultation_Booking::create($newRecordData);
+                        $lastInsertedId = $createdRecord->id;
+                        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+                        $bookingRefNo = 'BRN' . $leadingZeros . $lastInsertedId;
+                        $updateConsultation = Trn_Consultation_Booking::where('id', $lastInsertedId)->update([
+                            'updated_at' => Carbon::now(),
+                            'booking_reference_number' => $bookingRefNo
+                        ]);
+
+                        $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
+                        if ($patientDevice) {
+                            $title = 'Wellness Booking';
+                            $body = ' Here is a wellness booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
+                            $clickAction = "PatientWellnessBooking";
+                            $type = "Wellness Booking";
+
+                            // Save notification to the patient's notification table
+                            $notificationCreate = Trn_Notification::create([
+                                'patient_id' => Auth::id(),
+                                'title' => $title,
+                                'content' => $body,
+                                'read_status' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                            ]);
+                            foreach ($patientDevice as $pdt) {
+                                // Send notification to the patient's device
+                                $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                            }
+                        }
+                    }
                     // Fetch details of the selected time slot for the booking
                     $slotDetails = Mst_TimeSlot::where('id', $request->slot_id)->first();
 
@@ -979,28 +1076,6 @@ class WellnessController extends Controller
                         'booking_date' => $booking_date,
                         'time_slot' => $time_from . ' - ' . $time_to,
                     ];
-
-                    $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient_id)->get();
-                    if ($patientDevice) {
-                        $title = 'Wellness Booking';
-                        $body = ' Here is a wellness booking for ' . $wellness->wellness_name . ' on ' . $booking_date . '.';
-                        $clickAction = "PatientWellnessBooking";
-                        $type = "Wellness Booking";
-
-                        // Save notification to the patient's notification table
-                        $notificationCreate = Trn_Notification::create([
-                            'patient_id' => Auth::id(),
-                            'title' => $title,
-                            'content' => $body,
-                            'read_status' => 0,
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                        ]);
-                        foreach ($patientDevice as $pdt) {
-                            // Send notification to the patient's device
-                            $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
-                        }
-                    }
 
                     $data['status'] = 1;
                     $data['message'] = $accountHolder->patient_name . ", your booking has been confirmed.";
@@ -1029,6 +1104,7 @@ class WellnessController extends Controller
     // Reschedule or Rebooking wellness booking 
     public function wellnessReSchedule(Request $request)
     {
+        // Currently not in use 
         $data = array();
         try {
             $validator = Validator::make(
