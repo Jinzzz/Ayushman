@@ -1196,10 +1196,13 @@ class DoctorBookingController extends Controller
                             $is_available = 0;
                         }
                     }
-
+                    $message = "Data has been verified";
+                    if($is_available == 0){
+                        $message = "Currently, this slot is not available";
+                    }
                     $booking_date = PatientHelper::dateFormatUser($request->booking_date);
                     $data['status'] = 1;
-                    $data['message'] = "Data has been verified";
+                    $data['message'] = $message;
                     $data['booking_date'] = $booking_date;
                     $data['slot_id'] = $request->slot_id;
                     $data['is_available'] = $is_available;

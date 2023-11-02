@@ -70,16 +70,23 @@ class BookingHistoryController extends Controller
                 // Get pending consultation bookings
                 $queries = Trn_Consultation_Booking::where('patient_id', $patient_id)
                     ->whereIn('trn_consultation_bookings.booking_type_id',  [84, 85])
+                    ->where('trn_consultation_bookings.booking_status_id',  90)
                     ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
                     ->leftJoin('mst_master_values as booking_type', 'trn_consultation_bookings.booking_type_id', '=', 'booking_type.id')
                     ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
                     ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
                     ->leftJoin('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
                     ->where(function ($query) use ($currentDate, $currentTime) {
-                        $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
-                            ->orWhere(function ($query) use ($currentDate, $currentTime) {
-                                $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
-                                    ->where('mst_timeslots.time_to', '<', $currentTime);
+                        $query->where(function ($query) use ($currentDate, $currentTime) {
+                            $query->where('trn_consultation_bookings.booking_date', '<', $currentDate)
+                                ->orWhere(function ($query) use ($currentDate, $currentTime) {
+                                    $query->where('trn_consultation_bookings.booking_date', '=', $currentDate)
+                                        ->where('mst_timeslots.time_to', '<', $currentTime);
+                                });
+                        })
+                            ->orWhere(function ($query) use ($currentDate) {
+                                $query->where('trn_consultation_bookings.booking_date', '>=', $currentDate)
+                                    ->where('trn_consultation_bookings.booking_status_id', '=', 90);
                             });
                     })
                     ->select(
