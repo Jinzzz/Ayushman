@@ -157,7 +157,7 @@ class FamilyController extends Controller
                     $data['mobile_number'] = $request->member_mobile;
                     $data['patient_id'] = $patient_id;
                     $data['family_member_id'] = $addFamilyMember->id;
-                    $data['message'] = "Plese enter the otp that send to your mobile number.";
+                    $data['message'] = "Plese enter the OTP that send to your mobile number.";
                     return response($data);
                 } else {
                     $data['status'] = 0;
@@ -270,7 +270,7 @@ class FamilyController extends Controller
                     }
                 } else {
                     $data['status'] = 0;
-                    $data['message'] = "Patient id / Otp type / Otp is required";
+                    $data['message'] = "Patient id / OTP type / OTP is required";
                     return response($data);
                 }
             } else {
