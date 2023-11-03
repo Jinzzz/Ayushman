@@ -351,10 +351,14 @@ class WellnessController extends Controller
 
                         $finalSlots = PatientHelper::wellnessAvailability($booking_date, $weekDayId, $request->branch_id, $request->wellness_id);
 
+                        $wellness = Mst_Wellness::where('wellness_id', $request->wellness_id)
+                            ->where('is_active', 1)->first();
                         if (!$finalSlots) {
                             // sorry no slots available 
-                            $data['status'] = 0;
-                            $data['message'] = "Sorry, no slots available.";
+                            $data['status'] = 1;
+                            $data['message'] = "Data fetched.";
+                            $data['wellness_name'] = $wellness->wellness_name;
+                            $data['data'] = [];
                             return response()->json($data);
                         }
 
@@ -410,7 +414,7 @@ class WellnessController extends Controller
                         } else {
                             // Handle the case where $available_slots is not an array
                             $data['status'] = 0;
-                            $data['message'] = "Currently, No slots available";
+                            $data['message'] = "Sorry, no slots available";
                             return response()->json($data);
                         }
 
