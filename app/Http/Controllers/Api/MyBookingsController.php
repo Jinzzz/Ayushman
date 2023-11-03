@@ -699,7 +699,7 @@ class MyBookingsController extends Controller
                             if ($is_exist->booking_type_id == 85) {
                                 $take_wellness = Mst_Wellness::where('wellness_id', $booking_details->wellness_id)->first();
                                 $booking_type_details[] = [
-                                    'wellness_id' => $booking_details->booking_type_id,
+                                    'wellness_id' => $take_wellness->wellness_id,
                                     'wellness_name' => $take_wellness->wellness_name,
                                     'branch_id' => $booking_details->branch_id,
                                     'branch_name' => $booking_details->branch_name,

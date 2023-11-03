@@ -549,9 +549,9 @@ class BookingHistoryController extends Controller
                         $currentDate = date('Y-m-d');
                         // Check if the provided booking ID corresponds to a consultation booking for the given patient
                         $is_exist = Trn_Consultation_Booking::where('trn_consultation_bookings.id', $request->booking_id)
-                            ->where('patient_id', $patient_id)
-                            ->where('trn_consultation_bookings.booking_date', '<=', $currentDate)
-                            ->first();
+                        ->where('patient_id', $patient_id)
+                        ->first();
+                    
                         // If a consultation booking is found
                         if ($is_exist) {
                             // Check if the booking type is for a doctor consultation
@@ -619,7 +619,7 @@ class BookingHistoryController extends Controller
                                 if ($is_exist->booking_type_id == 85) {
                                     $take_wellness = Mst_Wellness::where('wellness_id', $booking_details->wellness_id)->first();
                                     $booking_type_details[] = [
-                                        'wellness_id' => $booking_details->booking_type_id,
+                                        'wellness_id' => $take_wellness->wellness_id,
                                         'wellness_name' => $take_wellness->wellness_name,
                                         'branch_id' => $booking_details->branch_id,
                                         'branch_name' => $booking_details->branch_name,
