@@ -110,6 +110,28 @@ class MyBookingsController extends Controller
                 if (isset($request->search_branch) && !is_null($request->search_branch) && $request->search_branch != "null" && $request->search_branch != null) {
                     $queries = $queries->where('trn_consultation_bookings.branch_id', $request->search_branch);
                 }
+                if (isset($request->search_booking_type) && !is_null($request->search_booking_type) && $request->search_booking_type != "null" && $request->search_booking_type != null) {
+
+                    if ($request->search_booking_type == 86) {
+                        // Booking type 86 corresponds to therapy, and it is not initiated by the patient or user; instead, it is recommended by a doctor.
+                        //  Therefore, in such cases, even though no results are found, we still need to maintain the same response structure in the API.
+                        $data['status'] = 1;
+                        $data['message'] = "Data fetched";
+                        $data['data'] = [];
+                        $data['pagination_details'] = [
+                            'current_page' => 1,
+                            'total_records' => 0,
+                            'total_pages' => 0,
+                            'per_page' => 5,
+                            'first_page_url' => null,
+                            'last_page_url' => null,
+                            'next_page_url' => null,
+                            'prev_page_url' => null,
+                        ];
+                        return response($data);
+                    }
+                    $queries = $queries->where('trn_consultation_bookings.booking_type_id', $request->search_booking_type);
+                }
 
                 $all_bookings = $queries->get();
 

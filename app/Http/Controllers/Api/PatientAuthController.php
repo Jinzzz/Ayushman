@@ -76,7 +76,7 @@ class PatientAuthController extends Controller
                             'patient_address'   => $request->patient_address,
                             'patient_gender'    => $patient_gender_id,
                             'patient_dob'       => $patient_dob,
-                            'patient_blood_group_id'  => $patient_blood_group_id ?? 68,
+                            'patient_blood_group_id'  => $patient_blood_group_id ?? null,
                             'patient_mobile'    => $request->patient_mobile,
                             'password'          => Hash::make($request->password),
                             'is_active'         => 1,
@@ -193,14 +193,39 @@ class PatientAuthController extends Controller
 
                     // If the token is created successfully, prepare and return the success response
                     if ($check_array) {
-                        $data['token'] =  $patient->createToken('Patient Token', ['patient']);
-                        $data['status'] = 1;
-                        $data['message'] = "Login Success";
-                        $data['name'] = $patient->patient_name;
-                        $data['patient_id'] = $patient->id;
-                        $data['patient_mobile'] = $patient->patient_mobile;
-                        $data['email_address'] = $patient->patient_email;
-                        return response($data);
+                        $is_verified = Mst_Patient::where('patient_mobile', $mobile)->where('is_otp_verified', 1)->first();
+                        if ($is_verified) {
+                            $data['token'] =  $patient->createToken('Patient Token', ['patient']);
+                            $data['status'] = 1;
+                            $data['message'] = "Login Success";
+                            $data['name'] = $patient->patient_name;
+                            $data['patient_id'] = $patient->id;
+                            $data['patient_mobile'] = $patient->patient_mobile;
+                            $data['email_address'] = $patient->patient_email;
+                            return response($data);
+                        } else {
+                            // Generate a new verification OTP
+                            $verification_otp = rand(100000, 999999);
+
+                            // Create a new OTP record for the patient
+                            $otpCreate = Trn_Patient_Otp::create([
+                                'patient_id' => $patient->id,
+                                'otp' => $verification_otp,
+                                'otp_type' => 4,
+                                'verified' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                                'otp_expire_at' => Carbon::now()->addMinutes(10),
+                            ]);
+
+                            // Prepare and return a success response
+                            $data['status'] = 2;
+                            $data['otp'] = $verification_otp;
+                            $data['otp_type'] = 4;
+                            $data['patient_id'] = $patient->id;
+                            $data['message'] = "OTP not verified. Kindly verify the OTP sent to registered mobile number.";
+                            return response($data);
+                        }
                     } else {
                         // If token creation fails, return an error response
                         $data['status'] = 0;
@@ -312,17 +337,28 @@ class PatientAuthController extends Controller
                                 }
                             }
 
+                            // Update patient's OTP verification status if the OTP type is 1 (Registration OTP)
+                            if ($request->otp_type == 4) {
+                                Mst_Patient::where('id', $patient_id)->update([
+                                    'updated_at' => Carbon::now(),
+                                    'is_otp_verified' => 1,
+                                ]);
+                            }
+
                             // Prepare and return a success response
                             $data['status'] = 1;
                             if ($request->otp_type == 1) {
                                 $data['message'] = "Registration completed successfully";
                             }
-                            
+
                             if ($request->otp_type == 2) {
                                 $data['message'] = "OTP verified successfully";
                             }
-                            
+
                             if ($request->otp_type == 3) {
+                                $data['message'] = "OTP verified successfully";
+                            }
+                            if ($request->otp_type == 4) {
                                 $data['message'] = "OTP verified successfully";
                             }
                             return response($data);
@@ -555,26 +591,26 @@ class PatientAuthController extends Controller
                         $patient->save();
 
                         $patientDevice = Trn_Patient_Device_Tocken::where('patient_id', $patient->id)->get();
-                                if ($patientDevice) {
-                                    $title = 'Password Reset Successfully';
-                                    $body = 'Your password has been reset successfully.';
-                                    $clickAction = "ChangePassword";
-                                    $type = "Change Password";
+                        if ($patientDevice) {
+                            $title = 'Password Reset Successfully';
+                            $body = 'Your password has been reset successfully.';
+                            $clickAction = "ChangePassword";
+                            $type = "Change Password";
 
-                                    // Save notification to the patient's notification table
-                                    $notificationCreate = Trn_Notification::create([
-                                        'patient_id' => $patient->id,
-                                        'title' => $title,
-                                        'content' => $body,
-                                        'read_status' => 0,
-                                        'created_at' => Carbon::now(),
-                                        'updated_at' => Carbon::now(),
-                                    ]);
-                                    foreach ($patientDevice as $pdt) {
-                                        // Send notification to the patient's device
-                                        $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
-                                    }
-                                }
+                            // Save notification to the patient's notification table
+                            $notificationCreate = Trn_Notification::create([
+                                'patient_id' => $patient->id,
+                                'title' => $title,
+                                'content' => $body,
+                                'read_status' => 0,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
+                            ]);
+                            foreach ($patientDevice as $pdt) {
+                                // Send notification to the patient's device
+                                $response =  DeviceTockenHelper::patientNotification($pdt->patient_device_token, $title, $body, $clickAction, $type);
+                            }
+                        }
                         // Prepare and return a success response
                         $data['status'] = 1;
                         $data['message'] = "Password reset sussessfully.";
@@ -624,12 +660,19 @@ class PatientAuthController extends Controller
             if ($patient_id) {
                 // Retrieve the current data of the authenticated patient
                 $accountHolder = Mst_Patient::join('mst_master_values as gender', 'mst_patients.patient_gender', '=', 'gender.id')
-                    ->join('mst_master_values as blood_group', 'mst_patients.patient_blood_group_id', '=', 'blood_group.id')
+                    ->leftJoin('mst_master_values as blood_group', 'mst_patients.patient_blood_group_id', '=', 'blood_group.id')
                     ->where('mst_patients.id', $patient_id)
                     ->select('mst_patients.*', 'gender.master_value as gender_name', 'blood_group.master_value as blood_group')
                     ->first();
 
                 // Build an array with account holder details
+                if (isset($accountHolder->blood_group)) {
+                    $blood_group = $accountHolder->blood_group;
+                    $blood_group_id = $accountHolder->patient_blood_group_id;
+                } else {
+                    $blood_group = null;
+                    $blood_group_id = null;
+                }
                 $accountHolderDetails[] = [
                     'patient_id' => $accountHolder->id,
                     'patient_name' => $accountHolder->patient_name,
@@ -639,8 +682,8 @@ class PatientAuthController extends Controller
                     'patient_mobile' => $accountHolder->patient_mobile,
                     'patient_email' => $accountHolder->patient_email,
                     'patient_address' => $accountHolder->patient_address,
-                    'blood_group' => $accountHolder->blood_group,
-                    'blood_group_id' => $accountHolder->patient_blood_group_id,
+                    'blood_group' => $blood_group,
+                    'blood_group_id' => $blood_group_id,
                 ];
 
                 // Prepare and return a success response
