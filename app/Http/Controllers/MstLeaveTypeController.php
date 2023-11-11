@@ -63,7 +63,7 @@ class MstLeaveTypeController extends Controller
                 } else {
                     $checkExists = Mst_Leave_Type::where('name', $request->leave_types)->first();
                     if ($checkExists) {
-                        return redirect()->route('leave.type.index')->with('exists', 'This leave type is aready exists.');
+                        return redirect()->route('leave.type.index')->with('exists', 'This leave type is already exists.');
                     } else {
                         Mst_Leave_Type::create([
                             'name' => $request->leave_types,

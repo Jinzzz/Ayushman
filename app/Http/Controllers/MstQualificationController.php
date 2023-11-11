@@ -61,7 +61,7 @@ class MstQualificationController extends Controller
                 } else {
                     $checkExists = Mst_Qualification::where('name', $request->qualification)->first();
                     if ($checkExists) {
-                        return redirect()->route('qualifications.index')->with('exists', 'This qualification is aready exists.');
+                        return redirect()->route('qualifications.index')->with('exists', 'This qualification is already exists.');
                     } else {
                         Mst_Qualification::create([
                             'name' => $request->qualification,

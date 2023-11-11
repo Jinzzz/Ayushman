@@ -48,7 +48,7 @@ class MstTaxController extends Controller
             ]);
             $checkExists = Mst_Tax::where('tax_name', $request->tax_name)->first();
             if ($checkExists) {
-                return redirect()->route('tax.create')->with('exists', 'This tax name is aready exists.');
+                return redirect()->route('tax.create')->with('exists', 'This tax name is already exists.');
             } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $taxes = new Mst_Tax();
@@ -90,7 +90,7 @@ class MstTaxController extends Controller
             $checkExists = Mst_Tax::where('tax_name', $request->tax_name)->first();
 
             if ($checkExists) {
-                return redirect()->route('tax.group.index')->with('exists', 'This tax name is aready exists.');
+                return redirect()->route('tax.group.index')->with('exists', 'This tax name is already exists.');
             } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $taxes = Mst_Tax::findOrFail($id);

@@ -34,8 +34,8 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <center>
+                </div>
+                <div class="form-group">
                             <button type="submit" class="btn btn-raised btn-primary">
                                 <i class="fa fa-check-square-o"></i> Add
                             </button>
@@ -45,9 +45,8 @@
                             <a href="{{ route('therapyrooms.index') }}" class="btn btn-secondary">
                                 Therapy Rooms
                             </a>
-
-                        </center>
                     </div>
+
             </form>
             <div class="table-responsive">
                 <table id="example" class="table table-striped table-bordered text-nowrap w-100">
@@ -72,7 +71,7 @@
                             <td>{{ $assign->branch->branch_name}}</td>
                             <td>{{ $assign->staff->staff_name}}</td>
                             <td>
-                                <button type="button" style="width: 70px;"  onclick="changeStatus({{ $assign->id }})" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
+                                <button type="button" style="width: 70px;" onclick="changeStatus({{ $assign->id }})" class="btn btn-sm @if($assign->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($assign->is_active == 0)
                                     Inactive
                                     @else

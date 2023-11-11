@@ -60,7 +60,7 @@ class MstMedicineDosageController extends Controller
                 } else {
                     $checkExists = Mst_Medicine_Dosage::where('name', $request->medicine_dosages)->first();
                     if ($checkExists) {
-                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is aready exists.');
+                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is already exists.');
                     } else {
                         Mst_Medicine_Dosage::create([
                             'name' => $request->medicine_dosages,
