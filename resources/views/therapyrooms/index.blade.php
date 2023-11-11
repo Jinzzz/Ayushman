@@ -91,7 +91,7 @@
                             <a class="btn btn-sm  btn-outline-success " href="{{ route('slot_assigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>SlotAssigning</a>
                         </td>
                         <td>
-                            <button type="button" onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
+                            <button type="button" style="width: 70px;"  onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
                                 @if($therapyroom->is_active == 0)
                                 InActive
                                 @else
@@ -188,9 +188,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(5)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

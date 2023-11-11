@@ -114,7 +114,7 @@
                                 <td>{{ $timeslot->slot_name }}</td>
                                 <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $timeslot->time_from)->format('g:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $timeslot->time_to)->format('g:i A') }}</td>
                                 <td>
-                                    <button type="button" onclick="changeStatus({{ $timeslot->id }})" class="btn btn-sm @if($timeslot->is_active == 0) btn-danger @else btn-success @endif">
+                                    <button type="button" style="width: 70px;"  onclick="changeStatus({{ $timeslot->id }})" class="btn btn-sm @if($timeslot->is_active == 0) btn-danger @else btn-success @endif">
                                         @if($timeslot->is_active == 0)
                                         Inactive
                                         @else
@@ -218,9 +218,9 @@
 
                                 // Update status in the table
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 // Update status in the form only if the dataId matches hidden_id

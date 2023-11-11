@@ -39,7 +39,7 @@
                         <td>{{ ++$i }}</td>
                         <td>{{ $account_sub_group->account_sub_group_name }}</td>
                         <td>
-                            <button type="button" onclick="changeStatus({{ $account_sub_group->id }})" class="btn btn-sm @if($account_sub_group->is_active == 0) btn-danger @else btn-success @endif">
+                            <button type="button" style="width: 70px;"  onclick="changeStatus({{ $account_sub_group->id }})" class="btn btn-sm @if($account_sub_group->is_active == 0) btn-danger @else btn-success @endif">
                                 @if($account_sub_group->is_active == 0)
                                 Inactive
                                 @else
@@ -136,9 +136,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(2)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

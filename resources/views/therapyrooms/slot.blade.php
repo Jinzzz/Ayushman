@@ -94,7 +94,7 @@
                             <td>{{ $slot->weekDay->master_value}}</td>
                             <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_from)->format('g:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_to)->format('g:i A') }}</td>
                             <td>
-                                <button type="button" onclick="changeStatus({{ $slot->id }})" class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
+                                <button type="button" style="width: 70px;"  onclick="changeStatus({{ $slot->id }})" class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($slot->is_active == 0)
                                     InActive
                                     @else
@@ -187,9 +187,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(3)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

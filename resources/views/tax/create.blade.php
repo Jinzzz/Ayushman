@@ -109,7 +109,7 @@
                         <td>{{ $tax->tax_rate }} %</td>
                         <td>{{ $tax->tax }}</td>
                         <td>
-                           <button type="button" onclick="changeStatus({{ $tax->id }})" class="btn btn-sm @if($tax->is_active == 0) btn-danger @else btn-success @endif">
+                           <button type="button" style="width: 70px;"  onclick="changeStatus({{ $tax->id }})" class="btn btn-sm @if($tax->is_active == 0) btn-danger @else btn-success @endif">
                               @if($tax->is_active == 0)
                               Inactive
                               @else
@@ -177,9 +177,9 @@
                         var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
                         if (cell.find('.btn-success').length) {
-                           cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                           cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                         } else {
-                           cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                           cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                         }
 
                         flashMessage('s', 'Status changed successfully');
