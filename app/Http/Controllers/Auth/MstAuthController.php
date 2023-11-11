@@ -26,6 +26,8 @@ class MstAuthController extends Controller
 
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
             // Authentication successful
+            // dd(Auth::id());
+            // Session::put
             return redirect()->intended('/home'); // Replace '/dashboard' with your desired destination
         } else {
             // Authentication failed

@@ -141,4 +141,6 @@ class MstTherapyRoomController extends Controller
             return redirect()->route('therapyrooms.index')->with('error', 'Something went wrong');
         }
     }
+
+   
 }

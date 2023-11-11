@@ -4,25 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mst_TimeSlot extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
     protected $table = 'mst_timeslots';
 
-
-    public function Doctor()
-    {
-        return $this->belongsTo(Mst_Staff::class, 'staff_id','staff_id');
-    }
-
-    public function weekDay()
-    {
-        return $this->belongsTo(Mst_Master_Value::class,'week_day','id');
-    }
-
-    public function timeSlot()
-    {
-        return $this->belongsTo(Mst_Master_Value::class,'time_slot','id');
-    }
+    protected $primaryKey = 'id';
+    protected $dates = ['deleted_at'];
+    protected $fillable = [
+        'slot_name',
+        'time_from',
+        'time_to',
+        'is_active',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+    ];
 }

@@ -46,8 +46,7 @@
     <link href="{{ asset('assets/plugins/sweet-alert/sweetalert.css') }}" rel="stylesheet" />
 
     <!-- COLOR SKIN CSS -->
-    <link id="theme" rel="stylesheet" type="text/css" media="all"
-        href="{{ asset('assets/colors/color1.css') }}" />
+    <link id="theme" rel="stylesheet" type="text/css" media="all" href="{{ asset('assets/colors/color1.css') }}" />
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
 
 </head>
@@ -69,83 +68,80 @@
                 <!-- CONTAINER OPEN -->
                 <div class="col col-login mx-auto">
                     <div class="text-center">
-                        <img src="{{ asset('assets/images/logo.png') }}" class="header-brand-img" alt=""
-                            width="100%">
+                        <img src="{{ asset('assets/images/logo.png') }}" class="header-brand-img" alt="" width="100%">
                     </div>
                 </div>
                 <div class="container-login100">
                     <div class="wrap-login100 p-6">
                         <div class="status">
                             @if (Session::has('status'))
-                                <div class="alert alert-success">
-                                    {{ Session::get('status') }}
-                                </div>
+                            <div class="alert alert-success">
+                                {{ Session::get('status') }}
+                            </div>
+                            @endif
+                            @if (Session::has('success'))
+                            <div class="alert alert-success">
+                                {{ Session::get('success') }}
+                            </div>
+                            @endif
+                            @if (Session::has('failed'))
+                            <div class="alert alert-danger">
+                                {{ Session::get('failed') }}
+                            </div>
+                            @endif
+                            @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
                             @endif
                         </div>
                         <div class="row justify-content-center">
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header-home home-login">{{ __('Login') }}</div>
-
                                     <div class="card-home">
-                                        @if ($errors->any())
-                                            <div class="alert alert-danger">
-                                                <ul>
-                                                    @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        @endif
-
-                                        <form class="login100-form login-form" method="POST"
-                                            action="{{ route('mst_login_redirect') }}">
+                                        <form class="login100-form login-form" method="POST" action="{{ route('mst_login_redirect') }}">
                                             @csrf
                                             <div class="wrap-input100 validate-input">
-                                                <input class="input100" type="text" name="username"
-                                                    placeholder="Username" required value="{{ old('username') }}">
+                                                <input class="input100" type="text" name="username" placeholder="Username" required value="{{ old('username') }}">
                                                 <span class="focus-input100"></span>
                                                 <span class="symbol-input100">
                                                     <i class="zmdi zmdi-email" aria-hidden="true"></i>
                                                 </span>
                                                 <div class="email">
                                                     @if ($errors->has('username'))
-                                                        <span
-                                                            class="text-danger errbk">{{ $errors->first('username') }}</span>
+                                                    <span class="text-danger errbk">{{ $errors->first('username') }}</span>
                                                     @endif
                                                 </div>
                                             </div>
 
-                                            <div class="wrap-input100 validate-input"
-                                                data-validate="Password is required">
-                                                <input class="input100" type="password" name="password" id="password"
-                                                    placeholder="Password" required>
-                                                <i class="fa fa-eye password-eye-slash" id="eye"
-                                                    onclick="togglePassword()"
-                                                    style="position: absolute; top: 18px; right:15px; color:#000"></i>
+                                            <div class="wrap-input100 validate-input" data-validate="Password is required">
+                                                <input class="input100" type="password" name="password" id="password" placeholder="Password" required>
+                                                <i class="fa fa-eye password-eye-slash" id="eye" onclick="togglePassword()" style="position: absolute; top: 18px; right:15px; color:#000"></i>
                                                 <span class="focus-input100"></span>
                                                 <span class="symbol-input100">
                                                     <i class="zmdi zmdi-lock" aria-hidden="true"></i>
                                                 </span>
                                                 <div class="password">
                                                     @if ($errors->has('password'))
-                                                        <span
-                                                            class="text-danger errbk">{{ $errors->first('password') }}</span>
+                                                    <span class="text-danger errbk">{{ $errors->first('password') }}</span>
                                                     @endif
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="form-group row mb-0" style="margin-left:0;margin-right:0">
                                                 <div class="container-login100-form-btn">
-                                                    <button type="submit"
-                                                        class="login100-form-btn btn-primary">Login</button>
+                                                    <button type="submit" class="login100-form-btn btn-primary">Login</button>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="form-group row mt-2 mb-0" style="margin-left:0;margin-right:0">
                                                 <div class="container-login100-form-btn">
-                                                    <a href="{{ route('verification.request') }}"
-                                                        class="btn-link">Forgot password?</a>
+                                                    <a href="{{ route('verification.request') }}" class="btn-link">Forgot password?</a>
                                                 </div>
                                             </div>
 

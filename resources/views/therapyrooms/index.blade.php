@@ -67,6 +67,7 @@
                         <!-- <th class="wd-20p">Room Type</th>
                                     <th class="wd-20p">Room Capacity</th> -->
                         <th class="wd-20p">Room Assigning</th>
+                        <th class="wd-20p">Slot Assigning</th>
                         <th class="wd-15p">Status</th>
                         <th class="wd-15p">Action</th>
                     </tr>
@@ -85,6 +86,9 @@
 
                         <td>
                             <a class="btn btn-sm  btn-outline-success " href="{{ route('therapyroomassigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>RoomAssigning</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-sm  btn-outline-success " href="{{ route('slot_assigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>SlotAssigning</a>
                         </td>
                         <td>
                             <button type="button" onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
@@ -181,7 +185,7 @@
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(5)');
 
                                 if (cell.find('.btn-success').length) {
                                     cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');

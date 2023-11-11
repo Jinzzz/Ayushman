@@ -11,6 +11,7 @@ use App\Http\Controllers\MstPatientController;
 use App\Http\Controllers\MstTherapyRoomController;
 use App\Http\Controllers\MstMembershipController;
 use App\Http\Controllers\MstWellnessController;
+use App\Http\Controllers\MstTherapyRoomSlotController;
 
 use App\Http\Controllers\MstUnitController;
 use App\Http\Controllers\MstTaxController;
@@ -35,6 +36,11 @@ use App\Http\Controllers\EmployeeBranchTransferController;
 use App\Http\Controllers\MedicinePurchaseController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
+use App\Http\Controllers\MedicineSalesController;
+use App\Http\Controllers\MedicineSalesReturnController;
+
+use App\Http\Controllers\TrnPrescriptionController;
+use App\Http\Controllers\TrnJournelEntryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,31 +54,41 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 */
 
 Route::get('/', function () {
-    return view('welcome'); 
+    return view('welcome');
 });
 
 Auth::routes();
+//Authentication:
+Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
+Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
+Route::match(['get', 'post'], '/logout', [MstAuthController::class, 'logout'])->name('logout');
+Route::get('/verification-request', [MstAuthController::class, 'verificationRequest'])->name('verification.request');
+// Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
+Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->name('reset.password');
 
-Route::get('/home', [DashboardController::class, 'index'])->name('home');
-//Manage-Branches:
-// test 
+// Routes to reset password starts
 Route::get('forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('password.request');
 Route::post('forgot-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('password.email.send');
 Route::get('reset-password/{token}/{email}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
-Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
-// test ends 
+Route::post('update-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
+// Routes to reset password ends
 
-Route::middleware('auth')->group(function () {
- Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
+// Middlewares starts 
+// Admin-only routes go here.., middleware' => 'admin'
+// Route::group(['middleware' => 'admin'], function () {
+// Dashboard 
+Route::get('/home', [DashboardController::class, 'index'])->name('home');
+
+//Manage-Branches:
+Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
 Route::get('/branches/create', [MstBranchController::class, 'create'])->name('branches.create');
 Route::post('/branches/store', [MstBranchController::class, 'store'])->name('branches.store');
 Route::get('/branches/edit/{branch_id}', [MstBranchController::class, 'edit'])->name('branches.edit');
 Route::get('/branches/show/{branch_id}', [MstBranchController::class, 'show'])->name('branches.show');
-Route::delete('/branches/destroy/{branch_id}', [MstBranchController::class,'destroy'])->name('branches.destroy');
+Route::delete('/branches/destroy/{branch_id}', [MstBranchController::class, 'destroy'])->name('branches.destroy');
 Route::patch('branches/{branch_id}/change-status', [MstBranchController::class, 'changeStatus'])->name('branches.changeStatus');
-Route::put('/branches/update/{branch_id}', [MstBranchController::class,'update'])->name('branches.update');
-Route::post('/branches/restore', [MstBranchController::class,'restoreBranches'])->name('branches.restore');
-});
+Route::put('/branches/update/{branch_id}', [MstBranchController::class, 'update'])->name('branches.update');
+Route::post('/branches/restore', [MstBranchController::class, 'restoreBranches'])->name('branches.restore');
 
 // Manage user privilage 
 Route::get('/user-type/index', [UserPrivilageController::class, 'indexUserType'])->name('usertype.index');
@@ -83,6 +99,7 @@ Route::delete('/user-type/destroy/{id}', [UserPrivilageController::class, 'destr
 
 // usertype Access 
 Route::get('/user-type-access/create', [UserPrivilageController::class, 'createUserTypeAccess'])->name('usertype.access.create');
+
 // user wise access 
 Route::get('/user-access/create', [UserPrivilageController::class, 'createUserTypeAccess'])->name('usertype.access.create');
 
@@ -92,56 +109,65 @@ Route::get('/staffs/create', [MstStaffController::class, 'create'])->name('staff
 Route::post('/staffs/store', [MstStaffController::class, 'store'])->name('staffs.store');
 Route::get('/staffs/edit/{staff_id}', [MstStaffController::class, 'edit'])->name('staffs.edit');
 Route::get('/staffs/show/{staff_id}', [MstStaffController::class, 'show'])->name('staffs.show');
-Route::delete('/staffs/destroy/{staff_id}', [MstStaffController::class,'destroy'])->name('staffs.destroy');
-Route::put('/staffs/update/{staff_id}', [MstStaffController::class,'update'])->name('staffs.update');
-Route::post('/staffs/restore', [MstStaffController::class,'restore'])->name('staffs.restore');
+Route::delete('/staffs/destroy/{staff_id}', [MstStaffController::class, 'destroy'])->name('staffs.destroy');
+Route::put('/staffs/update/{staff_id}', [MstStaffController::class, 'update'])->name('staffs.update');
+Route::post('/staffs/restore', [MstStaffController::class, 'restore'])->name('staffs.restore');
 Route::patch('staffs/{staff_id}/change-status', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
+
 //Manage-External-Doctors:
 Route::get('/externaldoctors/index', [MstExternalDoctorController::class, 'index'])->name('externaldoctors.index');
 Route::get('/externaldoctors/create', [MstExternalDoctorController::class, 'create'])->name('externaldoctors.create');
 Route::post('/externaldoctors/store', [MstExternalDoctorController::class, 'store'])->name('externaldoctors.store');
 Route::get('/externaldoctors/edit/{id}', [MstExternalDoctorController::class, 'edit'])->name('externaldoctors.edit');
 Route::get('/externaldoctors/show/{id}', [MstExternalDoctorController::class, 'show'])->name('externaldoctors.show');
-Route::delete('/externaldoctors/destroy/{id}', [MstExternalDoctorController::class,'destroy'])->name('externaldoctors.destroy');
-Route::put('/externaldoctors/update/{id}', [MstExternalDoctorController::class,'update'])->name('externaldoctors.update');
+Route::delete('/externaldoctors/destroy/{id}', [MstExternalDoctorController::class, 'destroy'])->name('externaldoctors.destroy');
+Route::put('/externaldoctors/update/{id}', [MstExternalDoctorController::class, 'update'])->name('externaldoctors.update');
 Route::patch('externaldoctors/{id}/change-status', [MstExternalDoctorController::class, 'changeStatus'])->name('externaldoctors.changeStatus');
+
 //Manage-Therapies:
 Route::get('/therapies/index', [MstTherapyController::class, 'index'])->name('therapy.index');
 Route::get('/therapies/create', [MstTherapyController::class, 'create'])->name('therapy.create');
 Route::post('/therapies/store', [MstTherapyController::class, 'store'])->name('therapy.store');
 Route::get('/therapies/edit/{id}', [MstTherapyController::class, 'edit'])->name('therapy.edit');
-Route::delete('/therapies/destroy/{id}', [MstTherapyController::class,'destroy'])->name('therapy.destroy');
-Route::put('/therapies/update/{id}', [MstTherapyController::class,'update'])->name('therapy.update');
+Route::delete('/therapies/destroy/{id}', [MstTherapyController::class, 'destroy'])->name('therapy.destroy');
+Route::put('/therapies/update/{id}', [MstTherapyController::class, 'update'])->name('therapy.update');
 Route::patch('therapies/{id}/change-status', [MstTherapyController::class, 'changeStatus'])->name('therapy.changeStatus');
 
 //Manage-TimeSlots:
+Route::post('/timeslot/store', [MstTimeSlotController::class, 'store'])->name('timeslot.store');
+Route::patch('timeslot/change-status/{id}', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
 Route::resource('timeslot', MstTimeSlotController::class);
-Route::patch('timeslot/{id}/change-status', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
-Route::get('/timeslot/show/{id}', [MstTimeSlotController::class, 'show'])->name('timeslot.show');
-Route::delete('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
+
+//Assigning timeslot for a particular staff:
+Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
+Route::post('/timeslot-staff/store', [MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
+
+// Assigning timeslot for a particular therapy room
+Route::get('/therapyroom-slot-assigning/index/{id}', [MstTherapyRoomSlotController::class, 'index'])->name('slot_assigning.index');
+Route::post('/therapyroom-slot/store', [MstTherapyRoomSlotController::class, 'store'])->name('room.slot.store');
+Route::delete('/therapyroom-slot//destroy/{id}', [MstTherapyRoomSlotController::class, 'destroy'])->name('room.slot.destroy');
+Route::patch('therapyroom-slot//change-status/{id}', [MstTherapyRoomSlotController::class, 'changeStatus'])->name('room.slot.changeStatus');
+
 //Manage-Patients:
 Route::get('/patients/index', [MstPatientController::class, 'index'])->name('patients.index');
 Route::get('/patients/create', [MstPatientController::class, 'create'])->name('patients.create');
 Route::post('/patients/store', [MstPatientController::class, 'store'])->name('patients.store');
 Route::get('/patients/edit/{id}', [MstPatientController::class, 'edit'])->name('patients.edit');
 Route::get('/patients/show/{id}', [MstPatientController::class, 'show'])->name('patients.show');
-Route::delete('/patients/destroy/{id}', [MstPatientController::class,'destroy'])->name('patients.destroy');
-Route::put('/patients/update/{id}', [MstPatientController::class,'update'])->name('patients.update');
+Route::delete('/patients/destroy/{id}', [MstPatientController::class, 'destroy'])->name('patients.destroy');
+Route::put('/patients/update/{id}', [MstPatientController::class, 'update'])->name('patients.update');
 Route::patch('patients/{id}/change-status', [MstPatientController::class, 'changeStatus'])->name('patients.changeStatus');
-Route::patch('/patients/{id}/toggle-otp-verification', [MstPatientController::class,'toggleOTPVerification'])->name('patients.toggleOTPVerification');
-Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class,'toggleApproval'])->name('patients.toggleApproval');
-Route::get('/patients/{id}/membership-assigning', [MstPatientController::class,'patientMembershipAssigning'])->name('patients.membership.assigning');
-
-
-
+Route::patch('/patients/{id}/toggle-otp-verification', [MstPatientController::class, 'toggleOTPVerification'])->name('patients.toggleOTPVerification');
+Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class, 'toggleApproval'])->name('patients.toggleApproval');
+Route::get('/patients/{id}/membership-assigning', [MstPatientController::class, 'patientMembershipAssigning'])->name('patients.membership.assigning');
 
 //Manage-Therapy-Rooms:
 Route::get('/therapyrooms/index', [MstTherapyRoomController::class, 'index'])->name('therapyrooms.index');
 Route::get('/therapyrooms/create', [MstTherapyRoomController::class, 'create'])->name('therapyrooms.create');
 Route::post('/therapyrooms/store', [MstTherapyRoomController::class, 'store'])->name('therapyrooms.store');
 Route::get('/therapyrooms/edit/{id}', [MstTherapyRoomController::class, 'edit'])->name('therapyrooms.edit');
-Route::delete('/therapyrooms/destroy/{id}', [MstTherapyRoomController::class,'destroy'])->name('therapyrooms.destroy');
-Route::put('/therapyrooms/update/{id}', [MstTherapyRoomController::class,'update'])->name('therapyrooms.update');
+Route::delete('/therapyrooms/destroy/{id}', [MstTherapyRoomController::class, 'destroy'])->name('therapyrooms.destroy');
+Route::put('/therapyrooms/update/{id}', [MstTherapyRoomController::class, 'update'])->name('therapyrooms.update');
 Route::patch('therapyrooms/change-status/{id}', [MstTherapyRoomController::class, 'changeStatus'])->name('therapyrooms.changeStatus');
 
 //Manage-Memberships:
@@ -165,8 +191,6 @@ Route::put('/wellness/update/{wellness_id}', [MstWellnessController::class, 'upd
 Route::get('/wellness/show/{wellness_id}', [MstWellnessController::class, 'show'])->name('wellness.show');
 Route::delete('/wellness/destroy/{wellness_id}', [MstWellnessController::class, 'destroy'])->name('wellness.destroy');
 Route::patch('wellness/{wellness_id}/change-status', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
-
-
 
 //Manage-Units:
 Route::get('/unit/index', [MstUnitController::class, 'index'])->name('unit.index');
@@ -208,34 +232,27 @@ Route::patch('consultation-billing/{id}/change-status', [TrnConsultationBillingC
 //Booking-Type:(consultation)
 Route::get('/booking-type/index', [BookingTypeController::class, 'index'])->name('booking_type.index');
 Route::get('/booking-type/show/{id}', [BookingTypeController::class, 'show'])->name('booking_type.show');
+
 //Booking-Type:(wellness)
 Route::get('/booking-type/wellnessIndex', [BookingTypeController::class, 'wellnessIndex'])->name('booking_type.wellnessIndex');
 Route::get('/booking-type/wellnessShow/{id}', [BookingTypeController::class, 'wellnessShow'])->name('booking_type.wellnessShow');
+
 //Booking-Type:(therapy)
 Route::get('/booking-type/therapyIndex', [BookingTypeController::class, 'therapyIndex'])->name('booking_type.therapyIndex');
 Route::get('/booking-type/therapyShow/{id}', [BookingTypeController::class, 'therapyShow'])->name('booking_type.therapyShow');
-
 
 //patient-search:
 Route::get('/patient-search/index', [PatientSearchController::class, 'index'])->name('patient_search.index');
 Route::get('/patient-search/show/{id}', [PatientSearchController::class, 'show'])->name('patient_search.show');
 
 //Manage-suppliers:
-Route::get('/supplier/index',[MstSupplierController::class, 'index'])->name('supplier.index');
-Route::get('/supplier/create',[MstSupplierController::class,'create'])->name('supplier.create');
+Route::get('/supplier/index', [MstSupplierController::class, 'index'])->name('supplier.index');
+Route::get('/supplier/create', [MstSupplierController::class, 'create'])->name('supplier.create');
 Route::post('/supplier/store', [MstSupplierController::class, 'store'])->name('supplier.store');
 Route::get('/supplier/edit/{id}', [MstSupplierController::class, 'edit'])->name('supplier.edit');
 Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->name('supplier.update');
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
 Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
-
-//Authentication:
-Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
-Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
-Route::match(['get', 'post'],'/logout', [MstAuthController::class, 'logout'])->name('logout');
-Route::get('/verification-request', [MstAuthController::class, 'verificationRequest'])->name('verification.request');
-// Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
-Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->name('reset.password');
 
 //Manage-Specialization:
 Route::get('/specialization/index/{id}', [MstStaffSpecializationController::class, 'index'])->name('specialization.index');
@@ -269,11 +286,7 @@ Route::delete('/masters/destroy/{id}', [MstMasterValueController::class, 'destro
 Route::patch('masters/{id}/change-status', [MstMasterValueController::class, 'changeStatus'])->name('mastervalues.changeStatus');
 
 
-//timeslot-storing in mst_master_values table:
-Route::post('/mastervalues/store', [MstTimeSlotController::class,'store'])->name('mastervalues.store');
-//adding timeslot for a particular staff:
-Route::get('/timeslot-staff/slot/{id}',[MstTimeSlotController::class,'slotIndex'])->name('staff.slot');
-Route::post('/timeslot-staff/store',[MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
+
 
 // Qualification - Screen for qualification
 Route::get('/qualifications', [MstQualificationController::class, 'index'])->name('qualifications.index');
@@ -324,8 +337,8 @@ Route::get('/account-sub-group/index', [AccountSubGroupController::class, 'index
 Route::get('/account-sub-group/create', [AccountSubGroupController::class, 'create'])->name('account.sub.group.create');
 Route::post('/account-sub-group/store', [AccountSubGroupController::class, 'store'])->name('account.sub.group.store');
 Route::get('/account-sub-group/edit/{id}', [AccountSubGroupController::class, 'edit'])->name('account.sub.group.edit');
-Route::delete('/account-sub-group/destroy/{id}', [AccountSubGroupController::class,'destroy'])->name('account.sub.group.destroy');
-Route::put('/account-sub-group/update/{id}', [AccountSubGroupController::class,'update'])->name('account.sub.group.update');
+Route::delete('/account-sub-group/destroy/{id}', [AccountSubGroupController::class, 'destroy'])->name('account.sub.group.destroy');
+Route::put('/account-sub-group/update/{id}', [AccountSubGroupController::class, 'update'])->name('account.sub.group.update');
 Route::patch('account-sub-group/change-status/{id}', [AccountSubGroupController::class, 'changeStatus'])->name('account.sub.group.changeStatus');
 
 //Manage-Account-Ledger
@@ -333,10 +346,10 @@ Route::get('/account-ledger/index', [AccountLedgerController::class, 'index'])->
 Route::get('/account-ledger/create', [AccountLedgerController::class, 'create'])->name('account.ledger.create');
 Route::post('/account-ledger/store', [AccountLedgerController::class, 'store'])->name('account.ledger.store');
 Route::get('/account-ledger/edit/{id}', [AccountLedgerController::class, 'edit'])->name('account.ledger.edit');
-Route::delete('/account-ledger/destroy/{id}', [AccountLedgerController::class,'destroy'])->name('account.ledger.destroy');
-Route::put('/account-ledger/update/{id}', [AccountLedgerController::class,'update'])->name('account.ledger.update');
+Route::delete('/account-ledger/destroy/{id}', [AccountLedgerController::class, 'destroy'])->name('account.ledger.destroy');
+Route::put('/account-ledger/update/{id}', [AccountLedgerController::class, 'update'])->name('account.ledger.update');
 Route::patch('account-ledger/changeStatus/{id}', [AccountLedgerController::class, 'changeStatus'])->name('account.ledger.changeStatus');
-Route::patch('/get-account-sub-groups/{id}', [AccountLedgerController::class,'getAccountSubGroups'])->name('get.account.sub.groups');
+Route::patch('/get-account-sub-groups/{id}', [AccountLedgerController::class, 'getAccountSubGroups'])->name('get.account.sub.groups');
 
 
 // staff-branch-transer:
@@ -352,4 +365,45 @@ Route::get('/medicine-purchase/create', [MedicinePurchaseController::class, 'cre
 // patient-membership 
 Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMembershipIndex'])->name('patients.membership');
 Route::post('/patients/membership/store/{id}', [MstPatientController::class, 'patientMembershipStore'])->name('patientsMembership.store');
-Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class ,'getWellnessDetails'])->name('getwellness.details');
+Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class, 'getWellnessDetails'])->name('getwellness.details');
+// });
+
+
+// Medicine sales invoice 
+Route::get('/medicine-sales-invoices', [MedicineSalesController::class, 'index'])->name('medicine.sales.invoices.index');
+Route::get('/medicine-sales-invoices/create', [MedicineSalesController::class, 'create'])->name('medicine.sales.invoices.create');
+Route::post('/medicine-sales-invoices/store', [MedicineSalesController::class, 'store'])->name('medicine.sales.invoices.store');
+Route::delete('/medicine-sales-invoices/destroy/{id}', [MedicineSalesController::class, 'destroy'])->name('medicine.sales.invoices.destroy');
+Route::get('/medicine-sales-invoices/edit/{id}', [MedicineSalesController::class, 'edit'])->name('medicine.sales.invoices.edit');
+Route::get('/medicine-sales-invoices/view/{id}', [MedicineSalesController::class, 'show'])->name('medicine.sales.invoices.show');
+Route::get('/medicine-sales-invoices/print/{id}', [MedicineSalesController::class, 'generatePDF'])->name('medicine.sales.invoices.print');
+Route::post('/medicine-sales-invoices/update', [MedicineSalesController::class, 'update'])->name('medicine.sales.invoices.update');
+Route::patch('/get-patient-booking-ids/{id}', [MedicineSalesController::class, 'getPatientBookingIds'])->name('get.patient.booking.ids');
+Route::patch('/get-medicine-batches/{id}', [MedicineSalesController::class, 'getMedicineBatches'])->name('get.medicine.batches');
+Route::get('/getLedgerNames', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames');
+
+// Medicine sales return 
+Route::get('/medicine-sales-return', [MedicineSalesReturnController::class, 'index'])->name('medicine.sales.return.index');
+Route::get('/medicine-sales-return/create', [MedicineSalesReturnController::class, 'create'])->name('medicine.sales.return.create');
+Route::post('/medicine-sales-return/store', [MedicineSalesReturnController::class, 'store'])->name('medicine.sales.return.store');
+Route::delete('/medicine-sales-return/destroy/{id}', [MedicineSalesReturnController::class, 'destroy'])->name('medicine.sales.return.destroy');
+Route::get('/medicine-sales-return/edit/{id}', [MedicineSalesReturnController::class, 'edit'])->name('medicine.sales.return.edit');
+Route::patch('/get-patient-invoice-ids/{id}', [MedicineSalesReturnController::class, 'getPatientInvoiceIds'])->name('get.patient.invoice.ids');
+Route::post('/medicine-sales-return/update', [MedicineSalesReturnController::class, 'update'])->name('medicine.sales.return.update');
+Route::get('/medicine-sales-return/show/{id}', [MedicineSalesReturnController::class, 'show'])->name('medicine.sales.return.show');
+Route::get('/medicine-sales-return/print/{id}', [MedicineSalesReturnController::class, 'generatePDF'])->name('medicine.sales.return.print');
+
+// Prescription Printing 
+Route::get('/prescriptions', [TrnPrescriptionController::class, 'index'])->name('prescriptions.index');
+Route::post('/prescriptions-list', [TrnPrescriptionController::class, 'list'])->name('prescriptions.list');
+Route::get('/prescriptions-show/{id}', [TrnPrescriptionController::class, 'show'])->name('prescriptions.show');
+Route::get('/prescriptions-print/{id}', [TrnPrescriptionController::class, 'print'])->name('prescriptions.print');
+Route::get('/get-booking-ids/{id}', [TrnPrescriptionController::class, 'getPatientBookingIds'])->name('get.booking.ids');
+
+// Journel Entry
+Route::get('/journel-entry', [TrnJournelEntryController::class, 'index'])->name('journel.entry.index');
+Route::get('/journel-entry-create', [TrnJournelEntryController::class, 'create'])->name('journel.entry.create');
+Route::post('/journel-entry-store', [TrnJournelEntryController::class, 'store'])->name('journel.entry.store');
+Route::get('/journel-entry-show/{id}', [TrnJournelEntryController::class, 'show'])->name('journel.entry.show');
+Route::delete('/journel-entry/destroy/{id}', [TrnJournelEntryController::class, 'destroy'])->name('journel.entry.destroy');
+
