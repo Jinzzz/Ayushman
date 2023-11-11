@@ -55,7 +55,7 @@
                             <td>
                                 <button type="button" onclick="changeStatus({{ $tax->id }})" class="btn btn-sm @if($tax->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($tax->is_active == 0)
-                                    InActive
+                                    Inactive
                                     @else
                                     Active
                                     @endif

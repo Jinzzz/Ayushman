@@ -52,7 +52,7 @@
                             <td>
                                 <button type="button" onclick="changeStatus({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($leave_type->is_active == 0)
-                                    InActive
+                                    Inactive
                                     @else
                                     Active
                                     @endif

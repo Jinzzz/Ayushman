@@ -45,7 +45,7 @@
                         <td>
                             <button type="button" onclick="changeStatus({{ $account_ledgers->id }})" class="btn btn-sm @if($account_ledgers->is_active == 0) btn-danger @else btn-success @endif">
                                 @if($account_ledgers->is_active == 0)
-                                InActive
+                                Inactive
                                 @else
                                 Active
                                 @endif

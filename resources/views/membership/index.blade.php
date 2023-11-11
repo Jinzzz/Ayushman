@@ -55,7 +55,7 @@
                                     @method('PATCH')
                                     <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($membership->is_active == 0) btn-danger @else btn-success @endif">
                                         @if($membership->is_active == 0)
-                                        InActive
+                                        Inactive
                                         @else
                                         Active
                                         @endif

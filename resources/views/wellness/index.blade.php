@@ -92,7 +92,7 @@
                                     <td>
                                         <button type="button" onclick="changeStatus({{$wellnes->wellness_id }})" class="btn btn-sm @if($wellnes->is_active == 0) btn-danger @else btn-success @endif">
                                             @if($wellnes->is_active == 0)
-                                            InActive
+                                            Inactive
                                             @else
                                             Active
                                             @endif

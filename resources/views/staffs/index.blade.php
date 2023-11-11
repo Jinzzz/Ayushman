@@ -130,7 +130,7 @@
                                                 onclick="return confirm('Do you want to Change status?');"
                                                 class="btn btn-sm @if($staff->is_active == 0) btn-danger @else btn-success @endif status-custom">
                                                 @if($staff->is_active == 0)
-                                                InActive
+                                                Inactive
                                                 @else
                                                 Active
                                                 @endif

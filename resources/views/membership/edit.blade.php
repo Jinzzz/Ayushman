@@ -181,7 +181,7 @@
                                                 <td>{{ $wellness->wellness_name }}</td>
                                                 <td>{{ $wellness->maximum_usage_limit }} times</td>
                                                 <td><span class="@if($wellness->is_active == 0) badge badge-danger @else badge badge-success @endif" style="width: 60px"> @if($wellness->is_active == 0)
-                                                        InActive
+                                                        Inactive
                                                         @else
                                                         Active
                                                         @endif </span>

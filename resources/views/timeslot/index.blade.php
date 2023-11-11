@@ -116,7 +116,7 @@
                                 <td>
                                     <button type="button" onclick="changeStatus({{ $timeslot->id }})" class="btn btn-sm @if($timeslot->is_active == 0) btn-danger @else btn-success @endif">
                                         @if($timeslot->is_active == 0)
-                                        InActive
+                                        Inactive
                                         @else
                                         Active
                                         @endif

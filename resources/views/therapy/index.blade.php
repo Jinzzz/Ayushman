@@ -51,7 +51,7 @@
                                     <td>
                                         <button type="button" onclick="changeStatus({{$therapy->id }})" class="btn btn-sm @if($therapy->is_active == 0) btn-danger @else btn-success @endif">
                                             @if($therapy->is_active == 0)
-                                            InActive
+                                            Inactive
                                             @else
                                             Active
                                             @endif
