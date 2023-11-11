@@ -251,7 +251,7 @@
                                                 <td>{!! $benefit->title !!}</td>
                                                 <td>
                                                     <span class="@if($benefit->is_active == 0) badge badge-danger @else badge badge-success @endif" style="width: 60px">
-                                                        @if($benefit->is_active == 0) InActive @else Active @endif
+                                                        @if($benefit->is_active == 0) Inactive @else Active @endif
                                                     </span>
                                                 </td>
 
