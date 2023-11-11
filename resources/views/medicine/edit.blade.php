@@ -26,13 +26,13 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Medicine Name</label>
-                     <input type="text" class="form-control" required name="medicine_name"   value="{{$medicine->medicine_name}}" placeholder="Medicine Name">
+                     <input type="text" class="form-control" required name="medicine_name" maxlength="100"  value="{{$medicine->medicine_name}}" placeholder="Medicine Name">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Generic Name</label>
-                     <input type="text" class="form-control" required name="generic_name" value="{{$medicine->generic_name}}"  placeholder="Generic Name">
+                     <input type="text" class="form-control" required name="generic_name" maxlength="100" value="{{$medicine->generic_name}}"  placeholder="Generic Name">
                   </div>
                </div>
                <div class="col-md-6">
@@ -60,12 +60,12 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Hsn Code</label>
-                     <input type="text" class="form-control" name="Hsn_code" value="{{ $medicine->Hsn_code}}" placeholder="Hsn Code">
+                     <input type="text" class="form-control" name="Hsn_code" maxlength="8" value="{{ $medicine->Hsn_code}}" placeholder="Hsn Code" oninput="validateNumericValue(this);">
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
-                     <label for="tax_id">Tax</label>
+                     <label class="form-label">Tax</label>
                      <select class="form-control" name="tax_id" id="tax_id">
                         <option value="">Choose Tax</option>
                         @foreach($taxes as $id => $tax)
@@ -88,7 +88,7 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Unit Price</label>
-                     <input type="text" class="form-control" required name="unit_price" value="{{$medicine->unit_price}}" placeholder="Unit Price">
+                     <input type="text" class="form-control" required name="unit_price" maxlength="14" value="{{$medicine->unit_price}}" placeholder="Unit Price" oninput="validateNumericValue(this);">
                   </div>
                </div>
                <div class="col-md-6">
@@ -99,11 +99,11 @@
                </div>
                <div class="col-md-6">
                   <div class="form-group">
-                      <label for="tax_id">Unit*</label>
+                      <label  class="form-label">Unit*</label>
                       <select class="form-control" name="unit_id" id="unit_id">
                           <option value="">Choose Unit</option>
                           @foreach($units as $unit_id => $unit)
-                              <option value="{{ $unit_id }}"{{ old('unit_id') == $unit_id ? 'selected' : '' }}>{{ $unit }}</option>
+                          <option value="{{ $unit_id }}"{{ $unit_id == $medicine->unit_id ? 'selected' : '' }}>{{ $unit }}</option>
                           @endforeach
                       </select>
                   </div>
@@ -111,7 +111,8 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Reorder Limit</label>
-                     <input type="text" class="form-control"  name="reorder_limit" value="{{$medicine->reorder_limit}}" placeholder="Reorder Limit">
+                     <input type="text" class="form-control"  name="reorder_limit" value="{{$medicine->reorder_limit}}"  maxlength="14" placeholder="Reorder Limit" 
+                     oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
                   </div>
                </div>
                <div class="col-md-12">
@@ -156,6 +157,11 @@
            $("#statusText").text('Inactive');
            $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
        }
+   }
+</script>
+<script>
+   function validateNumericValue(input) {
+       input.value = input.value.replace(/[^0-9.]/g, '');
    }
 </script>
 @endsection

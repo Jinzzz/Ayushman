@@ -32,7 +32,7 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Branch Name</label>
-                     <input type="text" class="form-control" required name="branch_name" value="{{ $branch->branch_name }}" placeholder="Branch Name">
+                     <input type="text" class="form-control" required name="branch_name" maxlength="100" value="{{ $branch->branch_name }}"  placeholder="Branch Name">
                   </div>
                </div>
                <div class="col-md-6">
@@ -52,14 +52,14 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Branch Email</label>
-                     <input type="email" class="form-control"  id="contact_email" name="branch_email" value="{{ $branch->branch_email }}" placeholder="Branch Email">
+                     <input type="email" class="form-control"  id="contact_email" name="branch_email" maxlength="100" value="{{ $branch->branch_email }}" placeholder="Branch Email">
                      <div class="text-danger" id="email-error"></div>
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Branch Admin Name</label>
-                     <input type="text" class="form-control"  name="branch_admin_name" value="{{ $branch->branch_admin_name }}" placeholder="Branch Admin Name">
+                     <input type="text" class="form-control"  name="branch_admin_name" maxlength="100" value="{{ $branch->branch_admin_name }}" placeholder="Branch Admin Name">
                   </div>
                </div>
                <div class="col-md-6">
@@ -72,14 +72,14 @@
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Latitude*</label>
-                     <input type="text" class="form-control" required name="latitude" value="{{ $branch->latitude }}" placeholder="Latitude" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
+                     <input type="text" class="form-control" required name="latitude" value="{{ $branch->latitude }}" placeholder="Latitude" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
                      pattern="[0-9]+(\.[0-9]+)?" >
                   </div>
                </div>
                <div class="col-md-6">
                   <div class="form-group">
                      <label class="form-label">Longitude*</label>
-                     <input type="text" class="form-control" required name="longitude" value="{{ $branch->longitude }}" placeholder="Longitude" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
+                     <input type="text" class="form-control" required name="longitude" value="{{ $branch->longitude }}" placeholder="Longitude" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
                      pattern="[0-9]+(\.[0-9]+)?" >
                   </div>
                </div>

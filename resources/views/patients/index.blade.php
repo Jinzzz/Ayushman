@@ -86,60 +86,39 @@
                                                 </td>
                                     
                      <td>
-                        <form action="{{ route('patients.toggleOTPVerification', $patient->id) }}" method="POST">
-                           @csrf
-                           @method('PATCH')
-                           <button type="submit"
-                              onclick="return confirm('Do you want to change otp verification status?');"
-                              class="btn btn-sm  btn-outline-success @if($patient->is_otp_verified == 0) btn-outline-danger @else btn-outline-success @endif">
+                        <button type="button" onclick="changeVerification({{ $patient->id}})" class="btn btn-sm @if($patient->is_otp_verified == 0) btn-danger @else btn-success @endif">
                            @if($patient->is_otp_verified == 0)
-                           Not Verified
+                           NotVerified
                            @else
                            Verified
                            @endif
-                           </button>
-                        </form>
+                       </button>
                      </td>
                      <td>
-                        <form action="{{ route('patients.changeStatus', $patient->id) }}" method="POST">
-                           @csrf
-                           @method('PATCH')
-                           <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($patient->is_active == 0) btn-danger @else btn-success @endif">
-                              @if($patient->is_active == 0)
-                              InActive
-                              @else
-                              Active
-                              @endif
-                           </button>
-                        </form>
+                        <button type="button" onclick="changeStatus({{ $patient->id}})" class="btn btn-sm @if($patient->is_active == 0) btn-danger @else btn-success @endif">
+                           @if($patient->is_active == 0)
+                           InActive
+                           @else
+                           Active
+                           @endif
+                       </button>
                      </td>
                      <td>
-                        <a class="btn btn-primary" href="{{ route('patients.edit', $patient->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                        <a class="btn btn-secondary" href="{{ route('patients.show', $patient->id) }}">
-                           <i class="fa fa-eye" aria-hidden="true"></i> View </a>
-                        <form style="display: inline-block" action="{{ route('patients.destroy', $patient->id) }}" method="post">
-                           @csrf
-                           @method('delete')
-                           <button type="submit" onclick="return confirm('Do you want to delete it?');" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-=======
+                        
+
                         <a class="btn btn-primary btn-sm edit-custom"
                            href="{{ route('patients.edit', $patient->id) }}"><i
                            class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                         <a class="btn btn-secondary btn-sm" href="{{ route('patients.show', $patient->id) }}">
-                        <i class="fa fa-eye" aria-hidden="true"></i> View    </a>
+                        <i class="fa fa-eye" aria-hidden="true"></i> View  </a>
                         <form style="display: inline-block"
                            action="{{ route('patients.destroy', $patient->id) }}" method="post">
                            @csrf
                            @method('delete')
-<<<<<<< HEAD
                            <button type="button" onclick="deleteData({{ $patient->id }})"class="btn-danger btn-sm">
                               <i class="fa fa-trash" aria-hidden="true"></i> Delete
                           </button>
-=======
-                           <button type="submit"  onclick="return confirm('Do you want to delete it?');"class="btn-danger btn-sm"><i class="fa fa-trash"
-                              aria-hidden="true"></i>Delete</button>
->>>>>>> b1d728f6546d129fd9a94b3ccdf41babb1291503
->>>>>>> ce91f8e63764c0f5d1fb8ed2d5ade76eca5f9e25
+
                         </form>
                      </td>
                   </tr>
@@ -194,4 +173,91 @@
                }
            });
    }
+   function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('patients.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(8)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the patient status.');
+                        },
+                    });
+                }
+            });
+    }
+
+
+
+    function changeVerification(dataId) {
+        swal({
+                title: "Change Verification?",
+                text: "Are you sure you want to change otp verification status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('patients.toggleOTPVerification', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(7)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeVerification(' + dataId + ')" class="btn btn-sm btn-danger">NotVerified</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeVerification(' + dataId + ')" class="btn btn-sm btn-success">Verified</button>');
+                                }
+
+                                flashMessage('s', 'Otp verification changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the patient status.');
+                        },
+                    });
+                }
+            });
+    }
    </script>

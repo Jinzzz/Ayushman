@@ -14,6 +14,7 @@ class MstMedicineController extends Controller
     public function index(Request $request)
     {
         $pageTitle = "Medicines";
+        $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
         $query = Mst_Medicine::query();
 
         if($request->has('medicine_name')){
@@ -23,11 +24,10 @@ class MstMedicineController extends Controller
         if($request->has('generic_name')){
             $query->where('generic_name','LIKE',"%{$request->generic_name}%");
         }
-        if ($request->filled('medicine_type')) {
-            $query->whereHas('medicineType', function ($q) use ($request) {
-                $q->where('master_value', 'like', '%' . $request->input('medicine_type') . '%');
-            });
+        if($request->has('medicine_type')){
+            $query->where('medicine_type','LIKE',"%{$request->medicine_type}%");
         }
+        
         // if ($request->filled('branch')) {
         //     $query->whereHas('branch', function ($q) use ($request) {
         //         $q->where('branch_name', 'like', '%' . $request->input('branch') . '%');
@@ -42,7 +42,7 @@ class MstMedicineController extends Controller
         //     });
         // }
         $medicines = $query->orderBy('updated_at', 'desc')->get();
-        return view('medicine.index', compact('pageTitle', 'medicines'));
+        return view('medicine.index', compact('pageTitle', 'medicines','medicineType'));
     }
 
     public function create()
@@ -84,14 +84,12 @@ class MstMedicineController extends Controller
          $medicines->medicine_type = $request->input('medicine_type');
          $medicines->Hsn_code = $request->input('Hsn_code');
          $medicines->tax_id = $request->input('tax_id');
-         //$medicines->dosage_form = $request->input('dosage_form');
          $medicines->manufacturer = $request->input('manufacturer');
          $medicines->unit_price = $request->input('unit_price');
          $medicines->description = $request->input('description');
          $medicines->unit_id = $request->input('unit_id');
          $medicines->is_active =  $is_active ;
          $medicines->reorder_limit = $request->input('reorder_limit');
-       //  $medicines->branch_id = $request->input('branch_id');
          $medicines->created_by = auth()->id();
          $medicines->save();
        
@@ -166,6 +164,7 @@ class MstMedicineController extends Controller
     {
         $medicine = Mst_Medicine::findOrFail($id);
         $medicine->delete();
+        return 1;
 
         return redirect()->route('medicine.index')->with('success','Medicine deleted successfully');
     }
@@ -176,7 +175,7 @@ class MstMedicineController extends Controller
     
         $medicine->is_active = !$medicine->is_active;
         $medicine->save();
-    
+        return 1;
         return redirect()->back()->with('success','Status changed successfully');
     }
 

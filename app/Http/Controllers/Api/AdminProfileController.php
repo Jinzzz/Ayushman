@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mst_User;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class AdminProfileController extends Controller
         $data=array();
         try
         {
-            $admin=User::find(Auth::id())->first();
+            $admin=Mst_User::find(Auth::id())->first();
             $data['status']=1;
             $data['data']=$admin;
             $data['message']="User Data Fetched";
@@ -57,13 +58,13 @@ class AdminProfileController extends Controller
 
                 if (!$validator->fails()) {
 
-                    $user = User::find(Auth::id());
+                    $user = Mst_User::find(Auth::id());
 
                     if (Hash::check($request->old_password, $user->password)) {
                         $data20 = [
                             'password'      => Hash::make($request->password),
                         ];
-                        User::where('id',Auth::id())->update($data20);
+                        Mst_User::where('user_id',Auth::id())->update($data20);
 
                        
                         $data['status'] = 1;
@@ -137,6 +138,7 @@ class AdminProfileController extends Controller
             $user->update();
             $data['status']=1;
             $data['user']=$user;
+            $data['image_path']='assets/uploads/admin_profile/images';
             $data['message'] = "Profile updated successfully.";
             return response($data);
 

@@ -42,7 +42,7 @@ return [
         ],
         'api' => [
             'driver' => 'passport', //update this line
-            'provider' => 'users',
+            'provider' => 'mst_users',
             'hash' => false,
         ],
     ],

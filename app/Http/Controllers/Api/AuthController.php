@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mst_User;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,14 +19,14 @@ class AuthController extends Controller
         $data=array();
         try
         {
-            $email = $request->input('email_address');
+            $username = $request->input('username');
             $passChk = $request->input('password');
             $vaildate_array= [
-                'email_address' => 'required|email',
+                'username' => 'required',
                 'password' => 'required',
             ];
             $vaildate_rules= [
-                'email_address.required' => "Email is required",
+                'username.required' => "Username is required",
                 'password.required' => "Password is required",
             ];
             $validator = Validator::make(
@@ -36,7 +37,7 @@ class AuthController extends Controller
             // dd($validator);
             if (!$validator->fails()) 
             {
-                $user=User::where('email',$email)->first();
+                $user=Mst_User::with(['staff','userType'])->where('username',$username)->first();
                 if(!$user)
                 {
                     $data['status'] = 0;
@@ -46,14 +47,14 @@ class AuthController extends Controller
                 }
                 if (Hash::check($passChk, $user->password)) 
                 {
-                    $check_array=['email' => request('email_address'), 'password' => request('password')];
+                    $check_array=['username' => request('username'), 'password' => request('password')];
                     if (Auth::attempt($check_array)) 
                     {
                         $data['token'] =  $user->createToken('authToken')->accessToken;
                         $data['status'] = 1;
                         $data['message'] = "Login Success";
-                        $data['name']=$user->name;
-                        $data['email_address']=$user->email;
+                        $data['userDetals']=$user;
+                       
                         return response($data);
 
                     }

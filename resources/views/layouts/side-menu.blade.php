@@ -35,7 +35,7 @@
       <a class="side-menu__item" data-toggle="slide" href="#"><i class="side-menu__icon ti-panel"></i><span class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
       <ul class="slide-menu">
         <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
-        <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li>
+        {{-- <li><a class="slide-item" href="{{ url('/qualifications') }}">{{ __('Qualifications') }}</a></li> --}}
         <li><a class="slide-item" href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
         <!-- <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li> -->
         <li><a class="slide-item" href="{{ route('manufacturer.index') }}">{{ __('Manufacturers') }}</a></li>
@@ -52,6 +52,7 @@
         <li><a class="slide-item" href="{{ route('supplier.index')}}">{{ __('Suppliers') }}</a></li>
         <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
         <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/user/index')}}">{{ __('Users') }}</a></li>
     </li>
     </ul>
 

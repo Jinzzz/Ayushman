@@ -50,11 +50,13 @@
                               <a href="{{ URL::previous() }}" class="btn btn-secondary">Back</a>
                            </div>
                         </div>
-                        <div class="card-body">
-                           <div class="col-md-12">
+                        
+                     <div class="card-body">
+                        <div class="row" style="align-items: flex-end;">
+                           <div class="col-md-6">
                               <div class="form-group">
                                  <label for="branch_id" class="form-label">Membership</label>
-                                 <select id="membership"  class="form-control" name="membership" onchange="loadWellness()">
+                                 <select id="membership"  class="form-control" name="membership" >
                                     <option value="">Choose Membership</option>
                                     @foreach($memberships as $membershipId => $packageTitle)
                                     <option value="{{ $membershipId }}">
@@ -64,6 +66,14 @@
                                  </select>
                               </div>
                            </div>
+                           <div class="col-md-6">
+                              <button type="button" class="btn btn-primary" style="margin-bottom: 1rem;" id="viewDetails" onclick="loadWellness()">View Details</button>
+                              {{-- <div id="wellness-details" class="row"></div>
+                              <div id="packageDetails"></div> --}}
+                           </div>
+                           <div id="wellness-details" class="row col-md-12"></div>
+                           <div id="packageDetails" class="mb-5" style="padding: 0 15px;"></div>
+                        </div>
                            <div class="row">
                               <div class="col-md-6">
                                  <div class="form-group">
@@ -71,18 +81,9 @@
                                     <input type="date" class="form-control" required name="start_date" placeholder="Start Date">
                                  </div>
                               </div>
-                              <div class="col-md-6">
-                                 <div class="form-group">
-                                    <label for="payment-type" class="form-label">Payment Type</label>
-                                    <select class="form-control" required name="payment_type" placeholder="Payment Type">
-                                       <option value="">Choose Payment Type</option>
-                                       <option value="1">Cash</option>
-                                       <option value="2">Liquid</option>
-                                    </select>
-                                 </div>
-                              </div>
+                             
                            </div>
-                           <div id="packageDetails">
+                           <div id="packageDetails1">
                               {{-- 
                               <h2 class="package-title"></h2>
                               <ul class="package-info">
@@ -98,12 +99,29 @@
                               </ul>
                               <p class="package-description"></p>
                            </div>
+                     <div class="row">
+                        <div class="col-md-6">
+                           <div class="form-group">
+                              <label for="payment-type" class="form-label">Payment Type</label>
+                              <select class="form-control" required name="payment_type" placeholder="Payment Type">
+                                 <option value="">Choose Payment Type</option>
+                                 @foreach($paymentType as $id => $value)
+                                 <option value="{{ $id }}">{{ $value }}</option>
+                                 @endforeach
+                              </select>
+                           </div>
                         </div>
                      </div>
                   </div>
-                  <button type="submit" class="btn btn-raised btn-primary">
-                  <i class="fa fa-check-square-o"></i> Add Membership
+               </div>
+               <div class="row col-md-12">
+               <div class="col-md-3">
+                  <button type="submit" class="btn btn-raised btn-primary" style="margin: 0 24px;">
+                  <i class="fa fa-check-square-o" ></i> Add Membership
                   </button>
+               </div>
+               
+               </div>
                </div>
             </div>
             <div class="border-top">
@@ -111,8 +129,8 @@
                   <div class="tab-menu-heading">
                      <div class="tabs-menu1">
                         <ul class="nav">
-                           <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Included wellnesses</a></li>
-                           <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li>
+                           <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Membership History</a></li>
+                           {{-- <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li> --}}
                         </ul>
                      </div>
                   </div>
@@ -121,41 +139,47 @@
          </div>
          <div class="card">
             <div class="card-body">
-               <div class="border-0">
-                  <div class="tab-content">
-                     <div class="tab-pane active show" id="tab-51">
-                        <div id="profile-log-switch">
-                           <div class="media-heading">
-                              <h5><strong>Included wellnesses and their details</strong></h5>
-                           </div>
-                           <div class="container">
-                              <div id="wellness-details" class="row">
-                                 {{-- @foreach($wellnessDetails as $wellness)
-                                 <div class="col-lg-6 mb-3">
-                                    <div class="card">
-                                       <div class="card-body">
-                                          <h4 class="card-title">{{ $wellness->wellness_name }}</h4>
-                                          <p class="card-text">
-                                             <strong>Duration:</strong> {{ $wellness->wellness_duration }}<br>
-                                             <strong>Maximum Usage Limit:</strong> {{ $wellness->maximum_usage_limit }}<br>
-                                             <strong>Wellness Inclusions:</strong> {{ $wellness->wellness_inclusions }}<br>
-                                             <!-- <strong>Wellness staus:</strong> {{ isset($wellness->is_active) && $wellness->is_active == 1 ? 'Active' : 'Inactive' }} -->
-                                          </p>
-                                       </div>
+                <div class="border-0">
+                    <div class="tab-content">
+                        <div class="tab-pane active show" id="tab-51">
+                            <div id="profile-log-switch">
+                              
+                                <div class="container">
+                                    <div id="patient-membership-history" class="row">
+                                        @foreach($patientMemberships as $membership)
+                                            <div class="col-lg-6 mb-3">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">Patient Membership History</h4>
+                                                        <p class="card-text">
+                                                            <strong>Membership Package: </strong>{{ $membership->membershipPackage->package_title }}<br>
+                                                            <strong>Start Date: </strong> {{ $membership->start_date }}<br>
+                                                            <strong>Payment Type: </strong> {{ $membership->payment_type == 1 ? 'Cash' : 'Liquid'}}<br>
+                                                            <strong>Payment Amount: </strong> {{ $membership->payment_amount }}<br>
+                                                            <strong>Expiry Date: </strong> {{ $membership->membership_expiry_date }}<br>
+                                                            <strong>Status: </strong>
+                                                            {{ $membership->is_active == 0 ? 'Inactive' : 'Active' }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                 </div>
-                                 @endforeach --}}
-                              </div>
-                           </div>
+                                </div>
+                            </div>
                         </div>
-                     </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
                      <div class="tab-pane" id="tab-61">
                         <div id="profile-log-switch">
                            <div class="media-heading">
                               <div class="container">
-                                 <div class="row" >
+                                 <div class="row">
                                     <div class="col-lg-6 mb-3" id="benefitDiv">
-                                       {{-- {!! $benefits->title !!} --}}
+                                       
                                     </div>
                                  </div>
                               </div>
@@ -163,12 +187,12 @@
                         </div>
                      </div>
                      <div class="tab-pane" id="tab-71">
-                        <div class="row">
+                        {{-- <div class="row">
                            <div class="col-lg-3 col-md-6">
                               <img class="img-fluid rounded mb-5" src="./assets/images/media/8.jpg " alt="banner image">
                            </div>
                            <!-- Other tab content goes here -->
-                        </div>
+                        </div> --}}
                      </div>
                      <!-- Add more tab content as needed -->
                   </div>
@@ -208,8 +232,8 @@
    			   response.wellnessDetails.forEach(element => {
    				//alert(element.wellness_name);
    				const divEl = `
-   				<div class="col-lg-6 mb-3">
-                                                   <div class="card">
+   				<div class="col-lg-3 mb-3">
+                                                   <div class="card mb-0">
                                                        <div class="card-body">
                                                            <h4 class="card-title">${ element.wellness_name }</h4>
                                                            <p class="card-text">
@@ -261,10 +285,11 @@
    }
    
    // Attach an event listener to the #membership dropdown
-   $("#membership").change(function() {
-       // Call the loadWellness function when the dropdown value changes
-       loadWellness();
-   });
+   // $("#viewDetails").click(function() {
+   //     // Call the loadWellness function when the dropdown value changes
+   //     alert("tes");
+   //     loadWellness();
+   // });
    
    // Trigger the loadWellness function on page load (if needed)
    $(document).ready(function() {

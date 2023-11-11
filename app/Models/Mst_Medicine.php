@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Mst_Medicine extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_medicines';
 
 
@@ -25,8 +26,7 @@ class Mst_Medicine extends Model
         'is_active',
         'reorder_limit',
         'created_by',
-        'updated_by',
-        'deleted_by',
+        'deleted_at',
     ];
 
     

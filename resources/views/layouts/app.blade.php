@@ -56,10 +56,19 @@
     <script src="https://cdn.ckeditor.com/4.16.2/standard/adapters/jquery.js"></script>
 
     <!-- multiple select dropdown -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/multipleselect/multiple-select.css')}}" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/select2/select2.min.css')}}" rel="stylesheet"/>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    
+
+
+   
+    {{-- <link href="{{asset('assets/plugins/select2/select2.full.min.js')}}" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/select2/select2.min.css')}}" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/multipleselect/multi-select.js')}}" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/multipleselect/multiple-select.css')}}" rel="stylesheet" />
+    <link href="{{asset('assets/plugins/multipleselect/multiple-select.js')}}" rel="stylesheet" /> --}}
     @yield('css')
    
 </head>
@@ -176,6 +185,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     {{--@include('admin.common.message')--}}
+    <script src="{{asset('assets/plugins/multipleselect/multiple-select.js')}}"></script>
+    <script src="{{asset('assets/plugins/multipleselect/multi-select.js')}}"></script>
+
 
     <script>
         $(document).on("click", 'a.frmsubmit', function(e) {

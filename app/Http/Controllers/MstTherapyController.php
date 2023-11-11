@@ -76,6 +76,8 @@ class MstTherapyController extends Controller
         $therapy = Mst_Therapy::findOrFail($id);
         $therapy->delete();
 
+        return 1;
+
         return redirect()->route('therapy.index')->with('success','Therapy deleted successfully'); 
 
     }
@@ -86,6 +88,7 @@ class MstTherapyController extends Controller
 
         $therapy->is_active = !$therapy->is_active;
         $therapy->save();
+        return 1;
 
         return redirect()->back()->with('success','Status changed successfully'); 
     }

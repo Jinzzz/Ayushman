@@ -9,15 +9,24 @@
     </div>
     <form action="{{ route('wellness.index') }}" method="GET">
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label for="wellness-name">Wellness Name:</label>
+            <div class="row mb-6">
+                <div class="col-md-6">
+                    <label class="form-label">Wellness Name: </label>
                     <input type="text" id="wellness-name" name="wellness_name" class="form-control" value="{{ request('wellness_name') }}">
                 </div>
               
-                <div class="col-md-3">
-                    <label for="branch">Branch:</label>
-                    <input type="text" id="branch" name="branch_id" class="form-control" value="{{ request('branch_id') }}">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Branch: </label>
+                        <select class="form-control" name="branch_id" id="branch_id">
+                            <option value="">Choose Branch</option>
+                            @foreach($branches as $id => $name)
+                                <option value="{{ $id }}"{{ request('branch_id') == $id ? 'selected' : '' }}>
+                                    {{ $name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             
             <div class="col-md-3 d-flex align-items-end">
@@ -64,7 +73,6 @@
                                 <tr>
                                     <th class="wd-15p">SL.NO</th>
                                     <th class="wd-15p">Wellness Name</th>
-                                    <th class="wd-15p">Branch</th>
                                     <th class="wd-15p">Wellness Cost</th>
                                     <th class="wd-20p">Status</th>
                                     <th class="wd-15p">Action</th>
@@ -77,25 +85,18 @@
                                 @foreach($wellness as $wellnes)
                                 <tr id="dataRow_{{$wellnes->wellness_id }}">
                                     <td>{{ ++$i }}</td>
-                                    <td>{{ $wellnes->wellness_name }}</td>
-                                    <td>{{ $wellnes->branch->branch_name ??''}}</td>
+                                    <td>{{ $wellnes->wellness_name }}</td>      
                                     <td>{{ $wellnes->wellness_cost }}</td>
                                  
 
                                     <td>
-                                         <form action="{{ route('wellness.changeStatus', $wellnes->wellness_id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                            <button type="submit"
-                                                onclick="return confirm('Do you want to Change status?');"
-                                                class="btn btn-sm @if($wellnes->is_active == 0) btn-danger @else btn-success @endif">
-                                                @if($wellnes->is_active == 0)
-                                                InActive
-                                                @else
-                                                Active
-                                                @endif
-                                            </button>
-                                        </form>
+                                        <button type="button" onclick="changeStatus({{$wellnes->wellness_id }})" class="btn btn-sm @if($wellnes->is_active == 0) btn-danger @else btn-success @endif">
+                                            @if($wellnes->is_active == 0)
+                                            InActive
+                                            @else
+                                            Active
+                                            @endif
+                                        </button>
                                     </td>
                                     <td>
                                         <a class="btn btn-primary btn-sm edit-custom"
@@ -162,6 +163,49 @@
                     });
                 } else {
                     return;
+                }
+            });
+    }
+      // Change status 
+      function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('wellness.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(3)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the therapy status.');
+                        },
+                    });
                 }
             });
     }
