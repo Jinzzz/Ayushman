@@ -61,7 +61,7 @@ class MstTherapyRoomController extends Controller
                 $therapyroom->room_type = 1;
                 $therapyroom->room_capacity = 1;
                 $therapyroom->is_active = $is_active;
-                $therapyroom->created_by = auth()->id();
+                $therapyroom->created_by = 1;
                 $therapyroom->save();
 
                 return redirect()->route('therapyrooms.index')->with('success', 'Therapy room added successfully');

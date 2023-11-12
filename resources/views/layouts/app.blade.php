@@ -14,7 +14,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/ayushman-logo.jpeg')}}" />
 
     <!-- TITLE -->
-    <title>Ayushman Ayurveda - </title>
+    <title> Ayushman Ayurveda </title>
      <!-- DATA TABLE CSS --> 
 		<link href="{{('assets/plugins/datatable/dataTables.bootstrap4.min.css" rel="stylesheet')}}"/>
     <!-- BOOTSTRAP CSS -->

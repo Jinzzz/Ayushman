@@ -110,7 +110,7 @@ class MstStaffController extends Controller
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
-            'created_by' => auth()->id(),
+            'created_by' => 1,
 
          ]);
         
@@ -198,7 +198,7 @@ class MstStaffController extends Controller
         }
     
         if ($existing != $updating) {
-            $createdBy = auth()->id();
+            $createdBy = 1;
             $transfer =  Mst_Staff_Transfer_Log::create([
                 'staff_id' => $staff_id,
                 'branch_id_from' => $existing,
@@ -214,7 +214,7 @@ class MstStaffController extends Controller
                 'commission_type' => $request->staff_commission_type,
                 'staff_commission' => $updatedCommission,
                 'commission_change_date' => Carbon::now(),
-                'created_by' => auth()->id(),
+                'created_by' => 1,
             ]);
         }
 
@@ -224,7 +224,7 @@ class MstStaffController extends Controller
                 'old_salary' => $existingSalary,
                 'new_salary' => $request->salary_amount,
                 'updated_date' => carbon::now(),
-                'created_by' => auth()->id(),
+                'created_by' => 1,
 
             ]);
         }

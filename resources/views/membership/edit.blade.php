@@ -31,7 +31,7 @@
                 <div class="card-header">
                     <h3 class="mb-0 card-title">Edit Membership Packages</h3>
                 </div>
-                <div class="col-lg-12">
+                <div class="col-lg-12" style="background-color:#fff">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between mb-3">
@@ -43,7 +43,7 @@
                     </div>
 
                     <!-- Tab 1: Basic Details -->
-                    <div id="basic-details-content">
+                    <div id="basic-details-content" >
                         <div class="row">
                             <form action="{{ route('membership.update',['id'=>request()->route('id')]) }}" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="update_type" value="1">
@@ -79,13 +79,12 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-11">
+                                        <div class="col-md-12">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Description</label>
                                                 <textarea class="form-control ckeditor" name="membership_package_description" placeholder="Membership Package Description">{{ isset($membership->package_description) ? $membership->package_description : old('package_description') }}</textarea>
                                             </div>
                                         </div>
-
                                         <div class="col-md-1">
                                             <div class="form-group">
                                                 <div class="form-label">Status</div>

@@ -54,7 +54,7 @@ class MstQualificationController extends Controller
                     Mst_Qualification::where('qualification_id', $request->hidden_id)->update([
                         'name' => $request->qualification,
                         'is_active' => $request->is_active,
-                        'updated_by' => Auth::id(),
+                        'updated_by' => 1,
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Qualifications updated successfully';
@@ -66,8 +66,8 @@ class MstQualificationController extends Controller
                         Mst_Qualification::create([
                             'name' => $request->qualification,
                             'is_active' => $request->is_active,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -89,7 +89,7 @@ class MstQualificationController extends Controller
     {
         try {
             $qualification = Mst_Qualification::findOrFail($id);
-            $qualification->deleted_by = Auth::id();
+            $qualification->deleted_by = 1;
             $qualification->save();
             $qualification->delete();
             return 1;

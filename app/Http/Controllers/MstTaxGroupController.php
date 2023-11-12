@@ -18,10 +18,10 @@ class MstTaxGroupController extends Controller
         try {
             $pageTitle = "Tax Groups";
             $taxes = [];
-            $tax_groups = Mst_Tax_Group::get();
+            $tax_groups = Mst_Tax_Group::orderBy('created_at', 'desc')->get();
             foreach ($tax_groups as $tax) {
-                $included_tax_ids = Mst_Tax_Group_Included_Taxes::where('tax_group_id', $tax->id)->pluck('included_tax')->toArray();
-                $rate = Mst_Tax::whereIn('id', $included_tax_ids)->pluck('tax_rate')->toArray();
+                $included_tax_ids = Mst_Tax_Group_Included_Taxes::where('tax_group_id', $tax->id)->orderBy('created_at', 'desc')->pluck('included_tax')->toArray();
+                $rate = Mst_Tax::whereIn('id', $included_tax_ids)->orderBy('created_at', 'desc')->pluck('tax_rate')->toArray();
                 $rateSum = array_sum($rate);
                 $taxes[] = [
                     'id' => $tax->id,
@@ -59,8 +59,8 @@ class MstTaxGroupController extends Controller
                 $lastInsertedId = Mst_Tax_Group::insertGetId([
                     'tax_group_name' => $request->tax_group_name,
                     'is_active' => 1,
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
+                    'created_by' => 1,
+                    'updated_by' => 1,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -77,8 +77,8 @@ class MstTaxGroupController extends Controller
                             'tax_group_id' => $lastInsertedId,
                             'included_tax' => $request->included_tax[$i],
                             'is_active' => 1,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -120,7 +120,7 @@ class MstTaxGroupController extends Controller
                 Mst_Tax_Group::where('id', $id)->update([
                     'tax_group_name' => $request->tax_group_name,
                     'is_active' => 1,
-                    'updated_by' => Auth::id(),
+                    'updated_by' => 1,
                     'updated_at' => Carbon::now(),
                 ]);
             } else {
@@ -138,8 +138,8 @@ class MstTaxGroupController extends Controller
                         'tax_group_id' => $id,
                         'included_tax' => $request->included_tax[$i],
                         'is_active' => 1,
-                        'created_by' => Auth::id(),
-                        'updated_by' => Auth::id(),
+                        'created_by' => 1,
+                        'updated_by' => 1,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);

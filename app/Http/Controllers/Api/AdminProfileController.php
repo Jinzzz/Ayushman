@@ -17,7 +17,7 @@ class AdminProfileController extends Controller
         $data=array();
         try
         {
-            $admin=Mst_User::find(Auth::id())->first();
+            $admin=Mst_User::find(1)->first();
             $data['status']=1;
             $data['data']=$admin;
             $data['message']="User Data Fetched";
@@ -58,13 +58,13 @@ class AdminProfileController extends Controller
 
                 if (!$validator->fails()) {
 
-                    $user = Mst_User::find(Auth::id());
+                    $user = Mst_User::find(1);
 
                     if (Hash::check($request->old_password, $user->password)) {
                         $data20 = [
                             'password'      => Hash::make($request->password),
                         ];
-                        Mst_User::where('user_id',Auth::id())->update($data20);
+                        Mst_User::where('user_id',1)->update($data20);
 
                        
                         $data['status'] = 1;
@@ -121,7 +121,7 @@ class AdminProfileController extends Controller
             return isset($request->profile_image);
         });
         if (!$validator->fails()) {
-            $user=User::find(Auth::id());
+            $user=User::find(1);
             $user->email=$request->email;
             $user->date_of_birth=$request->date_of_birth;
             $user->blood_group=$request->blood_group_id;

@@ -102,7 +102,7 @@
                             }
                         },
                         error: function() {
-                            alert('An error occurred while deleting the qualification.');
+                            alert('An error occurred while deleting the sub-group.');
                         },
                     });
                 } else {
@@ -147,7 +147,7 @@
                             }
                         },
                         error: function() {
-                            alert('An error occurred while changing the qualification status.');
+                            alert('An error occurred while changing the sub-group status.');
                         },
                     });
                 }

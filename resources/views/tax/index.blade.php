@@ -36,7 +36,7 @@
                         <tr>
                             <th class="wd-15p">SL.NO</th>
                             <th class="wd-15p"> Name</th>
-                            <th class="wd-15p">  Rate(%)</th>
+                            <th class="wd-15p"> Rate(%)</th>
                             <th class="wd-15p"> Type</th>
                             <th class="wd-15p">Status</th>
                             <th class="wd-15p">Action</th>

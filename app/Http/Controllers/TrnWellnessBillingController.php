@@ -35,7 +35,7 @@ class TrnWellnessBillingController extends Controller
 
    
 
-    $createdBy = Auth::id();
+    $createdBy = 1;
 
     $lastInsertedId = Trn_Wellness_Booking_Invoice::insertGetId([
         'booking_id' => $request->booking_id,
