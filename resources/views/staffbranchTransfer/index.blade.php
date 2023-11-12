@@ -116,13 +116,19 @@
                 $("#employee_list").empty();
                 // Append the fetched employees to the list
                 $.each(data, function(index, employee) {
-                    console.log(employee);
-                    var checkbox = $('<input type="checkbox" name="coming_staff_id[]" onclick="valEmployee.call(this)" class="chck_btn get-staff-val" style="display:inline;">')
-                        .data('staff_id', employee.staff_id);
-                    var label = $('<label class="ng-binding" style="display:inline;">').text(employee.staff_name);
-                    var row = $('<tr>').append($('<td>').append(checkbox, label));
-                    $("#employee_list").append(row);
-                });
+    console.log(employee);
+    
+    var checkbox = $('<input type="checkbox" name="coming_staff_id[]" onclick="valEmployee.call(this)" class="chck_btn get-staff-val" style="display:inline;">')
+        .data('staff_id', employee.staff_id);
+    
+    var label = $('<label class="ng-binding" style="display:inline;">').text(employee.staff_name);
+    
+    // Add a non-breaking space (&nbsp;) between checkbox and label
+    var row = $('<tr>').append($('<td>').append(checkbox, '&nbsp;&nbsp;', label));
+    
+    $("#employee_list").append(row);
+});
+
             },
             error: function(xhr, textStatus, errorThrown) {
                 console.log(xhr.responseText);
@@ -155,7 +161,7 @@
             var label = $('<label class="ng-binding" style="display:inline;">').text(employee.label);
             var hiddenInput = $('<input type="hidden" name="transfered_staff_id[]">').val(employee.id);
 
-            var row = $('<tr>').append($('<td>').append(checkbox, label, hiddenInput));
+            var row = $('<tr>').append($('<td>').append(checkbox,'&nbsp;&nbsp;', label, hiddenInput));
             $("#transferred_employee_list").append(row);
         });
     }
@@ -179,7 +185,7 @@
                 .data('staff_id', employeeRow.find('input[type=checkbox]').data('staff_id')); // Retrieve staff_id from data attribute
             // var hiddenInput = $('<input type="hidden" name="transfered_staff_id">').val(employee.id);
             var label = $('<label class="ng-binding" style="display:inline;">').text(employeeRow.find('label').text());
-            var row = $('<tr>').append($('<td>').append(checkbox, label));
+            var row = $('<tr>').append($('<td>').append(checkbox,'&nbsp;&nbsp;', label));
             $("#employee_list").append(row);
             // Remove the selected employee row from the "Transferred Employees" container
             employeeRow.remove();

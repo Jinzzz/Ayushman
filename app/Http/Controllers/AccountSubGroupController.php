@@ -14,7 +14,7 @@ class AccountSubGroupController extends Controller
     {
         try {
             $pageTitle = "Account Sub Groups";
-            $account_sub_groups = Mst_Account_Sub_Head::get();
+            $account_sub_groups = Mst_Account_Sub_Head::orderBy('created_at', 'desc')->get();
             return view('account_sub_group.index', compact('pageTitle', 'account_sub_groups'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
