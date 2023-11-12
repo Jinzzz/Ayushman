@@ -29,6 +29,7 @@ class MstTaxController extends Controller
             $taxes  = Sys_Tax::where('is_active', 1)->get();
             $all_taxes = Mst_Tax::join('sys__taxes', 'mst_taxes.tax_type', 'sys__taxes.id')
                 ->select('sys__taxes.tax_name as tax', 'mst_taxes.id', 'mst_taxes.tax_name', 'mst_taxes.tax_rate', 'mst_taxes.is_active',)
+                ->orderBy('mst_taxes.created_at', 'desc')
                 ->get();
             return view('tax.create', compact('pageTitle', 'taxes','all_taxes'));
         } catch (QueryException $e) {
@@ -48,7 +49,7 @@ class MstTaxController extends Controller
             ]);
             $checkExists = Mst_Tax::where('tax_name', $request->tax_name)->first();
             if ($checkExists) {
-                return redirect()->route('tax.create')->with('exists', 'This tax name is already exists.');
+                return redirect()->route('tax.create')->with('error', 'This tax name is already exists.');
             } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $taxes = new Mst_Tax();
@@ -60,7 +61,7 @@ class MstTaxController extends Controller
                 $taxes->updated_by = 1;
                 $taxes->save();
 
-                return redirect()->route('tax.create')->with('success', 'Tax added successfully');
+                return redirect()->route('tax.create')->with('status', 'Tax added successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('tax.create')->with('error', 'Something went wrong');

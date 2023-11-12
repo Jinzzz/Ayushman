@@ -56,14 +56,15 @@
                   </div>
 
 
-
-                  <div class="form-group">
+                  <div class="col-md-12 mt-5">
+                     <div class="form-group">
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> Update
                         </button>
                         <a class="btn btn-danger" href="{{ route('tax.group.index') }}">Cancel</a>
                      </center>
+                     </div>
                   </div>
                </form>
 
