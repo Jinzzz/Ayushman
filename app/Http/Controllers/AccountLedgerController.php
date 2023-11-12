@@ -62,8 +62,8 @@ class AccountLedgerController extends Controller
                     'ledger_code' => 1,
                     'notes' => $request->input('ledger_notes'),
                     'is_active' => $is_active,
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
+                    'created_by' => 1,
+                    'updated_by' => 1,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -131,8 +131,8 @@ class AccountLedgerController extends Controller
                 $account_ledger->ledger_code = 1;
                 $account_ledger->notes = $request->input('ledger_notes');
                 $account_ledger->is_active = $is_active;
-                $account_ledger->created_by = auth()->id();
-                $account_ledger->updated_by = auth()->id();
+                $account_ledger->created_by = 1;
+                $account_ledger->updated_by = 1;
                 $account_ledger->created_at = Carbon::now();
                 $account_ledger->updated_at = Carbon::now();
                 $account_ledger->save();

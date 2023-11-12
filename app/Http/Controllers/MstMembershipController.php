@@ -67,8 +67,8 @@ class MstMembershipController extends Controller
                 'package_price'    => $request->membership_package_price,
                 'package_discount_price'    => $request->discount_price,
                 'is_active'       => $request->membership_package_active,
-                'created_by'    => Auth::id(),
-                'updated_by'          => Auth::id(),
+                'created_by'    => 1,
+                'updated_by'          => 1,
                 'created_at'         => Carbon::now(),
                 'updated_at'         => Carbon::now(),
             ]);
@@ -82,8 +82,8 @@ class MstMembershipController extends Controller
                         'wellness_id' => $request->wellness_id[$i],
                         'maximum_usage_limit' => $request->max_limit[$i],
                         'is_active' => 1,
-                        'created_by' => Auth::id(),
-                        'updated_by' => Auth::id(),
+                        'created_by' => 1,
+                        'updated_by' => 1,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
@@ -96,8 +96,8 @@ class MstMembershipController extends Controller
                     'package_id' => $lastInsertedId,
                     'title' => $request->benefits,
                     'is_active' => 1,
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
+                    'created_by' => 1,
+                    'updated_by' => 1,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -146,7 +146,7 @@ class MstMembershipController extends Controller
                             'package_price'      => $request->membership_package_price,
                             'package_discount_price' => $request->discount_price,
                             'is_active'          => $request->membership_package_active,
-                            'updated_by'         => Auth::id(),
+                            'updated_by'         => 1,
                             'updated_at' => Carbon::now(),
                         ]);
                     }
@@ -161,8 +161,8 @@ class MstMembershipController extends Controller
                             'wellness_id' => $request->wellness_id,
                             'maximum_usage_limit' => $request->max_usage_limit,
                             'is_active' => 1,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -201,8 +201,8 @@ class MstMembershipController extends Controller
                             $updateMembershipBenefits = Mst_Membership_Benefit::where('package_id', $id)->update([
                                 'title' => $mergedHtml,
                                 'is_active' => 1,
-                                'created_by' => Auth::id(),
-                                'updated_by' => Auth::id(),
+                                'created_by' => 1,
+                                'updated_by' => 1,
                                 'created_at' => Carbon::now(),
                                 'updated_at' => Carbon::now(),
                             ]);
@@ -217,8 +217,8 @@ class MstMembershipController extends Controller
                             'package_id' => $id,
                             'title' => $request->benefit_title,
                             'is_active' => 1,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);

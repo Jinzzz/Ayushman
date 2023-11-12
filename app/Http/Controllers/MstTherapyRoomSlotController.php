@@ -62,7 +62,7 @@ class MstTherapyRoomSlotController extends Controller
     {
         try {
             $therapy_room_slot = Mst_Therapy_Room_Slot::findOrFail($id);
-            $therapy_room_slot->deleted_by = Auth::id();
+            $therapy_room_slot->deleted_by = 1;
             $therapy_room_slot->is_active = 0;
             $therapy_room_slot->save();
             $therapy_room_slot->delete();

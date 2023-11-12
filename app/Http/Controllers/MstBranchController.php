@@ -69,7 +69,7 @@ class MstBranchController extends Controller
         'branch_email' => $request->branch_email,
         'branch_admin_name' => $request->branch_admin_name,
         'branch_admin_contact_number' => $request->branch_admin_contact_number,
-        'created_by' => auth()->id(),
+        'created_by' => 1,
         'is_active' =>  $is_active,
       ]);
 

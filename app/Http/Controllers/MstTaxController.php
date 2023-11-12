@@ -56,8 +56,8 @@ class MstTaxController extends Controller
                 $taxes->tax_rate = $request->input('tax_rate');
                 $taxes->tax_type = $request->input('tax_type');
                 $taxes->is_active  = $is_active;
-                $taxes->created_by = auth()->id();
-                $taxes->updated_by = auth()->id();
+                $taxes->created_by = 1;
+                $taxes->updated_by = 1;
                 $taxes->save();
 
                 return redirect()->route('tax.create')->with('success', 'Tax added successfully');
@@ -98,8 +98,8 @@ class MstTaxController extends Controller
                 $taxes->tax_rate = $request->input('tax_rate');
                 $taxes->tax_type = $request->input('tax_type');
                 $taxes->is_active  = $is_active;
-                $taxes->created_by = auth()->id();
-                $taxes->updated_by = auth()->id();
+                $taxes->created_by = 1;
+                $taxes->updated_by = 1;
                 $taxes->save();
             }
             return redirect()->route('tax.group.index')->with('success', 'Tax updated successfully');

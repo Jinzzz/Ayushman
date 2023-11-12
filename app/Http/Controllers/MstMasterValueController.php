@@ -42,7 +42,7 @@ class MstMasterValueController extends Controller
         }
     
         $master->is_active = $is_active;
-        $master->created_by = auth()->id();
+        $master->created_by = 1;
         $master->save();
     
         return redirect()->route('mastervalues.index')->with('success', 'Master value added successfully');

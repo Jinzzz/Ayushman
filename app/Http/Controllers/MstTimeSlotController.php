@@ -49,7 +49,7 @@ class MstTimeSlotController extends Controller
                         'time_from' => $request->time_from,
                         'time_to' => $request->time_to,
                         'is_active' => $request->is_active,
-                        'updated_by' => Auth::id(),
+                        'updated_by' => 1,
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Timeslot updated successfully';
@@ -63,8 +63,8 @@ class MstTimeSlotController extends Controller
                             'time_from' => $request->time_from,
                             'time_to' => $request->time_to,
                             'is_active' => $request->is_active,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -103,7 +103,7 @@ class MstTimeSlotController extends Controller
         $slot->master_value = $request->input('slot_name');
         $slot->group_id = 0;
         $slot->is_active = 1;
-        $slot->created_by = auth()->id();
+        $slot->created_by = 1;
         $slot->update();
 
         return redirect()->route('timeslot.index')->with('success', 'Timeslot updated successfully');
@@ -172,7 +172,7 @@ class MstTimeSlotController extends Controller
             $staffslot->max_tokens = $request->input('tokens');
             $staffslot->is_available = 1;
             $staffslot->is_active = 1;
-            $staffslot->created_by  = auth()->id();
+            $staffslot->created_by  = 1;
             $staffslot->save();
 
 
