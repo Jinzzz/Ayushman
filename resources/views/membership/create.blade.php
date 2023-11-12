@@ -44,14 +44,14 @@
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Membership Package Duration(Days)*</label>
-                              <input type="number" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration">
+                              <input type="number" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                            </div>
                         </div>
 
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Regular Price*</label>
-                              <input type="number" class="form-control" required name="membership_package_price" value="{{ old('package_price') }}" placeholder="Membership Package Price">
+                              <input type="number" class="form-control" required name="membership_package_price" value="{{ old('package_price') }}" placeholder="Regular Price">
                            </div>
                         </div>
 
@@ -59,29 +59,28 @@
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Offer Price*</label>
-                              <input type="number" class="form-control" required name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Discount Price">
+                              <input type="number" class="form-control" required name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Offer Price">
                            </div>
                         </div>
-
-                        <div class="col-md-6">
-                           <div class="form-group">
-                              <label class="form-label">Gradient start*</label>
-                              <input type="text" class="form-control colorPicker" name="gradient_start" placeholder="Regular Price Color">
-                           </div>
-                        </div>
-
-                        <div class="col-md-6">
-                           <div class="form-group">
-                              <label class="form-label">Gradient end*</label>
-                              <input type="text" class="form-control colorPicker" name="gradient_end" placeholder="Offer Price Color">
-                           </div>
-                        </div>
-
 
                         <div class="col-md-11">
                            <div class="form-group">
                               <label class="form-label">Membership Package Description</label>
                               <textarea class="form-control ckeditor" id="benefitsDescription" name="membership_package_description" placeholder="Membership Package Description">{{ old('package_description') }}</textarea>
+                           </div>
+                        </div>
+
+                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
+                           <h6 class="mb-0 card-title" style="margin-left:15px;">Include Wellness</h6>
+                        </div>
+                        <div class="col-md-12">
+                           <div class="container" id="include_wellness" style="padding-left:0;padding-right:0;"></div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6><br>
+                           <div class="form-group">
+                              <textarea class="form-control ckeditor" id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
                            </div>
                         </div>
 
@@ -97,25 +96,6 @@
                               </label>
                            </div>
                         </div>
-
-
-                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Include Wellness</h6>
-                        </div>
-                        <div class="col-md-12">
-                           <div class="container" id="include_wellness" style="padding-left:0;padding-right:0;"></div>
-                        </div>
-                        <!-- 
-                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6>
-                        </div> -->
-                        <div class="col-md-12">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6><br>
-                           <div class="form-group">
-                              <textarea class="form-control ckeditor" id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
-                           </div>
-                        </div>
-
 
                         <div class="col-md-12">
                            <div class="form-group">
@@ -228,7 +208,7 @@
       data += '<select name="wellness_id[]" class="form-control" required>';
       data += '<option disabled selected value="">Select wellness</option>'; // Add the first option
       @foreach($wellnesses as $wellness)
-      data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{ $wellness->wellness_cost  . " ₹" }}">{{ $wellness->wellness_name }}</option>';
+      data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
       @endforeach
       data += '</select>';
       data += "<label class='form-label'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";

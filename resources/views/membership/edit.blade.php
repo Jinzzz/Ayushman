@@ -60,7 +60,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Duration(Days)*</label>
-                                                <input type="number" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration">
+                                                <input type="number" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                                             </div>
                                         </div>
 
@@ -75,7 +75,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Offer Price*</label>
-                                                <input type="number" class="form-control" required name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Discount Price">
+                                                <input type="number" class="form-control" required name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Offer Price">
                                             </div>
                                         </div>
 
@@ -287,7 +287,7 @@
             var duration = selectedOption.data('duration');
             var cost = selectedOption.data('cost');
 
-            var wellnessDetailsLabel = 'Wellness Duration: ' + (duration >= 60 ? (duration / 60) + ' hour' : duration + ' minutes') + ', Wellness Cost: ' + cost + ' ₹';
+            var wellnessDetailsLabel = 'Wellness Duration: ' + (duration >= 60 ? (duration / 60) + ' hour' : duration + ' minutes') + ', Wellness Cost: ' + ' ₹ ' + cost;
 
             $("#wellness-details").text(wellnessDetailsLabel);
         });
