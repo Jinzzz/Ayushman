@@ -97,7 +97,7 @@
                                 <th class="wd-15p">Journel Entry Type</th>
                                 <th class="wd-15p">Journel Number</th>
                                 <th class="wd-15p">Journel Date</th>
-                                <th class="wd-15p">Amout</th>
+                                <th class="wd-15p">Total Amout</th>
                                 <th class="wd-15p">Action</th>
                             </tr>
                         </thead>
@@ -112,10 +112,10 @@
                                 <td>{{ $journel_entry->journel_entry_type->journal_entry_type_name  }}</td>
                                 <td>{{ $journel_entry->journel_number  }}</td>
                                 <td>{{ date('d-m-y', strtotime($journel_entry->journel_date)) }}</td>
-                                <td>{{ $journel_entry->credit  }}</td>
+                                <td>{{ $journel_entry->total_debit  }}</td>
                                 <td>
-                                    <a class="btn btn-primary btn-sm edit-custom" href="{{ route('branches.edit', $journel_entry->journal_entry_id ) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                                    <a class="btn btn-secondary btn-sm" href="{{ route('branches.show',$journel_entry->journal_entry_id ) }}">
+                                    <a class="btn btn-primary btn-sm edit-custom" href="{{ route('journel.entry.edit', $journel_entry->journal_entry_id ) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
+                                    <a class="btn btn-secondary btn-sm" href="{{ route('journel.entry.show',$journel_entry->journal_entry_id ) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View </a>
                                     <button type="button" onclick="deleteData({{ $journel_entry->journal_entry_id }})" class="btn btn-danger">
                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete

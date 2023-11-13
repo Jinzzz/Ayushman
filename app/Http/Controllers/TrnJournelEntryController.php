@@ -23,7 +23,9 @@ class TrnJournelEntryController extends Controller
             $pageTitle = "Journel Entries";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $branches = Mst_Branch::get();
-            $query = Trn_Journel_Entry::join('trn__journel__entry__details','trn__journel__entries.journal_entry_id','trn__journel__entry__details.journal_entry_id')->with('journel_entry_type', 'branch');
+            // $query = Trn_Journel_Entry::join('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')->orderBy('trn__journel__entries.created_at', 'desc')->with('journel_entry_type', 'branch');
+
+            $query = Trn_Journel_Entry::orderBy('trn__journel__entries.created_at', 'desc')->with('journel_entry_type', 'branch');
             $branch_id = "0";
             $journel_entry_type_id = "0";
             $journel_number = "0";
@@ -90,7 +92,7 @@ class TrnJournelEntryController extends Controller
     public function create(Request $request)
     {
         try {
-            $pageTitle = "Create Medicine sales return";
+            $pageTitle = "Create Journel Entries";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $ledgers = Mst_Account_Ledger::get();
             return view('journel_entry.create', compact('pageTitle', 'ledgers', 'journel_entry_types'));
@@ -106,17 +108,17 @@ class TrnJournelEntryController extends Controller
                 $request->all(),
                 [
                     'journel_entry_type_id' => ['required'],
-                    'notes' => ['required'],
+                    'total_debit' => ['required'],
                     'ledger_id' => ['required'],
-                    'description' => ['required'],
+                    'total_credit' => ['required'],
                     'debit' => ['required'],
                     'credit' => ['required'],
                 ],
                 [
                     'journel_entry_type_id.required' => 'Journel entry type is required',
-                    'notes.required' => 'Notes is required',
+                    'total_debit.required' => 'Total debit is required',
                     'ledger_id.required' => 'Ledger is required',
-                    'description.required' => 'Description is required',
+                    'total_credit.required' => 'Total credit is required',
                     'debit.required' => 'Debit is required',
                     'credit.required' => 'Credit is required',
                 ]
@@ -134,8 +136,8 @@ class TrnJournelEntryController extends Controller
                     'financial_year_id' => $financial_year_id,
                     'branch_id' => $branch_id,
                     'notes' => $request->notes,
-                    'total_debit' => 100,
-                    'total_credit' => 100,
+                    'total_debit' => $request->total_debit,
+                    'total_credit' => $request->total_credit,
                     'is_deleted' => 0,
                     'created_by' => $user_id,
                     'created_at' => Carbon::now(),
@@ -180,6 +182,119 @@ class TrnJournelEntryController extends Controller
         } catch (QueryException $e) {
             dd($e->getmessage());
             return redirect()->route('journel.entry.index')->with('success', 'Exception error');
+        }
+    }
+
+    public function edit($id)
+    {
+        try {
+            $pageTitle = "Edit Journel Entry";
+            $journel_entry_types = Mst_Journel_Entry_Type::get();
+            $ledgers = Mst_Account_Ledger::get();
+            $all_entry_details = Trn_Journel_Entry_Details::where('journal_entry_id', $id)->get();
+            $journel_entries = Trn_Journel_Entry::join('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')
+                ->where('trn__journel__entries.journal_entry_id', $id)
+                ->orderBy('trn__journel__entries.created_at', 'desc')
+                ->with('journel_entry_type', 'branch')
+                ->first();
+            // dd($all_entry_details);
+            return view('journel_entry.edit', compact('pageTitle', 'all_entry_details', 'journel_entries', 'journel_entry_types', 'ledgers'));
+        } catch (QueryException $e) {
+            return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
+        }
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'journel_entry_type_id' => ['required'],
+                    'total_debit' => ['required'],
+                    'ledger_id' => ['required'],
+                    'total_credit' => ['required'],
+                    'debit' => ['required'],
+                    'credit' => ['required'],
+                ],
+                [
+                    'journel_entry_type_id.required' => 'Journel entry type is required',
+                    'total_debit.required' => 'Total debit is required',
+                    'ledger_id.required' => 'Ledger is required',
+                    'total_credit.required' => 'Total credit is required',
+                    'debit.required' => 'Debit is required',
+                    'credit.required' => 'Credit is required',
+                ]
+            );
+
+            if (!$validator->fails()) {
+                $user_id = 1;
+                $user_details = Mst_Staff::where('staff_id', $user_id)->first();
+                $branch_id = $user_details->branch_id;
+                $financial_year_id = 1;
+                $lastInsertedId = Trn_Journel_Entry::where('journal_entry_id', $request->hidden_id)->update([
+                    'journel_entry_type_id' => $request->journel_entry_type_id,
+                    'journel_date' => Carbon::now(),
+                    'financial_year_id' => $financial_year_id,
+                    'branch_id' => $branch_id,
+                    'notes' => $request->notes,
+                    'total_debit' => $request->total_debit,
+                    'total_credit' => $request->total_credit,
+                    'is_deleted' => 0,
+                    'created_by' => $user_id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+
+                Trn_Journel_Entry_Details::where('journal_entry_id', $request->hidden_id)->delete();
+                if (isset($request->ledger_id)) {
+                    $ledger_ids = $request->ledger_id;
+                    $descriptions = $request->description;
+                    $debits = $request->debit;
+                    $credits = $request->credit;
+                    $count = count($ledger_ids);
+
+                    for ($i = 0; $i < $count; $i++) {
+
+                        Trn_Journel_Entry_Details::create([
+                            'journal_entry_id' => $request->hidden_id,
+                            'account_ledger_id' => $ledger_ids[$i],
+                            'debit' => $debits[$i],
+                            'credit' => $credits[$i],
+                            'description' => $descriptions[$i],
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    }
+                }
+                $message = 'Journal entry has been successfully updated.';
+                return redirect()->route('journel.entry.index')->with('success', $message);
+            } else {
+                $messages = $validator->errors();
+                dd($messages);
+            }
+        } catch (QueryException $e) {
+            dd($e->getmessage());
+            return redirect()->route('journel.entry.index')->with('success', 'Exception error');
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $pageTitle = "Edit Journel Entry";
+            $journel_entry_types = Mst_Journel_Entry_Type::get();
+            $ledgers = Mst_Account_Ledger::get();
+            $all_entry_details = Trn_Journel_Entry_Details::where('journal_entry_id', $id)->get();
+            $journel_entries = Trn_Journel_Entry::join('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')
+                ->where('trn__journel__entries.journal_entry_id', $id)
+                ->orderBy('trn__journel__entries.created_at', 'desc')
+                ->with('journel_entry_type', 'branch')
+                ->first();
+            // dd($all_entry_details);
+            return view('journel_entry.show', compact('pageTitle', 'all_entry_details', 'journel_entries', 'journel_entry_types', 'ledgers'));
+        } catch (QueryException $e) {
+            return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
     }
 }

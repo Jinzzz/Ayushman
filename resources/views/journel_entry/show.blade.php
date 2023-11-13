@@ -27,16 +27,17 @@ use App\Helpers\AdminHelper;
                         </ul>
                     </div>
                     @endif
-                    <form action="{{ route('journel.entry.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    <form action="{{ route('journel.entry.update') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                         @csrf
+                        <input type="hidden" value="{{ $journel_entries->journal_entry_id }}" name="hidden_id">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Select Journel Entry Type*</label>
-                                    <select required class="form-control" name="journel_entry_type_id" id="journel_entry_type_id">
+                                    <select disabled required class="form-control" name="journel_entry_type_id" id="journel_entry_type_id">
                                         <option value="">Choose Journel Entry Type</option>
                                         @foreach($journel_entry_types as $journel_entry_type)
-                                        <option value="{{ $journel_entry_type->journal_entry_type_id }}">{{ $journel_entry_type->journal_entry_type_name }}</option>
+                                        <option value="{{ $journel_entry_type->journal_entry_type_id }}" {{ $journel_entry_type->journal_entry_type_id == $journel_entries->journel_entry_type_id ? ' selected' : '' }}>{{ $journel_entry_type->journal_entry_type_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -45,7 +46,7 @@ use App\Helpers\AdminHelper;
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Date</label>
-                                    <input type="date" class="form-control" readonly name="journel_date" id="date" placeholder="Date">
+                                    <input type="text" class="form-control" value="{{ date('d-m-Y', strtotime($journel_entries->journel_date)) }}" readonly name="journel_date" placeholder="Date">
                                 </div>
                             </div>
 
@@ -54,7 +55,7 @@ use App\Helpers\AdminHelper;
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Notes</label>
-                                    <textarea class="form-control" name="notes" placeholder="Notes"></textarea>
+                                    <textarea class="form-control" readonly name="notes" placeholder="Notes">{{$journel_entries->notes}}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -69,24 +70,24 @@ use App\Helpers\AdminHelper;
                                                     <th>Description</th>
                                                     <th>Debit</th>
                                                     <th>Credit</th>
-                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr id="productRowTemplate" style="display: none">
+                                            @foreach ($all_entry_details as $entry_details)
+                                                <tr id="productRowTemplate">
                                                     <td>
-                                                        <select class="form-control " name="ledger_id[]">
+                                                        <select class="form-control" disabled name="ledger_id[]">
                                                             <option value="">Please select account</option>
                                                             @foreach($ledgers as $ledger)
-                                                            <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
+                                                            <option value="{{ $ledger->id }}"  {{ $ledger->id == $entry_details->account_ledger_id ? ' selected' : '' }}>{{ $ledger->ledger_name}}</option>
                                                             @endforeach
                                                         </select>
                                                     </td>
-                                                    <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
-                                                    <td><input type="number" class="form-control" name="debit[]"></td>
-                                                    <td><input type="number" readonly class="form-control" name="credit[]"></td>
-                                                    <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                                    <td><textarea readonly class="form-control" name="description[]" placeholder="Description">{{$entry_details->description}}</textarea></td>
+                                                    <td><input type="number" readonly class="form-control" value="{{$entry_details->debit}}" name="debit[]"></td>
+                                                    <td><input type="number" readonly class="form-control" value="{{$entry_details->credit}}" name="credit[]"></td>
                                                 </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -95,26 +96,21 @@ use App\Helpers\AdminHelper;
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <button type="button" class="btn btn-primary" id="addProductBtn">Add Row</button>
-                            </div>
-                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Debit:</label>
-                                    <input class="form-control" readonly name="total_debit" id="totalDebit" placeholder="Total Debit">
+                                    <input type="text" class="form-control" readonly name="total_debit" value="{{$journel_entries->total_debit}}" id="totalDebit" placeholder="Total Debit">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Credit:</label>
-                                    <input class="form-control" readonly name="total_credit" id="totalCredit" placeholder="Total Credit">
+                                    <input type="text" class="form-control" readonly name="total_credit" value="{{$journel_entries->total_credit}}" id="totalCredit" placeholder="Total Credit">
                                 </div>
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <center>
-                                <button type="submit" class="btn btn-raised btn-primary">
-                                    <i class="fa fa-check-square-o"></i> Save</button>
                                 <a class="btn btn-danger" href="{{ route('journel.entry.index') }}">Cancel</a>
                             </center>
                         </div>
@@ -137,14 +133,6 @@ use App\Helpers\AdminHelper;
 
 
 <script>
-    // total amount 
-    // Get the current date
-    var currentDate = new Date();
-    // Format the date as "YYYY-MM-DD" (required by input type="date)
-    var formattedDate = currentDate.toISOString().split('T')[0];
-    // Set the value of the input field to today's date
-    document.getElementById("date").value = formattedDate;
-
     $(document).ready(function() {
         // Add an event listener for input changes in debit fields
         $("#productTable tbody").on("input", 'input[name="debit[]"]', function() {
@@ -181,7 +169,8 @@ use App\Helpers\AdminHelper;
             var newRow = $("#productRowTemplate").clone();
             // Remove the "style" attribute to make the row visible
             newRow.removeAttr("style");
-            newRow.find('select').addClass('medicine-select');
+            newRow.find('select').val('');
+            newRow.find('textarea').val('');
             newRow.find('input[type="text"]').val('');
             newRow.find('input[type="number"]').val('');
             newRow.removeAttr('style')

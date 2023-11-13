@@ -409,4 +409,5 @@ Route::get('/journel-entry-create', [TrnJournelEntryController::class, 'create']
 Route::post('/journel-entry-store', [TrnJournelEntryController::class, 'store'])->name('journel.entry.store');
 Route::get('/journel-entry-show/{id}', [TrnJournelEntryController::class, 'show'])->name('journel.entry.show');
 Route::delete('/journel-entry/destroy/{id}', [TrnJournelEntryController::class, 'destroy'])->name('journel.entry.destroy');
-
+Route::get('/journel-entry-edit/{id}', [TrnJournelEntryController::class, 'edit'])->name('journel.entry.edit');
+Route::post('/journel-entry-update', [TrnJournelEntryController::class, 'update'])->name('journel.entry.update');
