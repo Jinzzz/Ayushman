@@ -187,7 +187,7 @@ Route::post('/membership/store', [MstMembershipController::class, 'store'])->nam
 Route::get('/membership/edit/{id}/{active_tab}', [MstMembershipController::class, 'edit'])->name('membership.edit');
 Route::post('/membership/update/{id}', [MstMembershipController::class, 'update'])->name('membership.update');
 Route::delete('/membership/destroy/{id}', [MstMembershipController::class, 'destroyMembershipPackage'])->name('membership.destroy');
-Route::patch('membership/{id}/change-status', [MstMembershipController::class, 'changeStatus'])->name('membership.changeStatus');
+Route::patch('membership/change-status/{id}', [MstMembershipController::class, 'changeStatus'])->name('membership.changeStatus');
 Route::delete('/membership/destroy-wellness/{id}', [MstMembershipController::class, 'deleteWellness'])->name('membership.destroy.wellness');
 Route::delete('/membership/destroy-benefit/{id}', [MstMembershipController::class, 'deleteBenefit'])->name('membership.destroy.benefit');
 Route::get('/membership/view/{id}', [MstMembershipController::class, 'viewMembership'])->name('membership.view');

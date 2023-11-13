@@ -44,22 +44,22 @@
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Membership Package Duration(Days)*</label>
-                              <input type="number" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration(Days)">
+                              <input type="number" min="0" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                            </div>
                         </div>
 
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Regular Price*</label>
-                              <input type="number" class="form-control" required name="membership_package_price" value="{{ old('package_price') }}" placeholder="Regular Price">
+                              <input type="number" id="regularPrice" min="0" class="form-control" required name="membership_package_price" value="{{ old('package_price') }}" placeholder="Regular Price">
                            </div>
                         </div>
 
 
                         <div class="col-md-6">
                            <div class="form-group">
-                              <label class="form-label">Offer Price*</label>
-                              <input type="number" class="form-control" required name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Offer Price">
+                              <label class="form-label">Offer Price</label>
+                              <input type="number" id="offerPrice" min="0" class="form-control" name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Offer Price">
                            </div>
                         </div>
 
@@ -204,8 +204,8 @@
       data += '<div class="row">';
       data += '<div class="col-md-6 col-sm-offset-1">';
       data += '<div class="form-group label-floating">';
-      data += '<label class="form-label">Select wellness</label>';
-      data += '<select name="wellness_id[]" class="form-control" required>';
+      data += '<label class="form-label">Select wellness*</label>';
+      data += '<select required name="wellness_id[]" class="form-control" required>';
       data += '<option disabled selected value="">Select wellness</option>'; // Add the first option
       @foreach($wellnesses as $wellness)
       data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
@@ -213,7 +213,7 @@
       data += '</select>';
       data += "<label class='form-label'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";
       data += '</div></div>';
-      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit</label><input type='number' name='max_limit[]' class='form-control dob' required></div></div>";
+      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
       data += "<div style='align-self:center;' class='col-md-1 remove_field add-btn'><a href='javascript:void(0);'><span class='glyphicon glyphicon-plus' style='color:green;'></span></a></div>";
       data += "</div>";
 

@@ -39,23 +39,23 @@ class MstMembershipController extends Controller
                 'membership_package_name' => ['required'],
                 'membership_package_duration' => ['required'],
                 'membership_package_price' => ['required'],
-                'discount_price' => ['required'],
-                'membership_package_description' => ['required'],
+                // 'discount_price' => ['required'],
+                // 'membership_package_description' => ['required'],
                 'membership_package_active' => ['required'],
                 'wellness_id' => ['required'],
                 'max_limit' => ['required'],
-                'benefits' => ['required'],
+                // 'benefits' => ['required'],
             ],
             [
                 'membership_package_name.required' => 'Membership package name is required',
                 'membership_package_duration.required' => 'Membership package duration is required',
                 'membership_package_price.required' => 'Membership package price is required',
-                'discount_price.required' => 'Discount price is required',
-                'membership_package_description.required' => 'Membership package description is required',
+                // 'discount_price.required' => 'Discount price is required',
+                // 'membership_package_description.required' => 'Membership package description is required',
                 'membership_package_active.required' => 'Membership package status is required',
                 'wellness_id.required' => 'Atleast one wellness is required',
                 'max_limit.required' => 'Wellness max usage limit is required',
-                'benefits.required' => 'Membership package benefits is required',
+                // 'benefits.required' => 'Membership package benefits is required',
             ]
         );
 
@@ -90,7 +90,8 @@ class MstMembershipController extends Controller
                 }
             }
 
-            $checkBenefits = Mst_Membership_Benefit::where('package_id', $lastInsertedId)->where('title', $request->benefits[$i])->first();
+            if(isset($request->benefits)){
+                $checkBenefits = Mst_Membership_Benefit::where('package_id', $lastInsertedId)->where('title', $request->benefits[$i])->first();
             if (!$checkBenefits) {
                 $addMembershipBenefits = Mst_Membership_Benefit::create([
                     'package_id' => $lastInsertedId,
@@ -101,6 +102,7 @@ class MstMembershipController extends Controller
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
+            }
             }
             return redirect()->route('membership.index')->with('success', 'Membership package added successfully');
         } else {
@@ -311,6 +313,7 @@ class MstMembershipController extends Controller
         $membership = Mst_Membership_Package::findOrFail($id);
         $membership->is_active = !$membership->is_active;
         $membership->save();
+        return 1;
         return redirect()->back()->with('success', 'Status changed successfully');
     }
 

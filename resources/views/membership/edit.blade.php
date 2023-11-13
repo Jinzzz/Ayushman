@@ -60,22 +60,22 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Duration(Days)*</label>
-                                                <input type="number" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration(Days)">
+                                                <input type="number" min="0" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                                             </div>
                                         </div>
 
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Price*</label>
-                                                <input type="number" class="form-control" required name="membership_package_price" value="{{ isset($membership->package_price) ? $membership->package_price : old('package_price') }}" placeholder="Membership Package Price">
+                                                <input type="number" min="0" class="form-control" required name="membership_package_price" value="{{ isset($membership->package_price) ? $membership->package_price : old('package_price') }}" placeholder="Membership Package Price">
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Offer Price*</label>
-                                                <input type="number" class="form-control" required name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Offer Price">
+                                                <label class="form-label">Offer Price</label>
+                                                <input type="number" min="0" class="form-control" name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Offer Price">
                                             </div>
                                         </div>
 
@@ -139,7 +139,7 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label class="form-label">Max usage limit*</label>
-                                                <input type="number" class="form-control" required name="max_usage_limit" placeholder="Max usage limit">
+                                                <input type="number" min="1" class="form-control" required name="max_usage_limit" placeholder="Max usage limit">
                                             </div>
                                         </div>
 
