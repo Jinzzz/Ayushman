@@ -103,6 +103,12 @@ class MedicineSalesReturnController extends Controller
             );
 
             if (!$validator->fails()) {
+
+                $medicines = $request->medicine_id;
+                $count = count($medicines);
+                if ($count <= 1) {
+                    return redirect()->route('medicine.sales.return.create')->with('error', 'Please add atleast one medicine');
+                }
                 $user_id = 1;
                 $user_details = Mst_Staff::where('staff_id', $user_id)->first();
                 $branch_id = $user_details->branch_id;
@@ -146,19 +152,21 @@ class MedicineSalesReturnController extends Controller
                 for ($i = 1; $i < $count; $i++) {
                     $unit_id = Mst_Medicine::where('id', $medicines[$i])->first();
                     // dd($batches[$i]);
-                    Trn_Medicine_Sales_Return_Details::create([
-                        'sales_return_id' => $lastInsertedId,
-                        'medicine_id' => $medicines[$i],
-                        'quantity_unit_id' => $unit_id->unit_id,
-                        'batch_id' => $batches[$i],
-                        'quantity' => $quantities[$i],
-                        'rate' => $rates[$i],
-                        'amount' => $amounts[$i],
-                        'tax_amount' => $single_tax_amounts[$i],
-                        'discount' => $request->discount_amount,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
+                    if ($batches[$i] != null) {
+                        Trn_Medicine_Sales_Return_Details::create([
+                            'sales_return_id' => $lastInsertedId,
+                            'medicine_id' => $medicines[$i],
+                            'quantity_unit_id' => $unit_id->unit_id,
+                            'batch_id' => $batches[$i],
+                            'quantity' => $quantities[$i],
+                            'rate' => $rates[$i],
+                            'amount' => $amounts[$i],
+                            'tax_amount' => $single_tax_amounts[$i],
+                            'discount' => $request->discount_amount,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    }
                 }
 
                 $message = 'Medicine sales return details added successfully';
@@ -328,7 +336,7 @@ class MedicineSalesReturnController extends Controller
     {
         $data = [];
         $medicine_sale_invoices = Trn_Medicine_Sales_Return::where('sales_return_id', $id)->first();
-        $medicine_sale_details = Trn_Medicine_Sales_Return_Details::where('sales_return_id', $id)->with('Unit','Medicine')->get();
+        $medicine_sale_details = Trn_Medicine_Sales_Return_Details::where('sales_return_id', $id)->with('Unit', 'Medicine')->get();
         // dd($medicine_sale_details);
         // Create a Dompdf instance
         $data['sales_invoice_number'] = $medicine_sale_invoices->sales_return_no;

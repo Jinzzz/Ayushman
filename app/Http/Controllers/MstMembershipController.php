@@ -44,7 +44,7 @@ class MstMembershipController extends Controller
                 'membership_package_active' => ['required'],
                 'wellness_id' => ['required'],
                 'max_limit' => ['required'],
-                // 'benefits' => ['required'],
+                'benefits' => ['required'],
             ],
             [
                 'membership_package_name.required' => 'Membership package name is required',
@@ -55,7 +55,7 @@ class MstMembershipController extends Controller
                 'membership_package_active.required' => 'Membership package status is required',
                 'wellness_id.required' => 'Atleast one wellness is required',
                 'max_limit.required' => 'Wellness max usage limit is required',
-                // 'benefits.required' => 'Membership package benefits is required',
+                'benefits.required' => 'Membership package benefits is required',
             ]
         );
 

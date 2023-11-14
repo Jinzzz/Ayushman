@@ -246,15 +246,14 @@ class MstPatientController extends Controller
      
     public function patientMembershipStore(Request $request,$id)
     {
-        
+
         try{
         $request->validate([
-           
-            'payment_type' => 'required',
+            'payment_type_id' => 'required',
+            'membership_id' => 'required',
             'start_date' => 'required',
-
         ]);
-        $membershipId = $request->input('membership');
+        $membershipId = $request->input('membership_id');
         $patientId = $id;
         $selectedMembership = Mst_Membership_Package::findOrFail($membershipId);    
         $startDate = Carbon::parse($request->input('start_date')); 
@@ -264,10 +263,8 @@ class MstPatientController extends Controller
         $booking = new Mst_Patient_Membership_Booking();
         $booking->patient_id = $patientId;
         $booking->membership_package_id = $membershipId;
-        $booking->start_date = $request->input('start_date');
-        $booking->payment_type = $request->input('payment_type');
-
-      
+        $booking->start_date = Carbon::parse($request->input('start_date'))->format('Y-m-d');
+        $booking->payment_type = $request->input('payment_type_id');
         $booking->payment_amount = $selectedMembership->package_price;
         $booking->membership_expiry_date = $expiryDate;
         $booking->is_active = $selectedMembership->is_active;

@@ -11,6 +11,7 @@ use App\Helpers\AdminHelper;
          border: 1px solid #b0b0b0;
          /* Adjust the color as needed */
       }
+
       td.medicine-quantity span {
          color: red;
          font-size: 10px;
@@ -34,6 +35,11 @@ use App\Helpers\AdminHelper;
             <div class="card-body">
                @if ($message = Session::get('status'))
                <div class="alert alert-success">
+                  <p>{{ $message }}</p>
+               </div>
+               @endif
+               @if ($message = Session::get('error'))
+               <div class="alert alert-danger">
                   <p>{{ $message }}</p>
                </div>
                @endif
@@ -65,7 +71,7 @@ use App\Helpers\AdminHelper;
                            </select>
                         </div>
                      </div>
-                     
+
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Select Invoice ID*</label>
@@ -140,12 +146,12 @@ use App\Helpers\AdminHelper;
 
                                        <td class="medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
                                        <td class="medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
-                                       
+
                                        <td class="medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
                                        <td class="medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
-                                       
+
                                        <td class="medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
-                                       <td class="medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td> 
+                                       <td class="medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
                                  </tbody>
                               </table>
@@ -383,7 +389,8 @@ use App\Helpers\AdminHelper;
          newRow.find('select').addClass('medicine-select');
          newRow.find('input[type="text"]').val('');
          newRow.find('input[type="number"]').val('');
-         newRow.removeAttr('style')
+         newRow.find('input').removeAttr("disabled")
+         newRow.find('input span').remove()
          // Append the new row to the table
          $("#productTable tbody").append(newRow);
       });
@@ -624,100 +631,107 @@ use App\Helpers\AdminHelper;
    $(document).on('click', '.modal-close', function() {
       // ******************
       var selectedValue = $("input[name='selected_batch']:checked")
-      var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
-      var ids = $('input[name="med_stock_id[]"]');
-      var j = 0
-      var max = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
-      // var v2 = selectedValue.closest('tr').find('.batch-medicine-unit-price').text();
-      //    $(".selectedCls").find(".medicine-amount input").val(v2)
-      var selected = null
-      selected = ids.filter(function() {
-         return $(this).val() === id;
-      });
-      j = selected.length
-      var amt = 0
-      if (j > 1) {
-         selected.each(function(index) {
-            if (index == j - 1) {
-               $(this).closest('tr').find(".medicine-quantity input").val(j)
-               amt = $(this).closest('tr').find(".medicine-amount input").val()
-               $(this).closest('tr').find(".medicine-amount input").val(j * amt)
+      if (selectedValue.length != 0) {
 
-            } else {
-               $(this).closest('tr').remove()
-            }
+         var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
+         var ids = $('input[name="med_stock_id[]"]');
+         var j = 0
+         var max = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
+         // var v2 = selectedValue.closest('tr').find('.batch-medicine-unit-price').text();
+         //    $(".selectedCls").find(".medicine-amount input").val(v2)
+         var selected = null
+         selected = ids.filter(function() {
+            return $(this).val() === id;
+         });
+         j = selected.length
+         var amt = 0
+         if (j > 1) {
+            selected.each(function(index) {
+               if (index == j - 1) {
+                  $(this).closest('tr').find(".medicine-quantity input").val(j)
+                  amt = $(this).closest('tr').find(".medicine-amount input").val()
+                  $(this).closest('tr').find(".medicine-amount input").val(j * amt)
 
+               } else {
+                  $(this).closest('tr').remove()
+               }
+
+            });
+
+         }
+         var lmt = parseFloat(selectedValue.closest('tr').find('.batch-medicine-reorder-limit').text());
+         var stck = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
+         var quantity = parseFloat($(".selectedCls").find(".medicine-quantity input").val());
+         //$(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         var checkVal = 0
+         if (stck > lmt) {
+            checkVal = stck - lmt
+         } else {
+            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         }
+         if (checkVal != 0 && checkVal <= quantity) {
+            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         }
+
+
+
+
+
+
+
+         // ****************
+         var inputElements = $('input[name="amount[]"]');
+         var sum = 0;
+         inputElements.each(function() {
+            sum += parseFloat($(this).val()) || 0;
          });
 
+         $(".tot").text(sum);
+         $('#sub-total-input').val(sum);
+
+         //   tax 
+         // var inputElements = $('input[name="rate[]"]');
+         var tax = $('input[name="tax_rate[]"]');
+         var sum1 = 0;
+         var totalTax = 0
+         inputElements.each(function() {
+            sum1 = parseFloat($(this).val()) || 0;
+            var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
+            x = parseFloat(x) || 0;
+            var tax = (sum1 * x) / 100;
+            var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
+            y.val(tax)
+            totalTax += tax
+         });
+         1
+         $(".tax-amount").text(totalTax);
+         $('#tax-amount-input').val(totalTax);
+         $(".total-amount").text(sum + totalTax);
+         $('#total-amount-input').val(sum + totalTax);
+
+         var totalA = parseFloat($(".total-amount").text())
+         var discount = $("#discount_percentage").val()
+         var discountT = (totalA * discount) / 100
+         //alert(discountT)
+         $("#discount-amount-input").val(discountT)
+         $(".discount-amount").text('₹' + discountT)
+         var payable = totalA - discountT
+
+         $(".payable-amount b").text('₹' + payable)
+         $(".paid-amount").val(payable)
+
+
+
       }
-      var lmt = parseFloat(selectedValue.closest('tr').find('.batch-medicine-reorder-limit').text());
-      var stck = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
-      var quantity = parseFloat($(".selectedCls").find(".medicine-quantity input").val());
-      //$(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      var checkVal = 0
-      if (stck > lmt) {
-         checkVal = stck - lmt
-      } else {
-         $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
-      if (checkVal != 0 && checkVal <= quantity) {
-         $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
+      var disable = $('input[name="batch_no[]"]');
 
-
-
-
-
-
-
-      // ****************
-      var inputElements = $('input[name="amount[]"]');
-      var sum = 0;
-      inputElements.each(function() {
-         sum += parseFloat($(this).val()) || 0;
+      disable.each(function() {
+         if ($(this).val() == '') {
+            $(this).parent("td").siblings(".medicine-quantity").find('input').prop("readonly", true);
+         } else {
+            $(this).parent("td").siblings(".medicine-quantity").find('input').prop("readonly", false);
+         }
       });
-
-      $(".tot").text(sum);
-      $('#sub-total-input').val(sum);
-
-      //   tax 
-      // var inputElements = $('input[name="rate[]"]');
-      var tax = $('input[name="tax_rate[]"]');
-      var sum1 = 0;
-      var totalTax = 0
-      inputElements.each(function() {
-         sum1 = parseFloat($(this).val()) || 0;
-         var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
-         x = parseFloat(x) || 0;
-         var tax = (sum1 * x) / 100;
-         var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
-         y.val(tax)
-         totalTax += tax
-      });
-      1
-      $(".tax-amount").text(totalTax);
-      $('#tax-amount-input').val(totalTax);
-      $(".total-amount").text(sum + totalTax);
-      $('#total-amount-input').val(sum + totalTax);
-
-      var totalA = parseFloat($(".total-amount").text())
-      var discount = $("#discount_percentage").val()
-      var discountT = (totalA * discount) / 100
-      //alert(discountT)
-      $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('₹' + discountT)
-      var payable = totalA - discountT
-
-      $(".payable-amount b").text('₹' + payable)
-      $(".paid-amount").val(payable)
-
-
-
-
-
-
-
-
 
    });
    // calculate amount 
@@ -730,8 +744,8 @@ use App\Helpers\AdminHelper;
 
       // Find the amount input field in the same row
       var amountInput = row.querySelector('.medicine-amount input');
-      
-      
+
+
 
       // Calculate the amount based on the quantity and rate
       var quantity = parseFloat(input.value);
@@ -783,7 +797,7 @@ use App\Helpers\AdminHelper;
          $(".paid-amount").val(payable)
 
 
-         
+
       } else {
          amountInput.value = ''; // Clear the amount if either quantity or rate is not a number
       }
@@ -793,23 +807,23 @@ use App\Helpers\AdminHelper;
 
    $(document).on('change', '.medicine-quantity input', function() {
       var stck = parseFloat($(this).closest('tr').find('.medicine-current-stock input').val());
-         var lmt = parseFloat($(this).closest('tr').find('.medicine-reorder-limit input').val());
-         var quantity = parseFloat($(this).val());
-         // $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-         // alert(lmt)
-         // alert(quantity)
+      var lmt = parseFloat($(this).closest('tr').find('.medicine-reorder-limit input').val());
+      var quantity = parseFloat($(this).val());
+      // $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+      // alert(lmt)
+      // alert(quantity)
 
-        
-         var checkVal = 0
-         if (stck > lmt) {
-            checkVal =  stck - lmt
-            //alert(checkVal)
-         } else {
-            $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
-         }
-         if (checkVal != 0 && checkVal <= quantity) {
-            $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
-         }
+
+      var checkVal = 0
+      if (stck > lmt) {
+         checkVal = stck - lmt
+         //alert(checkVal)
+      } else {
+         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+      }
+      if (checkVal != 0 && checkVal <= quantity) {
+         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+      }
    })
 </script>
 @endsection

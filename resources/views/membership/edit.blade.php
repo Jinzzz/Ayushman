@@ -43,7 +43,7 @@
                     </div>
 
                     <!-- Tab 1: Basic Details -->
-                    <div id="basic-details-content" >
+                    <div id="basic-details-content">
                         <div class="row">
                             <form action="{{ route('membership.update',['id'=>request()->route('id')]) }}" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="update_type" value="1">
@@ -208,7 +208,7 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-11">
-                                            <label class="form-label">Include other benefits</label>
+                                            <label class="form-label">Include other benefits*</label>
                                             <!-- <h6 class="mb-0 card-title" style="margin-left:15px;">Include other benefits</h6><br> -->
                                             <div class="form-group">
                                                 <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefit_title" placeholder="Include other benefits">{{ old('package_description') }}</textarea>
@@ -219,7 +219,7 @@
                                             <div class="form-group">
                                                 <label class="form-label">Actions</label>
                                                 <!-- Removed the <center> tag as it's not recommended -->
-                                                <button type="submit" class="btn btn-raised btn-primary mt-5 mb-5"><i class="fa fa-check-square-o"></i> Add</button> <br>
+                                                <button type="submit" class="btn btn-raised btn-primary mb-3"><i class="fa fa-check-square-o"></i> Add</button> <br>
                                                 <a class="btn btn-danger" href="{{ route('membership.index') }}">Cancel</a>
                                             </div>
                                         </div>

@@ -335,7 +335,7 @@ use App\Helpers\AdminHelper;
       $('#sub-total, #tax-amount').on('input', updateTotalAmount);
 
       // Initial update of the Total Amount
-      updateTotalAmount();
+      // updateTotalAmount();
 
 
       // searchable dropdown
@@ -425,7 +425,9 @@ use App\Helpers\AdminHelper;
          newRow.find('select').addClass('medicine-select');
          newRow.find('input[type="text"]').val('');
          newRow.find('input[type="number"]').val('');
-         newRow.removeAttr('style')
+         newRow.find('input').removeAttr("disabled")
+         // newRow.removeAttr('style')
+         newRow.find('input span').remove()
          // Append the new row to the table
          $("#productTable tbody").append(newRow);
       });
@@ -666,101 +668,103 @@ use App\Helpers\AdminHelper;
    $(document).on('click', '.modal-close', function() {
       // ******************
       var selectedValue = $("input[name='selected_batch']:checked")
-      var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
-      var ids = $('input[name="med_stock_id[]"]');
-      var j = 0
-      var max = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
-      // var v2 = selectedValue.closest('tr').find('.batch-medicine-unit-price').text();
-      //    $(".selectedCls").find(".medicine-amount input").val(v2)
-      var selected = null
-      selected = ids.filter(function() {
-         return $(this).val() === id;
-      });
-      j = selected.length
-      var amt = 0
-      if (j > 1) {
-         selected.each(function(index) {
-            if (index == j - 1) {
-               $(this).closest('tr').find(".medicine-quantity input").val(j)
-               amt = $(this).closest('tr').find(".medicine-amount input").val()
-               $(this).closest('tr').find(".medicine-amount input").val(j * amt)
+      if (selectedValue.length != 0) {
+         var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
+         var ids = $('input[name="med_stock_id[]"]');
+         var j = 0
+         var max = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
+         // var v2 = selectedValue.closest('tr').find('.batch-medicine-unit-price').text();
+         //    $(".selectedCls").find(".medicine-amount input").val(v2)
+         var selected = null
+         selected = ids.filter(function() {
+            return $(this).val() === id;
+         });
+         j = selected.length
+         var amt = 0
+         if (j > 1) {
+            selected.each(function(index) {
+               if (index == j - 1) {
+                  $(this).closest('tr').find(".medicine-quantity input").val(j)
+                  amt = $(this).closest('tr').find(".medicine-amount input").val()
+                  $(this).closest('tr').find(".medicine-amount input").val(j * amt)
 
-            } else {
-               $(this).closest('tr').remove()
-            }
+               } else {
+                  $(this).closest('tr').remove()
+               }
 
+            });
+
+         }
+         var lmt = parseFloat(selectedValue.closest('tr').find('.batch-medicine-reorder-limit').text());
+         var stck = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
+         var quantity = parseFloat($(".selectedCls").find(".medicine-quantity input").val());
+         //$(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         var checkVal = 0
+         if (stck > lmt) {
+            checkVal = stck - lmt
+         } else {
+            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         }
+         if (checkVal != 0 && checkVal <= quantity) {
+            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         }
+
+
+
+
+
+
+
+         // ****************
+         var inputElements = $('input[name="amount[]"]');
+         var sum = 0;
+         inputElements.each(function() {
+            sum += parseFloat($(this).val()) || 0;
          });
 
+         $(".tot").text(sum);
+         $('#sub-total-input').val(sum);
+
+         //   tax 
+         // var inputElements = $('input[name="rate[]"]');
+         var tax = $('input[name="tax_rate[]"]');
+         var sum1 = 0;
+         var totalTax = 0
+         inputElements.each(function() {
+            sum1 = parseFloat($(this).val()) || 0;
+            var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
+            x = parseFloat(x) || 0;
+            var tax = (sum1 * x) / 100;
+            var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
+            y.val(tax)
+            totalTax += tax
+         });
+         1
+         $(".tax-amount").text(totalTax);
+         $('#tax-amount-input').val(totalTax);
+         $(".total-amount").text(sum + totalTax);
+         $('#total-amount-input').val(sum + totalTax);
+
+         var totalA = parseFloat($(".total-amount").text())
+         var discount = $("#discount_percentage").val()
+         var discountT = (totalA * discount) / 100
+         //alert(discountT)
+         $("#discount-amount-input").val(discountT)
+         $(".discount-amount").text('₹' + discountT)
+         var payable = totalA - discountT
+
+         $(".payable-amount b").text('₹' + payable)
+         $(".paid-amount").val(payable)
+
       }
-      var lmt = parseFloat(selectedValue.closest('tr').find('.batch-medicine-reorder-limit').text());
-      var stck = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
-      var quantity = parseFloat($(".selectedCls").find(".medicine-quantity input").val());
-      //$(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      var checkVal = 0
-      if (stck > lmt) {
-         checkVal = stck - lmt
-      } else {
-         $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
-      if (checkVal != 0 && checkVal <= quantity) {
-         $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
-
-
-
-
-
-
-
-      // ****************
-      var inputElements = $('input[name="amount[]"]');
-      var sum = 0;
-      inputElements.each(function() {
-         sum += parseFloat($(this).val()) || 0;
+      var disable = $('input[name="batch_no[]"]');
+      disable.each(function() {
+         if ($(this).val() == '') {
+            $(this).parent("td").siblings(".medicine-quantity").find('input').prop("readonly", true);
+         } else {
+            $(this).parent("td").siblings(".medicine-quantity").find('input').prop("readonly", false);
+         }
       });
-
-      $(".tot").text(sum);
-      $('#sub-total-input').val(sum);
-
-      //   tax 
-      // var inputElements = $('input[name="rate[]"]');
-      var tax = $('input[name="tax_rate[]"]');
-      var sum1 = 0;
-      var totalTax = 0
-      inputElements.each(function() {
-         sum1 = parseFloat($(this).val()) || 0;
-         var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
-         x = parseFloat(x) || 0;
-         var tax = (sum1 * x) / 100;
-         var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
-         y.val(tax)
-         totalTax += tax
-      });
-      1
-      $(".tax-amount").text(totalTax);
-      $('#tax-amount-input').val(totalTax);
-      $(".total-amount").text(sum + totalTax);
-      $('#total-amount-input').val(sum + totalTax);
-
-      var totalA = parseFloat($(".total-amount").text())
-      var discount = $("#discount_percentage").val()
-      var discountT = (totalA * discount) / 100
-      //alert(discountT)
-      $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('₹' + discountT)
-      var payable = totalA - discountT
-
-      $(".payable-amount b").text('₹' + payable)
-      $(".paid-amount").val(payable)
-
-
-
-
-
-
-
-
-
    });
    // calculate amount 
    function calculateAmount(input) {

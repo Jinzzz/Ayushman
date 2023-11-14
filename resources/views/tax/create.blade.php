@@ -59,15 +59,18 @@
                            </select>
                         </div>
                      </div>
+
+
+
                      <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>
                            <label class="custom-switch">
                               <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
-                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($qualification->is_active) && $qualification->is_active == 0 ? '' : 'checked' }}>
+                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($tax->is_active) && $tax->is_active == 0 ? '' : 'checked' }}>
                               <span id="statusLabel" class="custom-switch-indicator"></span>
                               <span id="statusText" class="custom-switch-description">
-                                 {{ isset($qualification->is_active) && $qualification->is_active ? 'Active' : 'Inactive' }}
+                                 {{ isset($tax->is_active) && $tax->is_active ? 'Active' : 'Inactive' }}
                               </span>
                            </label>
                         </div>

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-<link rel="stylesheet" type="text/css" href="{{ asset('plugins/date-picker/spectrum.css') }}">
-<script src="{{ asset('js/form-elements.js') }}"></script>
+   <link rel="stylesheet" type="text/css" href="{{ asset('plugins/date-picker/spectrum.css') }}">
+   <script src="{{ asset('js/form-elements.js') }}"></script>
 
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -55,11 +55,11 @@
                            </div>
                         </div>
 
-
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Offer Price</label>
-                              <input type="number" id="offerPrice" min="0" class="form-control" name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Offer Price">
+                              <input type="number" id="offerPrice" min="0" class="form-control" name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Offer Price" oninput="validatePrices()">
+                              <span id="priceError" style="color: red;"></span>
                            </div>
                         </div>
 
@@ -76,11 +76,11 @@
                         <div class="col-md-12">
                            <div class="container" id="include_wellness" style="padding-left:0;padding-right:0;"></div>
                         </div>
-                        
+
                         <div class="col-md-12">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6><br>
+                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits*</h6><br>
                            <div class="form-group">
-                              <textarea class="form-control ckeditor" id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
+                              <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
                            </div>
                         </div>
 
@@ -123,13 +123,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
 
 <script type="text/javascript">
+   function validatePrices() {
+      var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+      var offerPrice = parseFloat(document.getElementById('offerPrice').value);
+      var priceError = document.getElementById('priceError');
+
+      if (offerPrice >= regularPrice) {
+         priceError.textContent = 'Offer Price must be less than Regular Price';
+      } else {
+         priceError.textContent = '';
+      }
+   }
    $(document).ready(function() {
-      $(".colorPicker").spectrum({
-            preferredFormat: "hex",
-            showInput: true,
-            showPalette: true,
-            palette: ["#ff0000", "#00ff00", "#0000ff"] // Example palette
-         });
 
       CKEDITOR.replace('benefitsDescription', {
          removePlugins: 'image',
@@ -145,7 +150,7 @@
       });
 
       // Initialize the color pickers
-      
+
 
 
       CKEDITOR.replace('benefitsEditor', {

@@ -32,18 +32,18 @@
                      </div>
 
                      <div class="col-md-6">
-    <div class="form-group">
-        <div class="form-label">Status</div>
-        <label class="custom-switch">
-            <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
-            <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ old('is_active', isset($medicine_dosages->is_active) ? $medicine_dosages->is_active : 1) ? 'checked' : '' }}>
-            <span id="statusLabel" class="custom-switch-indicator"></span>
-            <span id="statusText" class="custom-switch-description">
-                {{ old('is_active', isset($medicine_dosages->is_active) ? ($medicine_dosages->is_active ? 'Active' : 'Inactive') : 'Active') }}
-            </span>
-        </label>
-    </div>
-</div>
+                        <div class="form-group">
+                           <div class="form-label">Status</div>
+                           <label class="custom-switch">
+                              <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
+                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ old('is_active', isset($medicine_dosages->is_active) ? $medicine_dosages->is_active : 1) ? 'checked' : '' }}>
+                              <span id="statusLabel" class="custom-switch-indicator"></span>
+                              <span id="statusText" class="custom-switch-description">
+                                 {{ old('is_active', isset($medicine_dosages->is_active) ? ($medicine_dosages->is_active ? 'Active' : 'Inactive') : 'Active') }}
+                              </span>
+                           </label>
+                        </div>
+                     </div>
 
                   </div>
                   <div class="form-group">

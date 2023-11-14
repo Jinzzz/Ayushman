@@ -46,7 +46,7 @@ class MedicineSalesController extends Controller
             $patients = Mst_Patient::where('is_active', 1)->get();
             $medicines = Mst_Medicine::where('item_type', 8)->get();
             $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');
-            $user_id = 2;
+            $user_id = 1;
             $staff_id = Mst_User::where('user_id', $user_id)->pluck('staff_id');
             $discount_percentage = Mst_Staff::where('staff_id', $staff_id)->pluck('max_discount_value');
             $branches = Mst_Branch::where('is_active', 1)->get();
@@ -206,6 +206,12 @@ class MedicineSalesController extends Controller
             );
 
             if (!$validator->fails()) {
+                $medicines = $request->medicine_id;
+                $count = count($medicines);
+                if ($count <= 1) {
+                    return redirect()->route('medicine.sales.invoices.create')->with('error', 'Please add atleast one medicine');
+                }
+
                 $user_id = 1;
                 $user_details = Mst_Staff::where('staff_id', $user_id)->first();
                 $branch_id = $user_details->branch_id;
@@ -261,21 +267,23 @@ class MedicineSalesController extends Controller
                     $mf_date = Carbon::parse($mf_dates[$i])->format('Y-m-d');
                     $exp_date = Carbon::parse($exp_dates[$i])->format('Y-m-d');
                     $unit_id = Mst_Medicine::where('id', $medicines[$i])->first();
+                    if ($batches[$i] != null) {
+                        Trn_Medicine_Sales_Invoice_Details::create([
+                            'sales_invoice_id' => $lastInsertedId,
+                            'medicine_id' => $medicines[$i],
+                            'medicine_unit_id' => $unit_id->unit_id,
+                            'batch_id' => $batches[$i],
+                            'quantity' => $quantities[$i],
+                            'rate' => $rates[$i],
+                            'amount' => $amounts[$i],
+                            'expiry_date' => $exp_date,
+                            'manufactured_date' => $mf_date,
+                            'med_quantity_tax_amount' => $single_tax_amounts[$i],
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    }
 
-                    Trn_Medicine_Sales_Invoice_Details::create([
-                        'sales_invoice_id' => $lastInsertedId,
-                        'medicine_id' => $medicines[$i],
-                        'medicine_unit_id' => $unit_id->unit_id,
-                        'batch_id' => $batches[$i],
-                        'quantity' => $quantities[$i],
-                        'rate' => $rates[$i],
-                        'amount' => $amounts[$i],
-                        'expiry_date' => $exp_date,
-                        'manufactured_date' => $mf_date,
-                        'med_quantity_tax_amount' => $single_tax_amounts[$i],
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
 
                     // $remaining_stock = $current_stocks[$i] - $quantities[$i];
                     // Trn_Medicine_Stock::where('batch_no', $batches[$i])->where('medicine_id', $medicines[$i])->where('branch_id', $branch_id)->update([
@@ -287,7 +295,7 @@ class MedicineSalesController extends Controller
                 return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
             } else {
                 $messages = $validator->errors();
-                dd($messages);
+                return redirect()->route('medicine.sales.invoices.create')->with('errors', $messages);
             }
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('success', 'Exception error');
@@ -438,12 +446,12 @@ class MedicineSalesController extends Controller
                     'manufactured_date' => $sale_details->manufactured_date,
                     'expiry_date' => $sale_details->expiry_date,
                 ];
-            
-                $all_medicine_sale_details[] = $details; 
+
+                $all_medicine_sale_details[] = $details;
             }
             // dd($all_medicine_sale_details);
             $deposit_to = $ledgerNames->ledger_name;
-            return view('medicine_sales_invoice.edit', compact('patient_booking_ids','pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to'));
+            return view('medicine_sales_invoice.edit', compact('patient_booking_ids', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to'));
         } catch (QueryException $e) {
             dd($e->getMessage());
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
@@ -453,6 +461,7 @@ class MedicineSalesController extends Controller
     public function update(Request $request)
     {
         try {
+            
             $user_id = 1;
             $user_details = Mst_Staff::where('staff_id', $user_id)->first();
             $branch_id = $user_details->branch_id;
@@ -494,9 +503,7 @@ class MedicineSalesController extends Controller
             // $current_stocks = $request->current - stock;
             $count = count($medicines);
 
-            foreach ($medicines as $medicine) {
-                $delete_condition_satisfying_all_rows = Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $request->hdn_id)->delete();
-            }
+            Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $request->hdn_id)->delete();
 
             for ($i = 0; $i < $count; $i++) {
                 $mf_date = Carbon::parse($mf_dates[$i])->format('Y-m-d');

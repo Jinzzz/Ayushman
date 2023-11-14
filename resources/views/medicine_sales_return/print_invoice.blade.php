@@ -1,87 +1,119 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Invoice</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .invoice {
-            width: 80%;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .invoice-details {
-            display: flex;
-            justify-content: space-between;
-        }
-        .invoice-info {
-            font-size: 16px;
-        }
-        .invoice-items {
-            margin-top: 20px;
-            border-collapse: collapse;
-            width: 100%;
-        }
-        .invoice-items th, .invoice-items td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
+    <title>Ayushman Ayurveda | Invoice</title>
 </head>
-<body>
-    <div class="invoice">
-        <div class="header">
-            <h1>Invoice</h1>
-        </div>
 
-        <div class="invoice-details">
-            <div class="invoice-info">
-                <p>Return Invoice No.: {{$data['sales_invoice_number']}}</p>
-                <p>Date: {{ date('d-m-y', strtotime($data['invoice_date'])) }}</p>
-                <!-- Add more invoice details here -->
-            </div>
-            <div class="invoice-info">
-                <p>Patient Name: {{$data['patient_name']}}</p>
-                <p>Patient Code: {{$data['patient_code']}}</p>
-                <!-- Add more customer details here -->
-            </div>
-        </div>
+<body style="box-sizing: border-box; margin: 0; font-family: Arial, Helvetica, sans-serif;">
 
-        <table class="invoice-items">
-            <thead>
-                <tr>
-                    <th>Medicine Name</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach($medicine_sale_details as $invoice)
-                <tr>
-                    <td>{{$invoice->medicine->medicine_name}}</td>
-                    <td>{{$invoice->quantity}}</td>
-                    <td>{{$invoice->amount}}</td>
-                </tr>
-                @endforeach
-            </tbody>
+    <div style="max-width: 600px; margin: auto;">
+        <table style="width: 100%; border: none; border-top: 5px solid #3DAA33;">
+            <colgroup>
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+            </colgroup>
+            <tr style="vertical-align: bottom; border-bottom: 1px solid #000;">
+                <th colspan="5" style="text-align: left; border: none; padding: 15px 0;">
+                    <img src="https://gcdnb.pbrd.co/images/UzY2RLjm3Sb1.png?o=1" style="max-width: 200px;">
+                </th>
+                <th colspan="5" style="text-align: right; border: none; padding: 15px 0;">
+                    <h2 style="margin: 0 0 13px;">Invoice</h2>
+                </th>
+            </tr>
+            <tr>
+                <td colspan="10" style="border-top: 1px solid #ddd;"></td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none; padding: 15px 0 0;">
+                    <p style="margin: 0;">Return Invoice No.:
+                        <b>{{$data['sales_invoice_number']}}</b>
+                    </p>
+                </td>
+                <td colspan="5" style="border: none; text-align: right; padding: 15px 0 0;">
+                    <p style="margin: 0;">Date:
+                        <b>{{ date('d-m-Y', strtotime($data['invoice_date'])) }}</b>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none; padding: 15px 0;">
+                    <p style="margin: 0;">Patient Name:
+                        <b>{{$data['patient_name']}}</b>
+                    </p>
+                </td>
+                <td colspan="5" style="border: none; text-align: right; padding: 15px 0;">
+                    <p style="margin: 0;">Patient Code:
+                        <b>{{$data['patient_code']}}</b>
+                    </p>
+                </td>
+            </tr>
         </table>
 
-        <div class="invoice-summary">
-            <p>Subtotal : {{$data['sub_total']}} /-</p>
-            <p>Tax Amount : {{$data['tax_amount']}} /-</p>
-            <p>Total Amount : {{$data['total_amount']}} /-</p>
-            <p>Discount Amount : {{$data['discount_amount']}} /-</p>
-        </div>
+        <table style="width: 100%; border: 1px solid #999; border-collapse: collapse; margin: 10px 0 0;">
+            <colgroup>
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+            </colgroup>
+            <tr style="text-align: left;">
+                <th colspan="6" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Medicine Name</th>
+                <th colspan="2" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Qty</th>
+                <th colspan="2" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Amt</th>
+            </tr>
+            @foreach($medicine_sale_details as $invoice)
+            <tr>
+                <td colspan="6" style="padding: 10px; border: 1px solid #999;">{{$invoice->medicine->medicine_name}}</td>
+                <td colspan="2" style="padding: 10px; border: 1px solid #999;">{{intval($invoice->quantity)}}</td>
+                <td colspan="2" style="padding: 10px; border: 1px solid #999;">{{ number_format($invoice->amount, 2) }}</td>
+            </tr>
+            @endforeach
+        </table>
 
-        <div class="footer">
-        <p>Thank you for choosing our services. Your satisfaction is our priority.</p>
+        <table style="width: 100%; border: none;">
+            <colgroup>
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+                <col width="10%">
+            </colgroup>
+            <tr>
+                <td colspan="10" style="border: none; padding: 10px 0 0; text-align: right;">
+                    <p style="margin: 15px 0 0;">Subtotal : {{ number_format($data['sub_total'], 2) }}</p>
+                    <p style="margin: 15px 0 0;">Tax Amount : {{ number_format($data['tax_amount'], 2) }}</p>
+                    <h3 style="margin: 15px 0 0;"><b>Total Amount : {{ number_format($data['total_amount'], 2) }}</b></h3>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="10" style="border: none; padding: 10px 0 0; text-align: center;">
+                    <p style="padding: 15px 0; background: #004f27; color: #fff;">Thank you for choosing our services. Your satisfaction is our priority.</p>
+                </td>
+            </tr>
+        </table>
 
-        </div>
     </div>
+
 </body>
+
 </html>
