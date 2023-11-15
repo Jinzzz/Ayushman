@@ -215,8 +215,7 @@ class MstPatientController extends Controller
         $pageTitle = "Membership details";
         $paymentType = Mst_Master_Value::where('master_id',25)->pluck('master_value','id');
         $memberships = Mst_Membership_Package::pluck('package_title', 'membership_package_id', 'package_duration', 'package_description', 'package_price', 'is_active');
-        $patientMemberships = Mst_Patient_Membership_Booking::where('patient_id', $id)->get();
- 
+        $patientMemberships = Mst_Patient_Membership_Booking::with('membershipPackage')->where('patient_id', $id)->get();
         return view('patients.membership_details', compact('pageTitle', 'memberships', 'id', 'patientMemberships','paymentType'));
     }
     
