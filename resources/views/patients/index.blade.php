@@ -40,7 +40,7 @@
         @endif
         @if ($message = Session::get('error'))
         <div class="alert alert-danger">
-            <p></p>
+            <p>{{$message}}</p>
         </div>
         @endif
         <div class="card-header">
@@ -97,8 +97,6 @@
                                 </button>
                             </td>
                             <td>
-
-
                                 <a class="btn btn-primary btn-sm edit-custom" href="{{ route('patients.edit', $patient->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                                 <a class="btn btn-secondary btn-sm" href="{{ route('patients.show', $patient->id) }}">
                                     <i class="fa fa-eye" aria-hidden="true"></i> View </a>

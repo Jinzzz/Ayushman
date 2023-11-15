@@ -50,17 +50,17 @@
                               <h5 class="mb-0">Membership Assigning</h5>
                            </div>
                            <div class="wideget-user-img ml-auto mb-4">
-                              <a href="{{ URL::previous() }}" class="btn btn-secondary">Back</a>
+                              <a href="{{ url('/patients/index')}}" class="btn btn-secondary">Back</a>
                            </div>
                         </div>
                         <!-- <hr> -->
                         <div class="card-body">
-                           <div class="row" style="align-items: flex-end;">
+                           <div class="row" style="align-items: flex-start;">
                               <div class="col-md-6">
                                  <!-- Left Div -->
                                  <div class="form-group">
                                     <label for="branch_id" class="form-label">Select Membership</label>
-                                    <select id="membership" class="form-control" name="membership_id">
+                                    <select id="membership" required class="form-control" name="membership_id">
                                        <option value="">Choose Membership</option>
                                        @foreach($memberships as $membershipId => $packageTitle)
                                        <option value="{{ $membershipId }}">
@@ -75,7 +75,7 @@
                                  </div>
                                  <div class="form-group">
                                     <label for="payment-type" class="form-label">Payment Type</label>
-                                    <select class="form-control" id="payment_mode" required name="payment_type" placeholder="Payment Type">
+                                    <select class="form-control" id="payment_mode" required name="payment_type_id" placeholder="Payment Type">
                                        <option value="">Choose Payment Type</option>
                                        @foreach($paymentType as $id => $value)
                                        <option value="{{ $id }}">{{ $value }}</option>
@@ -84,44 +84,51 @@
                                  </div>
                                  <div class="form-group">
                                     <label class="form-label">Deposit To</label>
-                                    <select class="form-control" name="deposit_to" id="deposit_to">
+                                    <select class="form-control" required name="deposit_to" id="deposit_to">
                                        <option value="">Deposit To</option>
                                     </select>
                                  </div>
                                  <div class="form-group">
                                     <label class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" required name="reference_no" placeholder="Reference No">
+                                    <input type="text" class="form-control" name="reference_no" placeholder="Reference No">
+                                 </div>
 
+                                 <div class="form-group">
+                                    <button type="submit" class="btn btn-raised btn-primary" style="margin: 0 24px;">
+                                       <i class="fa fa-check-square-o"></i> Add Membership
+                                    </button>
                                  </div>
 
                               </div>
                               <!-- Right side content -->
                               <div class="col-md-6">
-                                 <button type="button" class="btn btn-primary" style="margin-bottom: 1rem;" id="viewDetails" onclick="loadWellness()">View Details</button>
+                                 <button type="button" class="btn btn-primary" style="margin-bottom: 1rem;margin-top: 37px;height: 38px;" id="viewDetails" onclick="loadWellness()">View Details</button>
 
-                                 <div>
-                                    <h6>Basic Details</h6>
-                                    <div class="card">
-                                       <div class="card-body" id="packageDetails">
-                                          <!-- Package details will be appended here -->
+                                 <div class="membership-more-details">
+                                    <div>
+                                       <h6>Basic Details</h6>
+                                       <div class="card">
+                                          <div class="card-body" id="packageDetails">
+                                             <!-- Package details will be appended here -->
+                                          </div>
                                        </div>
                                     </div>
-                                 </div>
 
-                                 <div>
-                                    <h6>Included Wellness</h6>
-                                    <div class="card">
-                                       <div class="card-body" id="wellness-details">
-                                          <!-- Wellness details will be appended here -->
+                                    <div>
+                                       <h6>Included Wellness</h6>
+                                       <div class="card">
+                                          <div class="card-body" id="wellness-details">
+                                             <!-- Wellness details will be appended here -->
+                                          </div>
                                        </div>
                                     </div>
-                                 </div>
 
-                                 <div>
-                                    <h6>Benefits</h6>
-                                    <div class="card">
-                                       <div class="card-body" id="benefitDiv">
-                                          <!-- Benefits will be appended here -->
+                                    <div>
+                                       <h6>Benefits</h6>
+                                       <div class="card">
+                                          <div class="card-body" id="benefitDiv">
+                                             <!-- Benefits will be appended here -->
+                                          </div>
                                        </div>
                                     </div>
                                  </div>
@@ -130,13 +137,6 @@
                            </div>
                         </div>
                      </div>
-                  </div>
-               </div>
-               <div class="row col-md-12">
-                  <div class="col-md-3">
-                     <button type="submit" class="btn btn-raised btn-primary" style="margin: 0 24px;">
-                        <i class="fa fa-check-square-o"></i> Add Membership
-                     </button>
                   </div>
                </div>
             </div>
@@ -188,9 +188,6 @@
          </div>
       </div>
    </div>
-
-
-
    <div class="tab-pane" id="tab-61">
       <div id="profile-log-switch">
          <div class="media-heading">
@@ -204,22 +201,6 @@
          </div>
       </div>
    </div>
-   <div class="tab-pane" id="tab-71">
-      {{-- <div class="row">
-         <div class="col-lg-3 col-md-6">
-            <img class="img-fluid rounded mb-5" src="./assets/images/media/8.jpg " alt="banner image">
-         </div>
-         <!-- Other tab content goes here -->
-      </div> --}}
-   </div>
-   <!-- Add more tab content as needed -->
-   </div>
-   </div>
-   </div>
-   </div>
-   </div>
-   <!-- COL-END -->
-   </div>
 </form>
 <!-- ROW-1 CLOSED -->
 @endsection
@@ -227,22 +208,68 @@
 <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
-
 <script>
-   function loadWellness() {
-      // alert("tets");
-      var membershipId = document.getElementById("membership").value;
-      //alert(x);
-      // var membershipId = $("#membership").val();
+   $(document).ready(function() {
+      $("#viewDetails").hide();
+      $(".membership-more-details").hide();
+      $("#viewDetails").click(function() {
+         $(".membership-more-details").slideToggle();
+         $(this).text(function(i, text) {
+            return text === "View Details" ? "Hide Details" : "View Details";
+         });
+      });
+   });
 
-      if (membershipId) {
-         // Now you have the selected membership ID in the 'membershipId' variable
+   function loadWellness() {
+      // show btn 
+      $("#viewDetails").show();
+   }
+   $(document).on('change', '#payment_mode', function() {
+      // Get the selected value
+      var selectedPaymentMode = $(this).val();
+      // alert(selectedPaymentMode.length);
+      // Make an AJAX request to fetch the ledger names based on the selected payment mode
+      if (selectedPaymentMode.length > 0) {
+         $.ajax({
+            url: '{{ route("getLedgerNames") }}',
+            type: 'GET',
+            data: {
+               payment_mode: selectedPaymentMode
+            },
+            success: function(data) {
+               // Clear existing options
+               $('#deposit_to').empty();
+
+               // Add default option
+               $('#deposit_to').append('<option value="">Deposit To</option>');
+
+               // Add options based on the response
+               $.each(data, function(key, value) {
+                  $('#deposit_to').append('<option value="' + key + '">' + value + '</option>');
+               });
+            },
+            error: function(error) {
+               console.log(error);
+            }
+         });
+      } else {
+         $('#deposit_to').empty();
+         $('#deposit_to').append('<option value="">Deposit To</option>');
+      }
+
+   });
+   $(document).on('change', '#membership', function() {
+      // Get the selected value
+      var membershipId = document.getElementById("membership").value;
+      // alert(selectedPaymentMode.length);
+      // Make an AJAX request to fetch the ledger names based on the selected payment mode
+      if (membershipId.length > 0) {
          console.log("Selected Membership ID:", membershipId);
          $.ajax({
             type: 'GET',
             url: '/get-wellness-details/' + membershipId,
             success: function(response) {
+               $("#viewDetails").show();
                // Update the wellness details container with the received data
                console.log(response)
                // $("#wellness-details").html(response);
@@ -269,8 +296,8 @@
                const packageEl = `
    				<h2 class="package-title"><b>${response.package_details.package_title}</b> </h2>
    								<ul class="package-info">
-   									<li><strong>Validity </strong>${response.package_details.package_duration} days</li>
-   									<li><strong>₹</strong> ${response.package_details.package_price} </li>
+   									<li>Validity ${response.package_details.package_duration} days</li>
+   									<li>₹${response.package_details.package_price} </li>
    								</ul>   				
    				`
 
@@ -283,37 +310,10 @@
             }
          });
       } else {
-         // Handle the case when no package is selected
-         $("#wellness-details").html('');
+         // hide button 
+         $("#viewDetails").hide();
       }
-   }
-   $(document).on('change', '#payment_mode', function() {
-      // Get the selected value
-      var selectedPaymentMode = $(this).val();
-      // alert(selectedPaymentMode);
-      // Make an AJAX request to fetch the ledger names based on the selected payment mode
-      $.ajax({
-         url: '{{ route("getLedgerNames") }}',
-         type: 'GET',
-         data: {
-            payment_mode: selectedPaymentMode
-         },
-         success: function(data) {
-            // Clear existing options
-            $('#deposit_to').empty();
 
-            // Add default option
-            $('#deposit_to').append('<option value="">Deposit To</option>');
-
-            // Add options based on the response
-            $.each(data, function(key, value) {
-               $('#deposit_to').append('<option value="' + key + '">' + value + '</option>');
-            });
-         },
-         error: function(error) {
-            console.log(error);
-         }
-      });
    });
 </script>
 @endsection
