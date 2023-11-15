@@ -26,9 +26,9 @@ use App\Helpers\AdminHelper;
          position: relative;
       }
 
-      .display-med-row {
+      /* .display-med-row {
          display: none;
-      }
+      } */
    </style>
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -91,20 +91,6 @@ use App\Helpers\AdminHelper;
                            <input type="date" class="form-control" readonly name="due_date" id="date" placeholder="Date">
                         </div>
                      </div>
-
-                     <!-- <div class="col-md-3">
-                        <div class="form-group">
-                           <div class="form-label">Print Invoice</div>
-                           <label class="custom-switch">
-                              <input type="hidden" name="is_print" value="0">
-                              <input type="checkbox" id="is_print" name="is_print" value="1" checked="checked" onchange="toggleStatus(this)" class="custom-switch-input">
-                              <span id="statusLabel" class="custom-switch-indicator"></span>
-                              <span id="statusText" class="custom-switch-description">
-                                 Print Invoice
-                              </span>
-                           </label>
-                        </div>
-                     </div> -->
                   </div>
                   <div class="row">
                      <div class="col-md-12 col-lg-12">
@@ -114,19 +100,20 @@ use App\Helpers\AdminHelper;
                                  <thead>
                                     <tr>
                                        <th>Medicine Name</th>
-                                       <!-- <th>Stock ID</th> -->
                                        <th>Batch No</th>
                                        <th>Quantity</th>
-                                       <!-- <th>Current stock</th> -->
-                                       <!-- <th>Order limit</th> -->
+                                       
                                        <th>Unit</th>
                                        <th>Rate</th>
-                                       <!-- <th>Tax Rate</th> -->
-                                       <!-- <th>Tax Amount</th> -->
                                        <th>Amount</th>
-                                       <!-- <th>Manufacture Date</th> -->
-                                       <!-- <th>Expiry Date</th> -->
                                        <th>Actions</th>
+                                       <th>Stock ID</th>
+                                       <th>Current stock</th>
+                                       <th>Order limit</th>
+                                       <th>Tax Rate</th>
+                                       <th>Tax Amount</th>
+                                       <th>Manufacture Date</th>
+                                       <th>Expiry Date</th>
                                     </tr>
                                  </thead>
                                  <tbody>
@@ -145,16 +132,16 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
-                                       <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
+                                       <td class="display-med-row medicine-stock-id"><input type="text" class="form-control" name="med_stock_id[]" readonly></td>
 
-                                       <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
-                                       <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
+                                       <td class="display-med-row medicine-current-stock"><input type="text" class="form-control" name="current-stock[]" readonly></td>
+                                       <td class="display-med-row medicine-reorder-limit"><input type="text" class="form-control" name="limit[]" readonly></td>
 
-                                       <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
-                                       <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
+                                       <td class="display-med-row medicine-tax-rate"><input type="text" class="form-control" name="tax_rate[]"></td>
+                                       <td class="display-med-row medicine-tax-amount"><input type="text" class="form-control" name="single_tax_amount[]" readonly></td>
 
-                                       <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
-                                       <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
+                                       <td class="display-med-row medicine-mfd"><input type="text" class="form-control" name="mfd[]" readonly></td>
+                                       <td class="display-med-row medicine-expd"><input type="text" class="form-control" name="expd[]" readonly></td>
                                     </tr>
                                  </tbody>
                               </table>
@@ -169,7 +156,7 @@ use App\Helpers\AdminHelper;
                         <div class="modal-content">
                            <div class="modal-header">
                               <h5 class="modal-title" id="medicineBatchModalLabel">Medicine Batch Details</h5>
-                              <button type="button" class="close modal-close" data-dismiss="modal" aria-label="Close">
+                              <button type="button" class="close modal-close no-selected-item"  data-dismiss="modal" aria-label="Close">
                                  <span aria-hidden="true">&times;</span>
                               </button>
                            </div>
@@ -198,7 +185,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary modal-close" data-dismiss="modal">Select</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Close</button>
                            </div>
                         </div>
                      </div>
@@ -581,17 +568,16 @@ use App\Helpers\AdminHelper;
             console.log('Error fetching medicine batches.');
          }
       });
+      
+      
 
-      $(document).on('change', '.radio-batch-btn', function() {
+    $(document).on('change', '.radio-batch-btn', function() {
+         // $(document).on('click', '.modal-close', function() {
 
-
-         var selectedValue = $("input[name='selected_batch']:checked")
+         //var selectedValue = $("input[name='selected_batch']:checked")
          //select.closest(".medicine-batch-no").find("input").val()
-
-
+         var selectedValue = $("input[name='selected_batch']:checked")
          var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
-         //var foundInput = $('input[name="' + specificName + '"][value="' + specificValue + '"]');
-
          var stock = 0
          // alert(id)
 
@@ -663,10 +649,37 @@ use App\Helpers\AdminHelper;
 
    function myClickFunction(bt) {
       var x = bt.parentNode.parentNode
+      var subtotal= parseFloat($('.tot').text())
+      var totaltax= parseFloat($('.tax-amount').text())
+
+      var totalRemove = x.querySelector('input[name="amount[]"]').value;
+      var taxRemove = x.querySelector('input[name="single_tax_amount[]"]').value;
+      // alert(subtotal)
+      // alert(totaltax)
+      // alert(totalRemove)
+      // alert(taxRemove)
+
+      var subtotal = subtotal - totalRemove
+      $('.tot').text(subtotal)
+      var tax = totaltax-taxRemove
+      $('.tax-amount').text(tax)
+      var total= subtotal + tax      
+      $('.total-amount').text(total)
+
+         var discount = $("#discount_percentage").val()
+         var discountT = (total * discount) / 100
+         //alert(discountT)
+         $("#discount-amount-input").val(discountT)
+         $(".discount-amount").text('₹' + discountT)
+         var payable = total - discountT
+
+         $(".payable-amount b").text('₹' + payable)
+         $(".paid-amount").val(payable)
+
       x.remove()
    }
 
-   $(document).on('click', '.modal-close', function() {
+   $(document).on('click', '#close-modal', function() {
       // ******************
       var selectedValue = $("input[name='selected_batch']:checked")
       // console.log("test"+ selectedValue)
@@ -704,11 +717,15 @@ use App\Helpers\AdminHelper;
          var checkVal = 0
          if (stck > lmt) {
             checkVal = stck - lmt
+            $(".selectedCls").find(".medicine-quantity span").remove()
          } else {
             $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
          }
          if (checkVal != 0 && checkVal <= quantity) {
             $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+         }
+         if( checkVal > quantity){
+            $(".selectedCls").find(".medicine-quantity span").remove()
          }
          // ****************
          var inputElements = $('input[name="amount[]"]');
@@ -833,6 +850,21 @@ use App\Helpers\AdminHelper;
 
 
    }
+   $(document).on('click', '.no-selected-item', function() {
+     // var selectedValue = $("input[name='selected_batch']:checked")
+      $("input[name='selected_batch']:checked").prop("checked", false);
+
+      // Remove the "style" attribute to make the row visible
+      var newRow = $('.selectedCls');
+      newRow.removeAttr("style");
+         // newRow.find('select').addClass('medicine-select');
+         newRow.find('input[type="text"]').val('');
+         newRow.find('input[type="number"]').val('');
+         newRow.find('input').removeAttr("disabled")
+         // newRow.removeAttr('style')
+         newRow.find('input span').remove()
+
+   });
 
    $(document).on('change', '.medicine-quantity input', function() {
       var stck = parseFloat($(this).closest('tr').find('.medicine-current-stock input').val());
@@ -847,11 +879,15 @@ use App\Helpers\AdminHelper;
       if (stck > lmt) {
          checkVal = stck - lmt
          //alert(checkVal)
+         $(this).closest('tr').find(".medicine-quantity span").remove()
       } else {
          $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
       }
       if (checkVal != 0 && checkVal <= quantity) {
          $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+      }
+      if(checkVal > quantity) {
+         $(this).closest('tr').find(".medicine-quantity span").remove()
       }
    })
 </script>

@@ -51,7 +51,7 @@ use App\Helpers\AdminHelper;
                <form action="{{ route('medicine.sales.invoices.update') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                   @csrf
                   <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_invoice_id}}">
-                  <input type="hidden" name="saved-booking-id" value="{{$medicine_sale_invoices->booking_id}}" id="saved-booking-id">
+                  <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
                      <div class="col-md-4">
@@ -508,10 +508,13 @@ use App\Helpers\AdminHelper;
          },
          success: function(data) {
             // alert(1);
+
+            var v = $('#saved-booking-id').val()
             $('#patient_booking_id').empty().append('<option value="">Choose Booking ID</option>');
             $.each(data, function(key, value) {
+               var isSelected = (key === v) ? 'selected' : '';
+               $('#patient_booking_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
 
-               $('#patient_booking_id').append('<option value="' + key + '">' + value + '</option>');
             });
          },
          error: function() {
