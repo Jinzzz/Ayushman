@@ -71,13 +71,11 @@
                                  </div>
                                  <div class="form-group">
                                     <label class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" required name="start_date"
-                                       placeholder="Start Date">
+                                    <input type="date" class="form-control" required name="start_date" placeholder="Start Date">
                                  </div>
                                  <div class="form-group">
                                     <label for="payment-type" class="form-label">Payment Type</label>
-                                    <select class="form-control" id="payment_mode" required name="payment_type"
-                                       placeholder="Payment Type">
+                                    <select class="form-control" id="payment_mode" required name="payment_type" placeholder="Payment Type">
                                        <option value="">Choose Payment Type</option>
                                        @foreach($paymentType as $id => $value)
                                        <option value="{{ $id }}">{{ $value }}</option>
@@ -85,22 +83,21 @@
                                     </select>
                                  </div>
                                  <div class="form-group">
-                                       <label class="form-label">Deposit To</label>
-                                       <select class="form-control" name="deposit_to" id="deposit_to">
-                                          <option value="">Deposit To</option>
-                                       </select>
-                                    </div>
-                                    <div class="form-group">
-                                       <label class="form-label">Reference No.</label>
-                                       <input type="text" class="form-control" required name="reference_no" placeholder="Reference No">
+                                    <label class="form-label">Deposit To</label>
+                                    <select class="form-control" name="deposit_to" id="deposit_to">
+                                       <option value="">Deposit To</option>
+                                    </select>
+                                 </div>
+                                 <div class="form-group">
+                                    <label class="form-label">Reference No.</label>
+                                    <input type="text" class="form-control" required name="reference_no" placeholder="Reference No">
 
-                                    </div>
+                                 </div>
 
                               </div>
                               <!-- Right side content -->
                               <div class="col-md-6">
-                                 <button type="button" class="btn btn-primary" style="margin-bottom: 1rem;"
-                                    id="viewDetails" onclick="loadWellness()">View Details</button>
+                                 <button type="button" class="btn btn-primary" style="margin-bottom: 1rem;" id="viewDetails" onclick="loadWellness()">View Details</button>
 
                                  <div>
                                     <h6>Basic Details</h6>
@@ -145,53 +142,53 @@
             </div>
 
             <div class="border-top">
-         <div class="wideget-user-tab">
-            <div class="tab-menu-heading">
-               <div class="tabs-menu1">
-                  <ul class="nav">
-                     <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Patient Membership History</a></li>
-                     {{-- <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li> --}}
-                  </ul>
+               <div class="wideget-user-tab">
+                  <div class="tab-menu-heading">
+                     <div class="tabs-menu1">
+                        <ul class="nav">
+                           <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Patient Membership History</a></li>
+                           {{-- <li><a href="#tab-61" data-toggle="tab" class="">Included benefits</a></li> --}}
+                        </ul>
+                     </div>
+                  </div>
                </div>
             </div>
-         </div>
-      </div>
 
          </div>
       </div>
-      
+
    </div>
-  
-                    <div id="patient-membership-history" class="row">
-                        <div class="col-lg-12 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Previous Memberships</h4>
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Membership Package</th>
-                                                <th>Start Date</th>
-                                                <th>Expiry Date</th>
-                                                <th>Validity</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($patientMemberships as $membership)
-                                            <tr>
-                                                <td>{{ $membership->membershipPackage->package_title }}</td>
-                                                <td>{{ date('d-m-Y', strtotime($membership->start_date)) }}</td>
-                                                <td>{{ date('d-m-Y', strtotime($membership->membership_expiry_date)) }}</td>
-                                                <td>{{ $membership->membershipPackage->package_duration }} days</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
+
+   <div id="patient-membership-history" class="row">
+      <div class="col-lg-12 mb-3">
+         <div class="card">
+            <div class="card-body">
+               <h4 class="card-title">Previous Memberships</h4>
+               <table class="table table-bordered">
+                  <thead>
+                     <tr>
+                        <th>Membership Package</th>
+                        <th>Start Date</th>
+                        <th>Expiry Date</th>
+                        <th>Validity</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     @foreach($patientMemberships as $membership)
+                     <tr>
+                        <td>{{ $membership->membershipPackage->package_title }}</td>
+                        <td>{{ date('d-m-Y', strtotime($membership->start_date)) }}</td>
+                        <td>{{ date('d-m-Y', strtotime($membership->membership_expiry_date)) }}</td>
+                        <td>{{ $membership->membershipPackage->package_duration }} days</td>
+                     </tr>
+                     @endforeach
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+
 
 
    <div class="tab-pane" id="tab-61">
@@ -245,7 +242,7 @@
          $.ajax({
             type: 'GET',
             url: '/get-wellness-details/' + membershipId,
-            success: function (response) {
+            success: function(response) {
                // Update the wellness details container with the received data
                console.log(response)
                // $("#wellness-details").html(response);
@@ -273,7 +270,7 @@
    				<h2 class="package-title"><b>${response.package_details.package_title}</b> </h2>
    								<ul class="package-info">
    									<li><strong>Validity </strong>${response.package_details.package_duration} days</li>
-   									<li><strong>$ </strong> ${response.package_details.package_price} </li>
+   									<li><strong>₹</strong> ${response.package_details.package_price} </li>
    								</ul>   				
    				`
 
@@ -281,7 +278,7 @@
 
 
             },
-            error: function (error) {
+            error: function(error) {
                console.error(error);
             }
          });
@@ -290,7 +287,7 @@
          $("#wellness-details").html('');
       }
    }
-   $(document).on('change', '#payment_mode', function () {
+   $(document).on('change', '#payment_mode', function() {
       // Get the selected value
       var selectedPaymentMode = $(this).val();
       // alert(selectedPaymentMode);
@@ -301,7 +298,7 @@
          data: {
             payment_mode: selectedPaymentMode
          },
-         success: function (data) {
+         success: function(data) {
             // Clear existing options
             $('#deposit_to').empty();
 
@@ -309,11 +306,11 @@
             $('#deposit_to').append('<option value="">Deposit To</option>');
 
             // Add options based on the response
-            $.each(data, function (key, value) {
+            $.each(data, function(key, value) {
                $('#deposit_to').append('<option value="' + key + '">' + value + '</option>');
             });
          },
-         error: function (error) {
+         error: function(error) {
             console.log(error);
          }
       });

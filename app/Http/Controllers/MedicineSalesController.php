@@ -461,7 +461,7 @@ class MedicineSalesController extends Controller
     public function update(Request $request)
     {
         try {
-            
+
             $user_id = 1;
             $user_details = Mst_Staff::where('staff_id', $user_id)->first();
             $branch_id = $user_details->branch_id;

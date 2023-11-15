@@ -25,7 +25,8 @@ use App\Helpers\AdminHelper;
       td.medicine-quantity {
          position: relative;
       }
-      .display-med-row{
+
+      .display-med-row {
          display: none;
       }
    </style>
