@@ -30,6 +30,6 @@ class AdminMiddleware
         // }
 
         // If not an admin, redirect or return an error response
-        return redirect('/login')->with('failed', 'You need to log in to access this page.');
+        return 1;//redirect('/login')->with('failed', 'You need to log in to access this page.');
     }
 }

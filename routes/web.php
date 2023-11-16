@@ -59,7 +59,7 @@ Route::get('/', function () {
 
 Auth::routes();
 //Authentication:
-Route::middleware('web')->group(function () {
+Route::middleware('auth')->group(function () {
 // Medicine dosage - Screen for medicine dosges
 Route::get('/medicine-dosage', [MstMedicineDosageController::class, 'index'])->name('medicine.dosage.index');
 Route::get('/medicine-dosage/create', [MstMedicineDosageController::class, 'create'])->name('medicine.dosage.create');
@@ -262,7 +262,8 @@ Route::post('/supplier/store', [MstSupplierController::class, 'store'])->name('s
 Route::get('/supplier/edit/{id}', [MstSupplierController::class, 'edit'])->name('supplier.edit');
 Route::put('/supplier/update/{id}', [MstSupplierController::class, 'update'])->name('supplier.update');
 Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
-Route::patch('supplier/{id}/change-status', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
+Route::patch('supplier/change-status/{id}', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
+Route::get('/supplier/show/{id}', [MstSupplierController::class, 'show'])->name('supplier.show');
 
 //Manage-Specialization:
 Route::get('/specialization/index/{id}', [MstStaffSpecializationController::class, 'index'])->name('specialization.index');
