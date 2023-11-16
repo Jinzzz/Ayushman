@@ -34,6 +34,16 @@
    .bullet-list {
       list-style-type: disc;
    }
+
+   #wellnessData {
+      list-style-type: disc;
+      margin: 0;
+      padding: 0;
+   }
+
+   #wellnessData li {
+      margin-bottom: 10px;
+   }
 </style>
 <!-- ROW-1 OPEN -->
 <form action="{{ route('patientsMembership.store',['id' => $id ]) }}" method="POST" enctype="multipart/form-data">
@@ -41,6 +51,22 @@
    <div class="row" id="user-profile">
       <div class="col-lg-12">
          <div class="card">
+            @if ($message = Session::get('error'))
+            <div class="alert alert-danger">
+               <p>{{ $message }}</p>
+            </div>
+            @endif
+            @if ($messages = Session::get('errors'))
+            <div class="alert alert-danger">
+               <ul>
+                  @foreach (json_decode($messages, true) as $field => $errorMessages)
+                  @foreach ($errorMessages as $errorMessage)
+                  <li>{{$errorMessage}}</li>
+                  @endforeach
+                  @endforeach
+               </ul>
+            </div>
+            @endif
             <div class="card-body">
                <div class="wideget-user">
                   <div class="row">
@@ -59,8 +85,8 @@
                               <div class="col-md-6">
                                  <!-- Left Div -->
                                  <div class="form-group">
-                                    <label for="branch_id" class="form-label">Select Membership</label>
-                                    <select id="membership" required class="form-control" name="membership_id">
+                                    <label for="branch_id" class="form-label">Select Membership*</label>
+                                    <select id="membership" required class="form-control" value="{{ old('membership_id') }}" name="membership_id">
                                        <option value="">Choose Membership</option>
                                        @foreach($memberships as $membershipId => $packageTitle)
                                        <option value="{{ $membershipId }}">
@@ -70,12 +96,12 @@
                                     </select>
                                  </div>
                                  <div class="form-group">
-                                    <label class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" required name="start_date" placeholder="Start Date">
+                                    <label class="form-label">Start Date*</label>
+                                    <input type="date" class="form-control" required value="{{ old('start_date') }}" name="start_date" placeholder="Start Date">
                                  </div>
                                  <div class="form-group">
-                                    <label for="payment-type" class="form-label">Payment Type</label>
-                                    <select class="form-control" id="payment_mode" required name="payment_type_id" placeholder="Payment Type">
+                                    <label for="payment-type" class="form-label">Payment Type*</label>
+                                    <select class="form-control" id="payment_mode" required value="{{ old('payment_type_id') }}" name="payment_type_id" placeholder="Payment Type">
                                        <option value="">Choose Payment Type</option>
                                        @foreach($paymentType as $id => $value)
                                        <option value="{{ $id }}">{{ $value }}</option>
@@ -83,20 +109,22 @@
                                     </select>
                                  </div>
                                  <div class="form-group">
-                                    <label class="form-label">Deposit To</label>
-                                    <select class="form-control" required name="deposit_to" id="deposit_to">
+                                    <label class="form-label">Deposit To*</label>
+                                    <select class="form-control" required value="{{ old('deposit_to') }}" name="deposit_to" id="deposit_to">
                                        <option value="">Deposit To</option>
                                     </select>
                                  </div>
                                  <div class="form-group">
                                     <label class="form-label">Reference No.</label>
-                                    <input type="text" class="form-control" name="reference_no" placeholder="Reference No">
+                                    <input type="text" class="form-control" value="{{ old('reference_no') }}" name="reference_no" placeholder="Reference No">
                                  </div>
 
                                  <div class="form-group">
-                                    <button type="submit" class="btn btn-raised btn-primary" style="margin: 0 24px;">
-                                       <i class="fa fa-check-square-o"></i> Add Membership
-                                    </button>
+                                    <center>
+                                       <button type="submit" class="btn btn-raised btn-primary" style="margin: 0 24px;">
+                                          <i class="fa fa-check-square-o"></i> Add Membership
+                                       </button>
+                                    </center>
                                  </div>
 
                               </div>
@@ -119,7 +147,9 @@
                                        <div class="card">
                                           <div class="card-body" id="wellness-details">
                                              <!-- Wellness details will be appended here -->
+                                             <ul id="wellnessData"></ul>
                                           </div>
+
                                        </div>
                                     </div>
 
@@ -280,12 +310,25 @@
                benefits.empty();
                packageDetails.empty();
                response.wellnessDetails.forEach(element => {
-                  //alert(element.wellness_name);
-                  // const divEl = `<p>${element.wellness_name} ( ${ element.wellness_duration}) - ${element.maximum_usage_limit} times </p>`
+                  const durationInMinutes = element.wellness_duration;
+                  const hours = Math.floor(durationInMinutes / 60);
+                  const minutes = durationInMinutes % 60;
 
-                  const divEl = `<p>${element.wellness_name} - ${element.maximum_usage_limit} times </p>`
-                  wellnessData.append(divEl);
+                  let durationFormatted = '';
+                  if (hours > 0) {
+                     durationFormatted += `${hours} hr${hours > 1 ? 's' : ''}`;
+                  }
+                  if (minutes > 0) {
+                     if (durationFormatted !== '') {
+                        durationFormatted += ' and ';
+                     }
+                     durationFormatted += `${minutes} min${minutes > 1 ? 's' : ''}`;
+                  }
+
+                  const listItemEl = `<li><strong>${element.wellness_name}</strong> (Dur: ${durationFormatted}, Lim: ${element.maximum_usage_limit} times)</li>`;
+                  wellnessData.append(listItemEl);
                });
+
 
                const benefitEl = `
    				<span>${response.benefits.title}</span>
@@ -300,10 +343,7 @@
    									<li>₹${response.package_details.package_price} </li>
    								</ul>   				
    				`
-
                packageDetails.append(packageEl);
-
-
             },
             error: function(error) {
                console.error(error);
