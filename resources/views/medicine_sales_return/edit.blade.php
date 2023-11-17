@@ -52,6 +52,7 @@ use App\Helpers\AdminHelper;
                   @csrf
                   <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_return_id}}">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
+                  <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
                   <div class="row">
                      <div class="col-md-4">
                         <div class="form-group">
@@ -470,10 +471,11 @@ use App\Helpers\AdminHelper;
          },
          success: function(data) {
             // alert(1);
+            var v = $('#saved-booking-id').val()
             $('#patient_invoice_id').empty().append('<option value="">Choose Invoice ID</option>');
             $.each(data, function(key, value) {
-
-               $('#patient_invoice_id').append('<option value="' + key + '">' + value + '</option>');
+               var isSelected = (key === v) ? 'selected' : '';
+               $('#patient_invoice_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
             });
          },
          error: function() {

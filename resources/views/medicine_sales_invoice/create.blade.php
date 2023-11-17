@@ -26,9 +26,9 @@ use App\Helpers\AdminHelper;
          position: relative;
       }
 
-      /* .display-med-row {
+      .display-med-row {
          display: none;
-      } */
+      }
    </style>
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -102,18 +102,17 @@ use App\Helpers\AdminHelper;
                                        <th>Medicine Name</th>
                                        <th>Batch No</th>
                                        <th>Quantity</th>
-                                       
                                        <th>Unit</th>
                                        <th>Rate</th>
                                        <th>Amount</th>
                                        <th>Actions</th>
-                                       <th>Stock ID</th>
+                                       <!-- <th>Stock ID</th>
                                        <th>Current stock</th>
                                        <th>Order limit</th>
                                        <th>Tax Rate</th>
                                        <th>Tax Amount</th>
                                        <th>Manufacture Date</th>
-                                       <th>Expiry Date</th>
+                                       <th>Expiry Date</th> -->
                                     </tr>
                                  </thead>
                                  <tbody>
@@ -132,16 +131,16 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
-                                       <td class="display-med-row medicine-stock-id"><input type="text" class="form-control" name="med_stock_id[]" readonly></td>
+                                       <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
 
-                                       <td class="display-med-row medicine-current-stock"><input type="text" class="form-control" name="current-stock[]" readonly></td>
-                                       <td class="display-med-row medicine-reorder-limit"><input type="text" class="form-control" name="limit[]" readonly></td>
+                                       <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
+                                       <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
 
-                                       <td class="display-med-row medicine-tax-rate"><input type="text" class="form-control" name="tax_rate[]"></td>
-                                       <td class="display-med-row medicine-tax-amount"><input type="text" class="form-control" name="single_tax_amount[]" readonly></td>
+                                       <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
+                                       <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
 
-                                       <td class="display-med-row medicine-mfd"><input type="text" class="form-control" name="mfd[]" readonly></td>
-                                       <td class="display-med-row medicine-expd"><input type="text" class="form-control" name="expd[]" readonly></td>
+                                       <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
+                                       <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
                                  </tbody>
                               </table>
@@ -185,7 +184,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
