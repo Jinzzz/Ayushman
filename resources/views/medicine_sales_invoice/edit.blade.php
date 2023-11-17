@@ -198,7 +198,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
+                           <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
@@ -509,10 +509,13 @@ use App\Helpers\AdminHelper;
          },
          success: function(data) {
             // alert(1);
+
+            var v = $('#saved-booking-id').val()
             $('#patient_booking_id').empty().append('<option value="">Choose Booking ID</option>');
             $.each(data, function(key, value) {
+               var isSelected = (key === v) ? 'selected' : '';
+               $('#patient_booking_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
 
-               $('#patient_booking_id').append('<option value="' + key + '">' + value + '</option>');
             });
          },
          error: function() {
