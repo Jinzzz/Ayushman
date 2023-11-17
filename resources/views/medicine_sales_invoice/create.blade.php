@@ -132,13 +132,10 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                        <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
-
                                        <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
                                        <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
-
                                        <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
                                        <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
-
                                        <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
                                        <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
@@ -155,7 +152,7 @@ use App\Helpers\AdminHelper;
                         <div class="modal-content">
                            <div class="modal-header">
                               <h5 class="modal-title" id="medicineBatchModalLabel">Medicine Batch Details</h5>
-                              <button type="button" class="close modal-close no-selected-item"  data-dismiss="modal" aria-label="Close">
+                              <button type="button" class="close modal-close no-selected-item" data-dismiss="modal" aria-label="Close">
                                  <span aria-hidden="true">&times;</span>
                               </button>
                            </div>
@@ -567,10 +564,10 @@ use App\Helpers\AdminHelper;
             console.log('Error fetching medicine batches.');
          }
       });
-      
-      
 
-    $(document).on('change', '.radio-batch-btn', function() {
+
+
+      $(document).on('change', '.radio-batch-btn', function() {
          // $(document).on('click', '.modal-close', function() {
 
          //var selectedValue = $("input[name='selected_batch']:checked")
@@ -648,8 +645,8 @@ use App\Helpers\AdminHelper;
 
    function myClickFunction(bt) {
       var x = bt.parentNode.parentNode
-      var subtotal= parseFloat($('.tot').text())
-      var totaltax= parseFloat($('.tax-amount').text())
+      var subtotal = parseFloat($('.tot').text())
+      var totaltax = parseFloat($('.tax-amount').text())
 
       var totalRemove = x.querySelector('input[name="amount[]"]').value;
       var taxRemove = x.querySelector('input[name="single_tax_amount[]"]').value;
@@ -660,20 +657,20 @@ use App\Helpers\AdminHelper;
 
       var subtotal = subtotal - totalRemove
       $('.tot').text(subtotal)
-      var tax = totaltax-taxRemove
+      var tax = totaltax - taxRemove
       $('.tax-amount').text(tax)
-      var total= subtotal + tax      
+      var total = subtotal + tax
       $('.total-amount').text(total)
 
-         var discount = $("#discount_percentage").val()
-         var discountT = (total * discount) / 100
-         //alert(discountT)
-         $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
-         var payable = total - discountT
+      var discount = $("#discount_percentage").val()
+      var discountT = (total * discount) / 100
+      //alert(discountT)
+      $("#discount-amount-input").val(discountT)
+      $(".discount-amount").text('₹' + discountT)
+      var payable = total - discountT
 
-         $(".payable-amount b").text('₹' + payable)
-         $(".paid-amount").val(payable)
+      $(".payable-amount b").text('₹' + payable)
+      $(".paid-amount").val(payable)
 
       x.remove()
    }
@@ -723,7 +720,7 @@ use App\Helpers\AdminHelper;
          if (checkVal != 0 && checkVal <= quantity) {
             $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
          }
-         if( checkVal > quantity){
+         if (checkVal > quantity) {
             $(".selectedCls").find(".medicine-quantity span").remove()
          }
          // ****************
@@ -850,18 +847,18 @@ use App\Helpers\AdminHelper;
 
    }
    $(document).on('click', '.no-selected-item', function() {
-     // var selectedValue = $("input[name='selected_batch']:checked")
+      // var selectedValue = $("input[name='selected_batch']:checked")
       $("input[name='selected_batch']:checked").prop("checked", false);
 
       // Remove the "style" attribute to make the row visible
       var newRow = $('.selectedCls');
       newRow.removeAttr("style");
-         // newRow.find('select').addClass('medicine-select');
-         newRow.find('input[type="text"]').val('');
-         newRow.find('input[type="number"]').val('');
-         newRow.find('input').removeAttr("disabled")
-         // newRow.removeAttr('style')
-         newRow.find('input span').remove()
+      // newRow.find('select').addClass('medicine-select');
+      newRow.find('input[type="text"]').val('');
+      newRow.find('input[type="number"]').val('');
+      newRow.find('input').removeAttr("disabled")
+      // newRow.removeAttr('style')
+      newRow.find('input span').remove()
 
    });
 
@@ -885,7 +882,7 @@ use App\Helpers\AdminHelper;
       if (checkVal != 0 && checkVal <= quantity) {
          $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
       }
-      if(checkVal > quantity) {
+      if (checkVal > quantity) {
          $(this).closest('tr').find(".medicine-quantity span").remove()
       }
    })
