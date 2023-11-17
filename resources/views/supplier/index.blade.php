@@ -51,7 +51,7 @@
         @endif
         @if ($message = Session::get('error'))
         <div class="alert alert-danger">
-            <p></p>
+            <p>{{$message}}</p>
         </div>
         @endif
         <div class="card-header">
@@ -62,9 +62,6 @@
                 <i class="fa fa-plus"></i>
                 Create Supplier
             </a>
-
-
-
             <div class="table-responsive">
                 <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                     <thead>
@@ -190,7 +187,7 @@
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(10)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(6)');
 
                                 if (cell.find('.btn-success').length) {
                                     cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
