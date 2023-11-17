@@ -32,15 +32,15 @@ class MstMembershipController extends Controller
 
     public function store(Request $request)
     {
-        print_r($request->all());die();
+
         $validator = Validator::make(
             $request->all(),
             [
                 'membership_package_name' => ['required'],
                 'membership_package_duration' => ['required'],
                 'membership_package_price' => ['required'],
-                'discount_price' => ['required'],
-                'membership_package_description' => ['required'],
+                // 'discount_price' => ['required'],
+                // 'membership_package_description' => ['required'],
                 'membership_package_active' => ['required'],
                 'wellness_id' => ['required'],
                 'max_limit' => ['required'],
@@ -50,8 +50,8 @@ class MstMembershipController extends Controller
                 'membership_package_name.required' => 'Membership package name is required',
                 'membership_package_duration.required' => 'Membership package duration is required',
                 'membership_package_price.required' => 'Membership package price is required',
-                'discount_price.required' => 'Discount price is required',
-                'membership_package_description.required' => 'Membership package description is required',
+                // 'discount_price.required' => 'Discount price is required',
+                // 'membership_package_description.required' => 'Membership package description is required',
                 'membership_package_active.required' => 'Membership package status is required',
                 'wellness_id.required' => 'Atleast one wellness is required',
                 'max_limit.required' => 'Wellness max usage limit is required',
@@ -67,8 +67,8 @@ class MstMembershipController extends Controller
                 'package_price'    => $request->membership_package_price,
                 'package_discount_price'    => $request->discount_price,
                 'is_active'       => $request->membership_package_active,
-                'created_by'    => Auth::id(),
-                'updated_by'          => Auth::id(),
+                'created_by'    => 1,
+                'updated_by'          => 1,
                 'created_at'         => Carbon::now(),
                 'updated_at'         => Carbon::now(),
             ]);
@@ -82,25 +82,27 @@ class MstMembershipController extends Controller
                         'wellness_id' => $request->wellness_id[$i],
                         'maximum_usage_limit' => $request->max_limit[$i],
                         'is_active' => 1,
-                        'created_by' => Auth::id(),
-                        'updated_by' => Auth::id(),
+                        'created_by' => 1,
+                        'updated_by' => 1,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
                 }
             }
 
-            $checkBenefits = Mst_Membership_Benefit::where('package_id', $lastInsertedId)->where('title', $request->benefits[$i])->first();
+            if(isset($request->benefits)){
+                $checkBenefits = Mst_Membership_Benefit::where('package_id', $lastInsertedId)->where('title', $request->benefits[$i])->first();
             if (!$checkBenefits) {
                 $addMembershipBenefits = Mst_Membership_Benefit::create([
                     'package_id' => $lastInsertedId,
                     'title' => $request->benefits,
                     'is_active' => 1,
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
+                    'created_by' => 1,
+                    'updated_by' => 1,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
+            }
             }
             return redirect()->route('membership.index')->with('success', 'Membership package added successfully');
         } else {
@@ -146,7 +148,7 @@ class MstMembershipController extends Controller
                             'package_price'      => $request->membership_package_price,
                             'package_discount_price' => $request->discount_price,
                             'is_active'          => $request->membership_package_active,
-                            'updated_by'         => Auth::id(),
+                            'updated_by'         => 1,
                             'updated_at' => Carbon::now(),
                         ]);
                     }
@@ -161,8 +163,8 @@ class MstMembershipController extends Controller
                             'wellness_id' => $request->wellness_id,
                             'maximum_usage_limit' => $request->max_usage_limit,
                             'is_active' => 1,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -201,8 +203,8 @@ class MstMembershipController extends Controller
                             $updateMembershipBenefits = Mst_Membership_Benefit::where('package_id', $id)->update([
                                 'title' => $mergedHtml,
                                 'is_active' => 1,
-                                'created_by' => Auth::id(),
-                                'updated_by' => Auth::id(),
+                                'created_by' => 1,
+                                'updated_by' => 1,
                                 'created_at' => Carbon::now(),
                                 'updated_at' => Carbon::now(),
                             ]);
@@ -217,8 +219,8 @@ class MstMembershipController extends Controller
                             'package_id' => $id,
                             'title' => $request->benefit_title,
                             'is_active' => 1,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -311,6 +313,7 @@ class MstMembershipController extends Controller
         $membership = Mst_Membership_Package::findOrFail($id);
         $membership->is_active = !$membership->is_active;
         $membership->save();
+        return 1;
         return redirect()->back()->with('success', 'Status changed successfully');
     }
 

@@ -43,9 +43,9 @@
                         <td>{{ $account_ledgers->ledger_code }}</td>
                         <td>{{ $account_ledgers->ledger_name }}</td>
                         <td>
-                            <button type="button" onclick="changeStatus({{ $account_ledgers->id }})" class="btn btn-sm @if($account_ledgers->is_active == 0) btn-danger @else btn-success @endif">
+                            <button type="button" style="width: 70px;"  onclick="changeStatus({{ $account_ledgers->id }})" class="btn btn-sm @if($account_ledgers->is_active == 0) btn-danger @else btn-success @endif">
                                 @if($account_ledgers->is_active == 0)
-                                InActive
+                                Inactive
                                 @else
                                 Active
                                 @endif
@@ -139,12 +139,12 @@
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(3)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

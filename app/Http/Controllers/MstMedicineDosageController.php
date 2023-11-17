@@ -53,20 +53,20 @@ class MstMedicineDosageController extends Controller
                     Mst_Medicine_Dosage::where('medicine_dosage_id', $request->hidden_id)->update([
                         'name' => $request->medicine_dosages,
                         'is_active' => $request->is_active,
-                        'updated_by' => Auth::id(),
+                        'updated_by' => 1,
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Medicine dosage updated successfully';
                 } else {
                     $checkExists = Mst_Medicine_Dosage::where('name', $request->medicine_dosages)->first();
                     if ($checkExists) {
-                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is aready exists.');
+                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is already exists.');
                     } else {
                         Mst_Medicine_Dosage::create([
                             'name' => $request->medicine_dosages,
                             'is_active' => $request->is_active,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -89,7 +89,7 @@ class MstMedicineDosageController extends Controller
     {
         try {
             $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
-            $medicine_dosages->deleted_by = Auth::id();
+            $medicine_dosages->deleted_by = 1;
             $medicine_dosages->save();
             $medicine_dosages->delete();
             return 1;

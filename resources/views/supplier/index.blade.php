@@ -107,7 +107,7 @@
                                                 onclick="return confirm('Do you want to Change status?');"
                                                 class="btn btn-sm @if($supplier->is_active == 0) btn-danger @else btn-success @endif">
                                                 @if($supplier->is_active == 0)
-                                                InActive
+                                                Inactive
                                                 @else
                                                 Active
                                                 @endif

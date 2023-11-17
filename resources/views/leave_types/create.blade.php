@@ -36,10 +36,10 @@
                            <div class="form-label">Status</div>
                            <label class="custom-switch">
                               <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
-                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($leave_types->is_active) && $leave_types->is_active == 1 ? 'checked' : '' }}>
+                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ old('is_active', isset($medicine_dosages->is_active) ? $medicine_dosages->is_active : 1) ? 'checked' : '' }}>
                               <span id="statusLabel" class="custom-switch-indicator"></span>
                               <span id="statusText" class="custom-switch-description">
-                                 {{ isset($leave_types->is_active) && $leave_types->is_active ? 'Active' : 'Inactive' }}
+                                 {{ old('is_active', isset($medicine_dosages->is_active) ? ($medicine_dosages->is_active ? 'Active' : 'Inactive') : 'Active') }}
                               </span>
                            </label>
                         </div>
@@ -50,14 +50,15 @@
                            <div class="form-label">Is Deductible</div>
                            <label class="custom-switch">
                               <input type="hidden" name="is_dedactable" value="0"> <!-- Hidden field for false value -->
-                              <input type="checkbox" id="is_dedactable" name="is_dedactable" value="1" onchange="toggleDeductible(this)" class="custom-switch-input" {{ isset($leave_types->is_dedactable) && $leave_types->is_dedactable == 1 ? 'checked' : '' }}>
+                              <input type="checkbox" id="is_dedactable" name="is_dedactable" value="1" onchange="toggleDeductible(this)" class="custom-switch-input" {{ old('is_dedactable', isset($leave_types->is_dedactable) ? $leave_types->is_dedactable : 1) ? 'checked' : '' }}>
                               <span id="dedactableLabel" class="custom-switch-indicator"></span>
                               <span id="dedactableText" class="custom-switch-description">
-                                 {{ isset($leave_types->is_dedactable) && $leave_types->is_dedactable ? 'Deductible' : 'Non-Deductible' }}
+                                 {{ old('is_dedactable', isset($leave_types->is_dedactable) ? ($leave_types->is_dedactable ? 'Non-Deductible' : 'Deductible') : 'Non-Deductible') }}
                               </span>
                            </label>
                         </div>
                      </div>
+
 
                   </div>
                   <div class="form-group">
@@ -94,10 +95,10 @@
    }
    function toggleDeductible(checkbox) {
       if (checkbox.checked) {
-         $("#dedactableText").text('Deductible');
+         $("#dedactableText").text('Non-Deductible');
          $("input[name=is_dedactable]").val(1); // Set the value to 1 when checked
       } else {
-         $("#dedactableText").text('Non-Deductible');
+         $("#dedactableText").text('Deductible');
          $("input[name=is_dedactable").val(0); // Set the value to 0 when unchecked
       }
    }

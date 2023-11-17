@@ -40,7 +40,7 @@ class AuthController extends Controller
                 $user=Mst_User::with(['staff','userType'])->where('username',$username)->first();
                 if(!$user)
                 {
-                    $data['status'] = 0;
+                    $data['status'] = 3;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
 
@@ -60,7 +60,7 @@ class AuthController extends Controller
                     }
                     else
                     {
-                        $data['status'] = 0;
+                        $data['status'] = 3;
                         $data['message'] = "Invalid Login Details";
                         return response($data);
 
@@ -69,7 +69,7 @@ class AuthController extends Controller
                 }
                 else
                 {
-                    $data['status'] = 0;
+                    $data['status'] = 3;
                     $data['message'] = "Invalid Login Details";
                     return response($data);
                 }

@@ -17,6 +17,7 @@ class Mst_Patient_Membership_Booking extends Model
         'payment_type',
         'payment_amount',
         'details',
+        'reference_number',
     ];
 
     public function membershipPackage()

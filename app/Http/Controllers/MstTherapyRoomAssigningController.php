@@ -51,10 +51,13 @@ class MstTherapyRoomAssigningController extends Controller
                 'assigned_staff_id' => 'required',
             ]);
 
-            Mst_Therapy_Room_Assigning::where([
-                'therapy_room_id' => $request->input('therapy_room_id'),
-                'branch_id' => $request->input('branch_id'),
-            ])->update(['is_active' => 0]);
+            $checkExists = Mst_Therapy_Room_Assigning::where('therapy_room_id', $request->input('therapy_room_id'))
+            ->where('branch_id', $request->input('branch_id'))
+            ->where('staff_id', $request->input('assigned_staff_id'))
+            ->first();
+            if ($checkExists) {
+                return redirect()->route('therapyroomassigning.index', $request->therapy_room_id)->with('error', 'The staff has already been assigned to the room. Feel free to change the status if needed.');
+            }
 
             $store = new Mst_Therapy_Room_Assigning();
             $store->therapy_room_id = $request->input('therapy_room_id');
@@ -65,7 +68,7 @@ class MstTherapyRoomAssigningController extends Controller
 
             return redirect()->route('therapyroomassigning.index', $request->therapy_room_id)->with('success', 'Therapy room assigned successfully');
         } catch (QueryException $e) {
-            return redirect()->route('therapyroomassigning.index')->with('error', 'Something went wrong.');
+            return redirect()->route('therapyroomassigning.index', $request->therapy_room_id)->with('error', 'Something went wrong.');
         }
     }
 
@@ -123,11 +126,6 @@ class MstTherapyRoomAssigningController extends Controller
     {
         try {
             $targetRecord = Mst_Therapy_Room_Assigning::findOrFail($id);
-
-            Mst_Therapy_Room_Assigning::where([
-                'therapy_room_id' => $targetRecord->therapy_room_id,
-                'branch_id' => $targetRecord->branch_id,
-            ])->update(['is_active' => 0]);
 
             $targetRecord->is_active = !$targetRecord->is_active;
             $targetRecord->save();

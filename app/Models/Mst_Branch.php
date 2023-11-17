@@ -17,6 +17,7 @@ class Mst_Branch extends Model
     protected $fillable = [
         'branch_name',
         'branch_address',
+        'gstno',
         'is_active',
         'branch_contact_number',
         'branch_email',

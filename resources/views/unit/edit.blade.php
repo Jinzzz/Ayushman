@@ -14,7 +14,7 @@
                </div>
                @endif
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
                   <strong>Whoops!</strong> There were some problems with your input.<br><br>

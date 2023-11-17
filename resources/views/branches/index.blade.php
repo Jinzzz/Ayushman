@@ -85,9 +85,9 @@
                                     <td>{{ $branch->branch_admin_contact_number }}</td>
                                     <td>
                                        
-                                        <button type="button" onclick="changeStatus({{ $branch->branch_id }})" class="btn btn-sm @if($branch->is_active == 0) btn-danger @else btn-success @endif">
+                                        <button type="button" style="width: 70px;"  onclick="changeStatus({{ $branch->branch_id }})" class="btn btn-sm @if($branch->is_active == 0) btn-danger @else btn-success @endif">
                                             @if($branch->is_active == 0)
-                                            InActive
+                                            Inactive
                                             @else
                                             Active
                                             @endif
@@ -190,9 +190,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(6)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

@@ -25,5 +25,6 @@ class TrnLedgerPosting extends Model
         'branch_id',
         'transaction_amount',
         'narration',
+        'reference_number',
     ];
 }

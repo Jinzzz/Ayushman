@@ -54,7 +54,7 @@
                      @endforeach
                   </div>
 
-
+                  <div class="col-md-12 mt-5">
                   <div class="form-group">
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
@@ -65,6 +65,7 @@
                         </button>
                         <a class="btn btn-danger" href="{{ route('tax.group.index') }}">Cancel</a>
                      </center>
+                  </div>
                   </div>
                </form>
 

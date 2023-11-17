@@ -56,21 +56,21 @@ class MstLeaveTypeController extends Controller
                         'name' => $request->leave_types,
                         'is_active' => $request->is_active,
                         'is_dedactable' => $request->is_dedactable,
-                        'updated_by' => Auth::id(),
+                        'updated_by' => 1,
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Leave type updated successfully';
                 } else {
                     $checkExists = Mst_Leave_Type::where('name', $request->leave_types)->first();
                     if ($checkExists) {
-                        return redirect()->route('leave.type.index')->with('exists', 'This leave type is aready exists.');
+                        return redirect()->route('leave.type.index')->with('exists', 'This leave type is already exists.');
                     } else {
                         Mst_Leave_Type::create([
                             'name' => $request->leave_types,
                             'is_active' => $request->is_active,
                             'is_dedactable' => $request->is_dedactable,
-                            'created_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
+                            'created_by' => 1,
+                            'updated_by' => 1,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -93,7 +93,7 @@ class MstLeaveTypeController extends Controller
     {
         try {
             $leave_types = Mst_Leave_Type::findOrFail($id);
-            $leave_types->deleted_by = Auth::id();
+            $leave_types->deleted_by = 1;
             $leave_types->save();
             $leave_types->delete();
             return 1;
