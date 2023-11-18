@@ -29,7 +29,7 @@
                   <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Username</label>
+                           <label class="form-label">Username*</label>
                            <input type="text" class="form-control" required name="username" value="{{old('username')}}" placeholder="Username">
                         </div>
                      </div>
@@ -37,7 +37,7 @@
                         <div class="form-group">
                            <label class="form-label">Password*</label>
                            <div class="input-group">
-                              <input type="password" class="form-control" name="password" id="password" value="{{old('password')}}" placeholder="Password">
+                              <input type="password" required class="form-control" name="password" id="password" value="{{old('password')}}" placeholder="Password">
                               <div class="input-group-append">
                                  <span class="input-group-text">
                                     <i class="fa fa-eye-slash password-eye-slash" id="eye" onclick="togglePassword()" style="position: absolute; top: 18px; right:15px; color:#000"></i>
@@ -52,7 +52,7 @@
                         <div class="form-group">
                            <label class="form-label">Confirm Password*</label>
                            <div class="input-group">
-                              <input type="password" class="form-control" name="confirm_password" value="{{old('confirm_password')}}" placeholder="Confirm Password" id="confirmPassword" onkeyup="validatePassword()">
+                              <input type="password" class="form-control" required name="confirm_password" value="{{old('confirm_password')}}" placeholder="Confirm Password" id="confirmPassword" onkeyup="validatePassword()">
                               <div class="input-group-append">
                                  <span class="input-group-text">
                                     <i class="fa fa-eye-slash password-eye-slash" id="confirmEye" onclick="toggleConfirmPassword()" style="position: absolute; top: 18px; right:15px; color:#000"></i>
@@ -64,7 +64,7 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">User Email</label>
+                           <label class="form-label">User Email*</label>
                            <input type="text" class="form-control" required name="user_email" value="{{old('user_email')}}" placeholder="User Email">
                         </div>
                      </div>
@@ -72,8 +72,8 @@
                   <div class="row">
                      <div class="col-sm-6">
                         <div class="form-group">
-                           <label for="user_type_id" class="form-label">User Type</label>
-                           <select class="form-control" name="user_type_id" id="user_type_id">
+                           <label for="user_type_id" class="form-label">User Type*</label>
+                           <select class="form-control" required name="user_type_id" id="user_type_id">
                               <option value="">Choose User Type</option>
                               @foreach($userTypes as $id => $userType)
                               <option value="{{ $id }}">{{ $userType }}</option>
@@ -84,8 +84,8 @@
 
                      <div class="col-sm-6">
                         <div class="form-group">
-                           <label class="form-label">Staff</label>
-                           <select class="form-control" name="staff_id" id="staff_id">
+                           <label class="form-label">Staff*</label>
+                           <select class="form-control" required name="staff_id" id="staff_id">
                               <option value="">Select Staff</option>
                               @foreach($staffs as $id => $staffName)
                               <option value="{{ $id }}">{{ $staffName }}</option>

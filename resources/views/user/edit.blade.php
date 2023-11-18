@@ -1,6 +1,11 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+   <style>
+      .no-display{
+         display: none;
+      }
+   </style>
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
          <div class="card">
@@ -8,6 +13,11 @@
                <h3 class="mb-0 card-title">Edit User</h3>
             </div>
             <div class="col-lg-12" style="background-color: #fff;">
+               @if ($message = Session::get('error'))
+               <div class="alert alert-danger">
+                  <p>{{ $message }}</p>
+               </div>
+               @endif
                @if ($errors->any())
                <div class="alert alert-danger">
                   <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
@@ -18,21 +28,29 @@
                   </ul>
                </div>
                @endif
-               <form action="{{route('user.update',['id'=>$user->user_id])}}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('user.update', ['id' => $user['user_id']]) }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   @method('PUT')
                   <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Username*</label>
-                           <input type="text" class="form-control" required name="username" value="{{ $user->username }}" placeholder="Username">
+                           <input type="text" class="form-control" required name="username" value="{{ $user['username'] }}" placeholder="Username">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Password</label>
+                           <label class="form-label">User Email*</label>
+                           <input type="text" class="form-control" required name="user_email" value="{{ $user['email'] }}" placeholder="User Email">
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row no-display">
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Password*</label>
                            <div class="input-group">
-                              <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                              <input type="password" required class="form-control" value="{{$user['password']}}" name="password" id="password" placeholder="Password">
                               <div class="input-group-append">
                                  <span class="input-group-text">
                                     <i class="fa fa-eye-slash password-eye-slash" id="eye" onclick="togglePassword()" style="position: absolute; top: 18px; right:15px; color:#000"></i>
@@ -41,13 +59,11 @@
                            </div>
                         </div>
                      </div>
-                  </div>
-                  <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Confirm Password</label>
+                           <label class="form-label">Confirm Password*</label>
                            <div class="input-group">
-                              <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" id="confirmPassword" onkeyup="validatePassword()">
+                              <input type="password" class="form-control" value="{{$user['password']}}" required name="confirm_password" placeholder="Confirm Password" id="confirmPassword" onkeyup="validatePassword()">
                               <div class="input-group-append">
                                  <span class="input-group-text">
                                     <i class="fa fa-eye-slash password-eye-slash" id="confirmEye" onclick="toggleConfirmPassword()" style="position: absolute; top: 18px; right:15px; color:#000"></i>
@@ -57,32 +73,27 @@
                            <small id="password_error" class="text-secondary" style="color: green; display: none;">Passwords do not match.</small>
                         </div>
                      </div>
-                     <div class="col-md-6">
-                        <div class="form-group">
-                           <label class="form-label">User Email*</label>
-                           <input type="text" class="form-control" required name="user_email" value="{{ $user->user_email }}" placeholder="User Email">
-                        </div>
-                     </div>
+
                   </div>
                   <div class="row">
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">User Type*</label>
-                           <select class="form-control" name="user_type_id" id="user_type_id">
+                           <select class="form-control" required name="user_type_id" id="user_type_id">
                               <option value="">Choose User Type</option>
                               @foreach($userTypes as $id => $userType)
-                              <option value="{{ $id }}" {{$id == $user->user_type_id ?' selected' : ''}}>{{ $userType }}</option>
+                              <option value="{{ $id }}" {{$id == $user['user_type_id'] ?' selected' : ''}}>{{ $userType }}</option>
                               @endforeach
                            </select>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Staff</label>
-                           <select class="form-control" name="staff_id" id="staff_id">
+                           <label class="form-label">Staff*</label>
+                           <select class="form-control" required name="staff_id" id="staff_id">
                               <option value="">Select Staff</option>
                               @foreach($staff as $id => $staffName)
-                              <option value="{{ $id }}" {{$id == $user->staff_id ?' selected' : ''}}>{{ $staffName }}</option>
+                              <option value="{{ $id }}" {{$id == $user['staff_id'] ?' selected' : ''}}>{{ $staffName }}</option>
                               @endforeach
                            </select>
                         </div>

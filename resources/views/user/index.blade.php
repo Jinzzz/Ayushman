@@ -1,9 +1,42 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">User Search</h3>
+    </div>
+    <form action="{{ route('user.index') }}" method="GET">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">User Type:</label>
+                    <select class="form-control" name="user_type_id" id="user_type_id">
+                        <option value="">Choose User Type</option>
+                        @foreach($userTypes as $id => $userType)
+                        <option value="{{ $id }}" {{ $id == $user_type_id ? 'selected' : ''}}>{{ $userType }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Username:</label>
+                    <input type="text" id="username" name="username" class="form-control" value="{{ request('username') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Email:</label>
+                    <input type="text" id="email" name="email" class="form-control" value="{{ request('email') }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp;
+                        <a class="btn btn-primary" href="{{ route('user.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 <div class="row">
     <div class="card">
-
         @if ($message = Session::get('success'))
         <div class="alert alert-success">
             <p>{{$message}}</p>
@@ -22,9 +55,6 @@
                 <i class="fa fa-plus"></i>
                 Create User
             </a>
-
-
-
             <div class="table-responsive">
                 <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                     <thead>
@@ -47,7 +77,7 @@
                         <tr id="dataRow_{{ $user->user_id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $user->username }}</td>
-                            <td>{{ $user->user_email }}</td>
+                            <td>{{ $user->email }}</td>
                             <td>{{ $user->userType->master_value??''}}</td>
                             <td>{{ $user->Staff->staff_name??''}}</td>
                             {{-- <td>{{ $user->last_login_time }}</td> --}}
