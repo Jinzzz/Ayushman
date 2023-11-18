@@ -12,6 +12,7 @@ use App\Http\Controllers\MstTherapyRoomController;
 use App\Http\Controllers\MstMembershipController;
 use App\Http\Controllers\MstWellnessController;
 use App\Http\Controllers\MstTherapyRoomSlotController;
+use App\Http\Controllers\MstUserController;
 
 use App\Http\Controllers\MstUnitController;
 use App\Http\Controllers\MstTaxController;
@@ -381,6 +382,16 @@ Route::get('/patients/membership/{id}', [MstPatientController::class, 'addMember
 Route::post('/patients/membership/store/{id}', [MstPatientController::class, 'patientMembershipStore'])->name('patientsMembership.store');
 Route::get('/get-wellness-details/{membershipId}', [MstPatientController::class, 'getWellnessDetails'])->name('getwellness.details');
 // });
+
+//Manage-Users:
+Route::get('/user/index',[MstUserController::class,'index'])->name('user.index');
+Route::get('/user/create',[MstUserController::class,'create'])->name('user.create');
+Route::post('/user/store', [MstUserController::class, 'store'])->name('user.store');
+Route::get('/user/edit/{id}', [MstUserController::class, 'edit'])->name('user.edit');
+Route::put('/user/update/{id}', [MstUserController::class, 'update'])->name('user.update');
+Route::get('/user/show/{id}', [MstUserController::class, 'show'])->name('user.show');
+Route::delete('/user/destroy/{id}', [MstUserController::class, 'destroy'])->name('user.destroy');
+Route::patch('user/change-status/{id}', [MstUserController::class, 'changeStatus'])->name('user.changeStatus');
 
 
 // Medicine sales invoice 
