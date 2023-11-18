@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Mst_User_Type extends Model
 {
     use HasFactory;
-    protected $table ='mst_user_type';
+    protected $table ='mst_user_types';
     
 }
