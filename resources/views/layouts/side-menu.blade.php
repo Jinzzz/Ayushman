@@ -46,6 +46,7 @@
         <li><a class="slide-item" href="{{ url('/externaldoctors/index')}}">{{ __('External Doctors') }}</a></li>
         <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
         <li><a class="slide-item" href="{{ url('/timeslot')}}">{{ __('Timeslots') }}</a></li>
+        <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
         <li><a class="slide-item" href="{{ url('/therapies/index')}}">{{ __('Therapy') }}</a></li>
         <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Membership Packages') }}</a></li>
@@ -66,7 +67,7 @@
       <ul class="slide-menu">
         <!-- <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a> -->
         <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
-        <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
+        <li><a class="slide-item" href="{{ route('staffleave.index') }}">{{ __('Admin Leave Request') }}</a></li>
         <li><a class="slide-item" href="{{route('branchTransfer.index')}}">{{__('Employee Branch Transfer')}}</a></li>
     </li>
     </ul>
