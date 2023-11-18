@@ -144,7 +144,8 @@
                                 <input type="text" class="form-control" readonly name="GSTNO" value="{{$show->GSTNO}}" placeholder="GSTNO">
                             </div>
                         </div>
-                        <div class="row">
+                    </div>
+                    <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Terms And Condition</label>
@@ -163,7 +164,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <center>
+                                <a class="btn btn-danger" href="{{ route('supplier.index') }}">Cancel</a>
+                            </center>
+                        </div>
                     </form>
                 </div>
             </div>

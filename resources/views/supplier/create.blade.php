@@ -118,13 +118,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Credit Period</label>
-                                    <input type="number" class="form-control" name="credit_period" value="{{ old('credit_period') }}" placeholder="Credit Period">
+                                    <input type="number" class="form-control" max="99" name="credit_period" value="{{ old('credit_period') }}" placeholder="Credit Period">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Credit Limit</label>
-                                    <input type="number" class="form-control" name="credit_limit" value="{{ old('credit_limit') }}" placeholder="Credit Limit">
+                                    <input type="number" class="form-control" max="999999" name="credit_limit" value="{{ old('credit_limit') }}" placeholder="Credit Limit">
                                 </div>
                             </div>
                         </div>
@@ -132,7 +132,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Opening Balance*</label>
-                                    <input type="number" class="form-control" name="opening_balance" value="{{ old('opening_balance') }}" placeholder="Opening Balance">
+                                    <input type="number" class="form-control" max="999999" name="opening_balance" value="{{ old('opening_balance') }}" placeholder="Opening Balance">
                                 </div>
                             </div>
                             <div class="col-md-6">

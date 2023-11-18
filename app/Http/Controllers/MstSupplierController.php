@@ -157,7 +157,7 @@ class MstSupplierController extends Controller
                 
                 if ($request->opening_balance != null) {
                     // Account posting of opening balance 
-                    if (isset($request->account_ledger_id) && $supplier_ledger_id != null) {
+                    if (isset($request->opening_balance_type) && $supplier_ledger_id != null) {
                         // 1=>Debit, 2=>Credit
                         if ($request->opening_balance_type == 1) {
                             $debit = $request->opening_balance;
@@ -184,7 +184,7 @@ class MstSupplierController extends Controller
                             'updated_at' => Carbon::now(),
                         ]);
                     } else {
-                        return redirect()->route('supplier.create')->with('error', 'Please provide ledger id');
+                        return redirect()->route('supplier.create')->with('error', 'Please provide balance type');
                     }
                 }
                 return redirect()->route('supplier.index')->with('success', 'Supplier added successfully');
