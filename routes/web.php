@@ -200,7 +200,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/wellness/update/{wellness_id}', [MstWellnessController::class, 'update'])->name('wellness.update');
     Route::get('/wellness/show/{wellness_id}', [MstWellnessController::class, 'show'])->name('wellness.show');
     Route::delete('/wellness/destroy/{wellness_id}', [MstWellnessController::class, 'destroy'])->name('wellness.destroy');
-    Route::patch('wellness/{wellness_id}/change-status', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
+    Route::patch('wellness/change-status/{wellness_id}', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
 
     //Manage-Units:
     Route::get('/unit/index', [MstUnitController::class, 'index'])->name('unit.index');
