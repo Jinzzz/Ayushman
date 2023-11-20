@@ -26,7 +26,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label branch" id="branchLabel">Staff Branch*</label>
-                                    <select class="form-control" name="branch_id" id="branch_id" required>
+                                    <select class="form-control" name="branch_id" id="branch_id">
                                         <option value="">Choose Branch</option>
                                         @foreach($branches as $branch)
                                             <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
@@ -37,7 +37,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Staff Name</label>
-                                    <select class="form-control" name="staff_id" id="staff_id" required>
+                                    <select class="form-control" name="staff_id" id="staff_id">
                                         <option value="">Select a Branch...</option>
                                         <!-- Options will be dynamically populated using AJAX -->
                                     </select>
@@ -50,14 +50,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label"> From Date</label>
-                                    <input type="date" class="form-control" name="from_date" id="from_date" placeholder="Emergency Contact" required>
+                                    <input type="date" class="form-control" name="from_date" id="from_date" placeholder="Emergency Contact">
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="form-label">Start Day</label>
-                                    <select class="form-control" name="start_day" id="start_day" required>
+                                    <select class="form-control" name="start_day" id="start_day">
                                         <option value="Full Day">Full Day</option>
                                         <option value="Half Day">Half Day</option>
                                         <!-- Options will be dynamically populated using AJAX -->
@@ -71,14 +71,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">To Date</label>
-                                    <input type="date" class="form-control" name="to_date" id="to_date" required>
+                                    <input type="date" class="form-control" name="to_date" id="to_date">
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="form-label">End Day</label>
-                                    <select class="form-control" name="end_day" id="end_day" required>
+                                    <select class="form-control" name="end_day" id="end_day">
                                         <option value="Full Day">Full Day</option>
                                         <option value="Half Day">Half Day</option>
                                         <!-- Options will be dynamically populated using AJAX -->
@@ -91,7 +91,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">No Of Days</label>
-                                    <input type="text" class="form-control" value="{{ old('days') }}" name="days" id="no_of_days" placeholder="No Of Days" required>
+                                    <input type="text" class="form-control" value="{{ old('days') }}" name="days" id="no_of_days" placeholder="No Of Days">
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Leave Type</label>
-                                    <select class="form-control" name="leave_type" id="leave_type" required>
+                                    <select class="form-control" name="leave_type" id="leave_type">
                                         <option value="" disabled selected>Choose Leave Type</option>
                                         @foreach($leave_types as $leave_type)
                                             <option value="{{ $leave_type->leave_type_id }}">{{ $leave_type->name }}</option>
@@ -113,7 +113,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Reason</label>
-                                    <textarea class="form-control" name="reason" placeholder="Reason For Leave" required>{{ old('reason') }}</textarea>
+                                    <textarea class="form-control" name="reason" placeholder="Reason For Leave">{{ old('reason') }}</textarea>
                                 </div>
                             </div>
                         </div>
