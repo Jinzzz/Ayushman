@@ -114,7 +114,7 @@
 
                             </div>
                             <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Reason</label>
                                     <textarea class="form-control" name="reason" placeholder="Reason For Leave">{{ $leave_request->reason ?? old('reason') }}</textarea>
