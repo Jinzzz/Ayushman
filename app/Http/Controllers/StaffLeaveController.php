@@ -73,8 +73,8 @@ class StaffLeaveController extends Controller
         $request->validate([
             'branch_id' => 'required',
             'staff_id' => 'required',
-            'from_date' => 'required',
-            'from_date' => 'required|date',
+            'start_day' => 'required',
+            'from_date' => 'required|date|date_format:Y-m-d|after_or_equal:' . today()->format('Y-m-d'),
             'to_date' => 'required|date|after_or_equal:from_date',
             'end_day' => 'required',
             'days' => 'required',
@@ -118,6 +118,7 @@ class StaffLeaveController extends Controller
      */
     public function show($id)
     {
+        $pageTitle = "View Leave Request";
         $show = Staff_Leave::select(
             'staff_leave.*',
             'mst_staffs.staff_name as staff_name',
@@ -131,7 +132,7 @@ class StaffLeaveController extends Controller
         ->orderBy('staff_leave.updated_at', 'desc')
         ->first();
     
-        return view('staffleave.show', compact('show'));
+        return view('staffleave.show', compact('show','pageTitle'));
     }
 
     /**
@@ -175,7 +176,7 @@ class StaffLeaveController extends Controller
     {
         $request->validate([
             // Add your validation rules here based on your requirements
-            'from_date' => 'required|date',
+            'from_date' => 'required|date|date_format:Y-m-d|after_or_equal:' . today()->format('Y-m-d'),
             'to_date' => 'required|date|after_or_equal:from_date',
             'start_day' => 'required',
             'end_day' => 'required',

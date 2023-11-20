@@ -93,7 +93,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">No Of Days</label>
-                                    <input type="text" class="form-control" value="{{ $leave_request->days }}" name="days" id="no_of_days" placeholder="No Of Days">
+                                    <input type="text" class="form-control" value="{{ $leave_request->days }}" name="days" id="no_of_days" placeholder="No Of Days" readonly>
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
 
                             </div>
                             <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Reason</label>
                                     <textarea class="form-control" name="reason" placeholder="Reason For Leave">{{ $leave_request->reason ?? old('reason') }}</textarea>
@@ -134,7 +134,7 @@
                                         <button type="reset" class="btn btn-raised btn-success">
                                             Reset
                                         </button>
-                                        <a class="btn btn-danger" href="{{ route('patients.index') }}">Cancel</a>
+                                        <a class="btn btn-danger" href="{{ route('staffleave.index') }}">Cancel</a>
                                     </center>
                                 </div>
                             </div>

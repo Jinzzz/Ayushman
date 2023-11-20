@@ -5,7 +5,7 @@
       <div class="col-md-12">
          <div class="card">
             <div class="card-header">
-               <h3 class="mb-0 card-title">Show Leave Details</h3>
+               <h3 class="mb-0 card-title">View Leave Details</h3>
             </div>
             <div class="col-lg-12" style="background-color:#fff;">
                @if ($errors->any())
