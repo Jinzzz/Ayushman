@@ -12,7 +12,7 @@
             <div class="card-body">
                @if ($message = Session::get('status'))
                <div class="alert alert-success">
-                  <p></p>
+                  <p>{{$message}}</p>
                </div>
                @endif
             </div>
