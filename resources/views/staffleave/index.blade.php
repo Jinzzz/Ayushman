@@ -122,10 +122,14 @@
                             _token: "{{ csrf_token() }}",
                         },
                         success: function(response) {
+                            console.log(response.success);
                             // Handle the success response, e.g., remove the row from the table
-                            if (response == '1') {
+                            if (response.success == true) {
+                                
                                 $("#dataRow_" + dataId).remove();
                                 flashMessage('s', 'Data deleted successfully');
+                                   // Reload the page after a successful delete
+                        window.location.reload();
                             } else {
                                 flashMessage('e', 'An error occured! Please try again later.');
                             }

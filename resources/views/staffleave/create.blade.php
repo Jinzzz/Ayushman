@@ -94,7 +94,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">No Of Days</label>
-                                    <input type="text" class="form-control" value="{{ old('days') }}" name="days" id="no_of_days" placeholder="No Of Days">
+                                    <input type="text" class="form-control" value="{{ old('days') }}" name="days" id="no_of_days" placeholder="No Of Days" readonly>
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
