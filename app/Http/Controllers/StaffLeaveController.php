@@ -118,6 +118,7 @@ class StaffLeaveController extends Controller
      */
     public function show($id)
     {
+        $pageTitle = "View Leave Request";
         $show = Staff_Leave::select(
             'staff_leave.*',
             'mst_staffs.staff_name as staff_name',
@@ -131,7 +132,7 @@ class StaffLeaveController extends Controller
         ->orderBy('staff_leave.updated_at', 'desc')
         ->first();
     
-        return view('staffleave.show', compact('show'));
+        return view('staffleave.show', compact('show','pageTitle'));
     }
 
     /**
