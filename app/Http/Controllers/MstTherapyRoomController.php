@@ -7,6 +7,7 @@ use App\Models\Mst_Master_Value;
 use App\Models\Mst_Therapy_Room;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class MstTherapyRoomController extends Controller
 {

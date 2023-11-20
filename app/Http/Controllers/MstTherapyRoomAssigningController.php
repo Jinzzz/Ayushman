@@ -8,6 +8,7 @@ use App\Models\Mst_Therapy_Room;
 use App\Models\Mst_Therapy_Room_Assigning;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class MstTherapyRoomAssigningController extends Controller
 {

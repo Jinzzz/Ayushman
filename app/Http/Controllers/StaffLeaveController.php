@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Staff_Leave;
-use App\Models\Mst_Patient;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Leave_Type;

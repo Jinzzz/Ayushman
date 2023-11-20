@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Mst_Therapy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MstTherapyController extends Controller
 {

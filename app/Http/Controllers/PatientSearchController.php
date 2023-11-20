@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Consultation_Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PatientSearchController extends Controller
 {

@@ -9,6 +9,7 @@ use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Staff_Commission_Log;
 use App\Models\Trn_Staff_Salary_History;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +19,6 @@ class MstStaffController extends Controller
 {
     public function index(Request $request)
     {
-       
         $pageTitle = "staffs";
         $branch = Mst_Branch::pluck('branch_name','branch_id');
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
