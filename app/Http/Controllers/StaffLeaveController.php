@@ -74,7 +74,7 @@ class StaffLeaveController extends Controller
             'branch_id' => 'required',
             'staff_id' => 'required',
             'from_date' => 'required',
-            'from_date' => 'required|date',
+            'from_date' => 'required|date|after_or_equal:' . today(),
             'to_date' => 'required|date|after_or_equal:from_date',
             'end_day' => 'required',
             'days' => 'required',
@@ -175,7 +175,7 @@ class StaffLeaveController extends Controller
     {
         $request->validate([
             // Add your validation rules here based on your requirements
-            'from_date' => 'required|date',
+            'from_date' => 'required|date|after_or_equal:' . today(),
             'to_date' => 'required|date|after_or_equal:from_date',
             'start_day' => 'required',
             'end_day' => 'required',
