@@ -42,6 +42,7 @@ use App\Http\Controllers\MedicineSalesReturnController;
 
 use App\Http\Controllers\TrnPrescriptionController;
 use App\Http\Controllers\TrnJournelEntryController;
+use App\Http\Controllers\StaffLeaveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -361,6 +362,15 @@ Route::patch('/get-account-sub-groups/{id}', [AccountLedgerController::class, 'g
 Route::get('/staff-branch-transfer', [EmployeeBranchTransferController::class, 'index'])->name('branchTransfer.index');
 Route::post('/staff-branch-transfer/store', [EmployeeBranchTransferController::class, 'store'])->name('branchTransfer.store');
 Route::get('/get-employees/{branchId}', [EmployeeBranchTransferController::class, 'getEmployees'])->name('get.employees');
+// staff- leave
+Route::get('/staff-leave', [StaffLeaveController::class, 'index'])->name('staffleave.index');
+Route::get('/staffleave/create', [StaffLeaveController::class, 'create'])->name('staffleave.create');
+Route::get('/get-staff-names/{branchId}', [StaffLeaveController::class, 'getStaffNames'])->name('get-staff-names');
+Route::post('/staffleave/store', [StaffLeaveController::class, 'store'])->name('staffleave.store');
+Route::get('/staffleave/show/{staffleave_id}', [StaffLeaveController::class, 'show'])->name('staffleave.show');
+Route::get('/staffleave/edit/{id}', [StaffLeaveController::class, 'edit'])->name('staffleave.edit');
+Route::put('/staffleave/update/{id}', [StaffLeaveController::class, 'update'])->name('staffleave.update');
+Route::delete('/staffleave/destroy/{id}', [StaffLeaveController::class, 'destroy'])->name('staffleave.destroy');
 
 
 // Medicine Purchase
