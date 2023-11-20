@@ -53,7 +53,7 @@ class MstMedicineDosageController extends Controller
                     Mst_Medicine_Dosage::where('medicine_dosage_id', $request->hidden_id)->update([
                         'name' => $request->medicine_dosages,
                         'is_active' => $request->is_active,
-                        'updated_by' => 1,
+                        'updated_by' => Auth::id(),
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Medicine dosage updated successfully';
@@ -65,8 +65,8 @@ class MstMedicineDosageController extends Controller
                         Mst_Medicine_Dosage::create([
                             'name' => $request->medicine_dosages,
                             'is_active' => $request->is_active,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);

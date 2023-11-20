@@ -111,8 +111,8 @@ class MstUserController extends Controller
                 $user->staff_id = $request->input('staff_id');
                 $user->is_active = $is_active;
                 $user->last_login_time = Carbon::now();
-                $user->created_by = 1;
-                $user->last_updated_by = 1;
+                $user->created_by = Auth::id();
+                $user->last_updated_by = Auth::id();
                 $user->save();
                 return redirect()->route('user.index')->with('success', 'User added successfully');
             } else {
@@ -194,8 +194,8 @@ class MstUserController extends Controller
                 $user->staff_id = $request->input('staff_id');
                 $user->is_active = $is_active;
                 $user->last_login_time = now();
-                $user->created_by = 1;
-                $user->last_updated_by = 1;
+                $user->created_by = Auth::id();
+                $user->last_updated_by = Auth::id();
                 $user->save();
                 return redirect()->route('user.index')->with('success', 'User updated successfully');
             } else {

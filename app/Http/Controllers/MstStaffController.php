@@ -110,7 +110,7 @@ class MstStaffController extends Controller
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
-            'created_by' => 1,
+            'created_by' => Auth::id(),
 
          ]);
         
@@ -214,7 +214,7 @@ class MstStaffController extends Controller
                 'commission_type' => $request->staff_commission_type,
                 'staff_commission' => $updatedCommission,
                 'commission_change_date' => Carbon::now(),
-                'created_by' => 1,
+                'created_by' => Auth::id(),
             ]);
         }
 
@@ -224,7 +224,7 @@ class MstStaffController extends Controller
                 'old_salary' => $existingSalary,
                 'new_salary' => $request->salary_amount,
                 'updated_date' => carbon::now(),
-                'created_by' => 1,
+                'created_by' => Auth::id(),
 
             ]);
         }

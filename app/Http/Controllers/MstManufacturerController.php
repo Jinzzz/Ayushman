@@ -53,7 +53,7 @@ class MstManufacturerController extends Controller
                     Mst_Manufacturer::where('manufacturer_id', $request->hidden_id)->update([
                         'name' => $request->manufacturer,
                         'is_active' => $request->is_active,
-                        'updated_by' => 1,
+                        'updated_by' => Auth::id(),
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Manufacturer updated successfully';
@@ -65,8 +65,8 @@ class MstManufacturerController extends Controller
                         Mst_Manufacturer::create([
                             'name' => $request->manufacturer,
                             'is_active' => $request->is_active,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);

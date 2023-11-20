@@ -68,8 +68,8 @@ class EmployeeBranchTransferController extends Controller
                             'branch_id_from' => $fromBranchId,
                             'branch_id_to' => $toBranchId,
                             'transfer_date' => carbon::now(),
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'created_at' => carbon::now(),
                             'updated_at' => carbon::now(),
                         ]);

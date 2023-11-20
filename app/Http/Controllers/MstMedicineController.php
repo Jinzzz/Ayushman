@@ -89,7 +89,7 @@ class MstMedicineController extends Controller
          $medicines->unit_id = $request->input('unit_id');
          $medicines->is_active =  $is_active ;
          $medicines->reorder_limit = $request->input('reorder_limit');
-         $medicines->created_by = 1;
+         $medicines->created_by = Auth::id();
          $medicines->save();
        
     

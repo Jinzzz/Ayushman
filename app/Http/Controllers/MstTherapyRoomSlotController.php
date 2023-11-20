@@ -46,8 +46,8 @@ class MstTherapyRoomSlotController extends Controller
                 $therapySlot->week_day = $request->input('week_day');
                 $therapySlot->timeslot = $request->input('time_slot');
                 $therapySlot->is_active = 1;
-                $therapySlot->created_by = 1;
-                $therapySlot->updated_by = 1;
+                $therapySlot->created_by = Auth::id();
+                $therapySlot->updated_by = Auth::id();
                 $therapySlot->created_at = Carbon::now();
                 $therapySlot->updated_at = Carbon::now();
                 $therapySlot->save();

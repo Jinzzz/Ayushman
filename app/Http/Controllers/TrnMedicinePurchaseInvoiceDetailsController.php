@@ -125,7 +125,7 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             $invoice->payment_mode = $request->payment_mode;
             $invoice->deposit_to = $request->deposit_to;
             $invoice->reference_code = $request->reference_code;
-            $invoice->created_by = 1; // You may adjust the user ID as needed
+            $invoice->created_by = Auth::id(); // You may adjust the user ID as needed
             $invoice->save();
     
             // Get the ID of the saved invoice

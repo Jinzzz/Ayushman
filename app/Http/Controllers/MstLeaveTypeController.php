@@ -56,7 +56,7 @@ class MstLeaveTypeController extends Controller
                         'name' => $request->leave_types,
                         'is_active' => $request->is_active,
                         'is_dedactable' => $request->is_dedactable,
-                        'updated_by' => 1,
+                        'updated_by' => Auth::id(),
                         'updated_at' => Carbon::now(),
                     ]);
                     $message = 'Leave type updated successfully';
@@ -69,8 +69,8 @@ class MstLeaveTypeController extends Controller
                             'name' => $request->leave_types,
                             'is_active' => $request->is_active,
                             'is_dedactable' => $request->is_dedactable,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);

@@ -109,7 +109,7 @@ class MstPatientController extends Controller
             'whatsapp_number' => $request->whatsapp_number,
             'available_membership' =>  $available_membership,
             'is_active' =>  $is_active,
-            'created_by' => 1,
+            'created_by' => Auth::id(),
         ]);
 
         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
