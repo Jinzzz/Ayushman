@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Mst_Master_Value;
 use App\Models\Sys_Master;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MstMasterValueController extends Controller
 {
@@ -42,7 +43,7 @@ class MstMasterValueController extends Controller
         }
     
         $master->is_active = $is_active;
-        $master->created_by = 1;
+        $master->created_by = Auth::id();
         $master->save();
     
         return redirect()->route('mastervalues.index')->with('success', 'Master value added successfully');

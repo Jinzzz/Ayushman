@@ -6,6 +6,7 @@ use App\Models\Mst_Branch;
 use App\Models\Mst_Wellness;
 use App\Models\Trn_Wellness_Branch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MstWellnessController extends Controller
 {

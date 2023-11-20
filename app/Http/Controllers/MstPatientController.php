@@ -19,6 +19,7 @@ use App\Models\Trn_Notification;
 use App\Models\Trn_Patient_Device_Tocken;
 use App\Models\Trn_Patient_Wellness_Sessions;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class MstPatientController extends Controller
 {
@@ -108,7 +109,7 @@ class MstPatientController extends Controller
             'whatsapp_number' => $request->whatsapp_number,
             'available_membership' =>  $available_membership,
             'is_active' =>  $is_active,
-            'created_by' => 1,
+            'created_by' => Auth::id(),
         ]);
 
         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);

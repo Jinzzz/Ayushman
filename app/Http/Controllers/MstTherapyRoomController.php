@@ -7,6 +7,7 @@ use App\Models\Mst_Master_Value;
 use App\Models\Mst_Therapy_Room;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class MstTherapyRoomController extends Controller
 {
@@ -61,7 +62,7 @@ class MstTherapyRoomController extends Controller
                 $therapyroom->room_type = 1;
                 $therapyroom->room_capacity = 1;
                 $therapyroom->is_active = $is_active;
-                $therapyroom->created_by = 1;
+                $therapyroom->created_by = Auth::id();
                 $therapyroom->save();
 
                 return redirect()->route('therapyrooms.index')->with('success', 'Therapy room added successfully');

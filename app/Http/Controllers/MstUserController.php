@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mst_User;
 use App\Models\Mst_Master_Value;
-use App\Models\Mst_Branch;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use App\Models\Mst_Staff;
 use Carbon\Carbon;
@@ -99,6 +99,10 @@ class MstUserController extends Controller
                 if ($usernameExists) {
                     return redirect()->route('user.index')->with('error', 'Failed to create. This username is already taken.');
                 }
+                $roleExists = Mst_User::where('staff_id', $request->input('staff_id'))->where('user_type_id', $request->input('user_type_id'))->exists();
+                if ($roleExists) {
+                    return redirect()->route('user.index')->with('error', 'Failed to create. This role is already assigned for this staff.');
+                }
                 $user = new  Mst_User();
                 $user->username = $request->input('username');
                 $user->password = Hash::make($request->input('password'));
@@ -107,8 +111,8 @@ class MstUserController extends Controller
                 $user->staff_id = $request->input('staff_id');
                 $user->is_active = $is_active;
                 $user->last_login_time = Carbon::now();
-                $user->created_by = 1;
-                $user->last_updated_by = 1;
+                $user->created_by = Auth::id();
+                $user->last_updated_by = Auth::id();
                 $user->save();
                 return redirect()->route('user.index')->with('success', 'User added successfully');
             } else {
@@ -175,7 +179,11 @@ class MstUserController extends Controller
             if (!$validator->fails()) {
                 $usernameExists = Mst_User::where('user_id', '!=', $id)->where('username', $request->username)->exists();
                 if ($usernameExists) {
-                    return redirect()->route('user.edit', $id)->with('error', 'Failed to create. This username is already taken.');
+                    return redirect()->route('user.edit', $id)->with('error', 'Failed to update. This username is already taken.');
+                }
+                $roleExists = Mst_User::where('user_id', '!=', $id)->where('staff_id', $request->input('staff_id'))->where('user_type_id', $request->input('user_type_id'))->exists();
+                if ($roleExists) {
+                    return redirect()->route('user.index')->with('error', 'Failed to update. This role is already assigned for this staff.');
                 }
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $user =  Mst_User::findOrFail($id);
@@ -186,8 +194,8 @@ class MstUserController extends Controller
                 $user->staff_id = $request->input('staff_id');
                 $user->is_active = $is_active;
                 $user->last_login_time = now();
-                $user->created_by = 1;
-                $user->last_updated_by = 1;
+                $user->created_by = Auth::id();
+                $user->last_updated_by = Auth::id();
                 $user->save();
                 return redirect()->route('user.index')->with('success', 'User updated successfully');
             } else {

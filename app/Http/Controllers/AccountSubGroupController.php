@@ -7,6 +7,7 @@ use Illuminate\Database\QueryException;
 use App\Models\Sys_Account_Group;
 use App\Models\Mst_Account_Sub_Head;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class AccountSubGroupController extends Controller
 {
@@ -52,8 +53,8 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->account_group_id = $request->input('account_group_id');
                 $account_sub_group->account_sub_group_name = $request->input('sub_group_name');
                 $account_sub_group->is_active = $is_active;
-                $account_sub_group->created_by = 1;
-                $account_sub_group->updated_by = 1;
+                $account_sub_group->created_by = Auth::id();
+                $account_sub_group->updated_by = Auth::id();
                 $account_sub_group->created_at = Carbon::now();
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
@@ -97,7 +98,7 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->account_group_id = $request->input('account_group_id');
                 $account_sub_group->account_sub_group_name = $request->input('sub_group_name');
                 $account_sub_group->is_active = $is_active;
-                $account_sub_group->updated_by = 1;
+                $account_sub_group->updated_by = Auth::id();
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
 

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Mst_Medicine;
 use App\Models\Mst_Tax_Group;
-use App\Models\Mst_Branch;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
-use App\Models\Mst_Tax;
 use App\Models\Mst_Unit;
 use Illuminate\Http\Request;
 
@@ -90,7 +89,7 @@ class MstMedicineController extends Controller
          $medicines->unit_id = $request->input('unit_id');
          $medicines->is_active =  $is_active ;
          $medicines->reorder_limit = $request->input('reorder_limit');
-         $medicines->created_by = 1;
+         $medicines->created_by = Auth::id();
          $medicines->save();
        
     

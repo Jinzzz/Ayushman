@@ -59,8 +59,8 @@ class MstTaxGroupController extends Controller
                 $lastInsertedId = Mst_Tax_Group::insertGetId([
                     'tax_group_name' => $request->tax_group_name,
                     'is_active' => 1,
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -77,8 +77,8 @@ class MstTaxGroupController extends Controller
                             'tax_group_id' => $lastInsertedId,
                             'included_tax' => $request->included_tax[$i],
                             'is_active' => 1,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
@@ -120,7 +120,7 @@ class MstTaxGroupController extends Controller
                 Mst_Tax_Group::where('id', $id)->update([
                     'tax_group_name' => $request->tax_group_name,
                     'is_active' => 1,
-                    'updated_by' => 1,
+                    'updated_by' => Auth::id(),
                     'updated_at' => Carbon::now(),
                 ]);
             } else {
@@ -138,8 +138,8 @@ class MstTaxGroupController extends Controller
                         'tax_group_id' => $id,
                         'included_tax' => $request->included_tax[$i],
                         'is_active' => 1,
-                        'created_by' => 1,
-                        'updated_by' => 1,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);

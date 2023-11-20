@@ -9,6 +9,7 @@ use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Staff_Commission_Log;
 use App\Models\Trn_Staff_Salary_History;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +19,6 @@ class MstStaffController extends Controller
 {
     public function index(Request $request)
     {
-       
         $pageTitle = "staffs";
         $branch = Mst_Branch::pluck('branch_name','branch_id');
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
@@ -110,7 +110,7 @@ class MstStaffController extends Controller
             'salary_type' => $request->salary_type,
             'salary_amount' => $request->salary_amount,
             'last_login_time' =>  Carbon::now(), 
-            'created_by' => 1,
+            'created_by' => Auth::id(),
 
          ]);
         
@@ -214,7 +214,7 @@ class MstStaffController extends Controller
                 'commission_type' => $request->staff_commission_type,
                 'staff_commission' => $updatedCommission,
                 'commission_change_date' => Carbon::now(),
-                'created_by' => 1,
+                'created_by' => Auth::id(),
             ]);
         }
 
@@ -224,7 +224,7 @@ class MstStaffController extends Controller
                 'old_salary' => $existingSalary,
                 'new_salary' => $request->salary_amount,
                 'updated_date' => carbon::now(),
-                'created_by' => 1,
+                'created_by' => Auth::id(),
 
             ]);
         }

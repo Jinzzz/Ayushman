@@ -9,6 +9,7 @@ use App\Models\Mst_Account_Sub_Head;
 use App\Models\Mst_Account_Ledger;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 
 class AccountLedgerController extends Controller
 {
@@ -61,8 +62,8 @@ class AccountLedgerController extends Controller
                     'ledger_code' => 1,
                     'notes' => $request->input('ledger_notes'),
                     'is_active' => $is_active,
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -130,8 +131,8 @@ class AccountLedgerController extends Controller
                 $account_ledger->ledger_code = 1;
                 $account_ledger->notes = $request->input('ledger_notes');
                 $account_ledger->is_active = $is_active;
-                $account_ledger->created_by = 1;
-                $account_ledger->updated_by = 1;
+                $account_ledger->created_by = Auth::id();
+                $account_ledger->updated_by = Auth::id();
                 $account_ledger->created_at = Carbon::now();
                 $account_ledger->updated_at = Carbon::now();
                 $account_ledger->save();

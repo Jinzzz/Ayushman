@@ -149,8 +149,8 @@ class MstSupplierController extends Controller
                     'ledger_code' => 1,
                     'notes' => 'Ledger created on adding supplier',
                     'is_active' => 1,
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
