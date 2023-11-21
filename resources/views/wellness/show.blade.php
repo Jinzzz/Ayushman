@@ -33,7 +33,7 @@
                   </div>
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Wellness Price</label>
+                        <label class="form-label">Regular Price</label>
                         <input type="text" class="form-control" readonly name="wellness_cost" value="{{$show->wellness_cost}}" placeholder="Wellness Cost">
                      </div>
                   </div>

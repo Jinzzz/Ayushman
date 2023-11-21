@@ -45,14 +45,15 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Wellness Price*</label>
-                                    <input type="text" class="form-control" required name="wellness_cost" value="{{$wellness->wellness_cost}}" placeholder="Wellness Cost" oninput="validateDecimalInput(this)">
+                                    <label class="form-label">Regular Price*</label>
+                                    <input type="text" id="regularPrice" class="form-control" required name="wellness_cost" value="{{$wellness->wellness_cost}}" placeholder="Wellness Cost" oninput="validateDecimalInput(this)">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Wellness Offer Price*</label>
-                                    <input type="number" class="form-control" required name="wellness_offer_price" value="{{$wellness->offer_price}}" placeholder="Wellness Offer Price">
+                                    <input type="number" class="form-control" id="offerPrice" oninput="validatePrices()" required name="wellness_offer_price" value="{{$wellness->offer_price}}" placeholder="Wellness Offer Price">
+                                    <span id="priceError" style="color: red;"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -104,7 +105,8 @@
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
-                                        <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($wellness->is_active) checked @endif>
+                                    <input type="hidden" name="is_active" value="0">
+                                        <input type="checkbox" value="{{$wellness->is_active}}" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($wellness->is_active) checked @endif>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">
                                             @if($wellness->is_active)
@@ -138,6 +140,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script type="text/javascript">
+    function validatePrices() {
+        var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+        var offerPrice = parseFloat(document.getElementById('offerPrice').value);
+        var priceError = document.getElementById('priceError');
+
+        if (offerPrice >= regularPrice) {
+            priceError.textContent = 'Offer Price must be less than Regular Price';
+        } else {
+            priceError.textContent = '';
+        }
+    }
     $(document).ready(function() {
         CKEDITOR.replace('wellnessInclusion', {
             removePlugins: 'image',
@@ -149,8 +162,14 @@
                 removePlugins: 'image',
             });
         });
-
-        function toggleStatus(checkbox) {
+    });
+    //js for dropdown:
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
+<script>
+    function toggleStatus(checkbox) {
             if (checkbox.checked) {
                 $("#statusText").text('Active');
                 $("input[name=is_active]").val(1);
@@ -159,13 +178,6 @@
                 $("input[name=is_active]").val(0);
             }
         }
-    });
-    //js for dropdown:
-    $(document).ready(function() {
-        $('.select2').select2();
-    });
-</script>
-<script>
     function validateDecimalInput(input) {
         var numericValue = input.value.replace(/[^0-9.]/g, '').slice(0, 13);
         input.value = numericValue;

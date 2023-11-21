@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Wellness;
 use App\Models\Trn_Wellness_Branch;
+use App\Models\Mst_Therapy_Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Mst_Wellness_Therapyrooms;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -16,7 +18,7 @@ class MstWellnessController extends Controller
     public function index(Request $request)
     {
         try {
-            $pageTitle = "Wellness";
+            $pageTitle = "Wellnesses";
             $branches = Mst_Branch::pluck('branch_name', 'branch_id');
             $query = Mst_Wellness::query();
             if ($request->has('wellness_name')) {
@@ -47,8 +49,6 @@ class MstWellnessController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
-
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -149,7 +149,6 @@ class MstWellnessController extends Controller
 
     public function update(Request $request, $id)
     {
-        dd($request->all());
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -193,7 +192,7 @@ class MstWellnessController extends Controller
 
                     // $wellness_image = url("assets/uploads/wellness_image/{$new_file_name}");
                 }
-                
+
                 $wellness = Mst_Wellness::find($id);
                 // Update the wellness record with the new values
                 $wellness->wellness_name = $request->input('wellness_name');
@@ -222,7 +221,7 @@ class MstWellnessController extends Controller
                 return redirect()->route('wellness.index')->with('success', 'Wellness updated successfully');
             } else {
                 $messages = $validator->errors();
-                return redirect()->route('wellness.edit',$id)->with('errors', $messages);
+                return redirect()->route('wellness.edit', $id)->with('errors', $messages);
             }
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
@@ -235,8 +234,8 @@ class MstWellnessController extends Controller
             $pageTitle = "View wellness details";
             $show = Mst_Wellness::findOrFail($id);
             $branch = Mst_Branch::pluck('branch_name', 'branch_id');
-            $branch_ids = Trn_Wellness_Branch::where('wellness_id',$id)->pluck('branch_id');
-            return view('wellness.show', compact('pageTitle', 'show', 'branch','branch_ids'));
+            $branch_ids = Trn_Wellness_Branch::where('wellness_id', $id)->pluck('branch_id');
+            return view('wellness.show', compact('pageTitle', 'show', 'branch', 'branch_ids'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
@@ -262,6 +261,114 @@ class MstWellnessController extends Controller
             $wellness->save();
             return 1;
         } catch (QueryException $e) {
+            return redirect()->route('home')->with('error', 'Something went wrong');
+        }
+    }
+
+    public function roomAssign()
+    {
+        try {
+            $pageTitle = "Assign Therapy Room";
+            $branches = Mst_Branch::pluck('branch_name', 'branch_id');
+            $assignedRooms = Mst_Wellness_Therapyrooms::with(['branch', 'wellness', 'therapyRoom'])
+                ->orderBy('mst__wellness__therapyrooms.created_at', 'desc')
+                ->get();
+
+            return view('wellness.room', compact('pageTitle', 'branches', 'assignedRooms'));
+        } catch (QueryException $e) {
+            return redirect()->route('home')->with('error', 'Something went wrong');
+        }
+    }
+
+    public function roomDestroy($wellness_id)
+    {
+        try {
+            $assignedRoom = Mst_Wellness_Therapyrooms::findOrFail($wellness_id);
+            $assignedRoom->delete();
+            return 1;
+        } catch (QueryException $e) {
+            return redirect()->route('home')->with('error', 'Something went wrong');
+        }
+    }
+
+    public function getBranchWellnessRoomIds($id)
+    {
+        try {
+            // Fetch therapy rooms
+            $therapy_rooms = Mst_Therapy_Room::where('branch_id', $id)->where('is_active', 1)->select('room_name', 'id')->get();
+
+            // Fetch wellnesses
+            $wellnesses = Mst_Wellness::join('trn_wellness_branches', 'mst_wellness.wellness_id', 'trn_wellness_branches.wellness_id')
+                ->where('trn_wellness_branches.branch_id', $id)
+                ->where('mst_wellness.is_active', 1)
+                ->select(
+                    'mst_wellness.wellness_name',
+                    'mst_wellness.wellness_id'
+                )
+                ->get();
+
+            $bRooms = [];
+            $bWellnesses = [];
+
+            // Create an array of therapy rooms
+            foreach ($therapy_rooms as $room) {
+                $bRooms[$room->id] = $room->room_name;
+            }
+
+            // Create an array of wellnesses
+            foreach ($wellnesses as $wellness) {
+                $bWellnesses[$wellness->wellness_id] = $wellness->wellness_name;
+            }
+
+            // Return the response as JSON
+            return response()->json(['rooms' => $bRooms, 'wellnesses' => $bWellnesses]);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
+    }
+
+    public function roomStore(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'branch_id' => 'required',
+                    'wellness_id' => 'required',
+                    'therapy_room_id' => 'required',
+                ],
+                [
+                    'branch_id.required' => 'The branch is required.',
+                    'wellness_id.required' => 'The wellness is required.',
+                    'therapy_room_id.required' => 'The therapy rrom is required.',
+                ]
+            );
+
+            if (!$validator->fails()) {
+
+                $count = count($request->therapy_room_id);
+                $all_therapy_rooms = $request->therapy_room_id;
+
+                for ($i = 0; $i < $count; $i++) {
+                    $exists = Mst_Wellness_Therapyrooms::where('branch_id', $request->input('branch_id'))->where('therapy_room_id', $all_therapy_rooms[$i])->where('wellness_id', $request->input('wellness_id'))->exists();
+                    if (!$exists) {
+                        Mst_Wellness_Therapyrooms::create([
+                            'branch_id' => $request->input('branch_id'),
+                            'wellness_id' => $request->input('wellness_id'),
+                            'therapy_room_id' => $all_therapy_rooms[$i],
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                        // return redirect()->route('wellness.room.assign')->with('error', 'This therapy room already assigned for this wellness in this branch.');
+                    }
+                }
+                return redirect()->route('wellness.room.assign')->with('success', 'Therapy room assigned successfully');
+            } else {
+                $messages = $validator->errors();
+                return redirect()->route('wellness.room.assign')->with('errors', $messages);
+            }
+        } catch (QueryException $e) {
+            dd($e->getMessage());
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
     }

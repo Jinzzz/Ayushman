@@ -201,6 +201,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/wellness/show/{wellness_id}', [MstWellnessController::class, 'show'])->name('wellness.show');
     Route::delete('/wellness/destroy/{wellness_id}', [MstWellnessController::class, 'destroy'])->name('wellness.destroy');
     Route::patch('wellness/change-status/{wellness_id}', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
+    Route::get('/wellness/room/assign', [MstWellnessController::class, 'roomAssign'])->name('wellness.room.assign');
+    Route::delete('/wellness/room/destroy/{wellness_id}', [MstWellnessController::class, 'roomDestroy'])->name('wellness.room.destroy');
+    Route::get('/get-branch-wellness-room-ids/{id}', [MstWellnessController::class, 'getBranchWellnessRoomIds'])->name('get.branch.room.wellness');
+    Route::post('/wellness/room/store', [MstWellnessController::class, 'roomStore'])->name('wellness.room.store');
 
     //Manage-Units:
     Route::get('/unit/index', [MstUnitController::class, 'index'])->name('unit.index');

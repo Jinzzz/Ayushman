@@ -39,14 +39,15 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Wellness Price*</label>
-                                    <input type="number" class="form-control" required name="wellness_cost" value="{{ old('wellness_cost') }}" placeholder="Wellness Price" oninput="validateDecimalInput(this)">
+                                    <label class="form-label">Regular Price*</label>
+                                    <input type="number" id="regularPrice" class="form-control" required name="wellness_cost" value="{{ old('wellness_cost') }}" placeholder="Wellness Price" oninput="validateDecimalInput(this)">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Wellness Offer Price</label>
-                                    <input type="number" class="form-control" required name="wellness_offer_price" value="{{ old('wellness_offer_price') }}" placeholder="Wellness Offer Price">
+                                    <input type="number" class="form-control" id="offerPrice" required name="wellness_offer_price" value="{{ old('wellness_offer_price') }}" placeholder="Wellness Offer Price" oninput="validatePrices()">
+                                    <span id="priceError" style="color: red;"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -71,7 +72,6 @@
                                 <div class="form-group checkbox">
                                     <label for="branch_id" class="form-label">Branch*</label>
                                     <select class="multi-select" required name="branch[]" multiple style="width: 100%;">
-
                                         @foreach($branch as $id => $branchName)
                                         <option value="{{ $id }}">{{ $branchName }}</option>
                                         @endforeach
@@ -106,7 +106,7 @@
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
                                         <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
+                                        <input type="checkbox" id="is_active" value="1" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">Active</span>
                                     </label>
@@ -135,6 +135,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script type="text/javascript">
+    function validatePrices() {
+      var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+      var offerPrice = parseFloat(document.getElementById('offerPrice').value);
+      var priceError = document.getElementById('priceError');
+
+      if (offerPrice >= regularPrice) {
+         priceError.textContent = 'Offer Price must be less than Regular Price';
+      } else {
+         priceError.textContent = '';
+      }
+   }
     $(document).ready(function() {
         CKEDITOR.replace('wellnessInclusion', {
             removePlugins: 'image',
