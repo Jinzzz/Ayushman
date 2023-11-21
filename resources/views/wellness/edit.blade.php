@@ -73,7 +73,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Remarks</label>
-                                    <input type="text" class="form-control" name="remarks" value="{{$wellness->remarks}}" placeholder="Remarks">
+                                    <textarea type="text" class="form-control" name="remarks" value="{{$wellness->remarks}}" placeholder="Remarks">{{$wellness->remarks}}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">

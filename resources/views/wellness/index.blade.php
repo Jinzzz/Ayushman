@@ -10,12 +10,7 @@
             <form action="{{ route('wellness.index') }}" method="GET">
                 <div class="card-body">
                     <div class="row mb-6">
-                        <div class="col-md-6">
-                            <label class="form-label">Wellness Name: </label>
-                            <input type="text" id="wellness-name" name="wellness_name" class="form-control" value="{{ request('wellness_name') }}">
-                        </div>
-
-                        <div class="col-md-6">
+                    <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Branch: </label>
                                 <select class="form-control" name="branch_id" id="branch_id">
@@ -27,6 +22,11 @@
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Wellness Name: </label>
+                            <input type="text" id="wellness-name" name="wellness_name" class="form-control" value="{{ request('wellness_name') }}">
                         </div>
 
                         <div class="col-md-3 d-flex align-items-end">
@@ -70,6 +70,7 @@
                         <thead>
                             <tr>
                                 <th class="wd-15p">SL.NO</th>
+                                <th class="wd-15p">Branch Name</th>
                                 <th class="wd-15p">Wellness Name</th>
                                 <th class="wd-15p">Wellness Cost</th>
                                 <th class="wd-20p">Status</th>
@@ -83,6 +84,7 @@
                             @foreach($wellness as $wellnes)
                             <tr id="dataRow_{{$wellnes->wellness_id }}">
                                 <td>{{ ++$i }}</td>
+                                <td>{{ $wellnes->branch_name }}</td>
                                 <td>{{ $wellnes->wellness_name }}</td>
                                 <td>{{ $wellnes->wellness_cost }}</td>
 

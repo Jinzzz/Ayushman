@@ -29,12 +29,6 @@ class Mst_Wellness extends Model
 
     public function branch()
     {
-        return $this->belongsTo(Mst_Branch::class,'branch_id','branch_id');
+        return $this->belongsTo(Mst_Branch::class, 'branch_id', 'branch_id');
     }
-
-    public function branches()
-{
-    return $this->hasMany(Trn_Wellness_Branch::class, 'wellness_id');
-}
-
 }

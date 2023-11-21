@@ -19,17 +19,21 @@ class MstWellnessController extends Controller
     {
         try {
             $pageTitle = "Wellnesses";
-            $branches = Mst_Branch::pluck('branch_name', 'branch_id');
-            $query = Mst_Wellness::query();
+            $branches = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
+            $query = Mst_Wellness::select('mst_wellness.*', 'mst_branches.branch_name')
+                ->join('trn_wellness_branches', 'mst_wellness.wellness_id', 'trn_wellness_branches.wellness_id')
+                ->join('mst_branches', 'trn_wellness_branches.branch_id', 'mst_branches.branch_id')
+                ->where('mst_wellness.is_active', 1)
+                ->orderBy('mst_wellness.created_at', 'desc');
             if ($request->has('wellness_name')) {
-                $query->where('wellness_name', 'LIKE', "%{$request->wellness_name}%");
+                $query->where('mst_wellness.wellness_name', 'LIKE', "%{$request->wellness_name}%");
             }
 
             if ($request->has('branch_id')) {
-                $query->where('branch_id', 'LIKE', "%{$request->branch_id}%");
+                $query->where('trn_wellness_branches.branch_id', $request->branch_id);
             }
 
-            $wellness = $query->orderBy('updated_at', 'desc')->get();
+            $wellness = $query->get();
             return view('wellness.index', compact('pageTitle', 'wellness', 'branches'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
@@ -40,7 +44,7 @@ class MstWellnessController extends Controller
     {
         try {
             $pageTitle = "Create Wellness";
-            $branch = Mst_Branch::pluck('branch_name', 'branch_id');
+            $branch = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
             return view('wellness.create', compact('pageTitle', 'branch'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
@@ -140,7 +144,7 @@ class MstWellnessController extends Controller
             $pageTitle = "Edit Wellness";
             $wellness = Mst_Wellness::findOrFail($wellness_id);
             // $wellness->load('branches');
-            $branch = Mst_Branch::pluck('branch_name', 'branch_id');
+            $branch = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
             return view('wellness.edit', compact('pageTitle', 'wellness', 'branch'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
@@ -233,7 +237,7 @@ class MstWellnessController extends Controller
         try {
             $pageTitle = "View wellness details";
             $show = Mst_Wellness::findOrFail($id);
-            $branch = Mst_Branch::pluck('branch_name', 'branch_id');
+            $branch = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
             $branch_ids = Trn_Wellness_Branch::where('wellness_id', $id)->pluck('branch_id');
             return view('wellness.show', compact('pageTitle', 'show', 'branch', 'branch_ids'));
         } catch (QueryException $e) {
