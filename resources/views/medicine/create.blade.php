@@ -18,7 +18,7 @@
                   </ul>
                </div>
                @endif
-               <form action="{{ route('medicine.store') }}" method="POST" enctype="multipart/form-data">
+               <form id="addFm" action="{{ route('medicine.store') }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
                      <div class="col-md-6">
@@ -128,7 +128,7 @@
                   </div>
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
+                        <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                         <i class="fa fa-check-square-o"></i> Add</button>
                         <button type="reset" class="btn btn-raised btn-success">
                         Reset</button>
@@ -143,7 +143,60 @@
 </div>
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+   $(document).ready(function() {
+      var validator = $("#addFm").validate({
+         ignore: "",
+         rules: {
+            medicine_name: "required",
+            generic_name: "required",
+            unit_price: "required",
+            description: "required",
+         },
+         messages: {
+            medicine_name: {
+               required: 'Please enter medicine name.',
+            },
+            generic_name: {
+               required: 'Please enter generic name.',
+            },
+            unit_price: {
+               required: 'Please enter unit price.',
+            },
+            description: {
+               required: 'Please enter description.',
+            },
+         },
+         errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element.parent().children().last());
+         },
+         highlight: function(element, errorClass) {
+            $(element).parent().addClass('has-error');
+            $(element).addClass('form-control-danger');
+         },
+         unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('has-error');
+            $(element).removeClass('form-control-danger');
+         }
+      });
+
+      $(document).on('click', '#submitForm', function() {
+         if (validator.form()) {
+            $('#addFm').submit();
+         } else {
+            flashMessage('w', 'Please fill all mandatory fields');
+         }
+      });
+
+      function flashMessage(type, message) {
+         // Implement or replace this function based on your needs
+         console.log(type, message);
+      }
+   });
+   // impliment jQuery Validation 
    function toggleStatus(checkbox) {
        if (checkbox.checked) {
            $("#statusText").text('Active');
