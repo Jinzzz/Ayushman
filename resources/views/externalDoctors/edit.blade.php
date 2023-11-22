@@ -26,7 +26,7 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('externaldoctors.update', ['id' => $doctor->id]) }}"  id="addFm" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('externaldoctors.update', ['id' => $doctor->id]) }}" id="addFm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row">
@@ -48,33 +48,33 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Email</label>
-                                     <input type="email" class="form-control"  name="contact_email" maxlength="100" id="contact_email" value="{{ $doctor->contact_email }}" placeholder="Email">
-                                      <div class="text-danger" id="email-error"></div>
+                                    <input type="email" class="form-control" name="contact_email" maxlength="100" id="contact_email" value="{{ $doctor->contact_email }}" placeholder="Email">
+                                    <div class="text-danger" id="email-error"></div>
                                 </div>
                             </div>
-                       
-                        
+
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Address</label>
-                                    <textarea class="form-control"  name="address" placeholder="Address">{{ $doctor->address }}</textarea>
+                                    <textarea class="form-control" name="address" placeholder="Address">{{ $doctor->address }}</textarea>
                                 </div>
                             </div>
-                        </div>  
-                        <div class="row"> 
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Remarks</label>
-                                    <textarea class="form-control"  name="remarks" placeholder="Remarks">{{ $doctor->remarks }}</textarea>
+                                    <textarea class="form-control" name="remarks" placeholder="Remarks">{{ $doctor->remarks }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Commission(%)</label>
-                                    <input type="text" class="form-control"  required name ="commission" value="{{ $doctor->commission }}" placeholder="Commission" maxlength="3" oninput="validateCommission(this);">
+                                    <input type="text" class="form-control" required name="commission" value="{{ $doctor->commission }}" placeholder="Commission" maxlength="3" oninput="validateCommission(this);">
                                 </div>
                             </div>
-                        
+
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -116,64 +116,89 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
     $(document).ready(function() {
-      var validator = $("#addFm").validate({
-         ignore: "",
-         rules: {
-            doctor_name: "required",
-            contact_no: "required",
-            commission: "required",
-         },
-         messages: {
-            doctor_name: {
-               required: 'Please enter doctor name.',
-            },
-            contact_no: {
-               required: 'Please enter contact number.',
-            },
-            commission: {
-               required: 'Please enter commission.',
-            },
-         },
-         errorPlacement: function(label, element) {
-            label.addClass('text-danger');
-            label.insertAfter(element.parent().children().last());
-         },
-         highlight: function(element, errorClass) {
-            $(element).parent().addClass('has-error');
-            $(element).addClass('form-control-danger');
-         },
-         unhighlight: function(element, errorClass, validClass) {
-            $(element).parent().removeClass('has-error');
-            $(element).removeClass('form-control-danger');
-         }
-      });
+        $.validator.addMethod("checkPercentage", function(value, element) {
+            console.log("Inside checkPercentage", value);
+            return !isNaN(value) && parseFloat(value) <= 100;
+        }, "Commission must be a valid number and should not exceed 100%");
 
-      $(document).on('click', '#submitForm', function() {
-         if (validator.form()) {
-            $('#addFm').submit();
-         } else {
-            flashMessage('w', 'Please fill all mandatory fields');
-         }
-      });
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                doctor_name: {
+                    required: true,
+                    maxlength: 100
+                },
+                contact_no: {
+                    required: true,
+                    maxlength: 10
+                },
+                commission: {
+                    required: true,
+                    checkPercentage: true
+                },
+                contact_email: {
+                    email: true,
+                    maxlength: 100
+                },
+            },
+            messages: {
+                doctor_name: {
+                    required: 'Please enter doctor name.',
+                    maxlength: 'Doctor name must not exceed 100 characters.'
+                },
+                contact_no: {
+                    required: 'Please enter contact number.',
+                    digits: 'Please enter a valid 10-digit phone number.',
+                },
+                commission: {
+                    required: 'Please enter commission.',
+                    checkPercentage: 'Commission must be a valid number and should not exceed 100%',
+                },
+                contact_email: {
+                    email: 'Please enter a valid email address.',
+                    maxlength: 'Email address must not exceed 100 characters.'
+                },
+            },
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
 
-      function flashMessage(type, message) {
-         // Implement or replace this function based on your needs
-         console.log(type, message);
-      }
-   });
-   // impliment jQuery Validation 
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
+
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation 
     $(document).ready(function() {
         $('#contact_email').on('input', function() {
             var emailInput = $(this).val();
             var emailErrorDiv = $('#email-error');
-            
+
             if (emailInput.trim() === '' || isValidEmail(emailInput)) {
                 emailErrorDiv.text('');
             } else {
                 emailErrorDiv.text('Please enter a valid email address.');
             }
         });
-        
+
         function isValidEmail(email) {
             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
@@ -222,5 +247,3 @@
     }
 </script>
 @endsection
-
-

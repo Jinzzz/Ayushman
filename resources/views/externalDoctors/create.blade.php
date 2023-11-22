@@ -26,7 +26,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Doctor Name*</label>
-                                    <input type="text" class="form-control" required name="doctor_name" maxlength="100" value="{{ old('doctor_name') }}" placeholder="Doctor Name">
+                                    <input type="text" class="form-control" required name="doctor_name" value="{{ old('doctor_name') }}" placeholder="Doctor Name">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -41,7 +41,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" name="contact_email" maxlength="100" id="contact_email" value="{{ old('contact_email') }}" placeholder="Email">
+                                    <input type="email" class="form-control" name="contact_email" maxlength="100" value="{{ old('contact_email') }}" placeholder="Email">
                                     <div class="text-danger" id="email-error"></div>
                                 </div>
                             </div>
@@ -105,22 +105,47 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
     $(document).ready(function() {
+        $.validator.addMethod("checkPercentage", function(value, element) {
+            console.log("Inside checkPercentage", value);
+            return !isNaN(value) && parseFloat(value) <= 100;
+        }, "Commission must be a valid number and should not exceed 100%");
+
         var validator = $("#addFm").validate({
             ignore: "",
             rules: {
-                doctor_name: "required",
-                contact_no: "required",
-                commission: "required",
+                doctor_name: {
+                    required: true,
+                    maxlength: 100
+                },
+                contact_no: {
+                    required: true,
+                    maxlength: 10
+                },
+                commission: {
+                    required: true,
+                    checkPercentage: true
+                },
+                contact_email: {
+                    email: true,
+                    maxlength: 100
+                },
             },
             messages: {
                 doctor_name: {
                     required: 'Please enter doctor name.',
+                    maxlength: 'Doctor name must not exceed 100 characters.'
                 },
                 contact_no: {
                     required: 'Please enter contact number.',
+                    digits: 'Please enter a valid 10-digit phone number.',
                 },
                 commission: {
                     required: 'Please enter commission.',
+                    checkPercentage: 'Commission must be a valid number and should not exceed 100%',
+                },
+                contact_email: {
+                    email: 'Please enter a valid email address.',
+                    maxlength: 'Email address must not exceed 100 characters.'
                 },
             },
             errorPlacement: function(label, element) {
