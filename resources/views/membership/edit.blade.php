@@ -212,6 +212,7 @@
                                             <!-- <h6 class="mb-0 card-title" style="margin-left:15px;">Include other benefits</h6><br> -->
                                             <div class="form-group">
                                                 <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefit_title" placeholder="Include other benefits">{{ old('package_description') }}</textarea>
+                                                <span style="color: red;">*Please provide benefits using bullet points only.</span>
                                             </div>
                                         </div>
 

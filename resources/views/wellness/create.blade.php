@@ -82,6 +82,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Wellness Inclusions*</label>
                                     <textarea class="form-control" id="wellnessInclusion" required name="wellness_inclusions" placeholder="Wellness Inclusions">{{ old('wellness_inclusions') }}</textarea>
+                                    <span style="color: red;">*Please provide wellness inclusions using bullet points only.</span>
                                 </div>
                             </div>
                             <div class="col-md-6">

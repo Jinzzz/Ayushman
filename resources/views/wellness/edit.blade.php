@@ -81,7 +81,7 @@
                                     <label for="branch_id" class="form-label">Branch*</label>
                                     <select class="multi-select" required name="branch[]" multiple style="width: 100%;">
                                         @foreach($branch as $id => $branchName)
-                                        <option value="{{ $id }}" {{ in_array($id, $wellness->branches->pluck('branch_id')->toArray()) ? 'selected' : '' }}>
+                                        <option value="{{ $id }}" {{ $branch_ids->contains($id) ? 'selected' : '' }}>
                                             {{ $branchName }}
                                         </option>
                                         @endforeach
@@ -92,6 +92,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Wellness Inclusions*</label>
                                     <textarea class="form-control" required name="wellness_inclusions" id="wellnessInclusion" placeholder="Wellness Inclusions">{{$wellness->wellness_inclusions}}</textarea>
+                                    <span style="color: red;">*Please provide wellness inclusions using bullet points only.</span>
                                 </div>
                             </div>
 
@@ -105,7 +106,7 @@
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
-                                    <input type="hidden" name="is_active" value="0">
+                                        <input type="hidden" name="is_active" value="0">
                                         <input type="checkbox" value="{{$wellness->is_active}}" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" @if($wellness->is_active) checked @endif>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">
@@ -170,14 +171,15 @@
 </script>
 <script>
     function toggleStatus(checkbox) {
-            if (checkbox.checked) {
-                $("#statusText").text('Active');
-                $("input[name=is_active]").val(1);
-            } else {
-                $("#statusText").text('Inactive');
-                $("input[name=is_active]").val(0);
-            }
+        if (checkbox.checked) {
+            $("#statusText").text('Active');
+            $("input[name=is_active]").val(1);
+        } else {
+            $("#statusText").text('Inactive');
+            $("input[name=is_active]").val(0);
         }
+    }
+
     function validateDecimalInput(input) {
         var numericValue = input.value.replace(/[^0-9.]/g, '').slice(0, 13);
         input.value = numericValue;
