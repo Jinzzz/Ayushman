@@ -66,7 +66,7 @@
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Membership Package Price*</label>
+                                                <label class="form-label">Regular Price*</label>
                                                 <input type="number" min="0" class="form-control" required name="membership_package_price" value="{{ isset($membership->package_price) ? $membership->package_price : old('package_price') }}" placeholder="Membership Package Price">
                                             </div>
                                         </div>
@@ -138,7 +138,7 @@
 
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label class="form-label">Max usage limit*</label>
+                                                <label class="form-label">Max limit*</label>
                                                 <input type="number" min="1" class="form-control" required name="max_usage_limit" placeholder="Max usage limit">
                                             </div>
                                         </div>
