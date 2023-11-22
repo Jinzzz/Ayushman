@@ -73,7 +73,7 @@ Route::get('reset-password/{token}/{email}', [ForgotPasswordController::class, '
 Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
 // Routes to reset password ends
 
-Auth::routes();
+// Auth::routes();
 
 //Authentication:
 Route::middleware('auth')->group(function () {

@@ -8,7 +8,7 @@
                <h3 class="mb-0 card-title">Create Branch</h3>
             </div>
             <!-- Success message -->
-            <div class="col-lg-12 card-background" style="background-color:#fff";>
+            <div class="col-lg-12 card-background" style="background-color:#fff" ;>
                @if ($errors->any())
                <div class="alert alert-danger">
                   <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
@@ -19,7 +19,7 @@
                   </ul>
                </div>
                @endif
-               <form action="{{ route('branches.store') }}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('branches.store') }}" id="addFm" method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
                      <div class="col-md-6">
@@ -31,27 +31,27 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Address*</label>
-                           <textarea class="form-control" required name="branch_address"  placeholder="Branch Address">{{old('branch_address')}}</textarea>
+                           <textarea class="form-control" required name="branch_address" placeholder="Branch Address">{{old('branch_address')}}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Contact Number</label>
-                           <input type="text" class="form-control"  name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" pattern="[0-9]{10}" title="Please enter digits only" oninput="validateInput(this)">
+                           <input type="text" class="form-control" name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" pattern="[0-9]{10}" title="Please enter digits only" oninput="validateInput(this)">
                            <p class="error-message" style="color: green; display: none;">Only numbers are allowed.</p>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Email</label>
-                           <input type="email" class="form-control"  name="branch_email"  id="contact_email" maxlength="100" value="{{old('branch_email')}}" placeholder="Branch Email">
+                           <input type="email" class="form-control" name="branch_email" id="contact_email" maxlength="100" value="{{old('branch_email')}}" placeholder="Branch Email">
                            <div class="text-danger" id="email-error"></div>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Admin Name</label>
-                           <input type="text" class="form-control"  name="branch_admin_name" value="{{old('branch_admin_name')}}" maxlength="100" placeholder="Branch Admin Name">
+                           <input type="text" class="form-control" name="branch_admin_name" value="{{old('branch_admin_name')}}" maxlength="100" placeholder="Branch Admin Name">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -63,18 +63,16 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                            <label class="form-label">Latitude*</label>
-                            <input type="text" class="form-control" required name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" 
-                                oninput="validateNumericInput(this, 10);">
+                           <label class="form-label">Latitude*</label>
+                           <input type="text" class="form-control" required name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" oninput="validateNumericInput(this, 10);">
                         </div>
-                    </div>
-                    <div class="col-md-6">
+                     </div>
+                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="form-label">Longitude*</label>
-                            <input type="text" class="form-control" required name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" 
-                                oninput="validateNumericInput(this, 10);">
+                           <label class="form-label">Longitude*</label>
+                           <input type="text" class="form-control" required name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" oninput="validateNumericInput(this, 10);">
                         </div>
-                    </div>
+                     </div>
                      <!-- ... -->
                      <div class="col-md-6">
                         <div class="form-group">
@@ -91,10 +89,10 @@
                   <!-- ... -->
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
-                        <i class="fa fa-check-square-o"></i> Add</button>
+                        <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
+                           <i class="fa fa-check-square-o"></i> Add</button>
                         <button type="reset" class="btn btn-raised btn-success">
-                        Reset</button>
+                           Reset</button>
                         <a class="btn btn-danger" href="{{route('branches')}}">Cancel</a>
                      </center>
                   </div>
@@ -106,71 +104,124 @@
 </div>
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+   $(document).ready(function() {
+      var validator = $("#addFm").validate({
+         ignore: "",
+         rules: {
+            branch_name: "required",
+            branch_address: "required",
+            latitude: "required",
+            longitude: "required",
+         },
+         messages: {
+            branch_name: {
+               required: 'Please enter branch name.',
+            },
+            branch_address: {
+               required: 'Please enter branch address.',
+            },
+            latitude: {
+               required: 'Please enter latitude.',
+            },
+            longitude: {
+               required: 'Please enter longitude.',
+            },
+         },
+         errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element.parent().children().last());
+         },
+         highlight: function(element, errorClass) {
+            $(element).parent().addClass('has-error');
+            $(element).addClass('form-control-danger');
+         },
+         unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('has-error');
+            $(element).removeClass('form-control-danger');
+         }
+      });
+
+      $(document).on('click', '#submitForm', function() {
+         if (validator.form()) {
+            $('#addFm').submit();
+         } else {
+            flashMessage('w', 'Please fill all mandatory fields');
+         }
+      });
+
+      function flashMessage(type, message) {
+         // Implement or replace this function based on your needs
+         console.log(type, message);
+      }
+   });
+   // impliment jQuery Validation 
    function toggleStatus(checkbox) {
-       if (checkbox.checked) {
-           $("#statusText").text('Active');
-           $("input[name=is_active]").val(1); // Set the value to 1 when checked
-       } else {
-           $("#statusText").text('Inactive');
-           $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
-       }
+      if (checkbox.checked) {
+         $("#statusText").text('Active');
+         $("input[name=is_active]").val(1); // Set the value to 1 when checked
+      } else {
+         $("#statusText").text('Inactive');
+         $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+      }
    }
 </script>
 <script>
    function validateInput(input) {
-       var inputValue = input.value;
+      var inputValue = input.value;
 
-       // Remove any non-numeric characters from the input
-       var numericValue = inputValue.replace(/[^0-9]/g, '');
+      // Remove any non-numeric characters from the input
+      var numericValue = inputValue.replace(/[^0-9]/g, '');
 
-       // Ensure the input does not exceed 10 characters
-       if (numericValue.length > 10) {
-           // Truncate the input to the first 10 digits
-           numericValue = numericValue.slice(0, 10);
-       }
+      // Ensure the input does not exceed 10 characters
+      if (numericValue.length > 10) {
+         // Truncate the input to the first 10 digits
+         numericValue = numericValue.slice(0, 10);
+      }
 
-       // Update the input value with the numeric value
-       input.value = numericValue;
+      // Update the input value with the numeric value
+      input.value = numericValue;
 
-       // Check if the resulting value has exactly 10 digits
-       if (numericValue.length !== 10) {
-           input.setCustomValidity("Please enter exactly 10-digit numbers.");
-           input.parentNode.querySelector('.error-message').style.display = 'block';
-       } else {
-           input.setCustomValidity("");
-           input.parentNode.querySelector('.error-message').style.display = 'none';
-       }
+      // Check if the resulting value has exactly 10 digits
+      if (numericValue.length !== 10) {
+         input.setCustomValidity("Please enter exactly 10-digit numbers.");
+         input.parentNode.querySelector('.error-message').style.display = 'block';
+      } else {
+         input.setCustomValidity("");
+         input.parentNode.querySelector('.error-message').style.display = 'none';
+      }
    }
 </script>
 <script>
    $(document).ready(function() {
-       $('#contact_email').on('input', function() {
-           var emailInput = $(this).val();
-           var emailErrorDiv = $('#email-error');
-           
-           if (emailInput.trim() === '' || isValidEmail(emailInput)) {
-               emailErrorDiv.text('');
-           } else {
-               emailErrorDiv.text('Please enter a valid email address.');
-           }
-       });
-       
-       function isValidEmail(email) {
-           var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-           return emailRegex.test(email);
-       }
+      $('#contact_email').on('input', function() {
+         var emailInput = $(this).val();
+         var emailErrorDiv = $('#email-error');
+
+         if (emailInput.trim() === '' || isValidEmail(emailInput)) {
+            emailErrorDiv.text('');
+         } else {
+            emailErrorDiv.text('Please enter a valid email address.');
+         }
+      });
+
+      function isValidEmail(email) {
+         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         return emailRegex.test(email);
+      }
    });
 </script>
 <script>
    function validateNumericInput(input, maxLength) {
-       // Remove non-numeric characters and multiple periods using regular expression
-       input.value = input.value.replace(/[^0-9.]+/g, '');
+      // Remove non-numeric characters and multiple periods using regular expression
+      input.value = input.value.replace(/[^0-9.]+/g, '');
 
-       // Check if the input length exceeds the maxLength
-       if (input.value.length > maxLength) {
-           input.value = input.value.slice(0, maxLength); // Truncate to maxLength
-       }
+      // Check if the input length exceeds the maxLength
+      if (input.value.length > maxLength) {
+         input.value = input.value.slice(0, maxLength); // Truncate to maxLength
+      }
    }
 </script>
 
