@@ -71,7 +71,7 @@ Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->nam
 Route::get('forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('password.request');
 Route::post('forgot-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('password.email.send');
 Route::get('reset-password/{token}/{email}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
-Route::post('update-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('password.update');
 // Routes to reset password ends
 
 Auth::routes();
@@ -201,7 +201,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/wellness/update/{wellness_id}', [MstWellnessController::class, 'update'])->name('wellness.update');
     Route::get('/wellness/show/{wellness_id}', [MstWellnessController::class, 'show'])->name('wellness.show');
     Route::delete('/wellness/destroy/{wellness_id}', [MstWellnessController::class, 'destroy'])->name('wellness.destroy');
-    Route::patch('wellness/{wellness_id}/change-status', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
+    Route::patch('wellness/change-status/{wellness_id}', [MstWellnessController::class, 'changeStatus'])->name('wellness.changeStatus');
+    Route::get('/wellness/room/assign', [MstWellnessController::class, 'roomAssign'])->name('wellness.room.assign');
+    Route::delete('/wellness/room/destroy/{wellness_id}', [MstWellnessController::class, 'roomDestroy'])->name('wellness.room.destroy');
+    Route::get('/get-branch-wellness-room-ids/{id}', [MstWellnessController::class, 'getBranchWellnessRoomIds'])->name('get.branch.room.wellness');
+    Route::post('/wellness/room/store', [MstWellnessController::class, 'roomStore'])->name('wellness.room.store');
 
     //Manage-Units:
     Route::get('/unit/index', [MstUnitController::class, 'index'])->name('unit.index');

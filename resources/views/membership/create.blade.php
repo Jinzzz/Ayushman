@@ -81,6 +81,7 @@
                            <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits*</h6><br>
                            <div class="form-group">
                               <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
+                              <span style="color: red;">*Please provide benefits using bullet points only.</span>
                            </div>
                         </div>
 
