@@ -20,7 +20,7 @@
             </div>
             <!-- Success message -->
             <div class="col-lg-12" style="background-color:#fff">
-               <form action="{{ route('medicine.dosage.store') }}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('medicine.dosage.store') }}" id="addFm" method="POST" enctype="multipart/form-data">
                   <input type="hidden" name="hidden_id" value="{{ isset($medicine_dosages->medicine_dosage_id) ? $medicine_dosages->medicine_dosage_id : '' }}">
                   @csrf
                   <div class="row">
@@ -48,7 +48,7 @@
                   </div>
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
+                        <button type="button" id="submitForm" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> {{ isset($medicine_dosages->medicine_dosage_id) ? 'Update' : 'Add' }}</button>
                         @if (!isset($medicine_dosages->medicine_dosage_id))
                         <button type="reset" class="btn btn-raised btn-success">Reset</button>
@@ -58,9 +58,7 @@
                   </div>
             </div>
          </div>
-
          </form>
-
       </div>
    </div>
 </div>
@@ -68,17 +66,57 @@
 
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
+
 <script>
-   function toggleStatus(checkbox) {
-      if (checkbox.checked) {
-         $("#statusText").text('Active');
-         $("input[name=is_active]").val(1); // Set the value to 1 when checked
-      } else {
-         $("#statusText").text('Inactive');
-         $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+   $(document).ready(function() {
+      var validator = $("#addFm").validate({
+         ignore: "",
+         rules: {
+            medicine_dosages: "required",
+         },
+         messages: {
+            medicine_dosages: {
+               required: 'Please enter medicine dosage.',
+            }
+         },
+         errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element.parent().children().last());
+         },
+         highlight: function(element, errorClass) {
+            $(element).parent().addClass('has-error');
+            $(element).addClass('form-control-danger');
+         },
+         unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('has-error');
+            $(element).removeClass('form-control-danger');
+         }
+      });
+
+      $(document).on('click', '#submitForm', function() {
+         if (validator.form()) {
+            $('#addFm').submit();
+         } else {
+            flashMessage('w', 'Please fill all mandatory fields');
+         }
+      });
+
+      function flashMessage(type, message) {
+         // Implement or replace this function based on your needs
+         console.log(type, message);
       }
-   }
+
+      function toggleStatus(checkbox) {
+         if (checkbox.checked) {
+            $("#statusText").text('Active');
+            $("input[name=is_active]").val(1); // Set the value to 1 when checked
+         } else {
+            $("#statusText").text('Inactive');
+            $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+         }
+      }
+   });
 </script>
-
-
 @endsection

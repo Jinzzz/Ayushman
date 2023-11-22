@@ -146,7 +146,7 @@ class MstWellnessController extends Controller
             // $wellness->load('branches');
             $branch_ids = Trn_Wellness_Branch::where('wellness_id', $wellness_id)->pluck('branch_id');
             $branch = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
-            return view('wellness.edit', compact('pageTitle', 'wellness', 'branch','branch_ids'));
+            return view('wellness.edit', compact('pageTitle', 'wellness', 'branch', 'branch_ids'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
