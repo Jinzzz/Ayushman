@@ -43,6 +43,7 @@ use App\Http\Controllers\MedicineSalesReturnController;
 use App\Http\Controllers\TrnPrescriptionController;
 use App\Http\Controllers\TrnJournelEntryController;
 use App\Http\Controllers\StaffLeaveController;
+use App\Http\Controllers\HolidayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -374,6 +375,19 @@ Route::middleware('auth')->group(function () {
     Route::put('/staffleave/update/{id}', [StaffLeaveController::class, 'update'])->name('staffleave.update');
     Route::delete('/staffleave/destroy/{id}', [StaffLeaveController::class, 'destroy'])->name('staffleave.destroy');
 
+    //Holidays
+    Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
+    Route::get('/holiday/create', [HolidayController::class, 'create'])->name('holidays.create');
+    // Route::get('/get-staff-names/{branchId}', [HolidayController::class, 'getStaffNames'])->name('get-staff-names');
+    Route::post('/holiday/store', [HolidayController::class, 'store'])->name('holidays.store');
+    Route::get('/holiday/edit/{id}', [HolidayController::class, 'edit'])->name('holidays.edit');
+    Route::put('/holiday/update/{id}', [HolidayController::class, 'update'])->name('holidays.update');
+    Route::delete('/holiday/destroy/{id}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
+
+    Route::get('/holiday/staff-mapping/{holiday_id}', [HolidayController::class, 'staffHolidayMapping'])->name('holidays.staff-mapping');
+
+    Route::post('/holiday/storelink/{holidaymapping_id}', [HolidayController::class, 'storeHolidayMapping'])->name('holidays.storelink');
+    Route::delete('/holidaymapping/destroy/{id}', [HolidayController::class, 'destroyMapping'])->name('holidaysmapping.destroy');
 
     // Medicine Purchase
     Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');
