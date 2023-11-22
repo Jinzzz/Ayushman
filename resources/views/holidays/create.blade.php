@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0 card-title">Create Leave Request</h3>
+                    <h3 class="mb-0 card-title">Create Holiday</h3>
                 </div>
                 <div class="col-lg-12" style="background-color: #fff;">
                     @if ($errors->any())
@@ -19,91 +19,21 @@
                         </ul>
                     </div>
                     @endif
-                    <form action="{{ route('staffleave.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('holidays.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label branch" id="branchLabel">Staff Branch*</label>
-                                    <select class="form-control" name="branch_id" id="branch_id">
-                                    <option value="">Choose Branch</option>
-                                    @foreach($branches as $branch)
-                                        <option value="{{ $branch->branch_id }}" {{ old('branch_id') == $branch->branch_id ? 'selected' : '' }}>
-                                            {{ $branch->branch_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-
+                                    <label class="form-label branch" id="branchLabel">Holiday Name*</label>
+                                    <input type="text" class="form-control" name="holiday_name" id="holiday_name" value="{{ old('holiday_name') }}" placeholder="Holiday Name" >
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Staff Name</label>
-                                    <select class="form-control" name="staff_id" id="staff_id">
-                                        <option value="">Select a Branch...</option>
-                                        <!-- Options will be dynamically populated using AJAX -->
-                                    </select>
-                                    <p class="no-staff-message" style="color: red; display: none;">No staff members in the selected branch.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label"> From Date</label>
-                                    <input type="date" class="form-control" name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="Emergency Contact" >
-                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-label">Start Day</label>
-                                    <select class="form-control" name="start_day" id="start_day">
-                                    <option value="Full Day" {{ old('start_day') == 'Full Day' ? 'selected' : '' }}>Full Day</option>
-                                    <option value="Half Day" {{ old('start_day') == 'Half Day' ? 'selected' : '' }}>Half Day</option>
-                                    <!-- Options will be dynamically populated using AJAX -->
-                                </select>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">To Date</label>
-                                    <input type="date" class="form-control" name="to_date" id="to_date"  value="{{ old('to_date') }}">
-                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label class="form-label">End Day</label>
-                                    <select class="form-control" name="end_day" id="end_day">
-                                    <option value="Full Day" {{ old('end_day') == 'Full Day' ? 'selected' : '' }}>Full Day</option>
-                                    <option value="Half Day" {{ old('end_day') == 'Half Day' ? 'selected' : '' }}>Half Day</option>
-                                    <!-- Options will be dynamically populated using AJAX -->
-                                </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">No Of Days</label>
-                                    <input type="text" class="form-control" value="{{ old('days') }}" name="days" id="no_of_days" placeholder="No Of Days" readonly>
-                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
-                                </div>
-                            </div>
-                
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Leave Type</label>
+                            <div class="form-group">
+                                    <label class="form-label">Holiday Type</label>
                                     <select class="form-control" name="leave_type" id="leave_type">
-                                    <option value="" disabled selected>Choose Leave Type</option>
+                                    <option value="" disabled selected>Choose Holiday Type</option>
                                     @foreach($leave_types as $leave_type)
                                         <option value="{{ $leave_type->leave_type_id }}" {{ old('leave_type') == $leave_type->leave_type_id ? 'selected' : '' }}>
                                             {{ $leave_type->name }}
@@ -116,25 +46,49 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Reason</label>
-                                    <textarea class="form-control" name="reason" placeholder="Reason For Leave">{{ old('reason') }}</textarea>
-
+                                    <label class="form-label"> From Date</label>
+                                    <input type="date" class="form-control" name="from_date" id="from_date" value="{{ old('from_date') }}" placeholder="Emergency Contact" >
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" class="form-control" name="to_date" id="to_date"  value="{{ old('to_date') }}">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                         </div>
-
+                        <div class="row">
+                        <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Year</label>
+                                    <input type="number" class="form-control" name="year" id="year" pattern="\d{4}" placeholder="Enter a valid year (four digits)" value="{{ old('year') }}">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div> 
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Company</label>
+                                    <input type="text" class="form-control" name="company" id="company" value="Ayushman" placeholder="Company" readonly>
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div> 
+                        </div>
+                       
+</br>
                         <div class="form-group">
                             <center>
                                 <button type="submit" class="btn btn-raised btn-primary">
                                     <i class="fa fa-check-square-o"></i> Add
                                 </button>
-                                <button type="reset" class="btn btn-raised btn-success">
-                                    Reset
-                                </button>
-                                <a class="btn btn-danger" href="{{ route('h.index') }}">Cancel</a>
+                                <a class="btn btn-success" href="{{ route('holidays.index') }}">Rest</a>
+                             
+                                <a class="btn btn-danger" href="{{ route('holidays.index') }}">Cancel</a>
                             </center>
+                        </div>
                         </div>
                     </form>
                 </div>

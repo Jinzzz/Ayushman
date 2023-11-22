@@ -6,26 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Mst_Leave_Type extends Model
+class Holiday extends Model
 {
     use HasFactory,SoftDeletes;
-
-    protected $table = 'mst_leave_types';
-
-    protected $primaryKey = 'leave_type_id';
+    public $timestamps = true;
+    protected $table = 'holidays';
 
     protected $fillable = [
-        'name',
-        'is_active',
-        'is_dedactable',
-        'created_by',
-        'updated_by',
-        'deleted_by',
-        'deleted_at',
+        'holiday_name',
+        'leave_type',
+        'from_date',
+        'to_date',
+        'company',
+        'year',
     ];
+
     public function leaveType()
     {
         return $this->belongsTo(Mst_Leave_Type::class, 'leave_type_id');
     }
-    
 }

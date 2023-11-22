@@ -68,6 +68,7 @@
         <!-- <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a> -->
         <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li>
         <li><a class="slide-item" href="{{ route('staffleave.index') }}">{{ __('Admin Leave Request') }}</a></li>
+        <li><a class="slide-item" href="{{ route('holidays.index') }}">{{ __('Holidays') }}</a></li>
         <li><a class="slide-item" href="{{route('branchTransfer.index')}}">{{__('Employee Branch Transfer')}}</a></li>
     </li>
     </ul>
