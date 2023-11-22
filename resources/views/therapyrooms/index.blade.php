@@ -85,10 +85,10 @@
                                     <td>{{ $therapyroom->room_capacity }}</td> -->
 
                         <td>
-                            <a class="btn btn-sm  btn-outline-success " href="{{ route('therapyroomassigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>RoomAssigning</a>
+                            <a class="btn btn-sm  btn-outline-success " href="{{ route('therapyroomassigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Room Assigning</a>
                         </td>
                         <td>
-                            <a class="btn btn-sm  btn-outline-success " href="{{ route('slot_assigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>SlotAssigning</a>
+                            <a class="btn btn-sm  btn-outline-success " href="{{ route('slot_assigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot Assigning</a>
                         </td>
                         <td>
                             <button type="button" style="width: 70px;"  onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">

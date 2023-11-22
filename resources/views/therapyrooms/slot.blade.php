@@ -6,7 +6,7 @@
             <div class="card-header">
                 <h3 class="card-title"><strong>Assigning Timeslots</strong></h3>
             </div>
-            <form action="{{ route('room.slot.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('room.slot.store') }}" id="addFm" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row">
@@ -39,14 +39,14 @@
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" id="submitForm" class="btn btn-primary">
                             <i class="fa fa-check-square-o"></i> Submit
                         </button>&nbsp;&nbsp;
                         <a class="btn btn-primary" href="{{ route('slot_assigning.index',$id) }}">
                             <i class="fa fa-times" aria-hidden="true"></i> Reset
                         </a>
                         <a class="btn btn-primary" href="{{ route('therapyrooms.index') }}">
-                             Therapy Rooms
+                            Therapy Rooms
                         </a>
                     </div>
                 </div>
@@ -94,7 +94,7 @@
                             <td>{{ $slot->weekDay->master_value}}</td>
                             <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_from)->format('g:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_to)->format('g:i A') }}</td>
                             <td>
-                                <button type="button" style="width: 70px;"  onclick="changeStatus({{ $slot->id }})" class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
+                                <button type="button" style="width: 70px;" onclick="changeStatus({{ $slot->id }})" class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($slot->is_active == 0)
                                     InActive
                                     @else
@@ -117,7 +117,54 @@
 </div>
 </div>
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+    $(document).ready(function() {
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                time_slot: {
+                    required: true,
+                },
+                week_day: "required",
+            },
+            messages: {
+                time_slot: {
+                    required: 'Please select a slot.',
+                },
+                week_day: {
+                    required: 'Please select a week day.',
+                },
+            },
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
+
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
+
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation 
     function deleteData(dataId) {
         swal({
                 title: "Delete selected data?",
