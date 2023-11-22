@@ -24,13 +24,13 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Medicine Name*</label>
-                           <input type="text" class="form-control" required name="medicine_name" maxlength="100" value="{{ old('medicine_name') }}" placeholder="Medicine Name">
+                           <input type="text" class="form-control" required name="medicine_name" value="{{ old('medicine_name') }}" placeholder="Medicine Name">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Generic Name*</label>
-                           <input type="text" class="form-control" required name="generic_name" maxlength="100" value="{{ old('generic_name') }}" placeholder="Generic Name">
+                           <input type="text" class="form-control" required name="generic_name" value="{{ old('generic_name') }}" placeholder="Generic Name">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -39,7 +39,7 @@
                            <select class="form-control" name="item_type" id="item_type">
                               <option value="">Select Item Type</option>
                               @foreach($itemType as $masterId => $masterValue)
-                              <option value="{{ $masterId }}"{{ old('item_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
+                              <option value="{{ $masterId }}" {{ old('item_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
                               @endforeach
                            </select>
                         </div>
@@ -50,7 +50,7 @@
                            <select class="form-control" name="medicine_type" id="medicine_type">
                               <option value="">Select Medicine Type</option>
                               @foreach($medicineType as $masterId => $masterValue)
-                              <option value="{{ $masterId }}"{{ old('medicine_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
+                              <option value="{{ $masterId }}" {{ old('medicine_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
                               @endforeach
                            </select>
                         </div>
@@ -58,7 +58,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Hsn Code </label>
-                           <input type="text" class="form-control" name="Hsn_code"  maxlength="8" value="{{ old('Hsn_code') }}" placeholder="Hsn Code"  oninput="validateNumericValue(this);">
+                           <input type="text" class="form-control" name="Hsn_code" value="{{ old('Hsn_code') }}" placeholder="Hsn Code">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -67,7 +67,7 @@
                            <select class="form-control" name="tax_id" id="tax_id">
                               <option value="">Choose Tax</option>
                               @foreach($taxes as $tax_id => $tax)
-                              <option value="{{ $tax_id }}"{{ old('tax_id') == $tax_id ? 'selected' : '' }}>{{ $tax }}</option>
+                              <option value="{{ $tax_id }}" {{ old('tax_id') == $tax_id ? 'selected' : '' }}>{{ $tax }}</option>
                               @endforeach
                            </select>
                         </div>
@@ -78,7 +78,7 @@
                            <select class="form-control" name="manufacturer" id="manufacturer">
                               <option value="">Select Manufacturer</option>
                               @foreach($Manufacturer as $masterId => $masterValue)
-                              <option value="{{ $masterId }}"{{ old('manufacturer') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
+                              <option value="{{ $masterId }}" {{ old('manufacturer') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
                               @endforeach
                            </select>
                         </div>
@@ -86,13 +86,13 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Unit Price*</label>
-                           <input type="text" class="form-control" required name="unit_price" maxlength="10" value="{{ old('unit_price') }}" placeholder="Unit Price" oninput="validateNumericValue(this);">
+                           <input type="text" class="form-control" maxlength="10" required name="unit_price" value="{{ old('unit_price') }}" placeholder="Unit Price">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Description*</label>
-                           <textarea class="form-control" required name="description"  placeholder="Description">{{ old('description') }}</textarea>
+                           <textarea class="form-control" required name="description" placeholder="Description">{{ old('description') }}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -101,7 +101,7 @@
                            <select class="form-control" name="unit_id" id="unit_id">
                               <option value="">Choose Unit</option>
                               @foreach($units as $unit_id => $unit)
-                              <option value="{{ $unit_id }}"{{ old('unit_id') == $unit_id ? 'selected' : '' }}>{{ $unit }}</option>
+                              <option value="{{ $unit_id }}" {{ old('unit_id') == $unit_id ? 'selected' : '' }}>{{ $unit }}</option>
                               @endforeach
                            </select>
                         </div>
@@ -109,9 +109,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Reorder Limit</label>
-                           <input type="text" class="form-control" name="reorder_limit" maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit" 
-                           {{-- Add the numeric validation rule here --}}
-                           min="0" max="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');">
+                           <input type="text" class="form-control" name="reorder_limit" maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -129,9 +127,9 @@
                   <div class="form-group">
                      <center>
                         <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
-                        <i class="fa fa-check-square-o"></i> Add</button>
+                           <i class="fa fa-check-square-o"></i> Add</button>
                         <button type="reset" class="btn btn-raised btn-success">
-                        Reset</button>
+                           Reset</button>
                         <a class="btn btn-danger" href="{{route('medicine.index')}}">Cancel</a>
                      </center>
                   </div>
@@ -150,20 +148,50 @@
       var validator = $("#addFm").validate({
          ignore: "",
          rules: {
-            medicine_name: "required",
-            generic_name: "required",
-            unit_price: "required",
+            medicine_name: {
+               required: true,
+               maxlength: 100
+            },
+            generic_name: {
+               required: true,
+               maxlength: 100
+            },
+            Hsn_code: {
+               number: true,
+               maxlength: 8
+            },
+            unit_price: {
+               required: true,
+               number: true,
+               maxlength: 10
+            },
+            reorder_limit: {
+               number: true,
+               maxlength: 10
+            },
             description: "required",
          },
          messages: {
             medicine_name: {
                required: 'Please enter medicine name.',
+               maxlength: 'Medicine name must not exceed 100 characters.'
             },
             generic_name: {
                required: 'Please enter generic name.',
+               maxlength: 'Generic name must not exceed 100 characters.'
+            },
+            Hsn_code: {
+               number: 'Please enter a valid integer.',
+               maxlength: 'Hsn code must not exceed 8 characters.'
             },
             unit_price: {
                required: 'Please enter unit price.',
+               number: 'Please enter a valid integer.',
+               maxlength: 'Unit price must not exceed 10 characters.'
+            },
+            reorder_limit: {
+               number: 'Please enter a valid integer.',
+               maxlength: 'Reorder limit must not exceed 10 characters.'
             },
             description: {
                required: 'Please enter description.',
@@ -198,18 +226,18 @@
    });
    // impliment jQuery Validation 
    function toggleStatus(checkbox) {
-       if (checkbox.checked) {
-           $("#statusText").text('Active');
-           $("input[name=is_active]").val(1); // Set the value to 1 when checked
-       } else {
-           $("#statusText").text('Inactive');
-           $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
-       }
+      if (checkbox.checked) {
+         $("#statusText").text('Active');
+         $("input[name=is_active]").val(1); // Set the value to 1 when checked
+      } else {
+         $("#statusText").text('Inactive');
+         $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
+      }
    }
 </script>
 <script>
    function validateNumericValue(input) {
-       input.value = input.value.replace(/[^0-9.]/g, '');
+      input.value = input.value.replace(/[^0-9.]/g, '');
    }
 </script>
 
