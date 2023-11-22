@@ -25,7 +25,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Name*</label>
-                           <input type="text" class="form-control" required name="branch_name" value="{{old('branch_name')}}" maxlength="100" placeholder="Branch Name">
+                           <input type="text" class="form-control" required name="branch_name" value="{{old('branch_name')}}" placeholder="Branch Name">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -37,40 +37,40 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Contact Number</label>
-                           <input type="text" class="form-control" name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" pattern="[0-9]{10}" title="Please enter digits only" oninput="validateInput(this)">
-                           <p class="error-message" style="color: green; display: none;">Only numbers are allowed.</p>
+                           <input type="text" class="form-control" name="branch_contact_number" value="{{old('branch_contact_number')}}" placeholder="Branch Contact Number" title="Please enter digits only" oninput="validateInput(this)">
+                           <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Email</label>
-                           <input type="email" class="form-control" name="branch_email" id="contact_email" maxlength="100" value="{{old('branch_email')}}" placeholder="Branch Email">
+                           <input type="email" class="form-control" name="branch_email" value="{{old('branch_email')}}" placeholder="Branch Email">
                            <div class="text-danger" id="email-error"></div>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Admin Name</label>
-                           <input type="text" class="form-control" name="branch_admin_name" value="{{old('branch_admin_name')}}" maxlength="100" placeholder="Branch Admin Name">
+                           <input type="text" class="form-control" name="branch_admin_name" value="{{old('branch_admin_name')}}" placeholder="Branch Admin Name">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Branch Admin Contact Number</label>
-                           <input type="text" class="form-control" name="branch_admin_contact_number" value="{{old('branch_admin_contact_number')}}" placeholder="Branch Admin Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateInput(this)">
-                           <p class="error-message" style="color: green; display: none;">Only numbers are allowed.</p>
+                           <input type="text" class="form-control" name="branch_admin_contact_number" value="{{old('branch_admin_contact_number')}}" placeholder="Branch Admin Contact Number" title="Please enter digits only" oninput="validateInput(this)">
+                           <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Latitude*</label>
-                           <input type="text" class="form-control" required name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" oninput="validateNumericInput(this, 10);">
+                           <input type="text" class="form-control" required name="latitude" value="{{ old('latitude') }}" placeholder="Latitude" oninput="validateInput(this)">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Longitude*</label>
-                           <input type="text" class="form-control" required name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" oninput="validateNumericInput(this, 10);">
+                           <input type="text" class="form-control" required name="longitude" value="{{ old('longitude') }}" placeholder="Longitude" oninput="validateInput(this)">
                         </div>
                      </div>
                      <!-- ... -->
@@ -111,23 +111,65 @@
       var validator = $("#addFm").validate({
          ignore: "",
          rules: {
-            branch_name: "required",
-            branch_address: "required",
-            latitude: "required",
-            longitude: "required",
+            branch_name: {
+               required: true,
+               maxlength: 50
+            },
+            branch_admin_name: {
+               maxlength: 50
+            },
+            branch_address: {
+               required: true,
+               maxlength: 255
+            },
+            branch_contact_number: {
+               digits: 10,
+            },
+            branch_admin_contact_number: {
+               digits: 10,
+            },
+            branch_email: {
+               email: true,
+               maxlength: 100
+            },
+            latitude: {
+               required: true,
+               maxlength: 10
+            },
+            longitude: {
+               required: true,
+               maxlength: 10
+            },
          },
          messages: {
             branch_name: {
                required: 'Please enter branch name.',
+               maxlength: 'Branch name must not exceed 50 characters.'
+            },
+            branch_admin_name: {
+               maxlength: 'Branch admin name must not exceed 50 characters.'
             },
             branch_address: {
                required: 'Please enter branch address.',
+               maxlength: 'Branch address must not exceed 255 characters.'
+            },
+            branch_contact_number: {
+               digits: 'Please enter a valid 10-digit phone number.',
+            },
+            branch_admin_contact_number: {
+               digits: 'Please enter a valid 10-digit phone number.',
+            },
+            branch_email: {
+               email: 'Please enter a valid email address.',
+               maxlength: 'Branch email address must not exceed 100 characters.'
             },
             latitude: {
                required: 'Please enter latitude.',
+               maxlength: 'Latitude must not exceed 10 characters.'
             },
             longitude: {
                required: 'Please enter longitude.',
+               maxlength: 'Longitude must not exceed 10 characters.'
             },
          },
          errorPlacement: function(label, element) {
@@ -193,25 +235,6 @@
          input.parentNode.querySelector('.error-message').style.display = 'none';
       }
    }
-</script>
-<script>
-   $(document).ready(function() {
-      $('#contact_email').on('input', function() {
-         var emailInput = $(this).val();
-         var emailErrorDiv = $('#email-error');
-
-         if (emailInput.trim() === '' || isValidEmail(emailInput)) {
-            emailErrorDiv.text('');
-         } else {
-            emailErrorDiv.text('Please enter a valid email address.');
-         }
-      });
-
-      function isValidEmail(email) {
-         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-         return emailRegex.test(email);
-      }
-   });
 </script>
 <script>
    function validateNumericInput(input, maxLength) {
