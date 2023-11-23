@@ -18,11 +18,11 @@ class AccountLedgerController extends Controller
         try {
             $pageTitle = "Account Ledger";
             $account_ledgers = Mst_Account_Ledger::join('mst_account_sub_head', 'mst__account__ledgers.account_sub_group_id', 'mst_account_sub_head.id')
-            ->select('mst__account__ledgers.id', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_code', 'mst__account__ledgers.is_active', 'mst_account_sub_head.account_sub_group_name')
-            ->orderBy('mst__account__ledgers.created_at', 'desc')
-            ->get();
-        
-                
+                ->select('mst__account__ledgers.id', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_code', 'mst__account__ledgers.is_active', 'mst_account_sub_head.account_sub_group_name')
+                ->orderBy('mst__account__ledgers.created_at', 'desc')
+                ->get();
+
+
             return view('account_ledger.index', compact('pageTitle', 'account_ledgers'));
         } catch (QueryException $e) {
             return redirect()->route('account.ledger.index')->with('error', 'Something went wrong');
@@ -71,12 +71,12 @@ class AccountLedgerController extends Controller
                 $code =  Config::get('settings.ledger_code');
                 $zeroes = Config::get('settings.zeroes');
                 $leadingZeros = str_pad('', $zeroes - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-                $ledger_code =  $code.$leadingZeros.$lastInsertedId;
+                $ledger_code =  $code . $leadingZeros . $lastInsertedId;
                 Mst_Account_Ledger::where('id', $lastInsertedId)->update([
                     'ledger_code' => $ledger_code,
                     'updated_at' => Carbon::now(),
                 ]);
-                
+
 
                 return redirect()->route('account.ledger.index')->with('success', 'Ledger added successfully');
             }
@@ -99,7 +99,7 @@ class AccountLedgerController extends Controller
                 // Handle the case where the ledger with the given ID doesn't exist
                 return redirect()->route('account.ledger.index')->with('error', 'Account ledger not found');
             }
-            return view('account_ledger.edit', compact('pageTitle','subgroup_options', 'account_ledger', 'account_groups','account_sub_group'));
+            return view('account_ledger.edit', compact('pageTitle', 'subgroup_options', 'account_ledger', 'account_groups', 'account_sub_group'));
         } catch (QueryException $e) {
             return redirect()->route('account.ledger.index')->with('error', 'Something went wrong');
         }
@@ -116,9 +116,9 @@ class AccountLedgerController extends Controller
             ]);
 
             $is_exists = Mst_Account_Ledger::where('account_sub_group_id', $request->input('account_sub_group_id'))
-            ->where('ledger_name', $request->input('ledger_name'))
-            ->where('id',!$id)
-            ->first();
+                ->where('ledger_name', $request->input('ledger_name'))
+                ->where('id', !$id)
+                ->first();
             if ($is_exists) {
                 return redirect()->route('account.ledger.index')->with('error', 'This ledger is already exists.');
             } else {
