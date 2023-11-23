@@ -20,7 +20,7 @@
             </div>
             <!-- Success message -->
             <div class="col-lg-12" style="background-color:#fff">
-               <form action="{{ route('leave.type.store') }}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('leave.type.store') }}" method="POST" id="addFm" enctype="multipart/form-data">
                   <input type="hidden" name="hidden_id" value="{{ isset($leave_types->leave_type_id) ? $leave_types->leave_type_id : '' }}">
                   @csrf
                   <div class="row">
@@ -63,7 +63,7 @@
                   </div>
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
+                        <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> {{ isset($leave_types->leave_type_id) ? 'Update' : 'Add' }}</button>
                         @if (!isset($leave_types->leave_type_id))
                         <button type="reset" class="btn btn-raised btn-success">Reset</button>
@@ -83,7 +83,52 @@
 
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+   $(document).ready(function() {
+      var validator = $("#addFm").validate({
+         ignore: "",
+         rules: {
+            leave_types: {
+               required: true,
+               maxlength: 255
+            },
+         },
+         messages: {
+            leave_types: {
+               required: 'Please enter Leave type.',
+               maxlength: 'Leave type must not exceed 255 characters.'
+            },
+         },
+         errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element.parent().children().last());
+         },
+         highlight: function(element, errorClass) {
+            $(element).parent().addClass('has-error');
+            $(element).addClass('form-control-danger');
+         },
+         unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('has-error');
+            $(element).removeClass('form-control-danger');
+         }
+      });
+
+      $(document).on('click', '#submitForm', function() {
+         if (validator.form()) {
+            $('#addFm').submit();
+         } else {
+            flashMessage('w', 'Please fill all mandatory fields');
+         }
+      });
+
+      function flashMessage(type, message) {
+         // Implement or replace this function based on your needs
+         console.log(type, message);
+      }
+   });
+   // impliment jQuery Validation 
    function toggleStatus(checkbox) {
       if (checkbox.checked) {
          $("#statusText").text('Active');
