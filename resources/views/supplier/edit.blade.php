@@ -124,13 +124,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Credit Period</label>
-                                    <input type="number" max="99" class="form-control" name="credit_period" value="{{$supplier->credit_period}}" placeholder="Credit Period">
+                                    <input type="number" max="99" class="form-control" min="0" pattern="\d*" name="credit_period" value="{{$supplier->credit_period}}" placeholder="Credit Period">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Credit Limit</label>
-                                    <input type="number" max="999999" class="form-control" name="credit_limit" value="{{$supplier->credit_limit}}" placeholder="Credit Limit">
+                                    <input type="number" max="999999" class="form-control" min="0" pattern="\d*" name="credit_limit" value="{{$supplier->credit_limit}}" placeholder="Credit Limit">
                                 </div>
                             </div>
                         </div>
@@ -157,7 +157,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <!-- <label class="form-label">Opening Balance</label> -->
-                                    <input type="number" class="form-control no-updation" name="opening_balance" value="{{$supplier->opening_balance}}" placeholder="Opening Balance">
+                                    <input type="number" min="0" pattern="\d*" class="form-control no-updation" name="opening_balance" value="{{$supplier->opening_balance}}" placeholder="Opening Balance">
                                 </div>
                             </div>
                             <div class="col-md-6">

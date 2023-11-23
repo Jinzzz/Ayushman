@@ -53,7 +53,9 @@
                      <div class="form-group checkbox">
                         <label for="branch_id" class="form-label">Wellness Image*</label>
                         <input type="file" class="form-control" readonly required name="wellness_image" value="{{$show->wellness_image}}" placeholder="Wellness Image">
-                        <a href="{{url('/assets/uploads/wellness_image/'.$show->wellness_image)}}" target="_blank">{{$show->wellness_image}}</a>
+                        @if($show->wellness_image)
+                        <img src="{{url('/assets/uploads/wellness_image/'.$show->wellness_image)}}" alt="Wellness Image" style="max-width: 50px; max-height: 50px;">
+                        @endif
                      </div>
                   </div>
                   <div class="col-md-6">

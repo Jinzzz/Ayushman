@@ -15,19 +15,19 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Patient Name</label>
-                                    <input type="text" class="form-control" value="{{$patient_name}}" name="patient_name" placeholder="Patient Name">
+                                    <input type="text" readonly class="form-control" value="{{$patient_name}}" name="patient_name" placeholder="Patient Name">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Booking ID</label>
-                                    <input type="text" class="form-control" value="{{$basic_details->booking_reference_number}}" name="booking_id" placeholder="Booking ID">
+                                    <input type="text" readonly class="form-control" value="{{$basic_details->booking_reference_number}}" name="booking_id" placeholder="Booking ID">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Booking Date</label>
-                                    <input type="text" class="form-control" value="{{ date('d-m-Y', strtotime($basic_details->booking_date)) }}" name="booking_date" placeholder="Booking Date">
+                                    <input type="text" readonly class="form-control" value="{{ date('d-m-Y', strtotime($basic_details->booking_date)) }}" name="booking_date" placeholder="Booking Date">
                                 </div>
                             </div>
                         </div>
@@ -35,13 +35,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Diagnosis</label>
-                                    <textarea class="form-control" name="patient_diagnosis" placeholder="Patient Diagnosis">{{$basic_details->diagnosis}}</textarea>
+                                    <textarea class="form-control" readonly name="patient_diagnosis" placeholder="Patient Diagnosis">{{$basic_details->diagnosis}}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Advice</label>
-                                    <textarea class="form-control" name="doctor_advice" placeholder="Doctor Advice Address">{{$basic_details->advice}}</textarea>
+                                    <textarea class="form-control" readonly name="doctor_advice" placeholder="Doctor Advice Address">{{$basic_details->advice}}</textarea>
                                 </div>
                             </div>
                         </div>

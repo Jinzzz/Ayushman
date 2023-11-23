@@ -67,7 +67,9 @@
                                     <label for="branch_id" class="form-label">Wellness Image*</label>
                                     <input type="file" class="form-control" name="wellness_image" placeholder="Wellness Image">
                                     <input type="hidden" class="form-control" name="saved_img" value="{{$wellness->wellness_image}}">
-                                    <a href="{{url('/assets/uploads/wellness_image/'.$wellness->wellness_image)}}" target="_blank">{{$wellness->wellness_image}}</a>
+                                    @if($wellness->wellness_image)
+                                    <img src="{{url('/assets/uploads/wellness_image/'.$wellness->wellness_image)}}" alt="Wellness Image" style="max-width: 50px; max-height: 50px;">
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-md-6">
