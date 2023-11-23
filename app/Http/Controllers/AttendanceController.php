@@ -20,7 +20,7 @@ class AttendanceController extends Controller
         $firstDayOfMonth = Carbon::parse($selectedMonthYear . '-01');
         $daysInMonth = $firstDayOfMonth->daysInMonth;
         
-        return view('attendance.view', compact('pageTitle', 'selectedMonthYear','staffLeaves','daysInMonth','allStaff'));
+        return view('attendance.view', compact('pageTitle', 'selectedMonthYear','staffLeaves','daysInMonth','allStaff','firstDayOfMonth'));
     }
     public function monthlyAttendance(Request $request)
     {

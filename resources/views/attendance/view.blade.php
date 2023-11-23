@@ -55,21 +55,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
-<style>
+                                <style>
     .present-cell {
         color:#4CAF50;
-        font-weight: bold;
     }
 
     .absent-cell {
         color: #f44336;
-        font-weight: bold;
     }
 
     .empty-cell {
-        background-color: #CCCCCC; /* Light Grey for Empty Cell */
+        color: #CCCCCC;
     }
 </style>
 
@@ -81,7 +77,7 @@
             <td>
                 {{-- Check if the day is in the future --}}
                 @if (\Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->isFuture())
-                    <div style="background-color: #CCCCCC;"> {{-- Display an empty cell for upcoming days --}}
+                    <div class="empty-cell"> {{-- Display an empty cell for upcoming days --}}
                     </div>
                 @else
                     {{-- Check if the staff is on leave on this day --}}
@@ -101,7 +97,6 @@
         @endfor
     </tr>
 @endforeach
-
 
 
 
