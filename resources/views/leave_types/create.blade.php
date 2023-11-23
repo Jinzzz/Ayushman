@@ -97,7 +97,7 @@
          },
          messages: {
             leave_types: {
-               required: 'Please enter Leave type.',
+               required: 'Please enter leave type.',
                maxlength: 'Leave type must not exceed 255 characters.'
             },
          },
