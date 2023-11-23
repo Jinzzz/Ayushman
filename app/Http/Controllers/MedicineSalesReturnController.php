@@ -324,7 +324,7 @@ class MedicineSalesReturnController extends Controller
                 ]);
             }
 
-            $message = 'Medicine sales return details added successfully';
+            $message = 'Medicine sales return details updated successfully';
             return redirect()->route('medicine.sales.return.index')->with('success', $message);
         } catch (QueryException $e) {
             dd($e->getMessage());

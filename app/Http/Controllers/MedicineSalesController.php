@@ -530,7 +530,7 @@ class MedicineSalesController extends Controller
                 // ]);
             }
 
-            $message = 'Medicine sales invoice details added successfully';
+            $message = 'Medicine sales invoice details updated successfully';
             return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
         } catch (QueryException $e) {
             dd($e->getMessage());

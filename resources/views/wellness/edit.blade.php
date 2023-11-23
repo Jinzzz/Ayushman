@@ -68,7 +68,7 @@
                                     <input type="file" class="form-control" name="wellness_image" placeholder="Wellness Image">
                                     <input type="hidden" class="form-control" name="saved_img" value="{{$wellness->wellness_image}}">
                                     @if($wellness->wellness_image)
-                                    <img src="{{url('/assets/uploads/wellness_image/'.$wellness->wellness_image)}}" alt="Wellness Image" style="max-width: 50px; max-height: 50px;">
+                                    <img src="{{url('/assets/uploads/wellness_image/'.$wellness->wellness_image)}}" alt="Wellness Image" style="max-width: 100px; max-height: 100px;">
                                     @endif
                                 </div>
                             </div>

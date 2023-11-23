@@ -27,7 +27,7 @@
                   </div>
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Wellness Description*</label>
+                        <label class="form-label">Wellness Description</label>
                         <textarea class="form-control" readonly name="wellness_description" placeholder="Wellness Description">{{ $show->wellness_description }}</textarea>
                      </div>
                   </div>
@@ -45,16 +45,16 @@
                   </div>
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Wellness Duration(Minutes)*</label>
+                        <label class="form-label">Wellness Duration(Minutes)</label>
                         <input type="number" class="form-control" readonly required name="wellness_duration" value="{{$show->wellness_duration}}" placeholder="Wellness Duration(Minutes)">
                      </div>
                   </div>
                   <div class="col-md-6">
                      <div class="form-group checkbox">
-                        <label for="branch_id" class="form-label">Wellness Image*</label>
+                        <label for="branch_id" class="form-label">Wellness Image</label>
                         <input type="file" class="form-control" readonly required name="wellness_image" value="{{$show->wellness_image}}" placeholder="Wellness Image">
                         @if($show->wellness_image)
-                        <img src="{{url('/assets/uploads/wellness_image/'.$show->wellness_image)}}" alt="Wellness Image" style="max-width: 50px; max-height: 50px;">
+                        <img src="{{url('/assets/uploads/wellness_image/'.$show->wellness_image)}}" alt="Wellness Image" style="max-width: 100px; max-height: 100px;">
                         @endif
                      </div>
                   </div>
@@ -66,7 +66,7 @@
                   </div>
                   <div class="col-md-6">
                      <div class="form-group checkbox">
-                        <label for="branch_id" class="form-label">Branch*</label>
+                        <label for="branch_id" class="form-label">Branch</label>
                         <select class="multi-select" multiple style="width: 100%;">
                            @foreach($branch as $id => $branchName)
                            <option disabled value="{{ $id }}" {{ in_array($id, $branch_ids->toArray()) ? 'selected' : '' }}>
@@ -79,13 +79,13 @@
 
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Wellness Inclusions*</label>
+                        <label class="form-label">Wellness Inclusions</label>
                         <textarea class="form-control" name="wellness_inclusions" id="wellnessInclusion" readonly name="wellness_inclusions" placeholder="Wellness Inclusions">{{ $show->wellness_inclusions}}</textarea>
                      </div>
                   </div>
                   <div class="col-md-6">
                      <div class="form-group">
-                        <label class="form-label">Wellness T&C*</label>
+                        <label class="form-label">Wellness T&C</label>
                         <textarea class="form-control" name="wellness_terms_conditions" id="termsandCondition" readonly name="wellness_terms_conditions" placeholder="Wellness T&C">{{$show->wellness_terms_conditions}}</textarea>
                      </div>
                   </div>
