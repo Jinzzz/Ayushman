@@ -16,7 +16,7 @@ class CreateHolidayMappingsTable extends Migration
         Schema::create('holiday_mappings', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('holiday_id');
-            $table->bigInteger('department');
+            $table->string('department');
             $table->timestamps();
             $table->softDeletes();
         });

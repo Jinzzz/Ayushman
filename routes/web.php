@@ -44,7 +44,7 @@ use App\Http\Controllers\TrnPrescriptionController;
 use App\Http\Controllers\TrnJournelEntryController;
 use App\Http\Controllers\StaffLeaveController;
 use App\Http\Controllers\HolidayController;
-
+use App\Http\Controllers\AttendanceController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -388,6 +388,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/holiday/storelink/{holidaymapping_id}', [HolidayController::class, 'storeHolidayMapping'])->name('holidays.storelink');
     Route::delete('/holidaymapping/destroy/{id}', [HolidayController::class, 'destroyMapping'])->name('holidaysmapping.destroy');
+
+    //Attendance
+    Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.view');
+    Route::get('/attendance/monthly', [AttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
+
 
     // Medicine Purchase
     Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');
