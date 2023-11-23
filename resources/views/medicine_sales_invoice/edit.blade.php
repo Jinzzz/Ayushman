@@ -134,14 +134,14 @@ use App\Helpers\AdminHelper;
                                     @foreach ($all_medicine_sale_details as $sale_details)
                                     <tr id="productRowTemplate">
                                        <td>
-                                          <select class="form-control " name="medicine_id[]" dis>
+                                          <select class="form-control medicine-name" name="medicine_id[]" dis>
                                              <option value="">Please select medicine</option>
                                              @foreach($medicines as $medicine)
                                              <option value="{{ $medicine->id }}" {{ $medicine->id == $sale_details['medicine_id'] ? ' selected' : '' }}>{{ $medicine->medicine_name}}</option> @endforeach
                                           </select>
                                        </td>
                                        <td class="medicine-batch-no"><input type="text" class="form-control" value="{{$sale_details['batch_id']}}" name="batch_no[]" readonly></td>
-                                       <td class="medicine-quantity"><input type="number" class="form-control" value="{{ intval($sale_details['quantity']) }}" name="quantity[]" oninput="calculateAmount(this)"></td>
+                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" value="{{ intval($sale_details['quantity']) }}" name="quantity[]" oninput="calculateAmount(this)"></td>
                                        <td class="medicine-unit-id"><input type="text" class="form-control" value="{{$sale_details['unit_name']}}" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" class="form-control" value="{{$sale_details['rate']}}" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" value="{{$sale_details['amount']}}" name="amount[]" readonly></td>
@@ -289,7 +289,7 @@ use App\Helpers\AdminHelper;
                   <div class="form-group">
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
-                           <i class="fa fa-check-square-o"></i> Save</button>
+                           <i class="fa fa-check-square-o"></i> Update</button>
                         <a class="btn btn-danger" href="{{ url('/medicine-sales-invoices') }}">Cancel</a>
                      </center>
                   </div>
@@ -425,6 +425,8 @@ use App\Helpers\AdminHelper;
          newRow.find('select').addClass('medicine-select');
          newRow.find('input[type="text"]').val('');
          newRow.find('input[type="number"]').val('');
+         newRow.find('.medicine-quantity input').prop("readonly", true);
+         newRow.find('.medicine-name').val('');
          newRow.find('input').removeAttr("disabled")
          // newRow.removeAttr('style')
          newRow.find('input span').remove()

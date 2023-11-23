@@ -136,7 +136,7 @@ use App\Helpers\AdminHelper;
                                           </select>
                                        </td>
                                        <td class="medicine-batch-no"><input type="text" class="form-control" name="batch_no[]" readonly></td>
-                                       <td class="medicine-quantity"><input type="number" class="form-control" name="quantity[]" oninput="calculateAmount(this)"></td>
+                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" name="quantity[]" oninput="calculateAmount(this)"></td>
                                        <td class="medicine-unit-id"><input type="text" class="form-control" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
@@ -388,6 +388,8 @@ use App\Helpers\AdminHelper;
          newRow.find('select').addClass('medicine-select');
          newRow.find('input[type="text"]').val('');
          newRow.find('input[type="number"]').val('');
+         newRow.find('.medicine-quantity input').prop("readonly", true);
+         newRow.find('.medicine-name').val('');
          newRow.find('input').removeAttr("disabled")
          // newRow.removeAttr('style')
          newRow.find('input span').remove()
