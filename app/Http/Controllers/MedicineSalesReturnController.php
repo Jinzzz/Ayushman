@@ -200,7 +200,7 @@ class MedicineSalesReturnController extends Controller
     public function show($id)
     {
         try {
-            $pageTitle = "Edit Medicine Sales Return Details";
+            $pageTitle = "View Medicine Sales Return Details";
             $patients = Mst_Patient::where('is_active', 1)->get();
             $medicines = Mst_Medicine::where('item_type', 8)->get();
             $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');

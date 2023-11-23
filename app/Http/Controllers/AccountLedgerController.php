@@ -112,7 +112,6 @@ class AccountLedgerController extends Controller
                 'account_group_id' => 'required',
                 'account_sub_group_id' => 'required',
                 'ledger_name' => 'required',
-                'ledger_notes' => 'required',
                 'is_active' => 'required',
             ]);
 

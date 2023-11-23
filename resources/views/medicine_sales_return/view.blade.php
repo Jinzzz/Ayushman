@@ -107,7 +107,7 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-unit-id"><input type="text" value="{{$sale_details->quantity_unit_id}}" class="form-control" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" value="{{$sale_details->rate}}" class="form-control" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" value="{{$sale_details->amount}}" class="form-control" name="amount[]" readonly></td>
-                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                       <td><button type="button" onclick="myClickFunction(this)" disabled style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                        
                                        <td class="medicine-tax-rate"><input type="hidden" value="{{$sale_details->quantity_unit_id}}" class="form-control" name="tax_rate[]"></td>
                                        <td class="medicine-tax-amount"><input type="hidden" value="{{$sale_details->tax_amount}}" class="form-control" name="single_tax_amount[]" readonly></td>
@@ -165,11 +165,6 @@ use App\Helpers\AdminHelper;
                   </div>
 
                   <!-- popup ends  -->
-                  <div class="row">
-                     <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="addProductBtn">Add Medicine</button>
-                     </div>
-                  </div>
                   <!-- ROW-1 CLOSED -->
                   <div class="row">
                      <div class="col-md-6">
@@ -215,8 +210,6 @@ use App\Helpers\AdminHelper;
                   </div>
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
-                           <i class="fa fa-check-square-o"></i> Save</button>
                         <a class="btn btn-danger" href="{{ url('/medicine-sales-return') }}">Cancel</a>
                      </center>
                   </div>

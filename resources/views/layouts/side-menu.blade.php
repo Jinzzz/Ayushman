@@ -80,7 +80,7 @@
         <span class="side-menu__label"> {{ __('Accounts') }}</span><i class="angle fa fa-angle-right"></i>
       </a>
       <ul class="slide-menu">
-        <li><a class="slide-item" href="{{ url('/account-sub-group/index') }}">{{__('Account Subhead')}}</a></li>
+        <li><a class="slide-item" href="{{ url('/account-sub-group/index') }}">{{__('Account Sub Group')}}</a></li>
         <li><a class="slide-item" href="{{ url('/account-ledger/index') }}">{{__('Account ledger ')}}</a></li>
         <li><a class="slide-item" href="{{ url('/tax-group/index')}}">{{ __('Tax Groups') }}</a></li>
         <li><a class="slide-item" href="{{ url('/journel-entry')}}">{{__('Journel Entry')}}</a></li>
