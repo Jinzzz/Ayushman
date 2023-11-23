@@ -4,31 +4,31 @@
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
-        @if ($message = Session::get('success'))
-        <div class="alert alert-success">
-            <p>{{$message}}</p>
-        </div>
-        @endif
-        @if ($message = Session::get('error'))
-        <div class="alert alert-danger">
-            <p>{{$message}}</p>
-        </div>
-        @endif
-        @if ($messages = Session::get('validation'))
+            @if ($message = Session::get('success'))
+            <div class="alert alert-success">
+                <p>{{$message}}</p>
+            </div>
+            @endif
+            @if ($message = Session::get('error'))
             <div class="alert alert-danger">
-               <ul>
-                  @foreach (json_decode($messages, true) as $field => $errorMessages)
-                  @foreach ($errorMessages as $errorMessage)
-                  <li>{{$errorMessage}}</li>
-                  @endforeach
-                  @endforeach
-               </ul>
+                <p>{{$message}}</p>
+            </div>
+            @endif
+            @if ($messages = Session::get('validation'))
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (json_decode($messages, true) as $field => $errorMessages)
+                    @foreach ($errorMessages as $errorMessage)
+                    <li>{{$errorMessage}}</li>
+                    @endforeach
+                    @endforeach
+                </ul>
             </div>
             @endif
             <div class="card-header">
                 <h3 class="card-title"><strong>EMPLOYEE BRANCH TRANSFER</strong></h3>
             </div>
-            <form action="{{ route('branchTransfer.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('branchTransfer.store') }}" id="addFm" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row mb-3">
@@ -90,7 +90,7 @@
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <div>
-                            <button type="submit" class="btn btn-raised btn-primary">
+                            <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                                 <i class="fa fa-check-square-o"></i>Save
                             </button>
                             <a class="btn btn-primary" href="{{ route('branchTransfer.index') }}">
@@ -103,7 +103,58 @@
         </div>
     </div>
 </div>
+@endsection
+@section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+    $(document).ready(function() {
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                from_branch: {
+                    required: true,
+                },
+                to_branch: {
+                    required: true,
+                },
+            },
+            messages: {
+                from_branch: {
+                    required: 'Please select from branch.',
+                },
+                to_branch: {
+                    required: 'Please select to branch.',
+                },
+            },
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
+
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
+
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation 
     // This function will be triggered when the "From Branch" selection changes
     function loadEmployees() {
         var fromBranchId = $("#from_branch").val();
@@ -116,18 +167,18 @@
                 $("#employee_list").empty();
                 // Append the fetched employees to the list
                 $.each(data, function(index, employee) {
-    console.log(employee);
-    
-    var checkbox = $('<input type="checkbox" name="coming_staff_id[]" onclick="valEmployee.call(this)" class="chck_btn get-staff-val" style="display:inline;">')
-        .data('staff_id', employee.staff_id);
-    
-    var label = $('<label class="ng-binding" style="display:inline;">').text(employee.staff_name);
-    
-    // Add a non-breaking space (&nbsp;) between checkbox and label
-    var row = $('<tr>').append($('<td>').append(checkbox, '&nbsp;&nbsp;', label));
-    
-    $("#employee_list").append(row);
-});
+                    console.log(employee);
+
+                    var checkbox = $('<input type="checkbox" name="coming_staff_id[]" onclick="valEmployee.call(this)" class="chck_btn get-staff-val" style="display:inline;">')
+                        .data('staff_id', employee.staff_id);
+
+                    var label = $('<label class="ng-binding" style="display:inline;">').text(employee.staff_name);
+
+                    // Add a non-breaking space (&nbsp;) between checkbox and label
+                    var row = $('<tr>').append($('<td>').append(checkbox, '&nbsp;&nbsp;', label));
+
+                    $("#employee_list").append(row);
+                });
 
             },
             error: function(xhr, textStatus, errorThrown) {
@@ -161,7 +212,7 @@
             var label = $('<label class="ng-binding" style="display:inline;">').text(employee.label);
             var hiddenInput = $('<input type="hidden" name="transfered_staff_id[]">').val(employee.id);
 
-            var row = $('<tr>').append($('<td>').append(checkbox,'&nbsp;&nbsp;', label, hiddenInput));
+            var row = $('<tr>').append($('<td>').append(checkbox, '&nbsp;&nbsp;', label, hiddenInput));
             $("#transferred_employee_list").append(row);
         });
     }
@@ -185,7 +236,7 @@
                 .data('staff_id', employeeRow.find('input[type=checkbox]').data('staff_id')); // Retrieve staff_id from data attribute
             // var hiddenInput = $('<input type="hidden" name="transfered_staff_id">').val(employee.id);
             var label = $('<label class="ng-binding" style="display:inline;">').text(employeeRow.find('label').text());
-            var row = $('<tr>').append($('<td>').append(checkbox,'&nbsp;&nbsp;', label));
+            var row = $('<tr>').append($('<td>').append(checkbox, '&nbsp;&nbsp;', label));
             $("#employee_list").append(row);
             // Remove the selected employee row from the "Transferred Employees" container
             employeeRow.remove();
