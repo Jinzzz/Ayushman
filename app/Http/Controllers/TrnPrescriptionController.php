@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Trn_Prescription;
 use App\Models\Trn_Prescription_Details;
 use App\Models\Mst_Patient;
+use App\Models\Mst_Staff;
 use App\Models\Trn_Patient_Family_Member;
 use Dompdf\Dompdf;
 use View;
@@ -77,7 +78,7 @@ class TrnPrescriptionController extends Controller
                 )
                 ->get();
             // dd($basic_details);
-            return view('prescription.view', compact('pageTitle', 'basic_details','id', 'patient_name', 'medicine_details'));
+            return view('prescription.view', compact('pageTitle', 'basic_details', 'id', 'patient_name', 'medicine_details'));
         } catch (QueryException $e) {
             dd($e->getMessage());
             dd('Something went wrong.');
@@ -92,11 +93,34 @@ class TrnPrescriptionController extends Controller
                 ->where('trn__prescriptions.prescription_id', $id)
                 ->first();
             if ($basic_details->is_for_family_member == 0) {
-                $patient_name = Mst_Patient::where('id', $basic_details->patient_id)->value('patient_name');
+                $patient_details = Mst_Patient::where('id', $basic_details->patient_id)->first();
+                // Get the current year for age calculation
+                $currentYear = Carbon::now()->year;
+                $carbonDate = Carbon::parse($patient_details->patient_dob);
+                $year = $carbonDate->year;
+                $age = $currentYear - $year;
+                $patient_personal_details = [
+                    'patient_name' => $patient_details->patient_name ?? "N/A",
+                    'patient_mobile' => $patient_details->patient_mobile ?? "N/A",
+                    'patient_address' => $patient_details->patient_address ?? "N/A",
+                    'patient_age' => $age ?? "N/A",
+                ];
             } else {
-                $patient_name = Trn_Patient_Family_Member::where('id', $basic_details->family_member_id)->value('family_member_name');
+                $patient_details = Trn_Patient_Family_Member::where('id', $basic_details->family_member_id)->first();
+                // Get the current year for age calculation
+                $currentYear = Carbon::now()->year;
+                $carbonDate = Carbon::parse($patient_details->date_of_birth);
+                $year = $carbonDate->year;
+                $age = $currentYear - $year;
+                $patient_personal_details = [
+                    'patient_name' => $patient_details->family_member_name ?? "N/A",
+                    'patient_mobile' => $patient_details->mobile_number ?? "N/A",
+                    'patient_address' => $patient_details->address ?? "N/A",
+                    'patient_age' => $age ?? "N/A",
+                ];
             }
-
+            $getDoctorDetails = Mst_Staff::where('staff_id', $basic_details->doctor_id)->first();
+            // dd($basic_details);
             $medicine_details = Trn_Prescription_Details::where('trn__prescription__details.priscription_id', $id)
                 ->join('mst_medicines', 'trn__prescription__details.medicine_id', '=', 'mst_medicines.id')
                 ->join('mst_master_values as med_type_medicine', 'mst_medicines.medicine_type', '=', 'med_type_medicine.id')
@@ -113,7 +137,7 @@ class TrnPrescriptionController extends Controller
                 )
                 ->get();
             $dompdf = new Dompdf();
-            $view = View::make('prescription.print_prescription', ['pageTitle' => $pageTitle,'basic_details' => $basic_details, 'patient_name' => $patient_name, 'medicine_details' => $medicine_details]);
+            $view = View::make('prescription.print_prescription', ['doctorDetails' => $getDoctorDetails, 'pageTitle' => $pageTitle, 'basic_details' => $basic_details, 'patient_personal_details' => $patient_personal_details, 'medicine_details' => $medicine_details]);
             $html = $view->render();
             // Load HTML content from a template or dynamically generate it based on $data
             // $html = '<html>HIKSLQW OIDJQ WOIJ D UHWEN</html>'; // You can generate HTML content here based on $data
