@@ -157,7 +157,7 @@
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
                                         <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
+                                        <input type="checkbox" id="is_active" name="is_active" disabled onchange="toggleStatus(this)" class="custom-switch-input" checked>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">Active</span>
                                     </label>

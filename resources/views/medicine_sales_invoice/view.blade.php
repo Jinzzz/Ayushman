@@ -39,7 +39,7 @@ use App\Helpers\AdminHelper;
                   <div class="row">
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Select Patient*</label>
+                           <label class="form-label">Select Patient</label>
                            <select disabled class="form-control" readonly name="patient_id" id="patient_id" required>
                               @if($medicine_sale_invoices->patient_id == 0)
                               <option selected value="0">Guest Patient</option>
@@ -55,7 +55,7 @@ use App\Helpers\AdminHelper;
                      </div>
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Select Booking ID*</label>
+                           <label class="form-label">Select Booking ID</label>
                            <select class="form-control" name="patient_booking_id" disabled>
                               <option selected readonly>{{$booking_id}}</option>
                            </select>
@@ -93,7 +93,7 @@ use App\Helpers\AdminHelper;
                                     @foreach ($medicine_sale_details as $sale_details)
                                     <tr>
                                        <td>
-                                          <select class="form-control " name="medicine_id[]" dis>
+                                          <select class="form-control" disabled name="medicine_id[]" dis>
                                              <option value="">Please select medicine</option>
                                              @foreach($medicines as $medicine)
                                              <option value="{{ $medicine->id }}" {{ $medicine->id == $sale_details->medicine_id ? ' selected' : '' }}>{{ $medicine->medicine_name}}</option>
@@ -113,11 +113,6 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                         </div>
-                     </div>
-                  </div>
-                  <div class="row">
-                     <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="addProductBtn">Add Medicine</button>
                      </div>
                   </div>
                   <!-- ROW-1 CLOSED -->
@@ -199,9 +194,7 @@ use App\Helpers\AdminHelper;
                   </div>
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
-                           <i class="fa fa-check-square-o"></i> Save</button>
-                        <a class="btn btn-danger" href="{{ url('/medicine-sales-invoices') }}">Cancel</a>
+                     <a class="btn btn-danger" href="{{ url('/medicine-sales-invoices') }}">Cancel</a>
                      </center>
                   </div>
             </div>
