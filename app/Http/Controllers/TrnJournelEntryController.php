@@ -197,7 +197,7 @@ class TrnJournelEntryController extends Controller
                 return redirect()->route('journel.entry.create')->with('errors', $messages);
             }
         } catch (QueryException $e) {
-            dd($e->getmessage());
+            // dd($e->getmessage());
             return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
     }
@@ -287,11 +287,13 @@ class TrnJournelEntryController extends Controller
                 return redirect()->route('journel.entry.index')->with('success', $message);
             } else {
                 $messages = $validator->errors();
+                return redirect()->route('journel.entry.edit', ['id' => $request->hidden_id])->with('errors', $messages);
+
                 dd($messages);
             }
         } catch (QueryException $e) {
-            dd($e->getmessage());
-            return redirect()->route('journel.entry.index')->with('success', 'Exception error');
+            // dd($e->getmessage());
+            return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
     }
 

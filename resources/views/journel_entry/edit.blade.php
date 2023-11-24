@@ -74,6 +74,20 @@ use App\Helpers\AdminHelper;
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                            <tr id="productRowTemplate" style="display: none;">
+                                                    <td>
+                                                        <select class="form-control " name="ledger_id[]">
+                                                            <option value="">Please select account</option>
+                                                            @foreach($ledgers as $ledger)
+                                                            <option value="{{ $ledger->id }}" >{{ $ledger->ledger_name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
+                                                    <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
+                                                    <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                                    <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                                </tr>
                                                 @foreach ($all_entry_details as $entry_details)
                                                 <tr id="productRowTemplate">
                                                     <td>
