@@ -40,7 +40,8 @@ use App\Helpers\AdminHelper;
                @endif
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                  <ul>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                  <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
                      @endforeach
@@ -123,6 +124,20 @@ use App\Helpers\AdminHelper;
                                     </tr>
                                  </thead>
                                  <tbody>
+                                    <tr id="productRowTemplate" style="display: none;">
+                                       <td>
+                                          <select class="form-control " name="ledger_id[]">
+                                             <option value="">Please select account</option>
+                                             @foreach($ledgers as $ledger)
+                                             <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
+                                             @endforeach
+                                          </select>
+                                       </td>
+                                       <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
+                                       <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
+                                       <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                    </tr>
                                     @foreach ($all_medicine_sale_details as $sale_details)
                                     <tr id="productRowTemplate">
                                        <td>
@@ -193,7 +208,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                           <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
@@ -476,7 +491,7 @@ use App\Helpers\AdminHelper;
             $('#patient_invoice_id').empty().append('<option value="">Choose Invoice ID</option>');
             $.each(data, function(key, value) {
                var isSelected = (key === v) ? 'selected' : '';
-               $('#patient_invoice_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
+               $('#patient_invoice_id').append('<option value="' + key + '"' + isSelected + '>' + value + '</option>');
             });
          },
          error: function() {
