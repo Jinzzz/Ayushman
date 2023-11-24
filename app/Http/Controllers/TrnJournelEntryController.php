@@ -177,7 +177,7 @@ class TrnJournelEntryController extends Controller
                 return redirect()->route('journel.entry.index')->with('success', $message);
             } else {
                 $messages = $validator->errors();
-                dd($messages);
+                return redirect()->route('journel.entry.create')->with('errors', $messages);
             }
         } catch (QueryException $e) {
             dd($e->getmessage());

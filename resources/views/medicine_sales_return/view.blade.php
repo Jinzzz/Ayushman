@@ -36,12 +36,13 @@ use App\Helpers\AdminHelper;
                <form action="{{ route('medicine.sales.return.update') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                   @csrf
                   <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_return_id}}">
+                  <input type="hidden" name="saved-booking-id" value="{{ $medicine_sale_invoices->sales_invoice_id }}" id="saved-booking-id">
 
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Select Patient*</label>
+                           <label class="form-label">Select Patient</label>
                            <select class="form-control" disabled name="patient_id" id="patient_id" required>
                               <option value="">Select Patient</option>
                               <option value="0" {{ $medicine_sale_invoices->patient_id == 0 ? ' selected' : '' }}>Guest Patient</option>
@@ -56,9 +57,9 @@ use App\Helpers\AdminHelper;
 
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label" disabled>Select Invoice ID*</label>
+                           <label class="form-label" disabled>Select Invoice ID</label>
                            <select class="form-control" name="patient_invoice_id" id="patient_invoice_id">
-                              <option value="">Choose Invoice ID</option>
+                              <option value="" selected>{{ $sales_invoice_number->sales_invoice_number }}</option>
                            </select>
                         </div>
                      </div>
@@ -426,10 +427,11 @@ use App\Helpers\AdminHelper;
          },
          success: function(data) {
             // alert(1);
+            var v = $('#saved-booking-id').val()
             $('#patient_invoice_id').empty().append('<option value="">Choose Invoice ID</option>');
             $.each(data, function(key, value) {
-
-               $('#patient_invoice_id').append('<option value="' + key + '">' + value + '</option>');
+               var isSelected = (key === v) ? 'selected' : '';
+               $('#patient_invoice_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
             });
          },
          error: function() {

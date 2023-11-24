@@ -211,8 +211,8 @@ class MedicineSalesReturnController extends Controller
             }
             $sales_invoice_number = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $medicine_sale_invoices->sales_invoice_id)
                 ->first();
-            // dd($medicine_sale_invoices->sales_invoice_id);
-            return view('medicine_sales_return.view', compact('pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'medicine_sale_details'));
+            // dd($sales_invoice_number->sales_invoice_number);
+            return view('medicine_sales_return.view', compact('pageTitle','sales_invoice_number', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'medicine_sale_details'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
         }
@@ -260,7 +260,7 @@ class MedicineSalesReturnController extends Controller
                 // Handle the case where the ledger with the given ID doesn't exist
                 return redirect()->route('medicine.sales.invoices.view')->with('error', 'Data not found');
             }
-            // dd($medicine_sale_invoices);
+            // dd($medicine_sale_invoices->sales_invoice_id);
             return view('medicine_sales_return.edit', compact('all_medicine_sale_details', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'medicine_sale_details'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');

@@ -51,7 +51,7 @@ use App\Helpers\AdminHelper;
                   @csrf
                   <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_return_id}}">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
-                  <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
+                  <input type="hidden" name="saved-booking-id" value="{{ $medicine_sale_invoices->sales_invoice_id }}" id="saved-booking-id">
                   <div class="row">
                      <div class="col-md-4">
                         <div class="form-group">

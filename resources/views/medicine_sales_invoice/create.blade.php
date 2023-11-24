@@ -410,7 +410,7 @@ use App\Helpers\AdminHelper;
          newRow.find('input[type="number"]').val('');
          newRow.find('.medicine-quantity input').prop("readonly", true);
          newRow.find('input').removeAttr("disabled")
-         $('.medicine-quantity input').prop('disabled', true);
+         $('.medicine-quantity input').prop('readonly', true);
          // newRow.removeAttr('style')
          newRow.find('input span').remove()
          // Append the new row to the table
