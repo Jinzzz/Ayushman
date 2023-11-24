@@ -19,14 +19,15 @@ use App\Helpers\AdminHelper;
                     @endif
                     @if ($errors->any())
                     <div class="alert alert-danger">
-                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                        <ul>
+                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                        <ul>
                             @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
                     @endif
-                    <form action="{{ route('journel.entry.store') }}" id="addFm"  method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    <form action="{{ route('journel.entry.store') }}" id="addFm" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -47,7 +48,6 @@ use App\Helpers\AdminHelper;
                                     <input type="date" class="form-control" readonly name="journel_date" id="date" placeholder="Date">
                                 </div>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-12">
@@ -82,7 +82,7 @@ use App\Helpers\AdminHelper;
                                                         </select>
                                                     </td>
                                                     <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
-                                                    <td><input type="number" min="0" class="form-control" name="debit[]"></td>
+                                                    <td><input type="number" min="0" class="form-control debit-amount" name="debit[]"></td>
                                                     <td><input type="number" min="0" readonly class="form-control" name="credit[]"></td>
                                                     <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                                 </tr>
@@ -92,24 +92,26 @@ use App\Helpers\AdminHelper;
                                 </div>
                             </div>
                         </div>
+                        <!-- <span style="color: red;">*Please provide benefits using bullet points only.</span> -->
+
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-3">
                                 <button type="button" class="btn btn-primary" id="addProductBtn">Add Row</button>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Debit:</label>
-                                    <input class="form-control" readonly name="total_debit" id="totalDebit" placeholder="Total Debit">
+                                    <input class="form-control totalDebit" readonly name="total_debit" id="totalDebit" placeholder="Total Debit">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Credit:</label>
-                                    <input class="form-control" readonly name="total_credit" id="totalCredit" placeholder="Total Credit">
+                                    <input class="form-control totalCredit" readonly name="total_credit" id="totalCredit" placeholder="Total Credit">
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <center>
                                 <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
@@ -137,48 +139,47 @@ use App\Helpers\AdminHelper;
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
-    
-   $(document).ready(function() {
-      var validator = $("#addFm").validate({
-         ignore: "",
-         rules: {
-            journel_entry_type_id: {
-               required: true,
+    $(document).ready(function() {
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                journel_entry_type_id: {
+                    required: true,
+                },
             },
-         },
-         messages: {
-            journel_entry_type_id: {
-               required: 'Please select journel entry type.',
+            messages: {
+                journel_entry_type_id: {
+                    required: 'Please select journel entry type.',
+                },
             },
-         },
-         errorPlacement: function(label, element) {
-            label.addClass('text-danger');
-            label.insertAfter(element.parent().children().last());
-         },
-         highlight: function(element, errorClass) {
-            $(element).parent().addClass('has-error');
-            $(element).addClass('form-control-danger');
-         },
-         unhighlight: function(element, errorClass, validClass) {
-            $(element).parent().removeClass('has-error');
-            $(element).removeClass('form-control-danger');
-         }
-      });
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
 
-      $(document).on('click', '#submitForm', function() {
-         if (validator.form()) {
-            $('#addFm').submit();
-         } else {
-            flashMessage('w', 'Please fill all mandatory fields');
-         }
-      });
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
 
-      function flashMessage(type, message) {
-         // Implement or replace this function based on your needs
-         console.log(type, message);
-      }
-   });
-   // impliment jQuery Validation 
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation 
     // total amount 
     // Get the current date
     var currentDate = new Date();
@@ -236,8 +237,13 @@ use App\Helpers\AdminHelper;
     });
 
     function myClickFunction(bt) {
-        var x = bt.parentNode.parentNode
-        x.remove()
+        var x = bt.parentNode.parentNode;
+        var totalAmount = parseFloat($('.totalDebit').val());
+        var debitAmount = parseFloat(x.querySelector('input[name="debit[]"]').value);
+        var subtotal = totalAmount - debitAmount;
+        $('.totalDebit').val(subtotal.toFixed(2));
+        $('.totalCredit').val(subtotal.toFixed(2));
+        x.remove();
     }
 </script>
 @endsection

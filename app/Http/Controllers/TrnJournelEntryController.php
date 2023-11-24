@@ -94,7 +94,7 @@ class TrnJournelEntryController extends Controller
         try {
             $pageTitle = "Create Journel Entries";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
-            $ledgers = Mst_Account_Ledger::get();
+            $ledgers = Mst_Account_Ledger::where('is_active',1)->get();
             return view('journel_entry.create', compact('pageTitle', 'ledgers', 'journel_entry_types'));
         } catch (QueryException $e) {
             return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
@@ -190,15 +190,14 @@ class TrnJournelEntryController extends Controller
         try {
             $pageTitle = "Edit Journel Entry";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
-            $ledgers = Mst_Account_Ledger::get();
+            $ledgers = Mst_Account_Ledger::where('is_active',1)->get();
             $all_entry_details = Trn_Journel_Entry_Details::where('journal_entry_id', $id)->get();
-            $journel_entries = Trn_Journel_Entry::join('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')
+            $journel_entries = Trn_Journel_Entry::leftJoin('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')
                 ->where('trn__journel__entries.journal_entry_id', $id)
-                ->orderBy('trn__journel__entries.created_at', 'desc')
                 ->with('journel_entry_type', 'branch')
                 ->first();
-            // dd($all_entry_details);
-            return view('journel_entry.edit', compact('pageTitle', 'all_entry_details', 'journel_entries', 'journel_entry_types', 'ledgers'));
+            // dd($journel_entries);
+            return view('journel_entry.edit', compact('pageTitle','id', 'all_entry_details', 'journel_entries', 'journel_entry_types', 'ledgers'));
         } catch (QueryException $e) {
             return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
