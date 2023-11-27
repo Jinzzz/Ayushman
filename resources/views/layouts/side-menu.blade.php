@@ -222,6 +222,30 @@
     </ul>
 
     <li class="slide">
+      <a class="side-menu__item" data-toggle="slide" href="#">
+        <i class="side-menu__icon ti-wallet"></i>
+        <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
+      </a>
+      <ul class="slide-menu">
+        <!-- <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a> -->
+        <li><a class="slide-item" href="{{route('sales.report')}}">{{__('Sales Report')}}</a></li>
+        <li><a class="slide-item" href="{{ route('purchase.report') }}">{{ __('Purchase Report') }}</a></li>
+        <li><a class="slide-item" href="{{ route('return.report') }}">{{ __('Return Report') }}</a></li>
+        <li><a class="slide-item" href="{{ route('stock-transfer.report') }}">{{ __('Stock Transfer Report') }}</a></li>
+        <li><a class="slide-item" href="{{route('current-stock.report')}}">{{__('Current Stock Report')}}</a></li>
+        <li><a class="slide-item" href="{{ route('payment-received.report') }}">{{ __('Payment Received Report') }}</a></li>
+        <li><a class="slide-item" href="{{ route('payment-made.report') }}">{{ __('Payment Made Report') }}</a></li>
+        <li><a class="slide-item" href="{{ route('receivable.report') }}">{{ __('Receivable Report') }}</a></li>
+        <li><a class="slide-item" href="{{route('payable.report')}}">{{__('Payable Report')}}</a></li>
+        <li><a class="slide-item" href="{{ route('ledger.report') }}">{{ __('Ledger Report') }}</a></li>
+        <li><a class="slide-item" href="{{route('profit-and-loss.report')}}">{{__('Profit and Loss Report')}}</a></li>
+        <li><a class="slide-item" href="{{ route('trail-balance.report') }}">{{ __('Trail Balance Report') }}</a></li>
+        <li><a class="slide-item" href="{{route('balance-sheet.report')}}">{{__('Balance Sheet Report')}}</a></li>
+    </li>
+    </ul>
+
+
+    <li class="slide">
       <a class="side-menu__item {{ Request::is('prescriptions.index') ? 'active' : '' }}" href="{{ route('prescriptions.index') }}">
         <i class="fa-solid ti ti-file"></i>
         <span class="side-menu__label">Prescriptions</span>
