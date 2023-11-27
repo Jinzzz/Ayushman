@@ -45,6 +45,7 @@ use App\Http\Controllers\TrnJournelEntryController;
 use App\Http\Controllers\StaffLeaveController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -389,9 +390,26 @@ Route::middleware('auth')->group(function () {
     Route::post('/holiday/storelink/{holidaymapping_id}', [HolidayController::class, 'storeHolidayMapping'])->name('holidays.storelink');
     Route::delete('/holidaymapping/destroy/{id}', [HolidayController::class, 'destroyMapping'])->name('holidaysmapping.destroy');
 
+
     //Attendance
     Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.view');
     Route::get('/attendance/monthly', [AttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
+
+    //report
+    Route::get('/sales-report', [ReportController::class, 'salesReport'])->name('sales.report');
+    Route::get('/purchase-report', [ReportController::class, 'purchaseReport'])->name('purchase.report');
+    Route::get('/return-report', [ReportController::class, 'returnReport'])->name('return.report');
+    Route::get('/stock-transfer-report', [ReportController::class, 'stockTransferReport'])->name('stock-transfer.report');
+    Route::get('/current-stock-report', [ReportController::class, 'currentStockReport'])->name('current-stock.report');
+    Route::get('/payment-received-report', [ReportController::class, 'paymentReceivedReport'])->name('payment-received.report');
+    Route::get('/receivable-report', [ReportController::class, 'receivableReport'])->name('receivable.report');
+    Route::get('/payment-made-report', [ReportController::class, 'paymentMadeReport'])->name('payment-made.report');
+    Route::get('/payable-report', [ReportController::class, 'payableReport'])->name('payable.report');
+    Route::get('/ledger-report', [ReportController::class, 'ledgerReport'])->name('ledger.report');
+    Route::get('/profit-and-loss-report', [ReportController::class, 'profitAndLossReport'])->name('profit-and-loss.report');
+    Route::get('/trail-balance-report', [ReportController::class, 'trailBalanceReport'])->name('trail-balance.report');
+    Route::get('/balance-sheet-report', [ReportController::class, 'balanceSheetReport'])->name('balance-sheet.report');
+
 
 
     // Medicine Purchase

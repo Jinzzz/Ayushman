@@ -73,7 +73,7 @@ class HolidayController extends Controller
             'holiday_name' => 'required',
             'from_date' => 'required|date|date_format:Y-m-d',
             'to_date' => 'required|date|date_format:Y-m-d|after_or_equal:from_date',
-            'year' => 'required|numeric|digits:4',
+            'year' => 'required|numeric|digits:4|min:1999',
             'leave_type' => 'required', 
             'company' => 'required',
         ], [
@@ -108,7 +108,7 @@ class HolidayController extends Controller
             'year' => $request->year,
         ]);
     
-        return redirect()->route('holidays.index')->with('success', 'Leave Request added successfully');
+        return redirect()->route('holidays.index')->with('success', 'Holiday added successfully');
     }
     
 
@@ -208,8 +208,11 @@ class HolidayController extends Controller
                 $departments = DB::table('holiday_mappings')
                 ->join('mst_master_values', 'holiday_mappings.department', '=', 'mst_master_values.id')
                 ->join('holidays', 'holiday_mappings.holiday_id', '=', 'holidays.id')
+                ->whereNull('holiday_mappings.deleted_at')
                 ->select('holiday_mappings.id', 'holidays.holiday_name', 'mst_master_values.master_value as department_name', 'holiday_mappings.department')
-                ->get();            
+                ->orderBy('holiday_mappings.created_at', 'desc') // Order by creation timestamp in descending order
+                ->get();
+                       
 
             $staff_types = Mst_Master_Value::where('master_id', 4)->get();
         return view('holidays.staff-mapping', compact('pageTitle', 'holiday','staff_types','departments'));
@@ -247,7 +250,7 @@ class HolidayController extends Controller
 
         if (count($existingDepartments) > 0) {
             // Display a message for existing departments
-            $warningMessage = 'Departments already exist: ';
+            $warningMessage = 'Departments already exist';
             return redirect()->route('holidays.index')->with('error', $warningMessage)->withInput();
         }
         
@@ -260,12 +263,12 @@ class HolidayController extends Controller
     {
         $holiday = HolidayMapping::findOrFail($id);
         $holiday->delete();
-
+    
         return response()->json([
             'success' => true,
             'message' => 'Department Link deleted successfully',
         ]);
-    }
+    }    
     
     
 }

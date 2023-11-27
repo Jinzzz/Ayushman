@@ -12,35 +12,35 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="holiday_name" class="form-label">Holiday Name:</label>
+                        <label for="holiday_name" class="form-label" style="color: red;">Holiday Name*</label>
                         <input type="text" id="holiday_name" name="holiday_id" class="form-control" value="{{ $holiday->holiday_name }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="from_date" class="form-label">From Date:</label>
+                    <label for="from_date" class="form-label" style="color: red;">From Date*</label>
                         <input type="date" id="from_date" name="from_date" class="form-control" value="{{ $holiday->from_date }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="to_date" class="form-label">To Date:</label>
+                        <label for="to_date" class="form-label red-label" style="color: red;">To Date*</label>
                         <input type="date" id="to_date" name="to_date" class="form-control" value="{{ $holiday->to_date }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="year" class="form-label">Year:</label>
+                        <label for="year" class="form-label red-label" style="color: red;">Year*</label>
                         <input type="number" id="year" name="year" class="form-control" value="{{ $holiday->year }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="department" class="form-label" placeholder="Select Staff Type">Department*</label>
+                    <label for="department" class="form-label red-label" style="color: red;" placeholder="Select Staff Type">Department*</label>
                     <select class="multi-select" name="department[]" multiple style="width: 100%;">
                     <option value="" disabled selected>Select a Department</option>
                     @foreach($staff_types as $staff_type)
@@ -78,10 +78,6 @@
             <h3 class="card-title">List Holidays</h3>
         </div>
         <div class="card-body">
-            <a href="{{ route('holidays.create') }}" class="btn btn-block btn-info">
-                <i class="fa fa-plus"></i>
-                New Holiday
-            </a>
             <div class="table-responsive">
                 <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                     <thead>
@@ -126,52 +122,57 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-    function deleteData(dataId) {
-        swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('holidaysmapping.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            console.log(response.success);
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response.success == true) {
-                                
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                                   // Reload the page after a successful delete
-                        window.location.reload();
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the patient.');
-                        },
-                    });
-                } else {
-                    return;
-                }
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('holidaysmapping.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    if (response.success == true) {
+                        $("#dataRow_" + dataId).remove();
+                        // Display a success flash message
+                        flashMessage('success', 'Department deleted successfully');
+                    } else {
+                        // Display an error flash message
+                        flashMessage('error', 'An error occurred! Please try again later.');
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Display an error flash message
+                    flashMessage('error', 'An error occurred while deleting the Department.');
+                    console.error("Error: ", textStatus, errorThrown);
+                },
             });
-    }
+        }
+    });
+}
+
+function flashMessage(type, message) {
+    // Use Laravel's session to store flash messages
+    @if (session('flash_message'))
+        @foreach(session('flash_message') as $type => $message)
+            toastr.{{ $type }}("{{ $message }}");
+        @endforeach
+    @endif
+
+    // Add the new flash message
+    toastr[type](message);
+}
+
 </script>
 
-<script>
-    $(document).ready(function() {
-        $('.multi-select').select2();
-    });
-</script>

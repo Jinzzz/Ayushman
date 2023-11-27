@@ -29,14 +29,18 @@ class AttendanceController extends Controller
         $lastDayOfMonth = $firstDayOfMonth->copy()->endOfMonth();
         $daysInMonth = $firstDayOfMonth->daysInMonth;
     
-        // Fetch staff leaves during the specified time period
-        $staffLeaves = Staff_Leave::where('from_date', '<=', $lastDayOfMonth)
+        // Fetch absent staff IDs during the specified time period
+        $absentStaffIds = Staff_Leave::where('from_date', '<=', $lastDayOfMonth)
             ->where('to_date', '>=', $firstDayOfMonth)
-            ->get();
+            ->pluck('staff_id')
+            ->toArray();
+    
+        // Assuming you have a Staff model and you want to retrieve all staff
         $allStaff = Mst_Staff::all();
     
-        return view('attendance.view', compact('allStaff', 'staffLeaves', 'selectedMonthYear', 'daysInMonth', 'firstDayOfMonth'));
+        return view('attendance.view', compact('allStaff', 'absentStaffIds', 'selectedMonthYear', 'daysInMonth'));
     }
+    
     
     
     
