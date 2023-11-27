@@ -12,41 +12,42 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="holiday_name" class="form-label" style="color: red;">Holiday Name*</label>
+                        <label for="holiday_name" class="form-label" style="color: black;">Holiday Name*</label>
                         <input type="text" id="holiday_name" name="holiday_id" class="form-control" value="{{ $holiday->holiday_name }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                    <label for="from_date" class="form-label" style="color: red;">From Date*</label>
+                    <label for="from_date" class="form-label" style="color: black;">From Date*</label>
                         <input type="date" id="from_date" name="from_date" class="form-control" value="{{ $holiday->from_date }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="to_date" class="form-label red-label" style="color: red;">To Date*</label>
+                        <label for="to_date" class="form-label red-label" style="color: black;">To Date*</label>
                         <input type="date" id="to_date" name="to_date" class="form-control" value="{{ $holiday->to_date }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="year" class="form-label red-label" style="color: red;">Year*</label>
+                        <label for="year" class="form-label red-label" style="color: black;">Year*</label>
                         <input type="number" id="year" name="year" class="form-control" value="{{ $holiday->year }}" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="department" class="form-label red-label" style="color: red;" placeholder="Select Staff Type">Department*</label>
-                    <select class="multi-select" name="department[]" multiple style="width: 100%;">
+                    <label for="department" class="form-label red-label" style="color: black;" placeholder="Select Staff Type">Department*</label>
+                    <select class="multi-select" name="department[]" multiple style="width: 100%;" required>
                     <option value="" disabled selected>Select a Department</option>
                     @foreach($staff_types as $staff_type)
-                    <option value="{{ $staff_type->id }}">{{ $staff_type->master_value }}</option>
+                        <option value="{{ $staff_type->id }}">{{ $staff_type->master_value }}</option>
                     @endforeach
-            </select>
+                </select>
+
                 </div>
             </div>
 

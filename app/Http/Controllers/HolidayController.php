@@ -247,17 +247,21 @@ class HolidayController extends Controller
                 ]);
             }
         }
-
+    
         if (count($existingDepartments) > 0) {
             // Display a message for existing departments
             $warningMessage = 'Departments already exist';
-            return redirect()->route('holidays.index')->with('error', $warningMessage)->withInput();
+            return redirect()
+                ->route('holidays.index')
+                ->with('error', $warningMessage)
+                ->withInput();
         }
-        
-        
     
-        return redirect()->route('holidays.index')->with('success', 'Departments added successfully');
+        return redirect()
+            ->route('holidays.index')
+            ->with('success', 'Departments added successfully');
     }
+    
 
     public function destroyMapping($id)
     {
