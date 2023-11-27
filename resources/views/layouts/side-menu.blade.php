@@ -54,6 +54,7 @@
         <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
         <li><a class="slide-item" href="{{ url('/unit/index')}}">{{ __('Units') }}</a></li>
         <li><a class="slide-item" href="{{ url('/user/index')}}">{{ __('Users') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/salary/index')}}">{{ __('Salary Head') }}</a></li>
     </li>
     </ul>
 
