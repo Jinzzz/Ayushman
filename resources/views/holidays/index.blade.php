@@ -10,15 +10,15 @@
                 <div class="card-body">
                     <div class="row mb-3">
                     <div class="col-md-3">
-                            <label for="staff_name" class="form-label">Holiday Name:</label>
+                            <label for="staff_name" class="form-label">Holiday Name</label>
                             <input type="text" id="staff_name" name="holiday_name" class="form-control" value="{{ request('holiday_name') }}">
                         </div>
                         <div class="col-md-3">
-                            <label for="from_date" class="form-label">From Date:</label>
+                            <label for="from_date" class="form-label">From Date</label>
                             <input type="date" id="from_date" name="from_date" class="form-control" value="{{ request('from_date') }}">
                         </div>
                         <div class="col-md-3">
-                            <label for="to_date" class="form-label">To Date:</label>
+                            <label for="to_date" class="form-label">To Date</label>
                             <input type="date" id="to_date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                         </div>
                         <div class="col-md-3">
@@ -145,7 +145,7 @@
                             }
                         },
                         error: function() {
-                            alert('An error occurred while deleting the patient.');
+                            alert('An error occurred while deleting the holiday.');
                         },
                     });
                 } else {
