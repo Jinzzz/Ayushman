@@ -40,7 +40,8 @@ use App\Helpers\AdminHelper;
                @endif
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                  <ul>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                  <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
                      @endforeach
@@ -51,7 +52,7 @@ use App\Helpers\AdminHelper;
                   @csrf
                   <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_return_id}}">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
-                  <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
+                  <input type="hidden" name="saved-booking-id" value="{{ $medicine_sale_invoices->sales_invoice_id }}" id="saved-booking-id">
                   <div class="row">
                      <div class="col-md-4">
                         <div class="form-group">
@@ -123,6 +124,46 @@ use App\Helpers\AdminHelper;
                                     </tr>
                                  </thead>
                                  <tbody>
+                                 <tr id="productRowTemplate" style="display: none">
+                                       <td>
+                                          <select class="form-control medicine-name" name="medicine_id[]" dis>
+                                             <option value="">Please select medicine</option>
+                                             @foreach($medicines as $medicine)
+                                             <option value="{{ $medicine->id }}">{{ $medicine->medicine_name}}</option>
+                                             @endforeach
+                                          </select>
+                                       </td>
+                                       <td class="medicine-batch-no"><input type="text" class="form-control" value="" name="batch_no[]" readonly></td>
+                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" value="" name="quantity[]" oninput="calculateAmount(this)"></td>
+                                       <td class="medicine-unit-id"><input type="text" class="form-control" value="" name="unit_id[]" readonly></td>
+                                       <td class="medicine-rate"><input type="text" class="form-control" value="" name="rate[]" readonly></td>
+                                       <td class="medicine-amount"><input type="text" class="form-control" value="" name="amount[]" readonly></td>
+                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                       <td class="medicine-stock-id"><input type="hidden" class="form-control" value="" name="med_stock_id[]" readonly></td>
+
+                                       <td class="medicine-current-stock"><input type="hidden" class="form-control" value="" name="current-stock[]" readonly></td>
+                                       <td class="medicine-reorder-limit"><input type="hidden" class="form-control" value="" name="limit[]" readonly></td>
+
+                                       <td class="medicine-tax-rate"><input type="hidden" class="form-control" value="" name="tax_rate[]"></td>
+                                       <td class="medicine-tax-amount"><input type="hidden" class="form-control" value="" name="single_tax_amount[]" readonly></td>
+
+                                       <td class="medicine-mfd"><input type="hidden" class="form-control" value="" name="mfd[]" readonly></td>
+                                       <td class="medicine-expd"><input type="hidden" class="form-control" value="" name="expd[]" readonly></td>
+                                    </tr>
+                                    <tr id="productRowTemplate" style="display: none;">
+                                       <td>
+                                          <select class="form-control " name="ledger_id[]">
+                                             <option value="">Please select account</option>
+                                             @foreach($ledgers as $ledger)
+                                             <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
+                                             @endforeach
+                                          </select>
+                                       </td>
+                                       <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
+                                       <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
+                                       <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                    </tr>
                                     @foreach ($all_medicine_sale_details as $sale_details)
                                     <tr id="productRowTemplate">
                                        <td>
@@ -193,7 +234,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                           <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
@@ -224,24 +265,24 @@ use App\Helpers\AdminHelper;
                                  <table style="width: 100%;">
                                     <tr>
                                        <td><strong>Sub Total</strong></td>
-                                       <td style="text-align: right;"><strong class="tot">₹{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="sub-total-input" name="sub_total_amount" value="{{$medicine_sale_invoices->sub_total}}"></td>
+                                       <td style="text-align: right;"><strong class="tot">{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="sub-total-input" name="sub_total_amount" value="{{$medicine_sale_invoices->sub_total}}"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Tax Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="tax-amount">₹{{$medicine_sale_invoices->total_tax}}</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="{{$medicine_sale_invoices->total_tax}}"></td>
+                                       <td style="text-align: right;"><strong class="tax-amount">{{$medicine_sale_invoices->total_tax}}</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="{{$medicine_sale_invoices->total_tax}}"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Total Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="total-amount">₹{{$medicine_sale_invoices->total_amount}}</strong><input type="hidden" id="total-amount-input" name="total_amount" value="{{$medicine_sale_invoices->total_amount}}"></td>
+                                       <td style="text-align: right;"><strong class="total-amount">{{$medicine_sale_invoices->total_amount}}</strong><input type="hidden" id="total-amount-input" name="total_amount" value="{{$medicine_sale_invoices->total_amount}}"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Discount Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="discount-amount">₹{{$medicine_sale_invoices->total_discount}}</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="{{$medicine_sale_invoices->total_discount}}"></td>
+                                       <td style="text-align: right;"><strong class="discount-amount">{{$medicine_sale_invoices->total_discount}}</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="{{$medicine_sale_invoices->total_discount}}"></td>
                                     </tr>
                                  </table>
                                  <hr>
                                  <div class="form-group mb-2"> <!-- Decreased margin height -->
-                                    <label class="form-label payable-amount">Payable Amount : <b>₹0</b></label>
+                                    <label class="form-label payable-amount">Payable Amount : <b>0</b></label>
                                  </div>
                               </div>
                            </div>
@@ -287,7 +328,7 @@ use App\Helpers\AdminHelper;
          const subTotal = parseFloat($('.tot').val()) || 0;
          const taxAmount = parseFloat($('.tax-amount').val()) || 0;
          const totalAmount = subTotal + taxAmount;
-         $('.total-amount').text('₹' + totalAmount.toFixed(2));
+         $('.total-amount').text('' + totalAmount.toFixed(2));
          $('#sub-total-input').val(subTotal);
          $('#tax-amount-input').val(taxAmount);
          $('#total-amount-input').val(totalAmount);
@@ -476,7 +517,7 @@ use App\Helpers\AdminHelper;
             $('#patient_invoice_id').empty().append('<option value="">Choose Invoice ID</option>');
             $.each(data, function(key, value) {
                var isSelected = (key === v) ? 'selected' : '';
-               $('#patient_invoice_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
+               $('#patient_invoice_id').append('<option value="' + key + '"' + isSelected + '>' + value + '</option>');
             });
          },
          error: function() {
@@ -647,10 +688,10 @@ use App\Helpers\AdminHelper;
       var discountT = (total * discount) / 100
       //alert(discountT)
       $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('₹' + discountT)
+      $(".discount-amount").text('' + discountT)
       var payable = total - discountT
 
-      $(".payable-amount b").text('₹' + payable)
+      $(".payable-amount b").text('' + payable)
       $(".paid-amount").val(payable)
 
       x.remove()
@@ -739,10 +780,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
       }
       var disable = $('input[name="batch_no[]"]');
@@ -813,10 +854,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
 
 

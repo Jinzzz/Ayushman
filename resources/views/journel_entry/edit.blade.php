@@ -19,16 +19,17 @@ use App\Helpers\AdminHelper;
                     @endif
                     @if ($errors->any())
                     <div class="alert alert-danger">
-                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                        <ul>
+                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                        <ul>
                             @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
                     @endif
-                    <form action="{{ route('journel.entry.update') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    <form action="{{ route('journel.entry.update') }}" id="addFm" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                         @csrf
-                        <input type="hidden" value="{{ $journel_entries->journal_entry_id }}" name="hidden_id">
+                        <input type="hidden" value="{{ $id }}" name="hidden_id">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -73,18 +74,32 @@ use App\Helpers\AdminHelper;
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach ($all_entry_details as $entry_details)
+                                            <tr id="productRowTemplate" style="display: none;">
+                                                    <td>
+                                                        <select class="form-control " name="ledger_id[]">
+                                                            <option value="">Please select account</option>
+                                                            @foreach($ledgers as $ledger)
+                                                            <option value="{{ $ledger->id }}" >{{ $ledger->ledger_name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
+                                                    <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
+                                                    <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                                    <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                                </tr>
+                                                @foreach ($all_entry_details as $entry_details)
                                                 <tr id="productRowTemplate">
                                                     <td>
                                                         <select class="form-control " name="ledger_id[]">
                                                             <option value="">Please select account</option>
                                                             @foreach($ledgers as $ledger)
-                                                            <option value="{{ $ledger->id }}"  {{ $ledger->id == $entry_details->account_ledger_id ? ' selected' : '' }}>{{ $ledger->ledger_name}}</option>
+                                                            <option value="{{ $ledger->id }}" {{ $ledger->id == $entry_details->account_ledger_id ? ' selected' : '' }}>{{ $ledger->ledger_name}}</option>
                                                             @endforeach
                                                         </select>
                                                     </td>
                                                     <td><textarea class="form-control" name="description[]" placeholder="Description">{{$entry_details->description}}</textarea></td>
-                                                    <td><input type="number" class="form-control" value="{{$entry_details->debit}}" name="debit[]"></td>
+                                                    <td><input type="number" min="0" class="form-control" value="{{$entry_details->debit}}" name="debit[]"></td>
                                                     <td><input type="number" readonly class="form-control" value="{{$entry_details->credit}}" name="credit[]"></td>
                                                     <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                                 </tr>
@@ -102,20 +117,20 @@ use App\Helpers\AdminHelper;
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Debit:</label>
-                                    <input type="text" class="form-control" readonly name="total_debit" value="{{$journel_entries->total_debit}}" id="totalDebit" placeholder="Total Debit">
+                                    <input type="text" class="form-control totalDebit" readonly name="total_debit" value="{{$journel_entries->total_debit}}" id="totalDebit" placeholder="Total Debit">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Total Credit:</label>
-                                    <input type="text" class="form-control" readonly name="total_credit" value="{{$journel_entries->total_credit}}" id="totalCredit" placeholder="Total Credit">
+                                    <input type="text" class="form-control totalCredit" readonly name="total_credit" value="{{$journel_entries->total_credit}}" id="totalCredit" placeholder="Total Credit">
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <center>
-                                <button type="submit" class="btn btn-raised btn-primary">
+                                <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                                     <i class="fa fa-check-square-o"></i> Save</button>
                                 <a class="btn btn-danger" href="{{ route('journel.entry.index') }}">Cancel</a>
                             </center>
@@ -137,8 +152,50 @@ use App\Helpers\AdminHelper;
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+    $(document).ready(function() {
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                journel_entry_type_id: {
+                    required: true,
+                },
+            },
+            messages: {
+                journel_entry_type_id: {
+                    required: 'Please select journel entry type.',
+                },
+            },
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
+
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
+
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation
     $(document).ready(function() {
         // Add an event listener for input changes in debit fields
         $("#productTable tbody").on("input", 'input[name="debit[]"]', function() {
@@ -189,8 +246,13 @@ use App\Helpers\AdminHelper;
     });
 
     function myClickFunction(bt) {
-        var x = bt.parentNode.parentNode
-        x.remove()
+        var x = bt.parentNode.parentNode;
+        var totalAmount = parseFloat($('.totalDebit').val());
+        var debitAmount = parseFloat(x.querySelector('input[name="debit[]"]').value);
+        var subtotal = totalAmount - debitAmount;
+        $('.totalDebit').val(subtotal.toFixed(2));
+        $('.totalCredit').val(subtotal.toFixed(2));
+        x.remove();
     }
 </script>
 @endsection

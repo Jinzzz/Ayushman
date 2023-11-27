@@ -74,11 +74,15 @@
       var validator = $("#addFm").validate({
          ignore: "",
          rules: {
-            medicine_dosages: "required",
+            medicine_dosages: {
+               required: true,
+               maxlength: 255
+            },
          },
          messages: {
             medicine_dosages: {
                required: 'Please enter medicine dosage.',
+               maxlength: 'Medicine dosage must not exceed 255 characters.'
             }
          },
          errorPlacement: function(label, element) {

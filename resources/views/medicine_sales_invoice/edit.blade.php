@@ -44,7 +44,8 @@ use App\Helpers\AdminHelper;
                @endif
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                  <ul>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                  <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
                      @endforeach
@@ -131,6 +132,20 @@ use App\Helpers\AdminHelper;
                                     </tr>
                                  </thead>
                                  <tbody>
+                                    <tr id="productRowTemplate" style="display: none;">
+                                       <td>
+                                          <select class="form-control " name="ledger_id[]">
+                                             <option value="">Please select account</option>
+                                             @foreach($ledgers as $ledger)
+                                             <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
+                                             @endforeach
+                                          </select>
+                                       </td>
+                                       <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
+                                       <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
+                                       <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                    </tr>
                                     @foreach ($all_medicine_sale_details as $sale_details)
                                     <tr id="productRowTemplate">
                                        <td>
@@ -197,7 +212,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                           <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
@@ -232,24 +247,24 @@ use App\Helpers\AdminHelper;
                                  <table style="width: 100%;">
                                     <tr>
                                        <td><strong>Sub Total</strong></td>
-                                       <td style="text-align: right;"><strong class="tot">₹{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="sub-total-input" name="sub_total_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tot">{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="get-sub-total" value="{{$medicine_sale_invoices->sub_total}}"><input type="hidden" id="sub-total-input" name="sub_total_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Tax Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="tax-amount">₹{{$medicine_sale_invoices->total_tax_amount}}</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tax-amount">{{$medicine_sale_invoices->total_tax_amount}}</strong><input type="hidden" id="get-tax" value="{{$medicine_sale_invoices->total_tax_amount}}"><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Total Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="total-amount">₹{{$medicine_sale_invoices->total_amount}}</strong><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="total-amount">{{$medicine_sale_invoices->total_amount}}</strong><input type="hidden" id="get-total-amount" value="{{$medicine_sale_invoices->total_amount}}"><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Discount Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="discount-amount">₹{{$medicine_sale_invoices->discount_amount}}</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="discount-amount">{{$medicine_sale_invoices->discount_amount}}</strong><input type="hidden" id="get-discount-amount" value="{{$medicine_sale_invoices->discount_amount}}"><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
                                     </tr>
                                  </table>
                                  <hr>
                                  <div class="form-group mb-2"> <!-- Decreased margin height -->
-                                    <label class="form-label payable-amount">Payable Amount : <b>₹{{$medicine_sale_invoices->payable_amount}}</b></label>
+                                    <label class="form-label payable-amount">Payable Amount : <b>{{$medicine_sale_invoices->payable_amount}}</b></label>
                                  </div>
                               </div>
                            </div>
@@ -321,11 +336,13 @@ use App\Helpers\AdminHelper;
    document.getElementById("date").value = formattedDate;
 
    $(document).ready(function() {
+
       function updateTotalAmount() {
-         const subTotal = parseFloat($('.tot').val()) || 0;
-         const taxAmount = parseFloat($('.tax-amount').val()) || 0;
+         const subTotal = parseFloat($('#get-sub-total').val());
+         const taxAmount = parseFloat($('#get-tax').val());
          const totalAmount = subTotal + taxAmount;
-         $('.total-amount').text('₹' + totalAmount.toFixed(2));
+         // alert(taxAmount);
+         $('.total-amount').text('' + totalAmount.toFixed(2));
          $('#sub-total-input').val(subTotal);
          $('#tax-amount-input').val(taxAmount);
          $('#total-amount-input').val(totalAmount);
@@ -515,7 +532,7 @@ use App\Helpers\AdminHelper;
             $('#patient_booking_id').empty().append('<option value="">Choose Booking ID</option>');
             $.each(data, function(key, value) {
                var isSelected = (key === v) ? 'selected' : '';
-               $('#patient_booking_id').append('<option value="' + key + '"'+ isSelected  +'>' + value + '</option>');
+               $('#patient_booking_id').append('<option value="' + key + '"' + isSelected + '>' + value + '</option>');
 
             });
          },
@@ -687,10 +704,10 @@ use App\Helpers\AdminHelper;
       var discountT = (total * discount) / 100
       //alert(discountT)
       $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('₹' + discountT)
+      $(".discount-amount").text('' + discountT)
       var payable = total - discountT
 
-      $(".payable-amount b").text('₹' + payable)
+      $(".payable-amount b").text('' + payable)
       $(".paid-amount").val(payable)
 
       x.remove()
@@ -779,10 +796,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
       }
       var disable = $('input[name="batch_no[]"]');
@@ -853,10 +870,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
 
 

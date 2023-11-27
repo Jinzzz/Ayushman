@@ -225,24 +225,24 @@ use App\Helpers\AdminHelper;
                                  <table style="width: 100%;">
                                     <tr>
                                        <td><strong>Sub Total</strong></td>
-                                       <td style="text-align: right;"><strong class="tot">₹0</strong><input type="hidden" id="sub-total-input" name="sub_total_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tot">0</strong><input type="hidden" id="sub-total-input" name="sub_total_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Tax Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="tax-amount">₹0</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tax-amount">0</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Total Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="total-amount">₹0</strong><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="total-amount">0</strong><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Discount Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="discount-amount">₹0</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="discount-amount">0</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
                                     </tr>
                                  </table>
                                  <hr>
                                  <div class="form-group mb-2"> <!-- Decreased margin height -->
-                                    <label class="form-label payable-amount">Payable Amount : <b>₹0</b></label>
+                                    <label class="form-label payable-amount">Payable Amount : <b>0</b></label>
                                  </div>
                               </div>
                            </div>
@@ -288,7 +288,7 @@ use App\Helpers\AdminHelper;
          const subTotal = parseFloat($('.tot').val()) || 0;
          const taxAmount = parseFloat($('.tax-amount').val()) || 0;
          const totalAmount = subTotal + taxAmount;
-         $('.total-amount').text('₹' + totalAmount.toFixed(2));
+         $('.total-amount').text('' + totalAmount.toFixed(2));
          $('#sub-total-input').val(subTotal);
          $('#tax-amount-input').val(taxAmount);
          $('#total-amount-input').val(totalAmount);
@@ -647,10 +647,10 @@ use App\Helpers\AdminHelper;
       var discountT = (total * discount) / 100
       //alert(discountT)
       $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('₹' + discountT)
+      $(".discount-amount").text('' + discountT)
       var payable = total - discountT
 
-      $(".payable-amount b").text('₹' + payable)
+      $(".payable-amount b").text('' + payable)
       $(".paid-amount").val(payable)
 
       x.remove()
@@ -739,10 +739,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
       }
       var disable = $('input[name="batch_no[]"]');
@@ -813,10 +813,10 @@ use App\Helpers\AdminHelper;
          var discountT = (totalA * discount) / 100
          //alert(discountT)
          $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('₹' + discountT)
+         $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
 
-         $(".payable-amount b").text('₹' + payable)
+         $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
 
 

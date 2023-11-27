@@ -9,11 +9,11 @@
             <p>{{$message}}</p>
         </div>
         @endif
-        @if ($message = Session::get('error'))
+        <!-- @if ($message = Session::get('error'))
         <div class="alert alert-danger">
             <p>{{$message}}</p>
         </div>
-        @endif
+        @endif -->
         @if ($message = Session::get('exists'))
         <div class="alert alert-danger">
             <p>{{$message}}</p>

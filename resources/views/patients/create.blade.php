@@ -19,21 +19,19 @@
                         </ul>
                     </div>
                     @endif
-                    <form action="{{ route('patients.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('patients.store') }}" method="POST" id="addFm" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Name*</label>
-                                    <input type="text" class="form-control" required name="patient_name" maxlength="100"
-                                        value="{{ old('patient_name') }}" placeholder="Patient Name">
+                                    <input type="text" class="form-control" name="patient_name" maxlength="100" value="{{ old('patient_name') }}" placeholder="Patient Name">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Email</label>
-                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200"
-                                        name="patient_email" placeholder="Patient Email">
+                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200" name="patient_email" placeholder="Patient Email">
                                 </div>
                             </div>
                         </div>
@@ -41,16 +39,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Mobile*</label>
-                                    <input type="text" class="form-control" required name="patient_mobile"  maxlength="10" oninput="validateInput(this)"
-                                        value="{{ old('patient_mobile') }}" placeholder="Patient Mobile">
-                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                    <input type="text" class="form-control" required name="patient_mobile" maxlength="10" oninput="validateInput(this)" value="{{ old('patient_mobile') }}" placeholder="Patient Mobile">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Address</label>
-                                    <textarea class="form-control" name="patient_address" 
-                                        placeholder="Patient Address">{{ old('patient_address') }}</textarea>
+                                    <textarea class="form-control" name="patient_address" placeholder="Patient Address">{{ old('patient_address') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -69,8 +65,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Date Of Birth*</label>
-                                    <input type="date" class="form-control" name="patient_dob" required
-                                        placeholder="Patient Dob">
+                                    <input type="date" class="form-control" name="patient_dob" required placeholder="Patient Dob">
                                 </div>
                             </div>
                         </div>
@@ -78,8 +73,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="patient_blood_group_id" class="form-label">Blood Group</label>
-                                    <select class="form-control" name="patient_blood_group_id"
-                                        id="patient_blood_group_id">
+                                    <select class="form-control" name="patient_blood_group_id" id="patient_blood_group_id">
                                         <option value="">Choose Blood Group</option>
                                         @foreach($bloodgroup as $id => $bloodgroup)
                                         <option value="{{ $id }}">{{ $bloodgroup }}</option>
@@ -90,8 +84,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Emergency Contact Person</label>
-                                    <input type="text" class="form-control" name="emergency_contact_person" maxlength="100"
-                                        placeholder="Emergency Contact Person">
+                                    <input type="text" class="form-control" name="emergency_contact_person" maxlength="100" placeholder="Emergency Contact Person">
                                 </div>
                             </div>
                         </div>
@@ -99,9 +92,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Emergency Contact</label>
-                                    <input type="text" class="form-control" name="emergency_contact"  maxlength="10" oninput="validateInput(this)"
-                                        placeholder="Emergency Contact">
-                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                    <input type="text" class="form-control" name="emergency_contact" maxlength="10" oninput="validateInput(this)" placeholder="Emergency Contact">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -125,13 +117,12 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Whatsapp Number</label>
-                                    <input type="text" class="form-control" value="{{ old('whatsapp_number') }}"  maxlength="10" oninput="validateInput(this)"
-                                        name="whatsapp_number" placeholder="Whatsapp Number">
-                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                    <input type="text" class="form-control" value="{{ old('whatsapp_number') }}" maxlength="10" oninput="validateInput(this)" name="whatsapp_number" placeholder="Whatsapp Number">
+                                    <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div>
                         </div>
@@ -139,15 +130,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Medical History</label>
-                                    <textarea class="form-control" required name="patient_medical_history" id="medicalHistory"
-                                        placeholder="Medical History">{{ old('patient_medical_history') }}</textarea>
+                                    <textarea class="form-control" required name="patient_medical_history" id="medicalHistory" placeholder="Medical History">{{ old('patient_medical_history') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Current Medication</label>
-                                    <textarea class="form-control" required name="patient_current_medications" id="currentMedication"
-                                        placeholder="Patient Current Medication">{{ old('patient_current_medications') }}</textarea>
+                                    <textarea class="form-control" required name="patient_current_medications" id="currentMedication" placeholder="Patient Current Medication">{{ old('patient_current_medications') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -157,8 +146,7 @@
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
                                         <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" id="is_active" name="is_active"
-                                            onchange="toggleStatus(this)" class="custom-switch-input" checked>
+                                        <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">Active</span>
                                     </label>
@@ -167,7 +155,7 @@
                         </div>
                         <div class="form-group">
                             <center>
-                                <button type="submit" class="btn btn-raised btn-primary">
+                                <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                                     <i class="fa fa-check-square-o"></i> Add
                                 </button>
                                 <button type="reset" class="btn btn-raised btn-success">
@@ -184,23 +172,119 @@
 </div>
 @endsection
 @section('js')
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script>
+    $(document).ready(function() {
+        var validator = $("#addFm").validate({
+            ignore: "",
+            rules: {
+                patient_name: {
+                    required: true,
+                    maxlength: 50
+                },
+                branch_admin_name: {
+                    maxlength: 50
+                },
+                branch_address: {
+                    required: true,
+                    maxlength: 255
+                },
+                branch_contact_number: {
+                    digits: 10,
+                },
+                branch_admin_contact_number: {
+                    digits: 10,
+                },
+                branch_email: {
+                    email: true,
+                    maxlength: 100
+                },
+                latitude: {
+                    required: true,
+                    maxlength: 10
+                },
+                longitude: {
+                    required: true,
+                    maxlength: 10
+                },
+            },
+            messages: {
+                patient_name: {
+                    required: 'Please enter patient name.',
+                    maxlength: 'Patient name must not exceed 50 characters.'
+                },
+                branch_admin_name: {
+                    maxlength: 'Branch admin name must not exceed 50 characters.'
+                },
+                branch_address: {
+                    required: 'Please enter branch address.',
+                    maxlength: 'Branch address must not exceed 255 characters.'
+                },
+                branch_contact_number: {
+                    digits: 'Please enter a valid 10-digit phone number.',
+                },
+                branch_admin_contact_number: {
+                    digits: 'Please enter a valid 10-digit phone number.',
+                },
+                branch_email: {
+                    email: 'Please enter a valid email address.',
+                    maxlength: 'Branch email address must not exceed 100 characters.'
+                },
+                latitude: {
+                    required: 'Please enter latitude.',
+                    maxlength: 'Latitude must not exceed 10 characters.'
+                },
+                longitude: {
+                    required: 'Please enter longitude.',
+                    maxlength: 'Longitude must not exceed 10 characters.'
+                },
+            },
+            errorPlacement: function(label, element) {
+                label.addClass('text-danger');
+                label.insertAfter(element.parent().children().last());
+            },
+            highlight: function(element, errorClass) {
+                $(element).parent().addClass('has-error');
+                $(element).addClass('form-control-danger');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass('has-error');
+                $(element).removeClass('form-control-danger');
+            }
+        });
+
+        $(document).on('click', '#submitForm', function() {
+            if (validator.form()) {
+                $('#addFm').submit();
+            } else {
+                flashMessage('w', 'Please fill all mandatory fields');
+            }
+        });
+
+        function flashMessage(type, message) {
+            // Implement or replace this function based on your needs
+            console.log(type, message);
+        }
+    });
+    // impliment jQuery Validation 
+</script>
 <script type="text/javascript">
     $(document).ready(function() {
         CKEDITOR.replace('medicalHistory', {
             removePlugins: 'image',
-           
+
         });
 
         $(document).ready(function() {
-        CKEDITOR.replace('currentMedication', {
-            removePlugins: 'image',
-           
+            CKEDITOR.replace('currentMedication', {
+                removePlugins: 'image',
+
+            });
+
         });
 
-      });
         function toggleStatus(checkbox) {
             const statusLabel = document.getElementById("statusLabel");
             const statusText = document.getElementById("statusText");
@@ -241,5 +325,3 @@
         }
     }
 </script>
-
-
