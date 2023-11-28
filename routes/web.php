@@ -46,6 +46,7 @@ use App\Http\Controllers\StaffLeaveController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SalaryHeadController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -390,12 +391,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/holiday/storelink/{holidaymapping_id}', [HolidayController::class, 'storeHolidayMapping'])->name('holidays.storelink');
     Route::delete('/holidaymapping/destroy/{id}', [HolidayController::class, 'destroyMapping'])->name('holidaysmapping.destroy');
 
+   //salary
+   Route::get('/salary/index', [SalaryHeadController::class, 'index'])->name('salarys.index');
+   Route::get('/salary/create', [SalaryHeadController::class, 'create'])->name('salarys.create');
+   Route::post('/salary/store', [SalaryHeadController::class, 'store'])->name('salarys.store');
+   Route::get('/salary/show/{master_id}', [SalaryHeadController::class, 'show'])->name('salarys.show');
+   Route::get('/salary/edit/{id}', [SalaryHeadController::class, 'edit'])->name('salarys.edit');
+   Route::put('/salary/update/{id}', [SalaryHeadController::class, 'update'])->name('salarys.update');
+   Route::delete('/salary/destroy/{id}', [SalaryHeadController::class, 'destroy'])->name('salarys.destroy');
 
+   
     //Attendance
     Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.view');
     Route::get('/attendance/monthly', [AttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
 
-    //report
+   // report
     Route::get('/sales-report', [ReportController::class, 'salesReport'])->name('sales.report');
     Route::get('/purchase-report', [ReportController::class, 'purchaseReport'])->name('purchase.report');
     Route::get('/return-report', [ReportController::class, 'returnReport'])->name('return.report');

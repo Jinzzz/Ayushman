@@ -133,7 +133,7 @@
                                 <button type="reset" class="btn btn-raised btn-success">
                                     Reset
                                 </button>
-                                <a class="btn btn-danger" href="{{ route('h.index') }}">Cancel</a>
+                                <a class="btn btn-danger" href="{{ route('staffleave.index') }}">Cancel</a>
                             </center>
                         </div>
                     </form>
