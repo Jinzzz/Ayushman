@@ -56,8 +56,6 @@
                        <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>
-                           <div class="form-group">
-                        <div class="form-label">Status</div>
                         <label class="custom-switch">
                         <input type="hidden" name="status" value="0"> <!-- Default value for Inactive -->
                         <input type="checkbox" id="statusSwitch" name="status" onchange="toggleStatus(this)" class="custom-switch-input" checked>

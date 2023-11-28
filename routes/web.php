@@ -47,6 +47,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryHeadController;
+use App\Http\Controllers\SalaryPackageController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -399,6 +400,17 @@ Route::middleware('auth')->group(function () {
    Route::get('/salary/edit/{id}', [SalaryHeadController::class, 'edit'])->name('salarys.edit');
    Route::put('/salary/update/{id}', [SalaryHeadController::class, 'update'])->name('salarys.update');
    Route::delete('/salary/destroy/{id}', [SalaryHeadController::class, 'destroy'])->name('salarys.destroy');
+
+   //salary-package
+   Route::get('/package/index', [SalaryPackageController::class, 'index'])->name('packages.index');
+   Route::get('/package/create', [SalaryPackageController::class, 'create'])->name('packages.create');
+   Route::post('/package/store', [SalaryPackageController::class, 'store'])->name('packages.store');
+   Route::get('/package/show/{master_id}', [SalaryPackageController::class, 'show'])->name('packages.show');
+   Route::get('/package/edit/{id}', [SalaryPackageController::class, 'edit'])->name('packages.edit');
+   Route::put('/package/update/{id}', [SalaryPackageController::class, 'update'])->name('packages.update');
+   Route::delete('/package/destroy/{id}', [SalaryPackageController::class, 'destroy'])->name('packages.destroy');
+   Route::get('/getSalaryHeadType/{id}', [SalaryPackageController::class, 'getSalaryHeadType']);
+   Route::get('/getSalaryHeadTypes/{id}', [SalaryPackageController::class, 'getSalaryHeadTypes']);
 
    
     //Attendance

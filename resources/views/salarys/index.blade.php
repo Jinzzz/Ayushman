@@ -55,6 +55,8 @@
             <p>{{$message}}</p>
         </div>
         @endif
+        <div id="flash-messages"></div>
+
         <div class="card-header">
             <h3 class="card-title">List Salary Head</h3>
         </div>
@@ -118,47 +120,67 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script src="path/to/flash-message.js"></script>
+
 <script>
-    function deleteData(dataId) {
-        swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('salarys.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            console.log(response.success);
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response.success == true) {
-                                
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                                   // Reload the page after a successful delete
-                        window.location.reload();
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the holiday.');
-                        },
-                    });
-                } else {
-                    return;
-                }
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    }, function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('salarys.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    console.log(response.success);
+                    // Handle the success response
+                    if (response.success == true) {
+                        // Remove the deleted row from the table
+                        $("#dataRow_" + dataId).remove();
+                        flashMessage('s', 'Data deleted successfully');
+                    } else {
+                        flashMessage('e', 'An error occurred! Please try again later.');
+                    }
+                },
+                error: function() {
+                    flashMessage('e', 'Cannot delete the salary head because it is referenced in salary packages.');
+                },
             });
-    }
+        } else {
+            return;
+        }
+    });
+}
+
+    function flashMessage(type, message) {
+    // You can customize this implementation based on your needs
+    var alertClass = (type === 's') ? 'alert-success' : 'alert-danger';
+    var flashContainer = document.getElementById('flash-messages');
+
+    var alertDiv = document.createElement('div');
+    alertDiv.className = 'alert ' + alertClass;
+    alertDiv.innerHTML = message;
+
+    flashContainer.appendChild(alertDiv);
+
+    // Automatically remove the flash message after a few seconds
+    setTimeout(function() {
+        alertDiv.remove();
+    }, 3000);
+}
 </script>
+
+
+
+

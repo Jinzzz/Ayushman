@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Salary_Head_Type;
 use App\Models\Salary_Head_Master;
+use App\Models\Salary_Package;
 class SalaryHeadController extends Controller
 {
     /**
@@ -59,29 +60,42 @@ class SalaryHeadController extends Controller
      */
     public function store(Request $request)
     {
-       
         // Validate the request data
         $request->validate([
             'salary_head_name' => 'required|string|max:255',
-            'salary_head_type' => 'required|exists:salary_head_types,id', // Assuming it's a foreign key
-            'status' => 'required|string|max:255',
+            'salary_head_type' => 'required|exists:salary_head_types,id',
+            'status' => 'required', // Assuming the checkbox value is "on" or "off"
             'remark' => 'nullable|string',
             'company' => 'required|string|max:255',
         ]);
-        $is_status = $request->input('status') ? 1 : 0;
-
-        // Create a new record in the database
-        Salary_Head_Master::create([
+    
+        // Map the checkbox value to an integer (1 for "on", 0 for "off")
+        $is_status = $request->input('status') === 'on' ? 1 : 0;
+    
+        // Find the existing Salary_Head_Master
+        $salaryHead = Salary_Head_Master::where([
             'salary_head_name' => $request->input('salary_head_name'),
-            'salary_head_type' => $request->input('salary_head_type'),
+            'status' => $is_status,
+        ])->first();
+    
+        // If it already exists, show a message and redirect
+        if ($salaryHead) {
+            return redirect()->route('salarys.index')->with('error', 'Salary Head already exists.');
+        }
+    
+        // If not, create a new one
+        $newSalaryHead = Salary_Head_Master::create([
+            'salary_head_name' => $request->input('salary_head_name'),
             'status' => $is_status,
             'remark' => $request->input('remark'),
             'company' => $request->input('company'),
         ]);
-
+    
         // Redirect to a specific route or page after successful creation
-        return redirect()->route('salarys.index')->with('success', 'Salary Head created successfully');
+        return redirect()->route('salarys.index')->with('success', 'Salary Head created successfully.');
     }
+    
+    
 
     /**
      * Display the specified resource.
@@ -165,14 +179,34 @@ class SalaryHeadController extends Controller
      */
     public function destroy($id)
     {
-        $salary_head = Salary_Head_Master::findOrFail($id);
-
-        // Soft delete the record
-        $salary_head->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Salary Head Deleted Successfully',
-       ]);
+        try {
+            // Check if the salary head is referenced in the salary_packages table
+            $isReferenced = Salary_Package::where('salary_head_id', $id)->exists();
+    
+            if ($isReferenced) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete the salary head because it is referenced in salary packages.',
+                ], 400);
+            }
+    
+            // If not referenced, proceed with the deletion
+            $salary_head = Salary_Head_Master::findOrFail($id);
+            $salary_head->delete();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Salary Head Deleted Successfully',
+            ]);
+        } catch (\Exception $e) {
+            // Log the exception or handle it as needed
+            \Log::error('Exception in destroy method: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the salary head. ' . $e->getMessage(),
+            ], 500);
+        }
     }
+    
+    
 }
