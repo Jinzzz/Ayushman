@@ -2,7 +2,7 @@
 <aside class="app-sidebar">
   <div class="side-header">
     <a class="header-brand1" href="#">
-      {{-- GitLoad v2--}}
+      {{-- GitLoad v3--}}
       <img src="{{asset('assets/images/ayushman-logo.jpeg')}}" class="header-brand-img desktop-logo" alt="logo">
       <img src="{{asset('assets/images/ayushman-logo.jpeg')}}" class="header-brand-img toggle-logo" alt="logo">
       <img src="{{asset('assets/images/ayushman-logo.jpeg')}}" class="header-brand-img light-logo" alt="logo">
