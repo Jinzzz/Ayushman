@@ -48,6 +48,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryHeadController;
 use App\Http\Controllers\SalaryPackageController;
+use App\Http\Controllers\AvailableLeaveController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -412,7 +413,14 @@ Route::middleware('auth')->group(function () {
    Route::get('/getSalaryHeadType/{id}', [SalaryPackageController::class, 'getSalaryHeadType']);
    Route::get('/getSalaryHeadTypes/{id}', [SalaryPackageController::class, 'getSalaryHeadTypes']);
 
-   
+   //availableleaves
+   Route::get('/availableleave/index', [AvailableLeaveController::class, 'index'])->name('availableleaves.index');
+   Route::get('/availableleave/create', [AvailableLeaveController::class, 'create'])->name('availableleaves.create');
+   Route::post('/availableleave/store', [AvailableLeaveController::class, 'store'])->name('availableleaves.store');
+   Route::get('/availableleave/show/{staff_id}', [AvailableLeaveController::class, 'show'])->name('availableleaves.show');
+   Route::get('/availableleave/edit/{id}', [AvailableLeaveController::class, 'edit'])->name('availableleaves.edit');
+   Route::put('/availableleave/update/{id}', [AvailableLeaveController::class, 'update'])->name('availableleaves.update');
+
     //Attendance
     Route::get('/attendance', [AttendanceController::class, 'viewAttendance'])->name('attendance.view');
     Route::get('/attendance/monthly', [AttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');

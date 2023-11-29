@@ -74,6 +74,7 @@
         <li><a class="slide-item" href="{{ route('holidays.index') }}">{{ __('Holidays') }}</a></li>
         <li><a class="slide-item" href="{{ route('attendance.view') }}">{{ __('Attendance') }}</a></li>
         <li><a class="slide-item" href="{{route('branchTransfer.index')}}">{{__('Employee Branch Transfer')}}</a></li>
+        <li><a class="slide-item" href="{{route('availableleaves.index')}}">{{__('Employee Available Leaves')}}</a></li>
     </li>
     </ul>
     <!-- Accounts  -->
