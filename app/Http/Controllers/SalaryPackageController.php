@@ -15,13 +15,15 @@ class SalaryPackageController extends Controller
      */
     public function index(Request $request)
     {
+    
         $pageTitle = "List Salary Head";
         $branch = Salary_Head_Type::get();
         $masters = Salary_Head_Master::join('salary_head_types', 'salary_head_masters.salary_head_type', '=', 'salary_head_types.id')->select('salary_head_masters.*', 'salary_head_types.salary_head_type')
             ->orderBy('salary_head_masters.updated_at', 'desc')
             ->get();
-
+            
         $packages = Salary_Package::orderBy('updated_at', 'desc');
+       
 
         // Apply filters if provided
         if ($request->has('package_name'))
