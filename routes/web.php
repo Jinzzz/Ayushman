@@ -378,6 +378,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/staffleave/edit/{id}', [StaffLeaveController::class, 'edit'])->name('staffleave.edit');
     Route::put('/staffleave/update/{id}', [StaffLeaveController::class, 'update'])->name('staffleave.update');
     Route::delete('/staffleave/destroy/{id}', [StaffLeaveController::class, 'destroy'])->name('staffleave.destroy');
+    Route::get('/get-total-leaves/{staffId}', [StaffLeaveController::class, 'getTotalLeaves'])->name('get-total-leaves');
 
     //Holidays
     Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
@@ -401,6 +402,7 @@ Route::middleware('auth')->group(function () {
    Route::get('/salary/edit/{id}', [SalaryHeadController::class, 'edit'])->name('salarys.edit');
    Route::put('/salary/update/{id}', [SalaryHeadController::class, 'update'])->name('salarys.update');
    Route::delete('/salary/destroy/{id}', [SalaryHeadController::class, 'destroy'])->name('salarys.destroy');
+ 
 
    //salary-package
    Route::get('/package/index', [SalaryPackageController::class, 'index'])->name('packages.index');

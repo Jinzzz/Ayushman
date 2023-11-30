@@ -22,12 +22,13 @@
                             <input type="date" id="to_date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                         </div>
                 
-                    </div>
+                    
                     <div class="col-md-3 d-flex align-items-end">
                         <div>
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
                             <a class="btn btn-primary" href="{{ route('staffleave.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                         </div>
+                    </div>
                     </div>
                 </div>
         </div>
@@ -45,21 +46,23 @@
         </div>
         @endif
         <div class="card-header">
-            <h3 class="card-title">List Leave Request</h3>
+            <h3 class="card-title">Leave Request List</h3>
         </div>
         <div class="card-body">
             <a href="{{ route('staffleave.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
-                New Leave Request
+                Create Leave Request
             </a>
             <div class="table-responsive">
-                <table id="example" class="table table-striped table-bordered text-nowrap w-100">
+                <table id="example" class="table table-striped table-bordered text-nowrap w-100 leave_request_table">
                     <thead>
                         <tr>
                             <th class="wd-15p">SL.NO</th>
                             <th class="wd-10p">Name</th>
                             <th class="wd-10p">Branch</th>
-                            <th class="wd-15p">No Of Days</th>
+                            <th class="wd-10p">From date</th>
+                            <th class="wd-10p">To Date</th>
+                            <th class="wd-15p">No Of Leave Days</th>
                             <th class="wd-15p">Action</th>
                         </tr>
                     </thead>
@@ -72,6 +75,8 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $staffleave->staff_name }}</td>
                             <td>{{ $staffleave->branch_name }}</td>
+                            <td>{{ $staffleave->from_date }}</td>
+                            <td>{{ $staffleave->to_date }}</td>
                             <td>{{ $staffleave->days}}</td>
                             <td>
                             <a class="btn btn-secondary btn-sm" href="{{ route('staffleave.show', $staffleave->id) }}">
@@ -101,134 +106,49 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-    function deleteData(dataId) {
-        swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('staffleave.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            console.log(response.success);
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response.success == true) {
-                                
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                                   // Reload the page after a successful delete
-                        window.location.reload();
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the patient.');
-                        },
-                    });
-                } else {
-                    return;
-                }
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('staffleave.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    console.log(response.success);
+                    // Handle the success response
+                    if (response.success == true) {
+                        // Display a success message using sweetalert
+                        swal("Success", response.message, "success");
+
+                        // Remove the row from the table
+                        $("#dataRow_" + dataId).remove();
+                    } else {
+                        // Display an error message using sweetalert
+                        swal("Error", "An error occurred! Please try again later.", "error");
+                    }
+                },
+                error: function() {
+                    // Display an error message using sweetalert
+                    swal("Error", "An error occurred while deleting the data.", "error");
+                },
             });
-    }
+        } else {
+            return;
+        }
+    });
+}
 
-    // function changeStatus(dataId) {
-    //     swal({
-    //             title: "Change Status?",
-    //             text: "Are you sure you want to change the status?",
-    //             type: "warning",
-    //             showCancelButton: true,
-    //             confirmButtonColor: "#DD6B55",
-    //             confirmButtonText: "Yes",
-    //             cancelButtonText: "No",
-    //             closeOnConfirm: true,
-    //             closeOnCancel: true
-    //         },
-    //         function(isConfirm) {
-    //             if (isConfirm) {
-    //                 $.ajax({
-    //                     url: "{{ route('patients.changeStatus', '') }}/" + dataId,
-    //                     type: "patch",
-    //                     data: {
-    //                         _token: "{{ csrf_token() }}",
-    //                     },
-    //                     success: function(response) {
-    //                         if (response == '1') {
-    //                             var cell = $('#dataRow_' + dataId).find('td:eq(8)');
-
-    //                             if (cell.find('.btn-success').length) {
-    //                                 cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
-    //                             } else {
-    //                                 cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
-    //                             }
-
-    //                             flashMessage('s', 'Status changed successfully');
-    //                         } else {
-    //                             flashMessage('e', 'An error occurred! Please try again later.');
-    //                         }
-    //                     },
-    //                     error: function() {
-    //                         alert('An error occurred while changing the patient status.');
-    //                     },
-    //                 });
-    //             }
-    //         });
-    // }
-
-
-
-    function changeVerification(dataId) {
-        swal({
-                title: "Change Verification?",
-                text: "Are you sure you want to change otp verification status?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('patients.toggleOTPVerification', '') }}/" + dataId,
-                        type: "patch",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(7)');
-
-                                if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeVerification(' + dataId + ')" class="btn btn-sm btn-danger">NotVerified</button>');
-                                } else {
-                                    cell.html('<button type="button" onclick="changeVerification(' + dataId + ')" class="btn btn-sm btn-success">Verified</button>');
-                                }
-
-                                flashMessage('s', 'Otp verification changed successfully');
-                            } else {
-                                flashMessage('e', 'An error occurred! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while changing the patient status.');
-                        },
-                    });
-                }
-            });
-    }
 </script>

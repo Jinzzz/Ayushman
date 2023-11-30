@@ -162,10 +162,9 @@ class SalaryPackageController extends Controller
      */
     public function update(Request $request, $id)
     {
-       
         // Validate the request data
         $request->validate(['package_name' => 'required|string|max:255',
-        'status' => 'required', 
+        'status' => 'nullable', 
         'salary_head_type_id' => 'required',
         'remark' => 'nullable|string', 
         'salary_head_id' => 'required',

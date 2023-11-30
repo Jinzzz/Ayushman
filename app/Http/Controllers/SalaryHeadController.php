@@ -18,24 +18,22 @@ class SalaryHeadController extends Controller
     { 
        $pageTitle = "List Salary Head";
        $branch = Salary_Head_Type::get();
-       $masters = Salary_Head_Master::join('salary_head_types', 'salary_head_masters.salary_head_type', '=', 'salary_head_types.id')
-                                        ->select('salary_head_masters.*', 'salary_head_types.salary_head_type')
-                                        ->orderBy('salary_head_masters.updated_at', 'desc')
-                                        ->get();
-
-                                            
-    // Apply filters if provided
-    if ($request->has('salary_head_name')) {
-        $masters->where('salary_head_masters.salary_head_name', 'LIKE', "%{$request->salary_head_name}%");
-    }
-    
-    if ($request->has('salary_head_type')) {
-        $masters->where('salary_head_masters.salary_head_type', 'LIKE', "%{$request->salary_head_type}%");
-    }
-    
-    if ($request->has('status')) {
-        $masters->where('salary_head_masters.status', 'LIKE', "%{$request->status}%");
-    }
+        $masters = Salary_Head_Master::join('salary_head_types', 'salary_head_masters.salary_head_type', '=', 'salary_head_types.id')
+                                     ->select('salary_head_masters.*', 'salary_head_types.salary_head_type')
+                                     ->orderBy('salary_head_masters.updated_at', 'desc');
+                                
+        // Apply filters if provided
+        if ($request->has('salary_head_name')) {
+            $masters->where('salary_head_masters.salary_head_name', 'LIKE', "%{$request->salary_head_name}%");
+        }
+        
+        if ($request->has('salary_head_type')) {
+            $masters->where('salary_head_masters.salary_head_type', 'LIKE', "%{$request->salary_head_type}%");
+        }
+        
+   
+   // Now fetch the data
+   $masters = $masters->get();
 
        return view('salarys.index', compact('pageTitle', 'branch','masters'));
     }
@@ -92,7 +90,7 @@ class SalaryHeadController extends Controller
         ]);
     
         // Redirect to a specific route or page after successful creation
-        return redirect()->route('salarys.index')->with('success', 'Salary Head created successfully.');
+        return redirect()->route('salarys.index')->with('success', 'Salary head created successfully.');
     }
     
     
@@ -130,6 +128,7 @@ class SalaryHeadController extends Controller
                         ->select('salary_head_masters.*', 'salary_head_types.salary_head_type')
                         ->where('salary_head_masters.id', $id)
                         ->first();
+                 
             $branchs = Salary_Head_Type::get();
             return view('salarys.edit', compact('pageTitle', 'masters','branchs','id'));
         } catch (QueryException $e) {
@@ -147,29 +146,34 @@ class SalaryHeadController extends Controller
      */
     public function update(Request $request, $id)
     {
-            // Validate the request data
-            $request->validate([
-                'salary_head_name' => 'required|string|max:255',
-                'salary_head_type' => 'required|exists:salary_head_types,id', // Assuming it's a foreign key
-                'status' => 'required|string|max:255',
-                'remark' => 'nullable|string',
-                'company' => 'required|string|max:255',
-            ]);
-            $is_status = $request->input('status') ? 1 : 0;
-            $salary_head = Salary_Head_Master::findOrFail($id);
-            // Create a new record in the database
-           $salary_head->update([
-                'salary_head_name' => $request->input('salary_head_name'),
-                'salary_head_type' => $request->input('salary_head_type'),
-                'status' => $is_status,
-                'remark' => $request->input('remark'),
-                'company' => $request->input('company'),
-            ]);
+        // Validate the incoming request data
+        $request->validate([
+            'salary_head_name' => 'required|string|max:255',
+            'salary_head_type' => 'required|exists:salary_head_types,id', // Assuming it's a foreign key
+            'status' => 'nullable',
+            'remark' => 'nullable|string',
+            'company' => 'required|string|max:255',
+        ]);
     
-            // Redirect to a specific route or page after successful creation
-            return redirect()->route('salarys.index')->with('success', 'Salary Head updated successfully');
-        
+        // Determine the status value based on the 'status' input
+        $is_status = $request->input('status') ? 1 : 0;
+    
+        // Find the existing Salary_Head_Master model instance
+        $salary_head = Salary_Head_Master::findOrFail($id);
+    
+        // Update the model attributes with the new values from the request
+        $salary_head->update([
+            'salary_head_name' => $request->input('salary_head_name'),
+            'salary_head_type' => $request->input('salary_head_type'),
+            'status' => $is_status,
+            'remark' => $request->input('remark'),
+            'company' => $request->input('company'),
+        ]);
+    
+        // Redirect to a specific route or page after successful update
+        return redirect()->route('salarys.index')->with('success', 'Salary head updated successfully');
     }
+    
 
     /**
      * Remove the specified resource from storage.

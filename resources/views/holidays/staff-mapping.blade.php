@@ -54,7 +54,7 @@
                 <div class="col-md-3 d-flex align-items-end">
                         <div>
                             <button type="submit" class="btn btn-primary"><i class="fa fa-add" aria-hidden="true"></i> Save</button>&nbsp;
-                            <a class="btn btn-primary" href="{{ route('holidays.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                            <a class="btn btn-primary" href="{{ route('holidays.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Cancel</a>
                         </div>
                     </div>
             </div>
@@ -126,7 +126,7 @@
 function deleteData(dataId) {
     swal({
         title: "Delete selected data?",
-        text: "Are you sure you want to delete this data",
+        text: "Are you sure you want to delete this data?",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
@@ -144,21 +144,26 @@ function deleteData(dataId) {
                     _token: "{{ csrf_token() }}",
                 },
                 success: function(response) {
+                    console.log(response.success);
+                    // Handle the success response
                     if (response.success == true) {
+                        // Display a success message using sweetalert
+                        swal("Success", response.message, "success");
+
+                        // Remove the row from the table
                         $("#dataRow_" + dataId).remove();
-                        // Display a success flash message
-                        flashMessage('success', 'Department deleted successfully');
                     } else {
-                        // Display an error flash message
-                        flashMessage('error', 'An error occurred! Please try again later.');
+                        // Display an error message using sweetalert
+                        swal("Error", "An error occurred! Please try again later.", "error");
                     }
                 },
-                error: function(xhr, textStatus, errorThrown) {
-                    // Display an error flash message
-                    flashMessage('error', 'An error occurred while deleting the Department.');
-                    console.error("Error: ", textStatus, errorThrown);
+                error: function() {
+                    // Display an error message using sweetalert
+                    swal("Error", "An error occurred while deleting the data.", "error");
                 },
             });
+        } else {
+            return;
         }
     });
 }

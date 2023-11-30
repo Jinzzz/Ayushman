@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Leave_Type;
+use App\Models\EmployeeAvailableLeave;
 class StaffLeaveController extends Controller
 {
     /**
@@ -69,7 +70,6 @@ class StaffLeaveController extends Controller
      */
     public function store(Request $request)
     {
-  
         $request->validate([
             'branch_id' => 'required',
             'staff_id' => 'required',
@@ -91,9 +91,21 @@ class StaffLeaveController extends Controller
             'leave_type.required' => 'The leave type field is required.',
             'reason.required' => 'The reason field is required.',
         ]);
-    
-        // Rest of your code...
-    
+
+        // Check if the requested days are not greater than total days
+        $staffId = $request->staff_id;
+        $requestedDays = $request->days;
+        $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
+
+        if ($requestedDays > $totalLeaves) {
+            return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
+        }
+        $updatedTotalLeaves = $totalLeaves -  $requestedDays;
+   
+        EmployeeAvailableLeave::where('staff_id', $staffId)
+                               ->update(['total_leaves' => $updatedTotalLeaves,
+                            ]);
+
         $lastInsertedId = Staff_Leave::create([
             'branch_id' => $request->branch_id,
             'staff_id' => $request->staff_id,
@@ -105,7 +117,8 @@ class StaffLeaveController extends Controller
             'start_day' => $request->start_day,
             'end_day' => $request->end_day,
         ]);
-    
+
+
         return redirect()->route('staffleave.index')->with('success', 'Leave Request added successfully');
     }
     
@@ -143,22 +156,29 @@ class StaffLeaveController extends Controller
      */
     public function edit($id)
     {
+     
         try {
             $pageTitle = "Edit Leave Request";
             $leave_request = Staff_Leave::select(
                 'staff_leave.*',
                 'mst_staffs.staff_name as staff_name',
                 'mst_branches.branch_name',
-                'mst_leave_types.name as leave_type_name'
+                'mst_leave_types.name as leave_type_name',
+                'employee_available_leaves.total_leaves' // Add this line for total leaves
             )
             ->join('mst_staffs', 'staff_leave.staff_id', '=', 'mst_staffs.staff_id')
             ->join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
             ->leftJoin('mst_leave_types', 'staff_leave.leave_type', '=', 'mst_leave_types.leave_type_id')
+            ->leftJoin('employee_available_leaves', function ($join) {
+                $join->on('staff_leave.staff_id', '=', 'employee_available_leaves.staff_id')
+                    ->where('employee_available_leaves.staff_id', '=', 'staff_leave.staff_id');
+            })
             ->where('staff_leave.id', $id)
             ->orderBy('staff_leave.updated_at', 'desc')
             ->first();
+            $total_leaves = EmployeeAvailableLeave::where('staff_id', $leave_request->staff_id)->value('total_leaves');
             $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
-            return view('staffleave.edit', compact('pageTitle', 'leave_request','leave_types'));
+            return view('staffleave.edit', compact('pageTitle', 'leave_request','leave_types','total_leaves'));
         } catch (QueryException $e) {
             return redirect()->route('staffleave.index')->with('error', 'Something went wrong');
         }
@@ -174,21 +194,32 @@ class StaffLeaveController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $request->validate([
             // Add your validation rules here based on your requirements
             'from_date' => 'required|date|date_format:Y-m-d|after_or_equal:' . today()->format('Y-m-d'),
             'to_date' => 'required|date|after_or_equal:from_date',
             'start_day' => 'required',
             'end_day' => 'required',
-            'days' => 'required|numeric',
+            'days' => 'required',
             'leave_type' => 'required',
             'reason' => 'required',
         ]);
-
-        // Find the leave request by ID
+        $staffId = $request->staff_id;
+        $requestedDays = $request->days;
+      
+        $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
         $leaveRequest = Staff_Leave::findOrFail($id);
+        $current_days = $leaveRequest->days;
+        $t = $totalLeaves + $current_days;
+        if ($requestedDays > $t) {
+            return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
+        }
 
-        // Update the leave request with the new data
+        $updatedTotalLeaves = $t -  $requestedDays;
+        EmployeeAvailableLeave::where('staff_id', $staffId)
+                               ->update(['total_leaves' => $updatedTotalLeaves,
+                            ]);
         $leaveRequest->update([
             'from_date' => $request->input('from_date'),
             'to_date' => $request->input('to_date'),
@@ -228,5 +259,14 @@ class StaffLeaveController extends Controller
         $staffNames = Mst_Staff::where('branch_id', $branchId)->pluck('staff_name', 'staff_id');
 
         return response()->json($staffNames);
+    }
+
+    public function getTotalLeaves(Request $request, $staffId)
+    {
+        // Fetch the total leaves for the given staffId from the database
+        $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
+
+        // You can return the total leaves in JSON format
+        return response()->json(['total_leaves' => $totalLeaves]);
     }
 }

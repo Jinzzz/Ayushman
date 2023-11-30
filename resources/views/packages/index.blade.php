@@ -24,7 +24,7 @@
           </div>
           <div class="col-md-3">
             <button type="submit" class="btn btn-primary">
-              <i class="fa fa-filter" aria-hidden="true"></i> Filter </button>&nbsp; <a class="btn btn-primary" href="{{ route('salarys.index') }}">
+              <i class="fa fa-filter" aria-hidden="true"></i> Filter </button>&nbsp; <a class="btn btn-primary" href="{{ route('packages.index') }}">
               <i class="fa fa-times" aria-hidden="true"></i> Reset </a>
           </div>
         </div>
@@ -46,9 +46,9 @@
   </div>
   <div class="card-body">
     <a href="{{ route('packages.create') }}" class="btn btn-block btn-info">
-      <i class="fa fa-plus"></i> Add New </a>
+      <i class="fa fa-plus"></i> Add New Package </a>
     <div class="table-responsive">
-      <table id="example" class="table table-striped table-bordered text-nowrap w-100">
+      <table id="example" class="table table-striped table-bordered text-nowrap w-100 leave_request_table">
         <thead>
           <tr>
             <th class="wd-15p">SL.NO</th>

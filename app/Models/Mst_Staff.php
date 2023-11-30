@@ -86,4 +86,9 @@ class Mst_Staff extends Model
     return $this->hasMany(Mst_User::class, 'staff_id', 'staff_id');
     }
 
+    public function employeeAvailableLeave()
+    {
+        return $this->belongsTo(EmployeeAvailableLeave::class, 'staff_id', 'staff_id');
+    }
+
 }

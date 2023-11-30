@@ -49,15 +49,15 @@
         </div>
         @endif
         <div class="card-header">
-            <h3 class="card-title">List Holidays</h3>
+            <h3 class="card-title">Holiday List</h3>
         </div>
         <div class="card-body">
             <a href="{{ route('holidays.create') }}" class="btn btn-block btn-info">
                 <i class="fa fa-plus"></i>
-                New Holiday
+                Create Holiday
             </a>
             <div class="table-responsive">
-                <table id="example" class="table table-striped table-bordered text-nowrap w-100">
+                <table id="example" class="table table-striped table-bordered text-nowrap w-100 leave_request_table">
                     <thead>
                         <tr>
                             <th class="wd-15p">SL.NO</th>
@@ -111,46 +111,48 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-    function deleteData(dataId) {
-        swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('holidays.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            console.log(response.success);
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response.success == true) {
-                                
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                                   // Reload the page after a successful delete
-                        window.location.reload();
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the holiday.');
-                        },
-                    });
-                } else {
-                    return;
-                }
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('holidays.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    console.log(response.success);
+                    // Handle the success response
+                    if (response.success == true) {
+                        // Display a success message using sweetalert
+                        swal("Success", response.message, "success");
+
+                        // Remove the row from the table
+                        $("#dataRow_" + dataId).remove();
+                    } else {
+                        // Display an error message using sweetalert
+                        swal("Error", "An error occurred! Please try again later.", "error");
+                    }
+                },
+                error: function() {
+                    // Display an error message using sweetalert
+                    swal("Error", "An error occurred while deleting the data.", "error");
+                },
             });
-    }
+        } else {
+            return;
+        }
+    });
+}
 </script>

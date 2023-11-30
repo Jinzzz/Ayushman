@@ -53,23 +53,24 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="custom-switch">
-                                            <input type="checkbox" id="is_active" name="status" onchange="toggleStatus(this)"
-                                                 class="custom-switch-input" @if($masters->status) checked @endif>
-                                            <span id="statusLabel" class="custom-switch-indicator"></span>
-                                            <span id="statusText" class="custom-switch-description">
-                                                @if($masters->status)
-                                                    Active
-                                                @else
-                                                    Inactive
-                                                @endif
-                                            </span>
-                                        </label>
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="custom-switch">
+                                        <input type="checkbox" id="status" name="status" onchange="toggleStatus(this)"
+                                            class="custom-switch-input" @if($masters->status) checked @endif>
+                                        <span id="statusLabel" class="custom-switch-indicator"></span>
+                                        <span id="statusText" class="custom-switch-description">
+                                            @if($masters->status)
+                                            Active
+                                            @else
+                                               Inactive
+                                            @endif
+                                        </span>
+                                    </label>
                                 </div>
                             </div>
+                        </div>
+
 
                             <div class="row">
                                 <div class="col-md-3">
@@ -117,14 +118,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
     <script type="text/javascript">
-        function toggleStatus(checkbox) {
-            if (checkbox.checked) {
-                $("#statusText").text('Active');
-                $("input[name=status]").val(1); // Set the value to 1 when checked (Active)
-            } else {
-                $("#statusText").text('Inactive');
-                $("input[name=status]").val(0); // Set the value to 0 when unchecked (Inactive)
-            }
+    function toggleStatus(checkbox) {
+        if (checkbox.checked) {
+            // If the checkbox is checked, set the text to 'Active' and the hidden input value to 1
+            $("#statusText").text('Active');
+            $("input[name=status]").val(1); // Set the value to 1 when checked (Active)
+        } else {
+            // If the checkbox is unchecked, set the text to 'Inactive' and the hidden input value to 0
+            $("#statusText").text('Inactive');
+            $("input[name=status]").val(0); // Set the value to 0 when unchecked (Inactive)
         }
-    </script>
+    }
+</script>
+
 @endsection

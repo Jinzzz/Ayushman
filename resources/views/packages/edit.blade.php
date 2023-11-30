@@ -37,7 +37,7 @@
                 <div class="form-group">
                     <label class="form-label">Salary Head Type</label>
                     <input type="text" class="form-control" name="salary_head_type_id" id="salary_head_type" value="{{ $packages->salary_head_type }}" readonly>
-                    <input type="hidden" name="selected_salary_head_type_id" id="selected_salary_head_type_id" value="{{ $packages->selected_salary_head_type_id ?? '' }}">
+                    <input type="hidden" name="selected_salary_head_type_id" id="selected_salary_head_type_id" value="{{ $packages->salary_head_type_id ?? '' }}">
                 </div>
             </div>
         </div>
@@ -64,10 +64,18 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="custom-switch">
-                    <input type="checkbox" id="is_active" name="status" onchange="toggleStatus(this)" class="custom-switch-input" @if($packages->status) checked @endif> <span id="statusLabel" class="custom-switch-indicator"></span>
-                    <span id="statusText" class="custom-switch-description"> @if($packages->status) Active @else Inactive @endif </span>
-                  </label>
+                <label class="custom-switch">
+                                        <input type="checkbox" id="status" name="status" onchange="toggleStatus(this)"
+                                            class="custom-switch-input" @if($packages->status) checked @endif>
+                                        <span id="statusLabel" class="custom-switch-indicator"></span>
+                                        <span id="statusText" class="custom-switch-description">
+                                            @if($packages->status)
+                                                Active
+                                            @else
+                                               Inactive
+                                            @endif
+                                        </span>
+                                    </label>
                 </div>
               </div>
             </div>
@@ -85,7 +93,7 @@
                   <center>
                     <button type="submit" class="btn btn-raised btn-primary">
                       <i class="fa fa-check-square-o"></i> Update </button>
-                    <button type="reset" class="btn btn-raised btn-success"> Reset </button>
+                      <a class="btn btn-success" href="{{ route('packages.index') }}">Reset</a>
                     <a class="btn btn-danger" href="{{ route('packages.index') }}">Cancel</a>
                   </center>
                 </div>
