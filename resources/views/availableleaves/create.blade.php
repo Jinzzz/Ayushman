@@ -19,7 +19,7 @@
                 </ul>
               </div>
             @endif
-            <form action="{{ route('availableleaves.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('availableleaves.store') }}" id="addFm" method="POST" enctype="multipart/form-data">
               @csrf 
               <div class="row">
                 <div class="col-md-6">
@@ -49,7 +49,7 @@
               <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="form-label">Remark</label>
+                                    <label class="form-label">Remark*</label>
                                     <textarea class="form-control" name="remark" placeholder="Remark">{{ old('remark') }}</textarea>
 
                                 </div>
@@ -58,7 +58,7 @@
              </br></br>
               <div class="form-group">
                 <center>
-                  <button type="submit" class="btn btn-raised btn-primary">
+                  <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                     <i class="fa fa-check-square-o"></i> Add
                   </button>
                   <button type="reset" class="btn btn-raised btn-success"> Reset </button>
@@ -74,5 +74,43 @@
 @endsection
 
 @section('js')
-  <!-- Your JavaScript code here if needed -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script>
+        var validator; // Declare validator outside $(document).ready()
+
+        $(document).ready(function () {
+            validator = $("#addFm").validate({
+                rules: {
+                  staff_id: "required",
+                  total_leaves: "required",
+                  remark: "required",
+                },
+                messages: {
+                    staff_id: "Please select employee.",
+                    total_leaves: "Please enter total leaves.",
+                    remark: "Please enter remark.",
+                },
+                submitHandler: function (form) {
+                    // Your form submission logic here
+                    form.submit();
+                },
+            });
+
+            $(document).on('click', '#submitForm', function () {
+                if (validator.form()) {
+                    $('#addFm').submit();
+                } else {
+                    flashMessage('w', 'Please fill all mandatory fields');
+                }
+            });
+
+            function flashMessage(type, message) {
+                // Implement or replace this function based on your needs
+                console.log(type, message);
+            }
+        });
+    </script>
 @endsection
