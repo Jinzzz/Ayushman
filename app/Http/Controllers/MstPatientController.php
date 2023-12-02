@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Mail;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use App\Models\Mst_Membership;
@@ -20,7 +20,7 @@ use App\Models\Trn_Patient_Device_Tocken;
 use App\Models\Trn_Patient_Wellness_Sessions;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-
+use App\Mail\PatientEmail;
 class MstPatientController extends Controller
 {
     public function index(Request $request)
@@ -63,29 +63,17 @@ class MstPatientController extends Controller
         $request->validate([
 
             'patient_name' => 'required',
-            // 'patient_email' => 'required',
+            'patient_email' => 'required',
             'patient_mobile' => 'required|digits:10|numeric',
-            // 'patient_address' => 'required',
-            // 'patient_gender' => 'required',
-            // 'patient_dob' => 'required', 
-            // 'patient_blood_group_id' => 'required',
-            // 'emergency_contact_person' => 'required',
-            // 'emergency_contact' => 'required',
             'marital_status' => 'required',
             'patient_medical_history' => 'required',
             'patient_current_medications' => 'required',
             'patient_registration_type' => 'required',
-            // 'is_otp_verified' => 'required',
-            // 'is_approved' => 'required',
-            // 'password' => 'required',
-            // 'confirm_password' => 'required|same:password',
-            // 'whatsapp_number' => 'required',
-            // 'available_membership' => 'required',
             'is_active' => 'required',
         ]);
         $is_active = $request->input('is_active') ? 1 : 0;
         $available_membership = $request->has('available_membership') ? 1 : 0;
-        $generatedPassword = Str::random(8);
+        $generatedPassword = Str::random(6);
 
         $lastInsertedId = Mst_Patient::insertGetId([
 
@@ -112,13 +100,18 @@ class MstPatientController extends Controller
             'created_by' => Auth::id(),
         ]);
 
+        $email = $request->patient_email;
+        $phone  = $request->patient_mobile;
+        $password = $generatedPassword;
+
         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
         $patientCode = 'PAT' . $leadingZeros . $lastInsertedId;
 
         Mst_Patient::where('id', $lastInsertedId)->update([
             'patient_code' => $patientCode
         ]);
-
+        
+        Mail::to($email)->send(new PatientEmail($phone, $password));
 
         return redirect()->route('patients.index')->with('success', 'Patient added successfully');
     }
