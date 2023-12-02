@@ -68,13 +68,14 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Reason</label>
-                        <input type="text" class="form-control" readonly name="reason" value="{{$show->reason}}" placeholder="Reason">
+                        <textarea class="form-control" name="reason" placeholder="Reason For Leave" readonly>{{ old('reason', $show->reason) }}</textarea>
+
                      </div>
                   </div>
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Leave Type</label>
-                        <input type="text" class="form-control" readonly name="leave_type" value="{{$show->leave_type_name;}}" placeholder="Leave Type">
+                        <input type="text" class="form-control" readonly name="leave_type" value="{{$show->leave_type_name}}" placeholder="Leave Type">
                      </div>
                   </div>
                </div>

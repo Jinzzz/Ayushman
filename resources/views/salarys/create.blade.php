@@ -25,7 +25,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label branch" id="branchLabel">Salary Head*</label>
+                                    <label class="form-label branch" id="branchLabel">Salary Head Name*</label>
                                     <input type="text" class="form-control" name="salary_head_name" id="salary_head_name" value="{{ old('salary_head_name') }}" placeholder="Salary Head Name">
                                 </div>
                             </div>
@@ -55,6 +55,15 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="form-label">Remark*</label>
+                                    <textarea class="form-control" name="remark" placeholder="Remark">{{ old('remark') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="form-label">Status*</div>
@@ -65,15 +74,6 @@
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
                                         <span id="statusText" class="custom-switch-description">Active</span>
                                     </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label class="form-label">Remark*</label>
-                                    <textarea class="form-control" name="remark" placeholder="Remark">{{ old('remark') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -125,8 +125,8 @@
                     remark: "required",
                 },
                 messages: {
-                    salary_head_name: "Please enter salary head name.",
-                    salary_head_type: "Please enter salary head type.",
+                    salary_head_name: "Please select a salary head name.",
+                    salary_head_type: "Please select a salary head type.",
                     status: "Please enter status.",
                     remark: "Please enter remark.",
                 },

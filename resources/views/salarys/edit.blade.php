@@ -29,7 +29,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Salary Head Name</label>
+                                        <label class="form-label">Salary Head Name*</label>
                                         <input type="text" class="form-control" name="salary_head_name"
                                             value="{{ $masters->salary_head_name }}" placeholder="Staff Name">
                                     </div>
@@ -39,7 +39,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Salary Head Type</label>
+                                        <label class="form-label">Salary Head Type*</label>
                                         <select class="form-control" name="salary_head_type" id="salary_head_type">
                                         <option value="" disabled selected>Choose Salary Head Type</option>
                                             @foreach($branchs as $lt)
@@ -55,7 +55,7 @@
                             <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="custom-switch">
+                                    <label class="custom-switch">Status*
                                         <input type="checkbox" id="status" name="status" onchange="toggleStatus(this)"
                                             class="custom-switch-input" @if($masters->status) checked @endif>
                                         <span id="statusLabel" class="custom-switch-indicator"></span>
@@ -85,7 +85,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Remarks</label>
+                                        <label class="form-label">Remarks*</label>
                                         <textarea class="form-control" name="remark" placeholder="Reason For Leave">{{ $masters->remark ?? old('remark') }}</textarea>
                                     </div>
                                 </div>

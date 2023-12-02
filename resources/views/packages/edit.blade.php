@@ -12,7 +12,7 @@
           </div> @endif <form action="{{ route('packages.update', ['id' => $id]) }}" method="POST" enctype="multipart/form-data"> @csrf @method('PUT') <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-label">Package Name</label>
+                  <label class="form-label">Package Name*</label>
                   <input type="text" class="form-control" name="package_name" value="{{ $packages->package_name }}" placeholder="Staff Name">
                 </div>
               </div>
@@ -20,7 +20,7 @@
             <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="form-label">Salary Head Name</label>
+                    <label class="form-label">Salary Head Name*</label>
                     <select class="form-control" name="salary_head_id" id="salary_head_id">
                         <option value="" disabled selected>Choose Salary Head Type</option>
                         @foreach($heads as $head)
@@ -35,7 +35,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="form-label">Salary Head Type</label>
+                    <label class="form-label">Salary Head Type*</label>
                     <input type="text" class="form-control" name="salary_head_type_id" id="salary_head_type" value="{{ $packages->salary_head_type }}" readonly>
                     <input type="hidden" name="selected_salary_head_type_id" id="selected_salary_head_type_id" value="{{ $packages->salary_head_type_id ?? '' }}">
                 </div>
@@ -44,7 +44,7 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-label">Package Amount Type</label>
+                  <label class="form-label">Package Amount Type*</label>
                   <select class="form-control" name="package_amount_type" id="package_amount_type">
                     <option value="" disabled>Choose Amount Type</option>
                     <option value="Amount" {{ $packages->package_amount_type === 'Amount' ? 'selected' : '' }}>Amount</option>
@@ -64,6 +64,7 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
+                <div class="form-label">Status*</div> 
                 <label class="custom-switch">
                                         <input type="checkbox" id="status" name="status" onchange="toggleStatus(this)"
                                             class="custom-switch-input" @if($packages->status) checked @endif>
@@ -82,7 +83,7 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
-                  <label class="form-label">Remarks</label>
+                  <label class="form-label">Remarks*</label>
                   <textarea class="form-control" name="remark" placeholder="Reason For Leave">{{ $packages->remark ?? old('remark') }}</textarea>
                 </div>
               </div>

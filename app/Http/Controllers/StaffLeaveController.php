@@ -177,6 +177,7 @@ class StaffLeaveController extends Controller
             ->orderBy('staff_leave.updated_at', 'desc')
             ->first();
             $total_leaves = EmployeeAvailableLeave::where('staff_id', $leave_request->staff_id)->value('total_leaves');
+    
             $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
             return view('staffleave.edit', compact('pageTitle', 'leave_request','leave_types','total_leaves'));
         } catch (QueryException $e) {
@@ -263,6 +264,7 @@ class StaffLeaveController extends Controller
 
     public function getTotalLeaves(Request $request, $staffId)
     {
+      
         // Fetch the total leaves for the given staffId from the database
         $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
 

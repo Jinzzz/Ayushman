@@ -58,6 +58,7 @@ class SalaryHeadController extends Controller
      */
     public function store(Request $request)
     {
+       
         // Validate the request data
         $request->validate([
             'salary_head_name' => 'required|string|max:255',
@@ -87,6 +88,7 @@ class SalaryHeadController extends Controller
             'status' => $is_status,
             'remark' => $request->input('remark'),
             'company' => $request->input('company'),
+            'salary_head_type' => $request->input('salary_head_type'),
         ]);
     
         // Redirect to a specific route or page after successful creation
@@ -103,7 +105,7 @@ class SalaryHeadController extends Controller
      */
     public function show($id)
     {
-        $pageTitle = "View Admin Head";
+        $pageTitle = "View Salary Head";
         $show = Salary_Head_Master::join('salary_head_types', 'salary_head_masters.salary_head_type', '=', 'salary_head_types.id')
 
         ->select('salary_head_masters.*', 'salary_head_types.salary_head_type')

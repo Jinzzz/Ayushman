@@ -73,7 +73,7 @@ class HolidayController extends Controller
             'holiday_name' => 'required',
             'from_date' => 'required|date|date_format:Y-m-d',
             'to_date' => 'required|date|date_format:Y-m-d|after_or_equal:from_date',
-            'year' => 'required|numeric|digits:4|min:1999',
+            'year' => 'required|numeric|digits:4',
             'leave_type' => 'required', 
             'company' => 'required',
         ], [

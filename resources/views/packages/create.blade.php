@@ -37,20 +37,7 @@
                 </div> 
               </div> 
             </div> 
-            <div class="row"> 
-              <div class="col-md-6"> 
-                <div class="form-group"> 
-                  <div class="form-label">Status*</div> 
-                  <label class="custom-switch"> 
-                    <input type="hidden" name="status" value="0"> 
-                    <!-- Default value for Inactive --> 
-                    <input type="checkbox" id="statusSwitch" name="status" onchange="toggleStatus(this)" class="custom-switch-input" checked> 
-                    <span id="statusLabel" class="custom-switch-indicator"></span> 
-                    <span id="statusText" class="custom-switch-description">Active</span> 
-                  </label> 
-                </div> 
-              </div> 
-            </div> 
+
             <div class="row"> 
               <div class="col-md-6"> 
                 <div class="form-group"> 
@@ -98,6 +85,21 @@
                 <div class="form-group"> 
                   <label class="form-label">Remark*</label> 
                   <textarea class="form-control" name="remark" placeholder="Remark">{{ old('remark') }}</textarea> 
+                </div> 
+              </div> 
+            </div> 
+
+            <div class="row"> 
+              <div class="col-md-6"> 
+                <div class="form-group"> 
+                  <div class="form-label">Status*</div> 
+                  <label class="custom-switch"> 
+                    <input type="hidden" name="status" value="0"> 
+                    <!-- Default value for Inactive --> 
+                    <input type="checkbox" id="statusSwitch" name="status" onchange="toggleStatus(this)" class="custom-switch-input" checked> 
+                    <span id="statusLabel" class="custom-switch-indicator"></span> 
+                    <span id="statusText" class="custom-switch-description">Active</span> 
+                  </label> 
                 </div> 
               </div> 
             </div> 
@@ -214,8 +216,8 @@
         remark: "required", 
       }, 
       messages: { 
-        package_name: "Please enter package Name.", 
-        salary_head_id: "Please enter salary Head id.", 
+        package_name: "Please select a package Name.", 
+        salary_head_id: "Please select a salary Head .", 
         status: "Please enter status.", 
         salary_head_type_id: "Please enter salary head type id.", 
         package_amount_type: "Please enter package amount type.", 

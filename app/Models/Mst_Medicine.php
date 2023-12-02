@@ -12,6 +12,7 @@ class Mst_Medicine extends Model
 
 
     protected $fillable = [
+        'medicine_code',
         'medicine_name',
         'generic_name',
         'item_type',

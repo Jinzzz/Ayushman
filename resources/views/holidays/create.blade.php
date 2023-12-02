@@ -65,7 +65,7 @@
                         <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Year*</label>
-                                    <input type="number" class="form-control" name="year" id="year" pattern="\d{4}" placeholder="Enter a valid year (four digits)" value="{{ old('year') }}">
+                                    <input type="number" class="form-control" name="year" id="year" placeholder="YYYY" maxlength="4"value="{{ old('year') }}">
                                     <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                 </div>
                             </div> 
@@ -170,14 +170,18 @@
                     leave_type: "required",
                     from_date: "required",
                     to_date: "required",
-                    year: "required",
-                },
+                    year: {
+    required: true,
+    digits: true,
+    min: new Date().getFullYear()
+},
+                    },
                 messages: {
                     holiday_name: "Please enter holiday name.",
                     leave_type: "Please select leave type.",
-                    from_date: "Please enter from_date.",
-                    to_date: "Please enter todate.",
-                    year: "Please enter year.",
+                    from_date: "Please enter from date.",
+                    to_date: "Please enter to date.",
+                    year: "Please enter a valid year.",
                 },
                 submitHandler: function (form) {
                     // Your form submission logic here

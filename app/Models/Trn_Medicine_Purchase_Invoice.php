@@ -26,6 +26,7 @@ class Trn_Medicine_Purchase_Invoice extends Model
         'total_tax',
         'round_off',
         'total_amount',
+        'is_paid',
         'paid_amount',
         'payment_mode',
         'deposit_to',

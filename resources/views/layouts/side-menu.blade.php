@@ -220,6 +220,9 @@
         <span class="side-menu__label"> {{ __('Inventory') }}</span><i class="angle fa fa-angle-right"></i>
       </a>
       <ul class="slide-menu">
+      <li><a class="slide-item" href="{{ url('/medicine-purchase-invoice/index')}}">{{ __('Medicine Purchase Invoice') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/medicine-purchase-return/index')}}">{{ __('Medicine Purchase Return') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/medicine-stock-updation/index')}}">{{ __('Medicine Stock Updation') }}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine-sales-invoices') }}">{{__('Medicine Sales Invoice')}}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine-sales-return') }}">{{__('Medicine Sales Return')}}</a></li>
     </li>

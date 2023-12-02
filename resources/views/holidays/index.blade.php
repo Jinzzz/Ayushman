@@ -110,6 +110,8 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10"></link>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 function deleteData(dataId) {
     swal({
@@ -132,27 +134,33 @@ function deleteData(dataId) {
                     _token: "{{ csrf_token() }}",
                 },
                 success: function(response) {
-                    console.log(response.success);
-                    // Handle the success response
-                    if (response.success == true) {
-                        // Display a success message using sweetalert
-                        swal("Success", response.message, "success");
-
-                        // Remove the row from the table
-                        $("#dataRow_" + dataId).remove();
-                    } else {
-                        // Display an error message using sweetalert
-                        swal("Error", "An error occurred! Please try again later.", "error");
-                    }
+                    handleDeleteResponse(response, dataId);
                 },
                 error: function() {
                     // Display an error message using sweetalert
                     swal("Error", "An error occurred while deleting the data.", "error");
                 },
             });
-        } else {
-            return;
         }
     });
 }
+
+function handleDeleteResponse(response, dataId) {
+    console.log(response.success);
+    // Handle the success response
+    if (response.success) {
+        // Display a success message using sweetalert
+        swal("Success", response.message, "success");
+
+        // Remove the row from the table
+        $("#dataRow_" + dataId).remove();
+    } else {
+        // Display an error message using sweetalert
+        swal("Error", "An error occurred! Please try again later.", "error");
+    }
+}
+
+setTimeout(function(){
+            $('.alert-success').fadeOut('slow');
+        }, 2000); // 5000 milliseconds = 3 seconds
 </script>

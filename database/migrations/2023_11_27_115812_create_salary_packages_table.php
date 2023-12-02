@@ -24,7 +24,8 @@ class CreateSalaryPackagesTable extends Migration
             $table->string('package_amount_type');
             $table->string('package_amount_value');
             $table->timestamps();
-            $table->softDeletes();
+            
+            
         });
     }
 

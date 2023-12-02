@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h3 class="mb-0 card-title">View Employee Available Details</h3>
+          <h3 class="mb-0 card-title">View Employee Leave Details</h3>
         </div>
         <div class="col-lg-12" style="background-color: #fff;"> @if ($errors->any()) <div class="alert alert-danger">
             <strong>Whoops!</strong> There were some problems with your input. <br>

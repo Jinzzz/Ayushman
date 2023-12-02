@@ -6,8 +6,9 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="mb-0 card-title">View Leave Details</h3>
+                        <h3 class="mb-0 card-title">View Salary Head Details</h3></br></br>
                     </div>
+
                     <div class="col-lg-12" style="background-color: #fff;">
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -39,27 +40,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                            <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="custom-switch">
-                                        <input type="checkbox" id="is_active" name="is_active" @if($show->status) checked @endif disabled class="custom-switch-input">
-                                        <span class="custom-switch-indicator"></span>
-                                        <span class="custom-switch-description">
-                                            @if($show->status)
-                                                Active
-                                            @else
-                                                Inactive
-                                            @endif
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
                         
 
                         <div class="row">
@@ -73,11 +53,27 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Remarks</label>
-                                    <input type="text" class="form-control" readonly name="remark"
-                                        value="{{ $show->remark }}">
+                                    <textarea class="form-control" name="remark" placeholder="Reason For Leave" readonly>{{ $show->reason ?? old('reason') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="custom-switch">
+                                        <input type="checkbox" id="is_active" readonly name="is_active" @if($show->status) checked @endif disabled class="custom-switch-input">
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">
+                                            @if($show->status)
+                                                Active
+                                            @else
+                                                Inactive
+                                            @endif
+                                        </span>
+                                    </label>
                                 </div>
                             </div>
                         </div>

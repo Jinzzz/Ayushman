@@ -52,15 +52,23 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="custom-switch">
-                  <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" readonly class="custom-switch-input" @if($show->status) checked @endif> <span id="statusLabel" class="custom-switch-indicator"></span>
-                  <span id="statusText" class="custom-switch-description"> @if($show->status) Active @else Inactive @endif </span>
-                </label>
-              </div>
-            </div>
-          </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="custom-switch">
+                                        <input type="checkbox" id="is_active" readonly name="is_active" @if($show->status) checked @endif disabled class="custom-switch-input">
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">
+                                            @if($show->status)
+                                                Active
+                                            @else
+                                                Inactive
+                                            @endif
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
           <div class="row">
             <div class="col-md-12">
               <div class="form-group">
@@ -84,14 +92,4 @@
   </div>
 </div> @endsection @section('js') <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-<script type="text/javascript">
-  function toggleStatus(checkbox) {
-    if (checkbox.checked) {
-      $("#statusText").text('Active');
-      $("input[name=status]").val(1); // Set the value to 1 when checked (Active)
-    } else {
-      $("#statusText").text('Inactive');
-      $("input[name=status]").val(0); // Set the value to 0 when unchecked (Inactive)
-    }
-  }
-</script> @endsection
+ @endsection

@@ -70,8 +70,8 @@
                             <div class="row" style="display: none;" id="totalDaysContainer">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label">Total Days*</label>
-                                        <input type="text" class="form-control" value="{{ old('days') }}" name="total_days" id="total_days" placeholder="No Of Days" readonly>
+                                        <label class="form-label">Available Leaves*</label>
+                                        <input type="number" class="form-control" value="{{ old('days') }}" name="total_days" id="total_days" placeholder="No Of Days" readonly>
                                         <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
                                     </div>
                                 </div>
@@ -163,12 +163,16 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script> 
 
 <script type="text/javascript">
 $(document).ready(function () {
-    // Hide the staff_id div on page load
+    // Hide the staff_id div and totalDaysContainer on page load
     $('#staff_id').closest('.row').hide();
+    $('#totalDaysContainer').hide();
     $('.no-staff-message').hide();
+
+    // Other existing code
 
     // Handle change event on branch select
     $('#branch_id').change(function () {
@@ -198,10 +202,14 @@ $(document).ready(function () {
                             // Append the option to the staff select
                             $('#staff_id').append(option);
                         });
-                        // Show the staff_id div when staff options are available
+                        // Show the staff_id div and totalDaysContainer when staff options are available
                         $('#staff_id').closest('.row').show();
+                        $('#totalDaysContainer').show();
                     } else {
                         $('.no-staff-message').show();
+                        // If no staff members, hide the staff_id div and totalDaysContainer
+                        $('#staff_id').closest('.row').hide();
+                        $('#totalDaysContainer').hide();
                     }
                 },
                 error: function (error) {
@@ -209,11 +217,15 @@ $(document).ready(function () {
                 }
             });
         } else {
-            // If no branch is selected, hide the staff_id div
+            // If no branch is selected, hide the staff_id div and totalDaysContainer
             $('#staff_id').closest('.row').hide();
+            $('#totalDaysContainer').hide();
         }
     });
+
+    // Other existing code
 });
+
 
 
         // Handle change event on From Date and To Date inputs
@@ -241,21 +253,25 @@ $(document).ready(function () {
 
         // Handle change event on staff select
         $('#staff_id').change(function () {
-            var staffId = $(this).val();
+    var staffId = $(this).val();
 
-            // Make an AJAX request to get the total leaves for the selected staff
-            $.ajax({
-                type: 'GET',
-                url: '{{ route("get-total-leaves", ["staffId" => ":staffId"]) }}'.replace(':staffId', staffId),
-                success: function (data) {
-                    // Update the total days input with received data
-                    $('#total_days').val(data.total_leaves);
-                },
-                error: function (error) {
-                    console.error(error);
-                }
-            });
-        });
+    // Make an AJAX request to get the total leaves for the selected staff
+    $.ajax({
+        type: 'GET',
+        url: '{{ route("get-total-leaves", ["staffId" => ":staffId"]) }}'.replace(':staffId', staffId),
+        success: function (data) {
+            // Update the total days input with received data
+            $('#total_days').val(data.total_leaves);
+        },
+        error: function (error) {
+            console.error(error);
+        }
+    });
+});
+
+        // Handle change event on staff select
+
+
 
         // Function to calculate the difference in days
         function calculateDifferenceInDays(startDate, endDate, startDay, endDay) {
@@ -266,6 +282,7 @@ $(document).ready(function () {
             // Adjust the difference based on start and end days
             if(startDay === 'First Half' && endDay === 'First Half' || endDay === 'Second Half'){
                 differenceInDays -= 0.5;
+                
             }if(startDay === 'Second Half' && endDay === 'First Half' || endDay === 'Second Half'){
                 differenceInDays -= 0.5;
             }

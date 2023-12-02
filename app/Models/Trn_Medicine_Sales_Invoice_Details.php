@@ -24,6 +24,8 @@ class Trn_Medicine_Sales_Invoice_Details extends Model
         'med_quantity_tax_amount',
     ];
 
+    protected $dates = ['created_at'];
+
     public function Unit()
     {
         return $this->belongsTo(Mst_Unit::class, 'medicine_unit_id');

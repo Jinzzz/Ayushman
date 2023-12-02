@@ -89,62 +89,64 @@
   <!-- SECTION WRAPPER -->
 </div>
 </div></div>
-<!-- ROW-1 CLOSED --> @endsection
- <script>
-  function deleteData(dataId) {
-    swal({
-      title: "Delete selected data?",
-      text: "Are you sure you want to delete this data",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-      closeOnConfirm: true,
-      closeOnCancel: true
-    }, function(isConfirm) {
-      if (isConfirm) {
-        $.ajax({
-          url: "{{ route('packages.destroy', '') }}/" + dataId,
-          type: "DELETE",
-          data: {
-            _token: "{{ csrf_token() }}",
-          },
-          success: function(response) {
-            console.log(response.success);
-            // Handle the success response, e.g., remove the row from the table
-            if (response.success == true) {
-              $("#dataRow_" + dataId).remove();
-              flashMessage('s', 'Data deleted successfully');
-              // Reload the page after a successful delete
-              window.location.reload();
+<!-- ROW-1 CLOSED -->
+@endsection
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        function deleteData(dataId) {
+            swal({
+                title: "Delete selected data?",
+                text: "Are you sure you want to delete this data?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('packages.destroy', '') }}/" + dataId,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function (response) {
+                            handleDeleteResponse(response, dataId);
+                        },
+                        error: function () {
+                            // Display an error message using sweetalert
+                            swal("Error", "An error occurred while deleting the data.", "error");
+                        },
+                    });
+                }
+            });
+        }
+
+        function handleDeleteResponse(response, dataId) {
+            if (response.success) {
+                // Display a success message using sweetalert
+                swal("Success", response.message, "success");
+
+                // Remove the row from the table
+                $("#dataRow_" + dataId).remove();
             } else {
-              flashMessage('e', 'An error occured! Please try again later.');
+                // Display an error message using sweetalert
+                swal("Error", response.message || "An error occurred! Please try again later.", "error");
             }
-          },
-          error: function() {
-            alert('An error occurred while deleting the Package.');
-          },
+        }
+
+        $(document).ready(function () {
+            // Add any additional scripts or functions you may need
+            // ...
+
+            // Optional: Auto-hide success message after 2 seconds
+            setTimeout(function () {
+                $('.alert-success').fadeOut('slow');
+            }, 2000);
         });
-      } else {
-        return;
-      }
-    });
-  }
-</script>
-<!-- Include this script for flash messages -->
-<script>
-  function flashMessage(type, message) {
-    var alertClass = type === 's' ? 'alert-success' : 'alert-danger';
-    var flashContainer = $('<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert">' + message +
-      '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-
-    // Append the flash message container to the body
-    $('body').append(flashContainer);
-
-    // Automatically remove the flash message after 5 seconds
-    setTimeout(function () {
-      flashContainer.alert('close');
-    }, 5000);
-  }
-</script>
+    </script>

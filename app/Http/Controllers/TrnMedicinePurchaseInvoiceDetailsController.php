@@ -41,7 +41,7 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
         {
             $product->medicine_id=AdminHelper::getProductId($product->medicine_code);
         }
-        $suppliers = Mst_Supplier::select('supplier_name', 'supplier_id','credit_period')->get();
+        $suppliers = Mst_Supplier::select('supplier_name','supplier_id','credit_period')->get();
         $branch = Mst_Branch::pluck('branch_name', 'branch_id');
         $medicines = Mst_Medicine::pluck('medicine_name', 'id');
         $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');
@@ -74,6 +74,32 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
 
         return response()->json(['unit_id' => $unitId]);
     }
+
+    public function getCreditDetails(Request $request, $supplierId)
+    {
+        // Calculate Total Amount Due
+        $totalAmountDue = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
+            ->where('is_paid', 0) // Unpaid invoices
+            ->sum('total_amount');
+
+        // Calculate Total Amount Paid
+        $totalAmountPaid = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
+            ->where('is_paid', 1) // Paid invoices
+            ->sum('paid_amount');
+
+        // Calculate Current Credit
+        $currentCredit = $totalAmountDue - $totalAmountPaid;
+
+        // Retrieve credit limit from the database
+        $creditLimit = Mst_Supplier::where('supplier_id', $supplierId)->value('credit_limit');
+
+        return response()->json([
+            'creditLimit' => $creditLimit,
+            'currentCredit' => $currentCredit,
+        ]);
+    }
+
+
   
     
 
@@ -86,6 +112,8 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             'invoice_date' => 'required',
             'branch_id' => 'required',
             'due_date' => 'required',
+            // 'credit_limit' => 'required',
+            // 'current_credit' => 'required',
             'sub_total' => 'required',
             'item_wise_discount' => 'required',
             'bill_discount' => 'required',
@@ -97,6 +125,27 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             'deposit_to' => 'required',
             'reference_code' => 'required',
         ]);
+
+        $is_paid = $request->input('is_paid') ? 1 : 0;
+
+
+
+        $supplierId = $request->input('supplier_id');
+         // Calculate Total Amount Due
+         $totalAmountDue = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
+         ->where('is_paid', 0) // Unpaid invoices
+         ->sum('total_amount');
+
+        // Calculate Total Amount Paid
+         $totalAmountPaid = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
+        ->where('is_paid', 1) // Paid invoices
+        ->sum('paid_amount');
+
+       // Calculate Current Credit
+       $currentCredit = $totalAmountDue - $totalAmountPaid;
+
+       $creditLimit = Mst_Supplier::where('supplier_id', $supplierId)->value('credit_limit');
+
     
         // Begin a database transaction
         DB::beginTransaction();
@@ -113,8 +162,8 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             $invoice->invoice_date = $request->invoice_date;
             $invoice->branch_id = $request->branch_id;
             $invoice->due_date = $request->due_date;
-            $invoice->credit_limit = $request->credit_limit;
-            $invoice->current_credit = $request->current_credit;
+            $invoice->credit_limit =  $creditLimit;
+            $invoice->current_credit = $currentCredit;
             $invoice->sub_total = $request->sub_total;
             $invoice->item_wise_discount = $request->item_wise_discount;
             $invoice->bill_discount = $request->bill_discount;
@@ -125,7 +174,8 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             $invoice->payment_mode = $request->payment_mode;
             $invoice->deposit_to = $request->deposit_to;
             $invoice->reference_code = $request->reference_code;
-            $invoice->created_by = Auth::id(); // You may adjust the user ID as needed
+            $invoice->is_paid = $is_paid;
+            $invoice->created_by = 1; // You may adjust the user ID as needed
             $invoice->save();
     
             // Get the ID of the saved invoice
@@ -169,9 +219,13 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
                         $stock->purchase_rate = $request->input('rate')[$key];
                         $stock->purchase_unit_id = $request->input('unit_id')[$key]; // Adjust as needed
                         $stock->opening_stock = 0; // Set the initial opening stock as needed
+                        $stock->old_stock = 0;
                         $stock->current_stock = 0; // Set the initial current stock as needed
-                        // $stock->quantity = 0; // Set the initial quantity as needed
+                     
                         $stock->save();
+
+                        $stock->stock_code = 'STK' . str_pad($stock->stock_id, 5, '0', STR_PAD_LEFT);
+                        $stock->save(); 
                     }
     
                     //Update the stock quantity
@@ -188,14 +242,13 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
 
                     // Perform ledger posting
                     $ledgerEntry = new Trn_Ledger_Posting();
-                    $ledgerEntry->posting_date = now(); // You may adjust the posting date based on your business logic
-                    $ledgerEntry->account_ledger_id = $request->supplier_id; // Adjust as needed
+                    $ledgerEntry->posting_date = now(); 
+                    $ledgerEntry->account_ledger_id = $request->supplier_id; 
                     $ledgerEntry->branch_id = $request->branch_id;
-                    $ledgerEntry->transaction_amount = $request->total_amount; // You may need to calculate the actual amount based on your business logic
-                    $ledgerEntry->narration = 'Purchase Invoice Payment'; // You may adjust the narration based on your business logic
-            
-                    // Determine whether it's a debit or credit entry based on your business logic
-                    // In this example, I assumed it's a credit entry for supplier payment
+                    $ledgerEntry->transaction_amount = $request->total_amount;
+                    $ledgerEntry->narration = 'Purchase Invoice Payment'; 
+                  
+                
                     $ledgerEntry->debit = 0;
                     $ledgerEntry->credit = $request->total_amount;
             
@@ -209,7 +262,7 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             // Redirect or respond as needed
             return redirect('/medicine-purchase-invoice/index')->with('success', 'Invoice saved successfully');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            
             // An error occurred, rollback the transaction
             DB::rollback();
     
@@ -220,23 +273,20 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
 
     public function getLedgerNames(Request $request)
     {
-        // Retrieve the selected payment mode from the request
+       
         $paymentMode = $request->input('payment_mode');
-   
         // Set the default sub group id to 44 (for 'Card' and 'Bank')
         $subGroupId = 45;
-    
-        // If the payment mode is 'Cash', set the sub group id to 45
+     
         if ($paymentMode == '122') {
             $subGroupId = 45;
         } elseif ($paymentMode == '123' || $paymentMode == '124') {
-            // If the payment mode is 'Card' or 'Bank', set the sub group id to 44
+         
             $subGroupId = 44;
         }
     
-        // Perform a query to fetch ledger names based on the selected payment mode
         $ledgerNames = Mst_Account_Ledger::where('account_sub_group_id', $subGroupId)
-            ->pluck('ledger_name', 'id');
+            ->pluck('ledger_name','id');
     
         return response()->json($ledgerNames);
     }
@@ -246,6 +296,7 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
     {
         $pageTitle = "Edit Purchase Invoice";
         $medicinePurchaseInvoice = Trn_Medicine_Purchase_Invoice::findOrFail($id);
+        // dd( $medicinePurchaseInvoice);
         $products = Mst_Medicine::get();
         foreach($products as $product)
         {

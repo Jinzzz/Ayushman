@@ -36,10 +36,11 @@ use App\Http\Controllers\AccountLedgerController;
 use App\Http\Controllers\EmployeeBranchTransferController;
 use App\Http\Controllers\MedicinePurchaseController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-
+use App\Http\Controllers\TrnMedicineStockUpdationController;
 use App\Http\Controllers\MedicineSalesController;
 use App\Http\Controllers\MedicineSalesReturnController;
-
+use App\Http\Controllers\TrnMedicinePurchaseInvoiceDetailsController;
+use App\Http\Controllers\TrnMedicinePurchaseReturnController;
 use App\Http\Controllers\TrnPrescriptionController;
 use App\Http\Controllers\TrnJournelEntryController;
 use App\Http\Controllers\StaffLeaveController;
@@ -504,4 +505,48 @@ Route::middleware('auth')->group(function () {
     Route::delete('/journel-entry/destroy/{id}', [TrnJournelEntryController::class, 'destroy'])->name('journel.entry.destroy');
     Route::get('/journel-entry-edit/{id}', [TrnJournelEntryController::class, 'edit'])->name('journel.entry.edit');
     Route::post('/journel-entry-update', [TrnJournelEntryController::class, 'update'])->name('journel.entry.update');
+
+    //new
+
+    //Medicine-Purchase-Invoice:
+Route::get('/medicine-purchase-invoice/index',[TrnMedicinePurchaseInvoiceDetailsController ::class,'index'])->name('medicinePurchaseInvoice.index');
+Route::get('/medicine-purchase-invoice/create',[TrnMedicinePurchaseInvoiceDetailsController ::class,'create'])->name('medicinePurchaseInvoice.create');
+Route::post('/medicine-purchase-invoice/store', [TrnMedicinePurchaseInvoiceDetailsController::class, 'store'])->name('medicinePurchaseInvoice.store');
+Route::get('/medicine-purchase-invoice/edit/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'edit'])->name('medicinePurchaseInvoice.edit');
+Route::put('/medicine-purchase-invoice/update/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'update'])->name('medicinePurchaseInvoice.update');
+Route::get('/medicine-purchase-invoice/show/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'show'])->name('medicinePurchaseInvoice.show');
+Route::delete('/medicine-purchase-invoice/destroy/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'destroy'])->name('medicinePurchaseInvoice.destroy');
+Route::get('/medicine-purchase-invoice/products/sample', function () {
+    
+    $filepath = public_path('assets/uploads/medicine_purchase_sample.xlsx');
+
+    return Response::download($filepath); 
+
+})->name('download.products.sample');
+Route::match(['get', 'post'], '/import/excel', [TrnMedicinePurchaseInvoiceDetailsController::class, 'create'])->name('excel.import');
+
+Route::get('/get-product-id/{medicineCode}', [TrnMedicinePurchaseInvoiceDetailsController::class,'getProductId'])->name('getProductId');
+Route::get('/get-unit-id/{medicineCode}', [TrnMedicinePurchaseInvoiceDetailsController::class,'getUnitId'])->name('getUnitId');
+Route::get('/getLedgerNames', [TrnMedicinePurchaseInvoiceDetailsController::class,'getLedgerNames'])->name('getLedgerNames');
+Route::get('/get-credit-details/{supplierId}', [TrnMedicinePurchaseInvoiceDetailsController::class,'getCreditDetails'])->name('getCreditDetails');
+
+
+
+//Medicine-Purchase-Return:
+Route::get('/medicine-purchase-return/index',[TrnMedicinePurchaseReturnController ::class,'index'])->name('medicinePurchaseReturn.index');
+Route::match(['get', 'post'],'/medicine-purchase-return/create',[TrnMedicinePurchaseReturnController::class,'create'])->name('medicinePurchaseReturn.create');
+Route::get('/medicine-purchase-return/edit/{id}', [TrnMedicinePurchaseReturnController::class, 'edit'])->name('medicinePurchaseReturn.edit');
+Route::post('/medicine-purchase-return/store',[TrnMedicinePurchaseReturnController::class,'store'])->name('medicinePurchaseReturn.store');
+Route::put('/medicine-purchase-return/update/{id}', [TrnMedicinePurchaseReturnController::class, 'update'])->name('medicinePurchaseReturn.update');
+Route::get('/medicine-purchase-return/show/{id}', [TrnMedicinePurchaseReturnController::class, 'show'])->name('medicinePurchaseReturn.show');
+Route::get('/get-purchase-invoices',[TrnMedicinePurchaseReturnController::class,'getPurchaseInvoices'])->name('getPurchaseInvoices');
+Route::get('/getPurchaseInvoiceDetails', [TrnMedicinePurchaseReturnController::class, 'getPurchaseInvoiceDetails'])->name('getPurchaseInvoiceDetails');
+
+
+//Medicine Stock Updation:
+Route::get('/medicine-stock-updation/index',[TrnMedicineStockUpdationController ::class,'index'])->name('medicineStockUpdation.index');
+Route::get('/get-generic-name/{id}', [TrnMedicineStockUpdationController::class, 'getGenericName'])->name('getGenericName');
+Route::get('/get-batch-numbers/{id}', [TrnMedicineStockUpdationController::class, 'getBatchNumbers'])->name('getBatchNumbers');
+Route::get('/get-current-stock/{medicineId}/{batchNo}', [TrnMedicineStockUpdationController::class, 'getCurrentStock'])->name('getCurrentStock');
+Route::put('/update-medicine-stocks', [TrnMedicineStockUpdationController::class, 'updateMedicineStocks'])->name('update.medicine.stocks');
 });
