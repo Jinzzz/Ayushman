@@ -66,4 +66,9 @@ class Mst_Medicine extends Model
         return $this->belongsTo(Mst_Master_Value::class,'manufacturer','id');
     }
 
+    public function stockTransfers()
+    {
+        return $this->hasMany(MstStockTransferTherapy::class, 'medicine_id');
+    }
+
 }

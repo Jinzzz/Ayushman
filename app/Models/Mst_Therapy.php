@@ -18,4 +18,9 @@ class Mst_Therapy extends Model
         'is_active',
         'deleted_at',
     ];
+
+    public function stockTransfers()
+    {
+        return $this->hasMany(MstStockTransferTherapy::class, 'therapy_id');
+    }
 }

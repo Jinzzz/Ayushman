@@ -50,6 +50,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryHeadController;
 use App\Http\Controllers\SalaryPackageController;
 use App\Http\Controllers\AvailableLeaveController;
+use App\Http\Controllers\TherapyStockTransferController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -549,4 +550,12 @@ Route::get('/get-generic-name/{id}', [TrnMedicineStockUpdationController::class,
 Route::get('/get-batch-numbers/{id}', [TrnMedicineStockUpdationController::class, 'getBatchNumbers'])->name('getBatchNumbers');
 Route::get('/get-current-stock/{medicineId}/{batchNo}', [TrnMedicineStockUpdationController::class, 'getCurrentStock'])->name('getCurrentStock');
 Route::put('/update-medicine-stocks', [TrnMedicineStockUpdationController::class, 'updateMedicineStocks'])->name('update.medicine.stocks');
+
+//therapy-stock-transfer
+
+Route::get('/therapy-stock-transfer', [TherapyStockTransferController::class, 'index'])->name('therapy-stock-transfers.index');
+Route::get('/therapy-stock-transfer/create', [TherapyStockTransferController::class, 'create'])->name('therapy-stock-transfers.create');
+Route::post('/therapy-stock-transfer/store', [TherapyStockTransferController::class, 'store'])->name('therapy-stock-transfers.store');
+Route::get('/get-medicine-batch/{id}', [TherapyStockTransferController::class, 'getMedicineBatch'])->name('getMedicineBatch');
+Route::get('/get-current-medicine-stock/{medicineId}/{batchNo}', [TherapyStockTransferController::class, 'getCurrentMedicineStock'])->name('getCurrentMedicineStock');
 });

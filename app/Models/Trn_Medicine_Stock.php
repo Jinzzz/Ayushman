@@ -29,4 +29,9 @@ class Trn_Medicine_Stock extends Model
         'deleted_at',
         
     ];
+
+    public function stockTransfers()
+    {
+        return $this->hasMany(MstStockTransferTherapy::class, 'medicine_id', 'medicine_id');
+    }
 }

@@ -70,30 +70,7 @@
                         @php
                         $i = 0;
                         @endphp
-                        @foreach($staffleaves as $staffleave)
-                        <tr id="dataRow_{{$staffleave->id }}">
-                            <td>{{ ++$i }}</td>
-                            <td>{{ $staffleave->staff_name }}</td>
-                            <td>{{ $staffleave->branch_name }}</td>
-                            <td>{{ $staffleave->from_date }}</td>
-                            <td>{{ $staffleave->to_date }}</td>
-                            <td>{{ $staffleave->days}}</td>
-                            <td>
-                            <a class="btn btn-secondary btn-sm" href="{{ route('staffleave.show', $staffleave->id) }}">
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View </a>
-                                <a class="btn btn-primary btn-sm edit-custom" href="{{ route('staffleave.edit', $staffleave->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                              
-                                <form style="display: inline-block" action="{{ route('staffleave.destroy', $staffleave->id) }}" method="post">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="button" onclick="deleteData({{ $staffleave->id }})" class="btn-danger btn-sm">
-                                        <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                    </button>
-
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
+<th class="wd-10p">Medicine Name</th>
                     </tbody>
                 </table>
             </div>

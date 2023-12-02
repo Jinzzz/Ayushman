@@ -37,14 +37,10 @@ class StaffLeaveController extends Controller
     
     if ($request->has('to_date')) {
         $staffleaves->where('staff_leave.to_date', 'LIKE', "%{$request->to_date}%");
-    }
-
-    
+    } 
     $staffleaves = $staffleaves->get();
+  
     
-    // Rest of your code...
-    
-                       
 
         return view('staffleave.index', compact('pageTitle', 'staffleaves'));
     }
