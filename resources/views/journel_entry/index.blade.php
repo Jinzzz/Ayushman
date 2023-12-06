@@ -26,7 +26,7 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="pat-code">Branch:</label>
+                            <label for="pat-code" class="form-label">Branch:</label>
                             <select class="form-control" name="branch_id" id="branch_id">
                                 <option value="">Choose Branch</option>
                                 @foreach($branches as $branch)
@@ -35,32 +35,32 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="pat-code">Journel Entry Type:</label>
+                            <label for="pat-code" class="form-label">Journal Entry Type:</label>
                             <select class="form-control" name="journel_entry_type_id" id="journel_entry_type_id">
-                                <option value="">Choose Journel Entry Type</option>
+                                <option value="">Choose Journal Entry Type</option>
                                 @foreach($journel_entry_types as $journel_entry_type)
                                 <option value="{{ $journel_entry_type->journal_entry_type_id }}" {{ $journel_entry_type->journal_entry_type_id == $journel_entry_type_id ? ' selected' : '' }}>{{ $journel_entry_type->journal_entry_type_name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="pat-name">Journel Number:</label>
+                            <label for="pat-name" class="form-label">Journal Number</label>
                             <input type="text" id="journel_number" name="journel_number" class="form-control" value="{{ request('journel_number') }}">
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="pat-code">From Date:</label>
+                            <label for="pat-code" class="form-label">From Date</label>
                             <input type="date" id="from_date" name="from_date" class="form-control" value="{{ request('from_date') }}">
                         </div>
                         <div class="col-md-4">
-                            <label for="pat-name">To Date:</label>
+                            <label for="pat-name" class="form-label">To Date</label>
                             <input type="date" id="to_date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                         </div>
-                        <div class="col-md-4 d-flex justify-content-center align-items-end">
+                        <div class="col-md-12 d-flex justify-content-center align-items-end" style="margin-top:30px;">
                             <div>
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp;
-                                <a class="btn btn-primary" href="{{ route('journel.entry.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                                <button type="submit" class="btn btn-primary" style="padding: 4px 20px;"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp;
+                                <a class="btn btn-primary" href="{{ route('journel.entry.index') }}" style="padding: 4px 20px;"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                             </div>
                         </div>
                     </div>
@@ -94,10 +94,10 @@
                             <tr>
                                 <th class="wd-15p">SL.NO</th>
                                 <th class="wd-15p">Branch Name</th>
-                                <th class="wd-15p">Journel Entry Type</th>
-                                <th class="wd-15p">Journel Number</th>
-                                <th class="wd-15p">Journel Date</th>
-                                <th class="wd-15p">Total Amout</th>
+                                <th class="wd-15p">Journal Entry Type</th>
+                                <th class="wd-15p">Journal Number</th>
+                                <th class="wd-15p">Journal Date</th>
+                                <th class="wd-15p">Total Amount</th>
                                 <th class="wd-15p">Action</th>
                             </tr>
                         </thead>
