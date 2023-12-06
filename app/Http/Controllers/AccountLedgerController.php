@@ -88,13 +88,18 @@ class AccountLedgerController extends Controller
     public function edit($id)
     {
         try {
+            $subgroup_options =array();
             $pageTitle = "Edit Account Ledger";
             $account_groups = Sys_Account_Group::where('is_active', 1)->get();
             $account_ledger = Mst_Account_Ledger::find($id);
             $account_sub_group = Mst_Account_Sub_Head::find($account_ledger->account_sub_group_id);
+            if($account_sub_group)
+            {
             $subgroup_options = Mst_Account_Sub_Head::where('account_group_id', $account_sub_group->account_group_id)
                 ->where('is_active', 1)
                 ->get();
+            }
+            
             if (!$account_ledger) {
                 // Handle the case where the ledger with the given ID doesn't exist
                 return redirect()->route('account.ledger.index')->with('error', 'Account ledger not found');
@@ -136,7 +141,7 @@ class AccountLedgerController extends Controller
                 $account_ledger->updated_at = Carbon::now();
                 $account_ledger->save();
 
-                return redirect()->route('account.ledger.index')->with('success', 'Ledger added successfully');
+                return redirect()->route('account.ledger.index')->with('success', 'Ledger updated successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('account.ledger.index')->with('error', $e->getMessage());

@@ -22,4 +22,6 @@ class Mst_Account_Sub_Head extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    
 }
