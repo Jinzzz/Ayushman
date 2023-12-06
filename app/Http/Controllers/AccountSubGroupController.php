@@ -44,7 +44,7 @@ class AccountSubGroupController extends Controller
 
             $is_exists = Mst_Account_Sub_Head::where('account_sub_group_name', $request->input('sub_group_name'))->where('account_group_id', $request->input('account_group_id'))->first();
             if ($is_exists) {
-                return redirect()->route('account.sub.group.index')->with('error', 'This sub group name is already exists.');
+                return redirect()->route('account.sub.group.index')->with('error', 'This sub group already exists.');
             } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
 
@@ -59,7 +59,7 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
 
-                return redirect()->route('account.sub.group.index')->with('success', 'Sub group name added successfully');
+                return redirect()->route('account.sub.group.index')->with('success', 'Sub group added successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('account.sub.group.index')->with('error', $e->getMessage());
@@ -69,7 +69,7 @@ class AccountSubGroupController extends Controller
     public function edit($id)
     {
         try {
-            $pageTitle = "Edit Account Sub Groups";
+            $pageTitle = "Edit Account Sub Group";
             $account_groups = Sys_Account_Group::where('is_active', 1)->get();
             $account_sub_groups = Mst_Account_Sub_Head::findOrFail($id);
             return view('account_sub_group.edit', compact('pageTitle', 'account_sub_groups', 'account_groups'));
@@ -90,7 +90,7 @@ class AccountSubGroupController extends Controller
                 ->where('id', '!$id')->first();
 
             if ($is_exists) {
-                return redirect()->route('account.sub.group.index')->with('error', 'This sub group name is already exists.');
+                return redirect()->route('account.sub.group.index')->with('error', 'This sub group already exists.');
             } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
 
@@ -102,7 +102,7 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
 
-                return redirect()->route('account.sub.group.index')->with('success', 'Sub group name updated successfully');
+                return redirect()->route('account.sub.group.index')->with('success', 'Sub group updated successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('account.sub.group.index')->with('error', 'Something went wrong');
