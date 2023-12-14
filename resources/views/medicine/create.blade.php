@@ -86,7 +86,8 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Unit Price*</label>
-                           <input type="text" class="form-control" maxlength="10" required name="unit_price" value="{{ old('unit_price') }}" placeholder="Unit Price">
+                           <input type="number" class="form-control" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="10" required name="unit_price" value="{{ old('unit_price') }}" placeholder="Unit Price">
+
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -109,9 +110,12 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Reorder Limit</label>
-                           <input type="text" class="form-control" name="reorder_limit" maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit">
+                           <input type="number" class="form-control" name="reorder_limit" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"  maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit">
                         </div>
                      </div>
+   
+                           <input type="hidden" class="form-control" name="medicine_code" value="{{ old('medicine_code', $randomMedicineCode) }}" readonly>
+                   
                      <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>
@@ -156,9 +160,9 @@
                required: true,
                maxlength: 100
             },
-            Hsn_code: {
-               number: true,
-               maxlength: 8
+           Hsn_code: {
+                number: true,
+                maxlength: 8,
             },
             unit_price: {
                required: true,
@@ -183,6 +187,7 @@
             Hsn_code: {
                number: 'Please enter a valid integer.',
                maxlength: 'Hsn code must not exceed 8 characters.'
+               remote: 'Hsn code already exists.'
             },
             unit_price: {
                required: 'Please enter unit price.',

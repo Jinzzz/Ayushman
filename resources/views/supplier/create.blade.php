@@ -27,12 +27,7 @@
                     <form action="{{ route('supplier.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Supplier Name*</label>
-                                    <input type="text" class="form-control" required name="supplier_name" value="{{ old('supplier_name') }}" placeholder="Supplier Name">
-                                </div>
-                            </div>
+                            
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Supplier Type*</label>
@@ -43,6 +38,13 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Supplier Name*</label>
+                                    <input type="text" class="form-control" required name="supplier_name" value="{{ old('supplier_name') }}" placeholder="Supplier Name">
+                                </div>
+                            </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -52,23 +54,32 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">City*</label>
-                                    <input type="text" class="form-control" required name="supplier_city" value="{{ old('supplier_city') }}" placeholder="Supplier City">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Country*</label>
+                                <select class="form-control" required name="country"  id="country">
+                                    <option value="" disabled selected>Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country->country_id  }}">{{ $country->country_name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
+                        </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">State*</label>
-                                    <input type="text" class="form-control" required name="state" value="{{ old('state') }}" placeholder="State">
-                                </div>
+                            <div class="form-group">
+                            <label class="form-label">State*</label>
+                            <select class="form-control" required name="state" id="state">
+                                <option value="" disabled selected>Select State</option>
+                                <!-- States will be dynamically populated here -->
+                            </select>
+                        </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Country*</label>
-                                    <input type="text" class="form-control" required name="country" value="{{ old('country') }}" placeholder="Country">
+                                <label class="form-label">City*</label>
+                                    <input type="text" class="form-control" required name="supplier_city" value="{{ old('supplier_city') }}" placeholder="Supplier City">
                                 </div>
                             </div>
                         </div>
@@ -89,13 +100,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Phone Number*</label>
+                                    <label class="form-label">Contact Number*</label>
                                     <input type="number" class="form-control" max="9999999999" min="1000000000" required name="phone_1" value="{{ old('phone_1') }}" placeholder="Phone Number">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Alternative Number</label>
+                                    <label class="form-label">Alternative Mobile Number*</label>
                                     <input type="number" max="9999999999" min="1000000000" class="form-control" name="phone_2" value="{{ old('phone_2') }}" placeholder="Alternative Number">
                                 </div>
                             </div>
@@ -149,21 +160,21 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Opening Balance Date</label>
+                                    <label class="form-label">Opening Balance As On</label>
                                     <input type="date" class="form-control" name="opening_balance_date" value="{{ old('opening_balance_date') }}" placeholder="Opening Balance Date">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">GST Number</label>
-                                    <input type="number" class="form-control" min="0" name="GSTNO" value="{{ old('GSTNO') }}" placeholder="GSTNO">
+                                    <label class="form-label">GSTIN Number</label>
+                                    <input type="number" class="form-control" min="0" name="GSTNO" value="{{ old('GSTIN NO') }}" placeholder="GSTIN NO">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Terms And Condition</label>
+                                    <label class="form-label">Terms And Conditions</label>
                                     <textarea class="form-control" name="terms_and_conditions" placeholder="Terms And Condition">{{ old('terms_and_conditions') }}</textarea>
                                 </div>
                             </div>
@@ -198,6 +209,7 @@
 </div>
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
@@ -208,5 +220,51 @@
             $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
         }
     }
+
+    $(document).ready(function () {
+        $('#country').on('change', function () {
+            var countryId = $(this).val();
+
+            // Make an AJAX request to get states based on the selected country
+            $.ajax({
+                url: '/get-states/' + countryId, // Replace with the actual route
+                type: 'GET',
+                success: function (data) {
+                    // Clear existing options
+                    $('#state').empty();
+
+                    // Add new options based on the response
+                    $.each(data, function (key, value) {
+                        $('#state').append('<option value="' + value.state_id + '">' + value.state_name + '</option>');
+                    });
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        // Function to toggle the 'required' attribute on the 'Opening Balance As On' field
+        function toggleOpeningBalanceAsOnRequired() {
+            var openingBalance = parseFloat($("[name='opening_balance']").val());
+
+            if (openingBalance > 0) {
+                $("[name='opening_balance_date']").prop('required', true);
+            } else {
+                $("[name='opening_balance_date']").prop('required', false);
+            }
+        }
+
+        // Call the function on page load
+        toggleOpeningBalanceAsOnRequired();
+
+        // Add an event listener to 'Opening Balance' field
+        $("[name='opening_balance']").on('input', function () {
+            // Call the function whenever the 'Opening Balance' value changes
+            toggleOpeningBalanceAsOnRequired();
+        });
+    });
 </script>
 @endsection

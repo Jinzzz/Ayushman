@@ -35,18 +35,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Supplier Name*</label>
-                                    <input type="text" class="form-control" required name="supplier_name" value="{{$supplier->supplier_name}}" placeholder="Supplier Name">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Supplier Type*</label>
-                                    <select class="form-control" required name="supplier_type_id" id="supplier_type_id">
+                                <label class="form-label">Supplier Type*</label>
+                                <select class="form-control" required name="supplier_type_id" id="supplier_type_id">
                                         <option value="">Select Supplier Type</option>
                                         <option value="1" {{ $supplier->supplier_type_id === 1 ? 'selected' : ''}}>Individual</option>
                                         <option value="2" {{ $supplier->supplier_type_id === 2 ? 'selected' : ''}}>Business</option>
                                     </select>
+                                
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    
+                                    <label class="form-label">Supplier Name*</label>
+                                    <input type="text" class="form-control" required name="supplier_name" value="{{$supplier->supplier_name}}" placeholder="Supplier Name">
                                 </div>
                             </div>
                         </div>
@@ -58,23 +60,38 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">City*</label>
-                                    <input type="text" class="form-control" required name="supplier_city" value="{{$supplier->supplier_city}}" placeholder="Supplier City">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Country*</label>
+                                <select class="form-control" required name="country" id="country">
+                                    <option value="" disabled {{ old('country', optional($supplier)->country_name) ? '' : 'selected' }}>Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country->country_id }}" {{ old('country', optional($supplier)->country) == $country->country_id ? 'selected' : '' }}>
+                                            {{ $country->country_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">State*</label>
-                                    <input type="text" class="form-control" required name="state" value="{{$supplier->state}}" placeholder="State">
-                                </div>
+                            <div class="form-group">
+                            <label class="form-label">State*</label>
+                            <select class="form-control" required name="state" id="state">
+                                <option value="" disabled {{ old('state', optional($supplier)->state) ? '' : 'selected' }}>Select State</option>
+                                @foreach($states as $state)
+                                    <option value="{{ $state->state_id }}" {{ old('state', optional($supplier)->state) == $state->state_id ? 'selected' : '' }}>
+                                        {{ $state->state_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Country*</label>
-                                    <input type="text" class="form-control" required name="country" value="{{$supplier->country}}" placeholder="Country">
+                                    <label class="form-label">City*</label>
+                                    <input type="text" class="form-control" required name="supplier_city" value="{{$supplier->supplier_city}}">
                                 </div>
                             </div>
                         </div>
@@ -95,13 +112,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Phone Number*</label>
+                                    <label class="form-label">Contact Number*</label>
                                     <input type="number" class="form-control" required name="phone_1" value="{{$supplier->phone_1}}" max="9999999999" min="1000000000" placeholder="Phone Number">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Alternative Number</label>
+                                    <label class="form-label">Alternative Contact Number</label>
                                     <input type="number" class="form-control" max="9999999999" min="1000000000" name="phone_2" value="{{$supplier->phone_2}}" placeholder="Alternative Number">
                                 </div>
                             </div>
@@ -137,7 +154,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Terms And Condition</label>
+                                    <label class="form-label">Terms And Conditions</label>
                                     <textarea class="form-control" name="terms_and_conditions" placeholder="Terms And Condition">{{$supplier->terms_and_conditions}}</textarea>
                                 </div>
                             </div>

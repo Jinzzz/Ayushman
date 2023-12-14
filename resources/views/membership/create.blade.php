@@ -122,6 +122,7 @@
 @section('js')
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <script type="text/javascript">
    function validatePrices() {
@@ -217,9 +218,10 @@
       data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
       @endforeach
       data += '</select>';
-      data += "<label class='form-label'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";
+      data += '<label class="form-label wellness-details">Duration: <span class="selected_duration"></span>, Cost: <span class="selected_cost"></span></label>';
       data += '</div></div>';
-      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
+      data += "<div class='col-md-5'><div class='form-group label-floating '>"; // Add the wellness-details class
+      data += "<label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
       data += "<div style='align-self:center;' class='col-md-1 remove_field add-btn'><a href='javascript:void(0);'><span class='glyphicon glyphicon-plus' style='color:green;'></span></a></div>";
       data += "</div>";
 
@@ -247,4 +249,26 @@
 
    // Rest of your JavaScript code...
 </script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Initial hide of wellness details
+        $('.wellness-details').hide();
+
+        // Add an event listener to update the duration and cost labels when a wellness option is selected
+        $("select[name='wellness_id[]']").on('change', function() {
+            var selectedOption = $(this).find(':selected');
+            var duration = selectedOption.data('duration');
+            var cost = selectedOption.data('cost');
+            var wellnessDetailsContainer = $(this).closest('.row').find('.wellness-details');
+
+            // Update the labels and show them
+            wellnessDetailsContainer.find('.selected_duration').text(duration);
+            wellnessDetailsContainer.find('.selected_cost').text(cost);
+            wellnessDetailsContainer.show();
+        });
+    });
+</script>
+
+
 @endsection

@@ -240,6 +240,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/medicine/show/{id}', [MstMedicineController::class, 'show'])->name('medicine.show');
     Route::delete('/medicine/destroy/{id}', [MstMedicineController::class, 'destroy'])->name('medicine.destroy');
     Route::patch('medicine/{id}/change-status', [MstMedicineController::class, 'changeStatus'])->name('medicine.changeStatus');
+    Route::post('/validate-hsn-code', [MstMedicineController::class, 'validateHsnCode'])->name('validate.hsn_code');
+    Route::get('/medicine-stock-updations/{id}',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
+    Route::post('/getBatchNumbers', [MstMedicineController::class, 'getBatchNumbers'])->name('getBatchNumbers'); 
+    Route::get('/get-current-stock/{medicineId}/{batchNo}', [MstMedicineController::class, 'getCurrentStock']);
+    Route::put('/updatestockmedicine', [MstMedicineController::class, 'updateStockMedicine'])->name('updatestockmedicine'); 
+
+
 
     //Consultation-Billing:
     Route::get('/consultation-billing/index', [TrnConsultationBillingController::class, 'index'])->name('consultation_billing.index');
@@ -275,6 +282,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
     Route::patch('supplier/change-status/{id}', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
     Route::get('/supplier/show/{id}', [MstSupplierController::class, 'show'])->name('supplier.show');
+    Route::get('/get-states/{countryId}', [MstSupplierController::class, 'getStates']);
+
 
     //Manage-Specialization:
     Route::get('/specialization/index/{id}', [MstStaffSpecializationController::class, 'index'])->name('specialization.index');

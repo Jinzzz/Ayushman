@@ -65,7 +65,6 @@ class SalaryHeadController extends Controller
             'salary_head_type' => 'required|exists:salary_head_types,id',
             'status' => 'required', // Assuming the checkbox value is "on" or "off"
             'remark' => 'nullable|string',
-            'company' => 'required|string|max:255',
         ]);
     
         // Map the checkbox value to an integer (1 for "on", 0 for "off")
@@ -87,7 +86,7 @@ class SalaryHeadController extends Controller
             'salary_head_name' => $request->input('salary_head_name'),
             'status' => $is_status,
             'remark' => $request->input('remark'),
-            'company' => $request->input('company'),
+            'company' => 'Ayushman',
             'salary_head_type' => $request->input('salary_head_type'),
         ]);
     
@@ -185,18 +184,8 @@ class SalaryHeadController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            // Check if the salary head is referenced in the salary_packages table
-            $isReferenced = Salary_Package::where('salary_head_id', $id)->exists();
-    
-            if ($isReferenced) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot delete the salary head because it is referenced in salary packages.',
-                ], 400);
-            }
-    
-            // If not referenced, proceed with the deletion
+       
+
             $salary_head = Salary_Head_Master::findOrFail($id);
             $salary_head->delete();
     
@@ -204,15 +193,8 @@ class SalaryHeadController extends Controller
                 'success' => true,
                 'message' => 'Salary Head Deleted Successfully',
             ]);
-        } catch (\Exception $e) {
-            // Log the exception or handle it as needed
-            \Log::error('Exception in destroy method: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while deleting the salary head. ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-    
+        } 
+        
+
     
 }

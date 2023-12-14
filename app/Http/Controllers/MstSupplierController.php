@@ -9,6 +9,7 @@ use App\Models\TrnLedgerPosting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Account_Ledger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MstSupplierController extends Controller
@@ -50,7 +51,8 @@ class MstSupplierController extends Controller
         try {
             $pageTitle = "Create Supplier";
             $ledgers = Mst_Account_Ledger::pluck('ledger_name', 'id');
-            return view('supplier.create', compact('pageTitle','ledgers'));
+            $countries = DB::table('sys_countries')->get();
+            return view('supplier.create', compact('pageTitle','ledgers','countries'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
@@ -58,6 +60,7 @@ class MstSupplierController extends Controller
 
     public function store(Request $request)
     {
+     
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -122,7 +125,6 @@ class MstSupplierController extends Controller
                     'credit_limit' => $request->credit_limit ?? null,
                     'opening_balance' => $request->opening_balance ?? null,
                     'opening_balance_type' => $request->opening_balance_type ?? null,
-                    'account_ledger_id' => $request->account_ledger_id ?? null,
                     'terms_and_conditions' => $request->terms_and_conditions ?? null,
                     'opening_balance_date' => $request->opening_balance_date ?? null,
                     'is_active' =>  $is_active,
@@ -204,7 +206,9 @@ class MstSupplierController extends Controller
         try {
             $pageTitle = "Edit Supplier";
             $supplier = Mst_Supplier::findOrFail($id);
-            return view('supplier.edit', compact('pageTitle', 'supplier'));
+            $countries = DB::table('sys_countries')->get();
+            $states = DB::table('sys_states')->get();
+            return view('supplier.edit', compact('pageTitle', 'supplier','countries','states'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
@@ -212,6 +216,7 @@ class MstSupplierController extends Controller
 
     public function update(Request $request, $id)
     {
+
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -243,31 +248,6 @@ class MstSupplierController extends Controller
             );
             if (!$validator->fails()) {
                 $is_active = $request->input('is_active') ? 1 : 0;
-                $phone1Exists = Mst_Supplier::where(function ($query) use ($id, $request) {
-                    $query->where('phone_1', $request->phone_1)
-                        ->orWhere('phone_2', $request->phone_1);
-                })
-                    ->where('email', $request->email)
-                    ->where('supplier_id', '!=', $id)
-                    ->first();
-
-                $phone2Exists = Mst_Supplier::where(function ($query) use ($id, $request) {
-                    $query->where('phone_1', $request->phone_2)
-                        ->orWhere('phone_2', $request->phone_2);
-                })
-                    ->where('supplier_id', '!=', $id)
-                    ->where('email', $request->email)
-                    ->first();
-
-                $emailExists = Mst_Supplier::where('email', $request->email)
-                    ->where('supplier_id', '!=', $id)
-                    ->first();
-
-                if ($phone1Exists || $phone2Exists || $emailExists) {
-                    // Handle the case where the update fails
-                    return redirect()->route('supplier.index')->with('error', 'Failed to update. This supplier already exists.');
-                }
-
                 $update = Mst_Supplier::find($id);
                 $update->update([
                     'supplier_type_id' => $request->supplier_type_id,
@@ -287,7 +267,6 @@ class MstSupplierController extends Controller
                     'credit_limit' => $request->credit_limit,
                     'opening_balance' => $request->opening_balance,
                     'opening_balance_type' => $request->opening_balance_type,
-                    'account_ledger_id' => $request->account_ledger_id,
                     'terms_and_conditions' => $request->terms_and_conditions,
                     'opening_balance_date' => $request->opening_balance_date,
                     'is_active' =>  $is_active,
@@ -296,7 +275,7 @@ class MstSupplierController extends Controller
                 return redirect()->route('supplier.index')->with('success', 'Supplier updated successfully');
             } else {
                 $messages = $validator->errors();
-                return redirect()->route('supplier.edit')->with('errors', $messages);
+                return redirect()->route('supplier.index')->with('errors', $messages);
             }
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
@@ -335,5 +314,12 @@ class MstSupplierController extends Controller
         } catch (QueryException $e) {
             return 0;
         }
+    }
+    public function getStates(Request $request, $countryId)
+    {
+        // Logic to get states based on $countryId
+        $states = DB::table('sys_states')->where('country_id', $countryId)->get();
+
+        return response()->json($states);
     }
 }

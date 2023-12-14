@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mst_Medicine;
+use App\Models\Mst_Branch;
 use App\Models\Trn_Medicine_Stock;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class TrnMedicineStockUpdationController extends Controller
     {
         $pageTitle = "Medicine Stock Updation";
         $medicines = Mst_Medicine::pluck('medicine_name','id');
-        return view('medicine_stock_updation.index',compact('pageTitle','medicines'));
+        $branchs = Mst_Branch::get();
+        return view('medicine_stock_updation.index',compact('pageTitle','medicines','branchs'));
     }
 
     public function getGenericName($id)
@@ -39,7 +41,7 @@ class TrnMedicineStockUpdationController extends Controller
 
     public function updateMedicineStocks(Request $request)
 {
-//    dd($request->all());
+
     $request->validate([
         'medicine' => 'required|exists:mst_medicines,id',
         'generic_name' => 'required',
@@ -47,13 +49,14 @@ class TrnMedicineStockUpdationController extends Controller
         'current_stock' => 'required|numeric|min:0',
         'new_stock' => 'required|numeric|min:0',
         'remarks' => 'required',
+        'branch_id' => 'required',
         
     ]);
 
     // Update the medicine stocks in the database
     $medicineStock = Trn_Medicine_Stock::where('medicine_id', $request->input('medicine'))
-        ->where('batch_no', $request->input('batch_no'))
-        ->first();
+                                        ->where('batch_no', $request->input('batch_no'))
+                                        ->first();
 
     if (!$medicineStock) {
        
@@ -64,6 +67,7 @@ class TrnMedicineStockUpdationController extends Controller
     $newCurrentStock = $request->input('new_stock');
     $medicineStock->current_stock = $newCurrentStock;
     $medicineStock->remarks = $request->input('remarks');
+    $medicineStock->branch_id = $request->input('branch_id');
  
     $medicineStock->save();
 

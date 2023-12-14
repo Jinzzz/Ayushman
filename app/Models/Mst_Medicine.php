@@ -71,4 +71,5 @@ class Mst_Medicine extends Model
         return $this->hasMany(MstStockTransferTherapy::class, 'medicine_id');
     }
 
+
 }

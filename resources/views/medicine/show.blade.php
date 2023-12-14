@@ -11,7 +11,7 @@
             <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
