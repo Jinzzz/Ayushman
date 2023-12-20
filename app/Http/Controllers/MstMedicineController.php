@@ -6,10 +6,6 @@ use App\Models\Mst_Tax_Group;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Unit;
-use App\Models\Mst_Branch;
-use App\Models\Trn_Medicine_Stock;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use App\Models\Mst_Manufacturer;
 use Illuminate\Http\Request;
 
@@ -55,9 +51,12 @@ class MstMedicineController extends Controller
         $itemType = Mst_Master_Value::where('master_id',13)->pluck('master_value','id');
         $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
         // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
-        $Manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
-        // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
+        $Manufacturer = Mst_Manufacturer::where('is_active',  1)
+        ->whereNull('deleted_at') 
+        ->get();
+    // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
         $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
+
         $units = Mst_Unit::pluck('unit_name','id');
         $randomMedicineCode = 'MED_' . Str::random(8);
         return view('medicine.create', compact('pageTitle','taxes','itemType','medicineType','Manufacturer','units','randomMedicineCode'));
