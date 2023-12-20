@@ -77,8 +77,8 @@
                            <label class="form-label">Manufacturer</label>
                            <select class="form-control" name="manufacturer" id="manufacturer">
                               <option value="">Select Manufacturer</option>
-                              @foreach($Manufacturer as $masterId => $masterValue)
-                              <option value="{{ $masterId }}" {{ old('manufacturer') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
+                              @foreach($Manufacturer as $masterValue)
+                              <option value="{{ $masterValue->manufacturer_id }}" {{ old('manufacturer') == $masterValue->manufacturer_id ? 'selected' : '' }}>{{ $masterValue->name }}</option>
                               @endforeach
                            </select>
                         </div>

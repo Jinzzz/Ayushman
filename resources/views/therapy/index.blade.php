@@ -33,7 +33,7 @@
                                     <th class="wd-15p">SL.NO</th>
                                     <th class="wd-15p">Therapy Name</th>
                                     <th class="wd-20p">Therapy Cost </th>
-                                    <th class="wd-15p">Remarks</th>
+                
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -47,7 +47,7 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $therapy->therapy_name }}</td>
                                     <td>{{ $therapy->therapy_cost }}</td>
-                                    <td>{{ $therapy->remarks}}</td>
+                               
                                     <td>
                                         <button type="button" style="width: 70px;"  onclick="changeStatus({{$therapy->id }})" class="btn btn-sm @if($therapy->is_active == 0) btn-danger @else btn-success @endif">
                                             @if($therapy->is_active == 0)

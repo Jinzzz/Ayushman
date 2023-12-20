@@ -40,7 +40,7 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Wellness Offer Price</label>
-                        <input type="number" class="form-control" readonly required name="wellness_offer_price" value="{{$show->wellness_offer_price}}" placeholder="Wellness Offer Price">
+                        <input type="number" class="form-control" readonly required name="wellness_offer_price" value="{{$show->offer_price}}" placeholder="Wellness Offer Price">
                      </div>
                   </div>
                   <div class="col-md-6">
@@ -52,7 +52,7 @@
                   <div class="col-md-6">
                      <div class="form-group checkbox">
                         <label for="branch_id" class="form-label">Wellness Image</label>
-                        <input type="file" class="form-control" readonly required name="wellness_image" value="{{$show->wellness_image}}" placeholder="Wellness Image">
+                       
                         @if($show->wellness_image)
                         <img src="{{url('/assets/uploads/wellness_image/'.$show->wellness_image)}}" alt="Wellness Image" style="max-width: 100px; max-height: 100px;">
                         @endif

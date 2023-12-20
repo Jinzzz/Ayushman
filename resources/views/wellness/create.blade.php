@@ -53,13 +53,16 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Wellness Duration(Minutes)*</label>
-                                    <input type="number" class="form-control" required name="wellness_duration" value="{{ old('wellness_duration') }}" placeholder="Wellness Duration(Minutes)">
+                                    <input type="number" class="form-control" required name="wellness_duration" value="{{ old('wellness_duration') }}" placeholder="Wellness Duration(Minutes)" min="0" pattern="\d+">       
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group checkbox">
-                                    <label for="branch_id" class="form-label">Wellness Image*</label>
-                                    <input type="file" class="form-control" required name="wellness_image" value="{{ old('wellness_image') }}" placeholder="Wellness Image">
+                                <label for="branch_id" class="form-label">
+                                Wellness Image* 
+                                <span style="color: #0bb15d;">(Size: 500x500, Supported Formats: .png, .jpeg, .jpg)</span>
+                               </label>
+                                    <input type="file" class="form-control" required name="wellness_image" value="{{ old('wellness_image') }}" placeholder="Wellness Image" accept="image/*">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -134,6 +137,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script type="text/javascript">
     function validatePrices() {
@@ -183,5 +189,7 @@
         input.setCustomValidity(isValid ? '' : 'Please enter a valid decimal number (up to 10 digits before the decimal point and up to 2 digits after).');
         input.parentNode.querySelector('.error-message').style.display = isValid ? 'none' : 'block';
     }
+
+    
 </script>
 @endsection

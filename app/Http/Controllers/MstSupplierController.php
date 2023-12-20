@@ -9,6 +9,8 @@ use App\Models\TrnLedgerPosting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Account_Ledger;
+use App\Models\Trn_Medicine_Purchase_Invoice;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MstSupplierController extends Controller
@@ -47,17 +49,17 @@ class MstSupplierController extends Controller
 
     public function create()
     {
-        try {
+  
             $pageTitle = "Create Supplier";
             $ledgers = Mst_Account_Ledger::pluck('ledger_name', 'id');
-            return view('supplier.create', compact('pageTitle','ledgers'));
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+            $countries = DB::table('sys_countries')->get();
+            return view('supplier.create', compact('pageTitle','ledgers','countries'));
+    
     }
 
     public function store(Request $request)
     {
+       
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -204,7 +206,9 @@ class MstSupplierController extends Controller
         try {
             $pageTitle = "Edit Supplier";
             $supplier = Mst_Supplier::findOrFail($id);
-            return view('supplier.edit', compact('pageTitle', 'supplier'));
+            $countries = DB::table('sys_countries')->get();
+            $states = DB::table('sys_states')->get();
+            return view('supplier.edit', compact('pageTitle', 'supplier','countries','states'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
@@ -308,12 +312,29 @@ class MstSupplierController extends Controller
         try {
             $pageTitle = "View supplier details";
             $show = Mst_Supplier::findOrFail($id);
-            return view('supplier.show', compact('pageTitle', 'show'));
+            $countries = DB::table('sys_countries')->get();
+            $states = DB::table('sys_states')->get();
+            $outstanding_amount = Trn_Medicine_Purchase_Invoice::where('supplier_id', $id)
+                ->select('total_amount', 'paid_amount')
+                ->get();
+    
+            // Initialize $outstanding as an array
+            $outstanding = [];
+    
+            foreach ($outstanding_amount as $invoice) {
+                $totalAmount = $invoice->total_amount;
+                $paidAmount = $invoice->paid_amount;
+    
+                // Calculate outstanding amount for each row
+                $outstanding[] = $totalAmount - $paidAmount;
+            }
+    
+            return view('supplier.show', compact('pageTitle', 'show', 'outstanding','countries','states'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
     }
-
+    
     public function destroy($id)
     {
         try {
@@ -335,5 +356,13 @@ class MstSupplierController extends Controller
         } catch (QueryException $e) {
             return 0;
         }
+    }
+
+    public function getStates($countryId)
+    {
+
+        $states = DB::table('sys_states')->where('country_id', $countryId)->pluck('state_name', 'state_id');
+
+        return response()->json($states);
     }
 }

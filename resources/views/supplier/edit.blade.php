@@ -58,23 +58,34 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Country*</label>
+                            <select class="form-control" required name="country">
+                                <option value="" disabled>Select Country</option>
+                                @foreach ($countries as $id => $country)
+                                    <option value="{{ $country->country_id }}" {{ (old('country', $supplier->country) == $country->country_id) ? 'selected' : '' }}>{{ $country->country_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">State*</label>
+                            <select class="form-control" required name="state">
+                                <option value="" disabled>Select State</option>
+                                @foreach ($states as $id => $state)
+                                    <option value="{{ $state->state_id }}" {{ (old('state', $supplier->state) == $state->state_id) ? 'selected' : '' }}>{{ $state->state_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">City*</label>
                                     <input type="text" class="form-control" required name="supplier_city" value="{{$supplier->supplier_city}}" placeholder="Supplier City">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">State*</label>
-                                    <input type="text" class="form-control" required name="state" value="{{$supplier->state}}" placeholder="State">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Country*</label>
-                                    <input type="text" class="form-control" required name="country" value="{{$supplier->country}}" placeholder="Country">
                                 </div>
                             </div>
                         </div>
@@ -135,12 +146,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Terms And Condition</label>
                                     <textarea class="form-control" name="terms_and_conditions" placeholder="Terms And Condition">{{$supplier->terms_and_conditions}}</textarea>
                                 </div>
                             </div>
+                            </div>
+                            <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="form-label">Status*</div>

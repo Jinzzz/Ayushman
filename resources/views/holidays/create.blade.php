@@ -34,11 +34,8 @@
                                     <label class="form-label">Holiday Type*</label>
                                     <select class="form-control" name="leave_type" id="leave_type">
                                     <option value="" disabled selected>Choose Holiday Type</option>
-                                    @foreach($leave_types as $leave_type)
-                                        <option value="{{ $leave_type->leave_type_id }}" {{ old('leave_type') == $leave_type->leave_type_id ? 'selected' : '' }}>
-                                            {{ $leave_type->name }}
-                                        </option>
-                                    @endforeach
+                                    <option value="Weekend">Weekend</option>
+                                    <option value="General">General</option>
                                 </select>
 
                                 </div>

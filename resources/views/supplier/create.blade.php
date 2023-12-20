@@ -29,18 +29,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Supplier Name*</label>
-                                    <input type="text" class="form-control" required name="supplier_name" value="{{ old('supplier_name') }}" placeholder="Supplier Name">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
                                     <label class="form-label">Supplier Type*</label>
                                     <select class="form-control" required name="supplier_type_id" id="supplier_type_id">
                                         <option value="">Select Supplier Type</option>
                                         <option value="1">Individual</option>
                                         <option value="2">Business</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Supplier Name*</label>
+                                    <input type="text" class="form-control" required name="supplier_name" value="{{ old('supplier_name') }}" placeholder="Supplier Name">
                                 </div>
                             </div>
                         </div>
@@ -52,6 +52,28 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Country*</label>
+                                <select class="form-control" required name="country">
+                                    <option value="" selected disabled>Select Country</option>
+                                    @foreach ($countries as $id => $country)
+                                        <option value="{{ $country->country_id }}" {{ old('country') == $country->country_id  ? 'selected' : '' }}>{{ $country->country_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">State*</label>
+                                <select class="form-control" required name="state">
+                                    <option value="" selected disabled>Select State</option>
+                                    {{-- State options will be dynamically added here --}}
+                                </select>
+                            </div>
+                        </div>
+                                                <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">City*</label>
                                     <input type="text" class="form-control" required name="supplier_city" value="{{ old('supplier_city') }}" placeholder="Supplier City">
@@ -59,27 +81,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">State*</label>
-                                    <input type="text" class="form-control" required name="state" value="{{ old('state') }}" placeholder="State">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Country*</label>
-                                    <input type="text" class="form-control" required name="country" value="{{ old('country') }}" placeholder="Country">
-                                </div>
-                            </div>
+                        <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Pincode*</label>
+                            <input type="text" class="form-control" pattern="\d{6}" oninput="sanitizePincode(this)" required name="pincode" placeholder="Pincode">
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Pincode*</label>
-                                    <input type="number" class="form-control" max="999999" min="100000" required name="pincode" placeholder="Pincode">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
+                    </div>
+
+                                                    <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Business Name</label>
                                     <input type="text" class="form-control" name="business_name" value="{{ old('business_name') }}" placeholder="Business Name">
@@ -89,14 +98,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Phone Number*</label>
-                                    <input type="number" class="form-control" max="9999999999" min="1000000000" required name="phone_1" value="{{ old('phone_1') }}" placeholder="Phone Number">
+                                    <label class="form-label">Contact Number*</label>
+                                    <input type="number" class="form-control" max="9999999999" min="1000000000" required name="phone_1" value="{{ old('phone_1') }}" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Alternative Number</label>
-                                    <input type="number" max="9999999999" min="1000000000" class="form-control" name="phone_2" value="{{ old('phone_2') }}" placeholder="Alternative Number">
+                                    <label class="form-label">Alternative Mobile Number</label>
+                                    <input type="number" max="9999999999" min="1000000000" class="form-control" name="phone_2" value="{{ old('phone_2') }}" placeholder="Alternative Mobile Number">
                                 </div>
                             </div>
                         </div>
@@ -115,12 +124,17 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Credit Period</label>
-                                    <input type="number" class="form-control" max="99" min="0" pattern="\d*" name="credit_period" value="{{ old('credit_period') }}" placeholder="Credit Period">
+                        <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Credit Period</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" max="99" min="0" pattern="\d*" name="credit_period" id="creditPeriodInput" value="{{ old('credit_period') }}" placeholder="Credit Period" oninput="validateCreditPeriod(this)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Days</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Credit Limit</label>
@@ -149,27 +163,27 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Opening Balance Date</label>
+                                    <label class="form-label">Opening balance As On*</label>
                                     <input type="date" class="form-control" name="opening_balance_date" value="{{ old('opening_balance_date') }}" placeholder="Opening Balance Date">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">GST Number</label>
-                                    <input type="number" class="form-control" min="0" name="GSTNO" value="{{ old('GSTNO') }}" placeholder="GSTNO">
+                                    <label class="form-label">GSTIN Number</label>
+                                    <input type="number" class="form-control" min="0" name="GSTNO" value="{{ old('GSTNO') }}" placeholder="GSTIN                                                         NO">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Terms And Condition</label>
-                                    <textarea class="form-control" name="terms_and_conditions" placeholder="Terms And Condition">{{ old('terms_and_conditions') }}</textarea>
+                                    <label class="form-label">Terms And Conditions</label>
+                                    <textarea class="form-control" name="terms_and_conditions" placeholder="Terms And Conditions">{{ old('terms_and_conditions') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <div class="form-label">Status*</div>
+                                    <div class="form-label">Status Change*</div>
                                     <label class="custom-switch">
                                         <input type="hidden" name="is_active" value="0">
                                         <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
@@ -198,6 +212,9 @@
 </div>
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
@@ -209,4 +226,64 @@
         }
     }
 </script>
+
+<script>
+    $(document).ready(function() {
+        // Function to update state options based on the selected country
+        function updateStates(countryId) {
+            $.ajax({
+                url: '/get-states/' + countryId,
+                type: 'GET',
+                success: function(data) {
+                    // Clear existing options
+                    $('select[name="state"]').empty();
+
+                    // Add new options based on the fetched data
+                    $.each(data, function(state_id, state_name) {
+                        $('select[name="state"]').append('<option value="' + state_id + '">' + state_name + '</option>');
+                    });
+                }
+            });
+        }
+
+        // On change of the country select box
+        $('select[name="country"]').on('change', function() {
+            var countryId = $(this).val();
+            updateStates(countryId);
+        });
+    });
+
+    function sanitizePincode(input) {
+        // Remove non-numeric characters
+        input.value = input.value.replace(/[^0-9]/g, '');
+
+        // Show SweetAlert after entering the 7th digit
+        if (input.value.length === 7) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Valid Pincode',
+                text: 'You entered a valid 6-digit Pincode!',
+                timer: 3000, // Display the alert for 3 seconds
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+            input.value = '';
+        }
+    }
+
+    function validateCreditPeriod(input) {
+        var value = parseInt(input.value);
+
+        // Check if the entered value is within the desired range
+        if (isNaN(value) || value < 0 || value > 99) {
+            // Reset the input value to an empty string
+            input.value = '';
+        }
+
+        // Update the unit display dynamically
+        var unitDisplay = document.querySelector('#creditPeriodInput + .input-group-append .input-group-text');
+        unitDisplay.textContent = isNaN(value) ? 'Days' : value === 1 ? 'Days' : 'Days';
+    }
+</script>
+
 @endsection

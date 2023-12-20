@@ -80,7 +80,7 @@
                             <td>{{ $holiday->year }}</td>
                             <td>{{ $holiday->from_date }}</td>
                             <td>{{ $holiday->to_date }}</td>
-                            <td>{{ $holiday->leave_type_name }}</td>
+                            <td>{{ $holiday->leave_type }}</td>
                             <td>
                                 <a class="btn btn-secondary btn-sm" href="{{ route('holidays.staff-mapping', ['holiday_id' => $holiday->id]) }}">
                                     <i class="fa fa-eye" aria-hidden="true"></i> Link

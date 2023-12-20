@@ -6,6 +6,7 @@ use App\Models\Mst_Tax_Group;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Unit;
+use App\Models\Mst_Manufacturer;
 use Illuminate\Http\Request;
 
 class MstMedicineController extends Controller
@@ -50,8 +51,10 @@ class MstMedicineController extends Controller
         $itemType = Mst_Master_Value::where('master_id',13)->pluck('master_value','id');
         $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
         // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
-        $Manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
-        // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
+        $Manufacturer = Mst_Manufacturer::where('is_active',  1)
+        ->whereNull('deleted_at') 
+        ->get();
+    // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
         $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
@@ -102,13 +105,13 @@ class MstMedicineController extends Controller
         $medicine = Mst_Medicine::findOrFail($id);
         $itemType = Mst_Master_Value::where('master_id',13)->pluck('master_value','id');
         $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
-       // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
-        $manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
-        //$branches = Mst_Branch::pluck('branch_name','branch_id'); 
+        $Manufacturer = Mst_Manufacturer::where('is_active',  1)
+                        ->whereNull('deleted_at') 
+                        ->get();
         $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
-        return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','manufacturer','units'));
+        return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','Manufacturer','units'));
     }
 
     public function update(Request $request,$id)

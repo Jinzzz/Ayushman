@@ -40,23 +40,13 @@
                                 </div>
                             </div>
                         </div>
-                        
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Company</label>
-                                    <input type="text" class="form-control" readonly name="company"
-                                        value="{{ $show->company }}">
-                                </div>
-                            </div>
-                        </div>
-
+                    
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Remarks</label>
-                                    <textarea class="form-control" name="remark" placeholder="Reason For Leave" readonly>{{ $show->reason ?? old('reason') }}</textarea>
+                                    <textarea class="form-control" name="remark" placeholder="Reason For Leave" readonly>{{ $show->remark ?? old('reason') }}</textarea>
+
                                 </div>
                             </div>
                         </div>

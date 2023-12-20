@@ -145,21 +145,30 @@
    }
 
    function togglePassword() {
-      const passwordInput = document.querySelector("#password");
+    // Find the password input element
+    const passwordInput = document.querySelector("#password");
 
-      if (passwordInput.getAttribute("type") == "text") {
-         $("#eye").removeClass("fa-eye");
-         $("#eye").addClass("fa-eye-slash");
+    // Find the eye icon element
+    const eyeIcon = $("#eye");
 
-      } else {
-         $("#eye").removeClass("fa-eye-slash");
-         $("#eye").addClass("fa-eye");
+    // Check if elements are found
+    if (passwordInput && eyeIcon.length) {
+        // Toggle classes based on the current type of the password input
+        if (passwordInput.getAttribute("type") === "text") {
+            eyeIcon.removeClass("fa-eye-slash").addClass("fa-eye");
+        } else {
+            eyeIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+        }
 
-      }
+        // Toggle the type attribute between "password" and "text"
+        const type = passwordInput.getAttribute("type") === "text" ? "password" : "text";
+        passwordInput.setAttribute("type", type);
+    } else {
+        // Log an error if elements are not found
+        console.error("Element IDs not found.");
+    }
+}
 
-      const type = passwordInput.getAttribute("type") === "text" ? "password" : "text"
-      passwordInput.setAttribute("type", type)
-   }
 
    //function for confirmPassword eye icon:
    function toggleConfirmPassword() {

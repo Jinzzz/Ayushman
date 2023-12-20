@@ -124,11 +124,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/staffs/create', [MstStaffController::class, 'create'])->name('staffs.create');
     Route::post('/staffs/store', [MstStaffController::class, 'store'])->name('staffs.store');
     Route::get('/staffs/edit/{staff_id}', [MstStaffController::class, 'edit'])->name('staffs.edit');
+    Route::put('/staffs/update/{staff_id}', [MstStaffController::class, 'update'])->name('staffs.update');
     Route::get('/staffs/show/{staff_id}', [MstStaffController::class, 'show'])->name('staffs.show');
     Route::delete('/staffs/destroy/{staff_id}', [MstStaffController::class, 'destroy'])->name('staffs.destroy');
-    Route::put('/staffs/update/{staff_id}', [MstStaffController::class, 'update'])->name('staffs.update');
     Route::post('/staffs/restore', [MstStaffController::class, 'restore'])->name('staffs.restore');
-    Route::patch('staffs/{staff_id}/change-status', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
+    Route::patch('staffs/change-status/{staff_id}', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
+    Route::get('/getSalaryHeadTypes/{id}', [MstStaffController::class, 'getSalaryHeadTypes']);
+    Route::post('/checkUniqueEmail', [MstStaffController::class, 'checkUniqueEmail'])->name('checkUniqueEmail');
+    Route::post('/checkUniqueUsername', [MstStaffController::class, 'checkUniqueUsername'])->name('checkUniqueUsername');
+    Route::post('/checkUniqueAccessCardNumber', [MstStaffController::class, 'checkUniqueAccessCardNumber'])->name('checkUniqueAccessCardNumber');
 
     //Manage-External-Doctors:
     Route::get('/externaldoctors/index', [MstExternalDoctorController::class, 'index'])->name('externaldoctors.index');
@@ -275,6 +279,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/supplier/destroy/{id}', [MstSupplierController::class, 'destroy'])->name('supplier.destroy');
     Route::patch('supplier/change-status/{id}', [MstSupplierController::class, 'changeStatus'])->name('supplier.changeStatus');
     Route::get('/supplier/show/{id}', [MstSupplierController::class, 'show'])->name('supplier.show');
+    Route::get('/get-states/{countryId}', [MstSupplierController::class, 'getStates'])->name('get.states');
+
 
     //Manage-Specialization:
     Route::get('/specialization/index/{id}', [MstStaffSpecializationController::class, 'index'])->name('specialization.index');
@@ -559,3 +565,16 @@ Route::post('/therapy-stock-transfer/store', [TherapyStockTransferController::cl
 Route::get('/get-medicine-batch/{id}', [TherapyStockTransferController::class, 'getMedicineBatch'])->name('getMedicineBatch');
 Route::get('/get-current-medicine-stock/{medicineId}/{batchNo}', [TherapyStockTransferController::class, 'getCurrentMedicineStock'])->name('getCurrentMedicineStock');
 });
+
+
+Route::get('/doctor/login', [MstAuthController::class, 'showLoginForm'])->name('doctor_login');
+Route::post('/doctor/login', [MstAuthController::class, 'login']);
+
+Route::get('/accountant/login', [MstAuthController::class, 'showLoginForm'])->name('accountant_login');
+Route::post('/accountant/login', [MstAuthController::class, 'login']);
+
+Route::get('/pharmacist/login', [MstAuthController::class, 'showLoginForm'])->name('pharmacist_login');
+Route::post('/pharmacist/login', [MstAuthController::class, 'login']);
+
+Route::get('/receptionist/login', [MstAuthController::class, 'showLoginForm'])->name('receptionist_login');
+Route::post('/receptionist/login', [MstAuthController::class, 'login']);

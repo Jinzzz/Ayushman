@@ -52,6 +52,16 @@
                                 </div>
                             </div>
 
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Remarks</label>
+                                        <textarea class="form-control" name="remark" placeholder="Reason For Leave">{{ $masters->remark ?? old('remark') }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -70,26 +80,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label class="form-label">Company</label>
-                                        <input type="text" class="form-control" readonly name="company"
-                                            value="{{ $masters->company }}">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Remarks*</label>
-                                        <textarea class="form-control" name="remark" placeholder="Reason For Leave">{{ $masters->remark ?? old('remark') }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
 
                             <div class="row">
                                 <div class="col-md-12">

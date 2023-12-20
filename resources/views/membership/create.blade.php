@@ -206,34 +206,39 @@
 
    // Render wellness form fields
    function renderForm() {
-      var data = '';
-      data += '<div class="row">';
-      data += '<div class="col-md-6 col-sm-offset-1">';
-      data += '<div class="form-group label-floating">';
-      data += '<label class="form-label">Select wellness*</label>';
-      data += '<select required name="wellness_id[]" class="form-control" required>';
-      data += '<option disabled selected value="">Select wellness</option>'; // Add the first option
-      @foreach($wellnesses as $wellness)
-      data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
-      @endforeach
-      data += '</select>';
-      data += "<label class='form-label'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";
-      data += '</div></div>';
-      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
-      data += "<div style='align-self:center;' class='col-md-1 remove_field add-btn'><a href='javascript:void(0);'><span class='glyphicon glyphicon-plus' style='color:green;'></span></a></div>";
-      data += "</div>";
+    var data = '';
+    data += '<div class="row">';
+    data += '<div class="col-md-6 col-sm-offset-1">';
+    data += '<div class="form-group label-floating">';
+    data += '<label class="form-label">Select wellness*</label>';
+    data += '<select required name="wellness_id[]" class="form-control" required>';
+    data += '<option disabled selected value="">Select wellness</option>'; // Add the first option
+    @foreach($wellnesses as $wellness)
+    data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
+    @endforeach
+    data += '</select>';
+    data += "<label class='form-label duration-cost-label' style='display:none;'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";
+    data += '</div></div>';
+    data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
+    data += "<div style='align-self:center;' class='col-md-1 remove_field add-btn' style='display:none;'><a href='javascript:void(0);'><span class='glyphicon glyphicon-plus' style='color:green;'></span></a></div>";
+    data += "</div>";
 
-      $("#include_wellness").append(data);
+    $("#include_wellness").append(data);
 
-      // Add an event listener to update the duration and cost labels when a wellness option is selected
-      $("select[name='wellness_id[]']").on('change', function() {
-         var selectedOption = $(this).find(':selected');
-         var duration = selectedOption.data('duration');
-         var cost = selectedOption.data('cost');
-         $(this).closest('.row').find('.selected_duration').text(duration);
-         $(this).closest('.row').find('.selected_cost').text(cost);
-      });
-   }
+    // Add an event listener to update the duration and cost labels when a wellness option is selected
+    $("select[name='wellness_id[]']").on('change', function() {
+        var selectedOption = $(this).find(':selected');
+        var duration = selectedOption.data('duration');
+        var cost = selectedOption.data('cost');
+        $(this).closest('.row').find('.duration-cost-label').show();
+        $(this).closest('.row').find('.selected_duration').text(duration);
+        $(this).closest('.row').find('.selected_cost').text(cost);
+
+        // Show the "Add Wellness" button after the first wellness option is selected
+        $(this).closest('.row').find('.add-btn').show();
+    });
+}
+
 
    function toggleStatus(checkbox) {
       if (checkbox.checked) {

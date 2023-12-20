@@ -94,6 +94,3 @@
             }
          }
       </script>
-
-
-      @endsection

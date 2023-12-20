@@ -46,15 +46,6 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Company*</label>
-                                    <input type="text" class="form-control" name="company" id="company" value="Ayushman" readonly>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="form-label">Remark*</label>

@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 @section('content')
 <div class="container">
@@ -79,7 +80,8 @@
                   <div class="col-md-6">
                      <div class="form-group">
                         <label class="form-label">Marital Status</label>
-                        <input type="text" class="form-control" readonly name="maritial_status" value="{{$show->maritialStatus->master_value}}" placeholder=" Marital Status">
+                        <input type="text" class="form-control" readonly name="maritial_status" value="{{ optional($show->maritialStatus)->master_value }}" placeholder="Marital Status">
+
                      </div>
                   </div>
                </div>
@@ -114,18 +116,25 @@
                </div>
 
 
-               <div class="col-md-12">
-                  <div class="form-group">
-                     <label class="form-label">Status</label>
-                     <button type="button" class="status-button @if($show->is_active) Active @else Inactive  @endif" disabled>
-                        @if($show->is_active)
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="custom-switch">
+                <input type="checkbox" id="is_active" readonly name="is_active" @if($show->is_active) checked @endif disabled class="custom-switch-input">
+                <span class="custom-switch-indicator"></span>
+                <span class="custom-switch-description">
+                    @if($show->is_active)
                         Active
-                        @else
+                    @else
                         Inactive
-                        @endif
-                     </button>
-                  </div>
-               </div>
+                    @endif
+                </span>
+            </label>
+        </div>
+    </div>
+</div>
+
 
                <div class="col-md-12">
                   <div class="form-group">

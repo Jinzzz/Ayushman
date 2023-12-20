@@ -30,8 +30,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Patient Email</label>
-                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200" name="patient_email" placeholder="Patient Email">
+                                    <label class="form-label">Patient Email*</label>
+                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200" name="patient_email" placeholder="Patient Email" required>
                                 </div>
                             </div>
                         </div>

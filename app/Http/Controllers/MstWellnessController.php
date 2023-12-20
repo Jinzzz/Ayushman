@@ -17,7 +17,8 @@ class MstWellnessController extends Controller
 {
     public function index(Request $request)
     {
-        try {
+
+       
             $pageTitle = "Wellnesses";
             $branches = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
             $query = Mst_Wellness::select('mst_wellness.*', 'mst_branches.branch_name')
@@ -25,20 +26,21 @@ class MstWellnessController extends Controller
                 ->join('mst_branches', 'trn_wellness_branches.branch_id', 'mst_branches.branch_id')
                 ->where('mst_wellness.is_active', 1)
                 ->orderBy('mst_wellness.created_at', 'desc');
-            if ($request->has('wellness_name')) {
-                $query->where('mst_wellness.wellness_name', 'LIKE', "%{$request->wellness_name}%");
-            }
+
+                if ($request->has('wellness_name')) {   
+                    $query->where('mst_wellness.wellness_name', 'LIKE', '%' . $request->wellness_name . '%');
+                }
+                
 
             if ($request->has('branch_id')) {
                 $query->where('trn_wellness_branches.branch_id', $request->branch_id);
             }
 
             $wellness = $query->get();
+            
             return view('wellness.index', compact('pageTitle', 'wellness', 'branches'));
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
         }
-    }
+  
 
     public function create()
     {
@@ -164,7 +166,7 @@ class MstWellnessController extends Controller
                     'wellness_terms_conditions' => 'required',
                     'branch' => 'required|array',
                     'wellness_cost' => 'required|numeric',
-                    'wellness_duration' => 'required',
+                    'wellness_duration' => 'required|integer|min:0',
                     'is_active' => 'required',
                     'wellness_offer_price' => 'required|numeric',
                 ],
@@ -235,40 +237,39 @@ class MstWellnessController extends Controller
 
     public function show($id)
     {
-        try {
+  
             $pageTitle = "View wellness details";
             $show = Mst_Wellness::findOrFail($id);
             $branch = Mst_Branch::where('is_active', 1)->pluck('branch_name', 'branch_id');
             $branch_ids = Trn_Wellness_Branch::where('wellness_id', $id)->pluck('branch_id');
             return view('wellness.show', compact('pageTitle', 'show', 'branch', 'branch_ids'));
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+
     }
 
     public function destroy($wellness_id)
     {
-        try {
+
             $wellness = Mst_Wellness::findOrFail($wellness_id);
             $wellness->delete();
-            return 1;
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Wellness deleted successfully',
+        ]);
     }
 
 
-    public function changeStatus(Request $request, $wellness_id)
+    public function changeStatus($wellness_id)
     {
-        try {
+        
             $wellness = Mst_Wellness::findOrFail($wellness_id);
             $wellness->is_active = !$wellness->is_active;
             $wellness->save();
             return 1;
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+       
     }
+    
+    
 
     public function roomAssign()
     {

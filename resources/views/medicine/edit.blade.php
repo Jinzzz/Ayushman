@@ -78,11 +78,14 @@
                         <div class="form-group">
                            <label class="form-label">Manufacturer</label>
                            <select class="form-control" name="manufacturer" id="manufacturer">
-                              <option value="">Select Manufacturer</option>
-                              @foreach($manufacturer as $masterId => $masterValue)
-                              <option value="{{ $masterId }}" {{$masterId == $medicine->manufacturer ?' selected' : ''}}>{{ $masterValue }}</option>
-                              @endforeach
-                           </select>
+                           <option value="">Select Manufacturer</option>
+                           @foreach($Manufacturer as $masterValue)
+                              <option value="{{ $masterValue->manufacturer_id }}" {{ $masterValue->manufacturer_id == $medicine->manufacturer ? 'selected' : '' }}>
+                                    {{ $masterValue->name }}
+                              </option>
+                           @endforeach
+                        </select>
+
                         </div>
                      </div>
                      <div class="col-md-6">

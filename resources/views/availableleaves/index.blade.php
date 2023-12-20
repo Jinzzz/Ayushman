@@ -48,12 +48,12 @@
         </div>
     @endif
     <div class="card-header">
-        <h3 class="card-title">List Salary package</h3>
+        <h3 class="card-title">List Available Leave</h3>
     </div>
     <div class="card-body">
-        <a href="{{ route('availableleaves.create') }}" class="btn btn-block btn-info">
+        <!-- <a href="{{ route('availableleaves.create') }}" class="btn btn-block btn-info">
             <i class="fa fa-plus"></i> Add Employee Leave
-        </a>
+        </a> -->
         <div class="table-responsive">
             <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                 <thead>
@@ -61,7 +61,7 @@
                         <th class="wd-15p">SL.NO</th>
                         <th class="wd-10p">Employee Name</th>
                         <th class="wd-10p">Total Leaves</th>
-                        <th class="wd-15p">Action</th>
+                        <!-- <th class="wd-15p">Action</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -72,12 +72,12 @@
             <td>{{ ++$i }}</td>
             <td>{{ $availableleave->staff_name }}</td>
             <td>{{ $availableleave->total_leaves }}</td>
-            <td>
+            <!-- <td>
               <a class="btn btn-secondary btn-sm" href="{{ route('availableleaves.show', $availableleave->id) }}">
                 <i class="fa fa-eye" aria-hidden="true"></i> View </a>
               <a class="btn btn-primary btn-sm edit-custom" href="{{ route('availableleaves.edit', $availableleave->id) }}">
                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-            </td>
+            </td> -->
           </tr> @endforeach 
                 </tbody>
             </table>

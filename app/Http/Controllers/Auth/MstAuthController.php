@@ -21,14 +21,32 @@ class MstAuthController extends Controller
     // Process the login form
     public function login(Request $request)
     {
-        $credentials = $request->only('username', 'password');
-
+ $credentials = $request->only('username', 'password');
 
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
-            // Authentication successful
-            // dd(1);
-            // Session::put
-            return redirect()->intended('/home'); // Replace '/dashboard' with your desired destination
+            $user = Auth::guard('mst_users_guard')->user();
+
+            // Redirect based on the user's role
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->route('/home');
+                    break;
+                case 'doctor':
+                    return redirect()->route('/home');
+                    break;
+                case 'accountant':
+                    return redirect()->route('/home');
+                    break;
+                case 'pharmacist':
+                    return redirect()->route('/home');
+                    break;
+                case 'receptionist':
+                    return redirect()->route('/home');
+                    break;
+                // Add more cases for other roles if needed
+                default:
+                    return redirect()->intended('/home');
+            }
         } else {
             // Authentication failed
             return back()->withInput()->withErrors(['login' => 'Invalid credentials']);
@@ -122,4 +140,5 @@ class MstAuthController extends Controller
             return view('auth.reset_password')->with('login', $e->getMessage());
         }
     }
+
 }
