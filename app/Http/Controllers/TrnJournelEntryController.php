@@ -20,7 +20,7 @@ class TrnJournelEntryController extends Controller
     {
         try {
             // dd($request->all());
-            $pageTitle = "Journel Entries";
+            $pageTitle = "Journal Entries";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $branches = Mst_Branch::get();
             // $query = Trn_Journel_Entry::join('trn__journel__entry__details', 'trn__journel__entries.journal_entry_id', 'trn__journel__entry__details.journal_entry_id')->orderBy('trn__journel__entries.created_at', 'desc')->with('journel_entry_type', 'branch');
@@ -92,7 +92,7 @@ class TrnJournelEntryController extends Controller
     public function create(Request $request)
     {
         try {
-            $pageTitle = "Create Journel Entries";
+            $pageTitle = "Create Journal Entry";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $ledgers = Mst_Account_Ledger::where('is_active', 1)->get();
             return view('journel_entry.create', compact('pageTitle', 'ledgers', 'journel_entry_types'));
@@ -115,7 +115,7 @@ class TrnJournelEntryController extends Controller
                     'credit' => ['required'],
                 ],
                 [
-                    'journel_entry_type_id.required' => 'Journel entry type is required',
+                    'journel_entry_type_id.required' => 'Journal entry type is required',
                     'total_debit.required' => 'Total debit is required',
                     'ledger_id.required' => 'Ledger is required',
                     'total_credit.required' => 'Total credit is required',
@@ -205,7 +205,7 @@ class TrnJournelEntryController extends Controller
     public function edit($id)
     {
         try {
-            $pageTitle = "Edit Journel Entry";
+            $pageTitle = "Edit Journal Entry";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $ledgers = Mst_Account_Ledger::where('is_active', 1)->get();
             $all_entry_details = Trn_Journel_Entry_Details::where('journal_entry_id', $id)->get();
@@ -234,7 +234,7 @@ class TrnJournelEntryController extends Controller
                     'credit' => ['required'],
                 ],
                 [
-                    'journel_entry_type_id.required' => 'Journel entry type is required',
+                    'journel_entry_type_id.required' => 'Journal entry type is required',
                     'total_debit.required' => 'Total debit is required',
                     'ledger_id.required' => 'Ledger is required',
                     'total_credit.required' => 'Total credit is required',
@@ -300,7 +300,7 @@ class TrnJournelEntryController extends Controller
     public function show($id)
     {
         try {
-            $pageTitle = "Edit Journel Entry";
+            $pageTitle = "Edit Journal Entry";
             $journel_entry_types = Mst_Journel_Entry_Type::get();
             $ledgers = Mst_Account_Ledger::get();
             $all_entry_details = Trn_Journel_Entry_Details::where('journal_entry_id', $id)->get();

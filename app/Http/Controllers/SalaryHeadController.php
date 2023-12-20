@@ -86,7 +86,7 @@ class SalaryHeadController extends Controller
             'salary_head_name' => $request->input('salary_head_name'),
             'status' => $is_status,
             'remark' => $request->input('remark'),
-            'company' => $company,
+            'company' => 'Ayushman',
             'salary_head_type' => $request->input('salary_head_type'),
         ]);
     

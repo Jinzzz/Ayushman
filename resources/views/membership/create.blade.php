@@ -122,6 +122,7 @@
 @section('js')
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <script type="text/javascript">
    function validatePrices() {
@@ -252,4 +253,26 @@
 
    // Rest of your JavaScript code...
 </script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Initial hide of wellness details
+        $('.wellness-details').hide();
+
+        // Add an event listener to update the duration and cost labels when a wellness option is selected
+        $("select[name='wellness_id[]']").on('change', function() {
+            var selectedOption = $(this).find(':selected');
+            var duration = selectedOption.data('duration');
+            var cost = selectedOption.data('cost');
+            var wellnessDetailsContainer = $(this).closest('.row').find('.wellness-details');
+
+            // Update the labels and show them
+            wellnessDetailsContainer.find('.selected_duration').text(duration);
+            wellnessDetailsContainer.find('.selected_cost').text(cost);
+            wellnessDetailsContainer.show();
+        });
+    });
+</script>
+
+
 @endsection

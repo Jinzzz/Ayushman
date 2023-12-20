@@ -88,7 +88,7 @@
         <li><a class="slide-item" href="{{ url('/account-sub-group/index') }}">{{__('Account Sub Group')}}</a></li>
         <li><a class="slide-item" href="{{ url('/account-ledger/index') }}">{{__('Account ledger ')}}</a></li>
         <li><a class="slide-item" href="{{ url('/tax-group/index')}}">{{ __('Tax Groups') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/journel-entry')}}">{{__('Journel Entry')}}</a></li>
+        <li><a class="slide-item" href="{{ url('/journel-entry')}}">{{__('Journal Entry')}}</a></li>
         <!-- <li><a class="slide-item" href="#">{{__('Attendence View-Biometric')}}</a></li> -->
         <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
     </li>

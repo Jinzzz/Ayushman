@@ -52,9 +52,10 @@
                               <input type="hidden" name="is_dedactable" value="0"> <!-- Hidden field for false value -->
                               <input type="checkbox" id="is_dedactable" name="is_dedactable" value="1" onchange="toggleDeductible(this)" class="custom-switch-input" {{ old('is_dedactable', isset($leave_types->is_dedactable) ? $leave_types->is_dedactable : 1) ? 'checked' : '' }}>
                               <span id="dedactableLabel" class="custom-switch-indicator"></span>
-                              <span id="dedactableText" class="custom-switch-description">
-                                 {{ old('is_dedactable', isset($leave_types->is_dedactable) ? ($leave_types->is_dedactable ? 'Non-Deductible' : 'Deductible') : 'Non-Deductible') }}
-                              </span>
+                     <span id="dedactableText" class="custom-switch-description">
+                     {{ old('is_dedactable', isset($leave_types->is_dedactable) ? ($leave_types->is_dedactable ? 'Deductable' : 'Non-Deductable') : 'Non-Deductable') }}
+                  </span>
+
                            </label>
                         </div>
                      </div>

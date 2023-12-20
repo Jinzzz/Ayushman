@@ -28,7 +28,7 @@
                   </ul>
                </div>
                @endif
-               <form action="{{ route('update.medicine.stocks') }}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('updatestockmedicine') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="_method" value="PUT">
                   <div class="row">
@@ -37,27 +37,33 @@
                             <label class="form-label">Branch *</label>
                             <select class="form-control" required name="branch_id" id="branch_id">
                                 <option value="">Choose Branch</option>
-                                @foreach($branchs as  $branch)
-                                <option value="{{ $branch->branch_id  }}">{{ $branch->branch_name }}</option>
-                                @endforeach
+                                @foreach($branchs as $branch)
+                    <option value="{{ $branch->branch_id  }}" {{ $branch->branch_id  == $medicines->branch_id ? 'selected' : '' }}>
+                      {{ $branch->branch_name }}
+                    </option>
+                    @endforeach
                             </select>
                         </div>
                      </div>
                      <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="form-label">Medicine *</label>
-                            <select class="form-control" required name="medicine" id="medicine">
-                                <option value="">Choose Medicine</option>
-                                @foreach($medicines as $id => $value)
-                                <option value="{{ $id }}">{{ $value }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Medicine *</label>
+                        <select class="form-control" required name="medicine" id="medicine" readonly disabled>
+                            <option value="">Choose Medicine</option>
+                            @foreach($meds as $med)
+                                <option value="{{ $med->id }}" {{ $med->id == $medicines->id ? 'selected' : '' }}>
+                                    {{ $med->medicine_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Generic Name *</label>
-                           <input type="text" class="form-control" required name="generic_name" id="generic_name"  placeholder="Generic Name" >
+                           <input type="text" class="form-control" required name="generic_name" id="generic_name"  placeholder="Generic Name" value="{{$medicines->generic_name}}" readonly>
                         </div>
                      </div>
                      <div class="col-md-4">
@@ -83,8 +89,8 @@
                      </div>
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Remarks *</label>
-                           <input type="text" class="form-control"  required name="remarks"  placeholder="Remarks">
+                           <label class="form-label">Remarks</label>
+                           <textarea class="form-control" name="remarks">{{ $medicines->remark }}</textarea>
                         </div>
                      </div>
                   </div>
@@ -116,62 +122,71 @@
 @endsection
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/34.0.1/classic/ckeditor.js"></script>
+
+
+<!-- Add the correct path to the CKEditor script -->
+<script src="https://cdn.ckeditor.com/ckeditor5/34.0.1/classic/ckeditor.js"></script>
+
 <script>
-    // Fetch generic name, batch numbers, and current stock based on selected medicine
-    document.getElementById('medicine').addEventListener('change', function () {
-        var medicineId = this.value;
+    $(document).ready(function () {
+        // Fetch batch numbers based on the initially selected medicine at page load
+        fetchBatchNumbers();
 
-        // Make an AJAX request to get the generic name
-        $.ajax({
-            url: '/get-generic-name/' + medicineId,
-            type: 'GET',
-            success: function (data) {
-                // Update the value of the 'generic_name' input field
-                document.getElementById('generic_name').value = data.generic_name;
-            },
-            error: function (error) {
-                console.error('Error fetching generic name:', error);
-            }
-        });
+        // Fetch current stock based on the initially selected batch number at page load
+        fetchCurrentStock();
 
-        // Make an AJAX request to get batch numbers
-        $.ajax({
-            url: '/get-batch-numbers/' + medicineId,
-            type: 'GET',
-            success: function (data) {
-                // Update the options of the 'batch_no' dropdown
-                var batchNoDropdown = document.getElementById('batch_no');
-                batchNoDropdown.innerHTML = '<option value="">Choose Batch No</option>';
-                data.batch_numbers.forEach(function (batchNumber) {
-                    var option = document.createElement('option');
-                    option.value = batchNumber;
-                    option.text = batchNumber;
-                    batchNoDropdown.appendChild(option);
-                });
-            },
-            error: function (error) {
-                console.error('Error fetching batch numbers:', error);
-            }
-        });
-    });
+        // Function to fetch batch numbers based on the selected medicine
+        function fetchBatchNumbers() {
+            var medicineId = $('#medicine').val();
 
-    // Make an AJAX request to get current stock based on selected batch number
-    document.getElementById('batch_no').addEventListener('change', function () {
-        var medicineId = document.getElementById('medicine').value;
-        var batchNo = this.value;
+            // Make an AJAX request to fetch batch numbers based on the selected medicine
+            $.ajax({
+                url: '/getBatchNumbers', // Replace with the actual route to fetch batch numbers
+                method: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'medicine_id': medicineId
+                },
+                success: function (data) {
+                    // Clear existing options
+                    $('#batch_no').empty();
 
-        // Make an AJAX request to get current stock
-        $.ajax({
-            url: '/get-current-stock/' + medicineId + '/' + batchNo,
-            type: 'GET',
-            success: function (data) {
-                // Update the value of the 'current_stock' input field
-                document.getElementById('current_stock').value = data.current_stock;
-            },
-            error: function (error) {
-                console.error('Error fetching current stock:', error);
-            }
+                    // Add new batch numbers based on the response
+                    $.each(data.batchNumbers, function (key, value) {
+                        $('#batch_no').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        // Function to fetch current stock based on the selected batch number
+        function fetchCurrentStock() {
+            var medicineId = $('#medicine').val();
+            var batchNo = $('#batch_no').val();
+
+            // Make an AJAX request to get current stock
+            $.ajax({
+                url: '/get-current-stock/' + medicineId + '/' + batchNo,
+
+                type: 'GET',
+                success: function (data) {
+                    // Update the value of the 'current_stock' input field
+                    $('#current_stock').val(data.current_stock);
+                },
+                error: function (error) {
+                    console.error('Error fetching current stock:', error);
+                }
+            });
+        }
+
+        // Make an AJAX request to get current stock based on selected batch number
+        $('#batch_no').on('change', function () {
+            fetchCurrentStock();
         });
     });
 </script>
-@endsection
+

@@ -100,6 +100,8 @@
                                             class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                                     <a class="btn btn-secondary btn-sm" href="{{ route('medicine.show', $medicine->id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View </a>
+                                        <a class="btn btn-secondary btn-sm" href="{{ route('viewMedicineStockUpdation.view',$medicine->id) }}">
+                                        <i class="fa fa-eye" aria-hidden="true"></i> Update Stock </a>
                                         <form style="display: inline-block"
                                         action="{{ route('medicine.destroy', $medicine->id ) }}" method="post">
                                         @csrf

@@ -80,6 +80,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        </div>
                         <div class="row">
                         <div class="col-md-6">
                         <div class="form-group">
@@ -225,6 +227,52 @@
             $("input[name=is_active]").val(0); // Set the value to 0 when unchecked
         }
     }
+
+    $(document).ready(function () {
+        $('#country').on('change', function () {
+            var countryId = $(this).val();
+
+            // Make an AJAX request to get states based on the selected country
+            $.ajax({
+                url: '/get-states/' + countryId, // Replace with the actual route
+                type: 'GET',
+                success: function (data) {
+                    // Clear existing options
+                    $('#state').empty();
+
+                    // Add new options based on the response
+                    $.each(data, function (key, value) {
+                        $('#state').append('<option value="' + value.state_id + '">' + value.state_name + '</option>');
+                    });
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        // Function to toggle the 'required' attribute on the 'Opening Balance As On' field
+        function toggleOpeningBalanceAsOnRequired() {
+            var openingBalance = parseFloat($("[name='opening_balance']").val());
+
+            if (openingBalance > 0) {
+                $("[name='opening_balance_date']").prop('required', true);
+            } else {
+                $("[name='opening_balance_date']").prop('required', false);
+            }
+        }
+
+        // Call the function on page load
+        toggleOpeningBalanceAsOnRequired();
+
+        // Add an event listener to 'Opening Balance' field
+        $("[name='opening_balance']").on('input', function () {
+            // Call the function whenever the 'Opening Balance' value changes
+            toggleOpeningBalanceAsOnRequired();
+        });
+    });
 </script>
 
 <script>

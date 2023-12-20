@@ -61,9 +61,9 @@
                             <td>
                                 <button type="button" style="width: 115px;" onclick="changeDeductible({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_dedactable == 0) btn-danger @else btn-success @endif">
                                     @if($leave_type->is_dedactable == 0)
-                                    Deductible
-                                    @else
                                     Non-Deductible
+                                    @else
+                                    Deductible
                                     @endif
                                 </button>
                             </td>

@@ -33,9 +33,9 @@ use App\Helpers\AdminHelper;
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Select Journel Entry Type*</label>
+                                    <label class="form-label">Select Journal Entry Type*</label>
                                     <select required class="form-control" name="journel_entry_type_id" id="journel_entry_type_id">
-                                        <option value="">Choose Journel Entry Type</option>
+                                        <option value="">Choose Journal Entry Type</option>
                                         @foreach($journel_entry_types as $journel_entry_type)
                                         <option value="{{ $journel_entry_type->journal_entry_type_id }}" {{ $journel_entry_type->journal_entry_type_id == $journel_entries->journel_entry_type_id ? ' selected' : '' }}>{{ $journel_entry_type->journal_entry_type_name }}</option>
                                         @endforeach
@@ -165,7 +165,7 @@ use App\Helpers\AdminHelper;
             },
             messages: {
                 journel_entry_type_id: {
-                    required: 'Please select journel entry type.',
+                    required: 'Please select Journal entry type.',
                 },
             },
             errorPlacement: function(label, element) {
