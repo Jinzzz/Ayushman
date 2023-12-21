@@ -8,6 +8,7 @@ use App\Models\Mst_Master_Value;
 use App\Models\Mst_Unit;
 use App\Models\Mst_Manufacturer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class MstMedicineController extends Controller
 {
@@ -75,7 +76,6 @@ class MstMedicineController extends Controller
             'description' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
             'is_active' => 'required',
-            'Hsn_code'  => 'unique:mst_medicines,Hsn_code|required',
             'medicine_code' => 'unique:mst_medicines,medicine_code|required',
         ]);
     
