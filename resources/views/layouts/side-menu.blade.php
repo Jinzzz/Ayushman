@@ -76,8 +76,21 @@
         <li><a class="slide-item" href="{{ route('attendance.view') }}">{{ __('Attendance') }}</a></li>
         <li><a class="slide-item" href="{{route('branchTransfer.index')}}">{{__('Employee Branch Transfer')}}</a></li>
         <li><a class="slide-item" href="{{route('availableleaves.index')}}">{{__('Employee Available Leaves')}}</a></li>
+        </ul>
     </li>
-    </ul>
+
+
+    <li class="slide">
+      <a class="side-menu__item" data-toggle="slide" href="#">
+        <i class="side-menu__icon ti-book"></i>
+        <span class="side-menu__label"> {{ __('Booking') }}</span><i class="angle fa fa-angle-right"></i>
+      </a>
+      <ul class="slide-menu">
+        <li><a class="slide-item" href="{{ url('/booking/wellness')}}">{{ __('Wellness Booking') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/booking/consultation')}}">{{ __('Consultation Booking') }}</a></li>
+      </ul>
+    </li>
+    
     <!-- Accounts  -->
     <li class="slide">
       <a class="side-menu__item" data-toggle="slide" href="#">
@@ -91,8 +104,9 @@
         <li><a class="slide-item" href="{{ url('/journel-entry')}}">{{__('Journal Entry')}}</a></li>
         <!-- <li><a class="slide-item" href="#">{{__('Attendence View-Biometric')}}</a></li> -->
         <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
+        </ul>
     </li>
-    </ul>
+   
     <!-- <li class="slide">
       <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a>
     </li> -->

@@ -51,6 +51,7 @@ use App\Http\Controllers\SalaryHeadController;
 use App\Http\Controllers\SalaryPackageController;
 use App\Http\Controllers\AvailableLeaveController;
 use App\Http\Controllers\TherapyStockTransferController;
+use App\Http\Controllers\BookingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -459,8 +460,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/trail-balance-report', [ReportController::class, 'trailBalanceReport'])->name('trail-balance.report');
     Route::get('/balance-sheet-report', [ReportController::class, 'balanceSheetReport'])->name('balance-sheet.report');
 
-
-
+    //booking 
+    Route::get('/booking/wellness', [BookingController::class, 'wellnessBooking'])->name('wellness.booking');
+    Route::get('/booking/consultation', [BookingController::class, 'consultationBooking'])->name('consultation.booking');
+    Route::get('/booking/viewwellness/{id}', [BookingController::class, 'viewWellnessBooking'])->name('viewwellness.booking');
+    Route::get('/booking/viewconsultation/{id}', [BookingController::class, 'viewConsultationBooking'])->name('viewconsultation.booking');
+    Route::post('/booking/addmedicineconsultation/{id}', [BookingController::class, 'addMedicineConsultation'])->name('addmedicine.consultation');
+    Route::post('/booking/addmedicinewellness/{id}', [BookingController::class, 'addMedicineWellness'])->name('addmedicine.wellness');
+    
     // Medicine Purchase
     Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');
     Route::get('/medicine-purchase/create', [MedicinePurchaseController::class, 'create'])->name('medicine.purchase.create');

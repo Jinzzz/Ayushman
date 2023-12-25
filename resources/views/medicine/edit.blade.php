@@ -189,10 +189,7 @@
                      required: 'Please enter generic name.',
                      maxlength: 'Generic name must not exceed 100 characters.'
                   },
-                  Hsn_code: {
-                     number: 'Please enter a valid integer.',
-                     maxlength: 'Hsn code must not exceed 8 characters.'
-                  },
+
                   unit_price: {
                      required: 'Please enter unit price.',
                      number: 'Please enter a valid integer.',
