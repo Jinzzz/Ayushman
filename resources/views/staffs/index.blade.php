@@ -11,22 +11,22 @@
                 <form action="{{ route('staffs.index') }}" method="GET">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="staff-code">Staff Code:</label>
-                            <input type="text" id="staff-code" name="staff_code" class="form-control" value="{{ request('staff_code') }}">
+                            <label for="staff-code">Staff Code</label>
+                            <input type="text" id="staff-code" name="staff_code" class="form-control" value="{{ request('staff_code') }}" placeholder="Staff Code">
                         </div>
                          <div class="col-md-4">
-                            <label for="staff-name">Staff Name:</label>
-                            <input type="text" id="staff-name" name="staff_name" class="form-control" value="{{ request('staff_name') }}">
+                            <label for="staff-name">Staff Name</label>
+                            <input type="text" id="staff-name" name="staff_name" class="form-control" value="{{ request('staff_name') }}" placeholder="Staff Name">
                         </div>
                          <div class="col-md-4">
-                            <label for="contact-number">Contact Number:</label>
-                            <input type="text" id="contact-number" name="contact_number" class="form-control" value="{{ request('contact_number') }}">
+                            <label for="contact-number">Contact Number</label>
+                            <input type="text" id="contact-number" name="contact_number" class="form-control" value="{{ request('contact_number') }}" placeholder="Contact Number">
                         </div>
                    </div>
                    <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="staff_type">Staff Type*</label>
+                                <label for="staff_type">Staff Type</label>
                                 <select class="form-control" name="staff_type" id="staff_type" onchange="toggleBookingFeeField()">
                                     <option value="">Select Staff Type</option>
                                     @foreach($stafftype as $masterId => $masterValue)
@@ -102,8 +102,7 @@
                                     <th class="wd-15p">Branch</th> 
                                     <th class="wd-15p">Contact Number</th>
                                     <th class="wd-15p">Qualification</th>
-                                  
-                                    <th class="wd-15p">Status</th>
+                        
                                     <th class="wd-15p">Action</th>
                                 </tr>
                             </thead>
@@ -121,22 +120,6 @@
                                     <td>{{ $staff->staff_contact_number }}</td>
                                     <td>{{ $staff->staff_qualification}}</td>
                                      
-                                    
-                                    <td>
-                                        <form action="{{ route('staffs.changeStatus', $staff->staff_id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                            <button type="submit"
-                                                onclick="return confirm('Do you want to Change status?');"
-                                                class="btn btn-sm @if($staff->is_active == 0) btn-danger @else btn-success @endif status-custom">
-                                                @if($staff->is_active == 0)
-                                                Inactive
-                                                @else
-                                                Active
-                                                @endif
-                                            </button>
-                                        </form>
-                                    </td>
                                        
                                     <td>
                                         <a class="btn btn-primary btn-sm edit-custom"
@@ -156,11 +139,11 @@
                                         </form>
                                         <br>
                                         @if($staff->staff_type == '20')
-                                        <a class="btn btn-sm  btn-primary"
+                                        <!-- <a class="btn btn-sm  btn-primary"
                                         href="{{ route('staff.slot', $staff->staff_id) }}" style="    font-size: 0.65rem;
                                         margin-right: 0;
                                         margin-top: 2px;"><i
-                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a>
+                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a> -->
                                             @endif
                                     </td>
                                 </tr>
@@ -177,46 +160,67 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-    <script>
-    function deleteData(dataId) {
-        swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('staffs.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response == '1') {
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the staff.');
-                        },
-                    });
-                } else {
-                    return;
-                }
+<script>
+function deleteData(dataId) {
+    Swal.fire({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "{{ route('staffs.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    // Handle the success response, e.g., remove the row from the table
+                    if (response == '1') {
+                        $("#dataRow_" + dataId).remove();
+                        showSuccessMessage('Data deleted successfully');
+                    } else {
+                        showErrorMessage('An error occurred! Please try again later.');
+                    }
+                },
+                error: function() {
+                    showErrorMessage('An error occurred while deleting the staff.');
+                },
             });
-    }
+        } else {
+            // Handle the cancel action if needed
+            return;
+        }
+    });
+}
+
+function showSuccessMessage(message) {
+    Swal.fire({
+        title: "Success!",
+        text: message,
+        icon: "success",
+    });
+}
+
+function showErrorMessage(message) {
+    Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+    });
+}
+
+
+
     // Change status 
     function changeStatus(dataId) {
         swal({
@@ -233,14 +237,14 @@
             function(isConfirm) {
                 if (isConfirm) {
                     $.ajax({
-                        url: "{{ route('manufacturer.changeStatus', '') }}/" + dataId,
+                        url: "{{ route('staffs.changeStatus', '') }}/" + dataId,
                         type: "patch",
                         data: {
                             _token: "{{ csrf_token() }}",
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(2)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(5)');
 
                                 if (cell.find('.btn-success').length) {
                                     cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
@@ -254,7 +258,7 @@
                             }
                         },
                         error: function() {
-                            alert('An error occurred while changing the qualification status.');
+                            alert('An error occurred while changing the staff status.');
                         },
                     });
                 }

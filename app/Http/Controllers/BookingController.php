@@ -105,6 +105,7 @@ class BookingController extends Controller
         'mst_master_values.*',
         'mst_timeslots.*')
         ->first();
+       
         
 
         $prescriptions = DB::table('trn__prescriptions')
