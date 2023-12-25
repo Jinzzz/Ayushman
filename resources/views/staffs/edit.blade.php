@@ -112,10 +112,14 @@
                 <div class="form-group">
                   <label class="form-label">Staff Type*</label>
                   <select class="form-control" name="staff_type" id="staff_type">
-                      <option value="">Select Staff Type</option> @foreach($stafftype as $masterId => $masterValue) <option value="{{ $masterId }}" {{ $staffs->staff_type == $masterId ? 'selected' : '' }}>
-                        {{ $masterValue }}
-                      </option> @endforeach
-                    </select>
+    <option value="">Select Staff Type</option>
+    @foreach($stafftype as $masterId => $masterValue)
+        <option value="{{ $masterId }}" {{ optional($staffs)->staff_type == $masterId ? 'selected' : '' }}>
+            {{ $masterValue }}
+        </option>
+    @endforeach
+</select>
+
                 </div>
               </div>
               <div class="col-md-6">

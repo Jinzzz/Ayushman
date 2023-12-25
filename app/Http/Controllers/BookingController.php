@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
-   public function wellnessBooking()
+   public function wellnessBooking(Request $request)
    {
  
         $pageTitle = "Wellness Booking";
@@ -27,11 +27,27 @@ class BookingController extends Controller
                 'mst_Patients.*',
                 'mst_master_values.*'
             )
-            ->get();
+            ->orderBy('trn_consultation_bookings.updated_at', 'desc');
+
+                
+    // Apply filters if provided
+    if ($request->has('patient_code')) {
+        $consultations->where('mst_Patients.patient_code', 'LIKE', "%{$request->patient_code}%");
+    }
+    
+    if ($request->has('patient_name')) {
+        $consultations->where('mst_Patients.patient_name', 'LIKE', "%{$request->patient_name}%");
+    }
+    
+    if ($request->has('patient_email')) {
+        $consultations->where('mst_Patients.patient_email', 'LIKE', "%{$request->patient_email}%");
+    } 
+    $consultations = $consultations->get();
+  
         return view('patientbookings.wellness', compact('pageTitle', 'consultations'));
 
    }
-   public function consultationBooking()
+   public function consultationBooking(Request $request)
    {
  
         $pageTitle = "Consultations Booking";
@@ -47,7 +63,22 @@ class BookingController extends Controller
                 'mst_Patients.*',
                 'mst_master_values.*'
             )
-            ->get();
+            ->orderBy('trn_consultation_bookings.updated_at', 'desc');
+
+                
+            // Apply filters if provided
+            if ($request->has('patient_code')) {
+                $consultations->where('mst_Patients.patient_code', 'LIKE', "%{$request->patient_code}%");
+            }
+            
+            if ($request->has('patient_name')) {
+                $consultations->where('mst_Patients.patient_name', 'LIKE', "%{$request->patient_name}%");
+            }
+            
+            if ($request->has('patient_email')) {
+                $consultations->where('mst_Patients.patient_email', 'LIKE', "%{$request->patient_email}%");
+            } 
+            $consultations = $consultations->get();
         return view('patientbookings.consultation', compact('pageTitle', 'consultations'));
 
    }

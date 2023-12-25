@@ -193,11 +193,11 @@ class MstStaffController extends Controller
         $staffs = Mst_Staff::findOrFail($staff_id)
         ->join('mst_salary', 'mst_staffs.staff_id', '=', 'mst_salary.staff_id')
         ->join('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
-        ->where('mst_staffs.staff_id', $staff_id)
         ->select(
             'mst_staffs.*','mst_salary.*','mst_leave_config.*'
         )
         ->first();
+   
        
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
         $selectedLeaveTypes = DB::table('mst_leave_config')
@@ -212,8 +212,9 @@ class MstStaffController extends Controller
         $heads = Salary_Head_Master::where('status', 1)->get();
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
         $salaryData = DB::table('mst_salary')->where('staff_id', $staff_id)->get();
+        $staff_id = $staff_id;
         
-        return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branchs','salaryType','commissiontype','heads','leave_types','salaryData','selectedLeaveTypes'));
+        return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branchs','salaryType','commissiontype','heads','leave_types','salaryData','selectedLeaveTypes','staff_id'));
 
     }
 
