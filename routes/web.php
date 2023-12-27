@@ -461,12 +461,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/balance-sheet-report', [ReportController::class, 'balanceSheetReport'])->name('balance-sheet.report');
 
     //booking 
-    Route::get('/booking/wellness', [BookingController::class, 'wellnessBooking'])->name('wellness.booking');
-    Route::get('/booking/consultation', [BookingController::class, 'consultationBooking'])->name('consultation.booking');
-    Route::get('/booking/viewwellness/{id}', [BookingController::class, 'viewWellnessBooking'])->name('viewwellness.booking');
-    Route::get('/booking/viewconsultation/{id}', [BookingController::class, 'viewConsultationBooking'])->name('viewconsultation.booking');
+    Route::get('/search/wellness', [BookingController::class, 'wellnessBooking'])->name('wellness.booking');
+    Route::get('/search/consultation', [BookingController::class, 'consultationBooking'])->name('consultation.booking');
+    Route::get('/search/viewwellness/{id}', [BookingController::class, 'viewWellnessBooking'])->name('viewwellness.booking');
+    Route::get('/search/viewconsultation/{id}', [BookingController::class, 'viewConsultationBooking'])->name('viewconsultation.booking');
     Route::post('/booking/addmedicineconsultation/{id}', [BookingController::class, 'addMedicineConsultation'])->name('addmedicine.consultation');
     Route::post('/booking/addmedicinewellness/{id}', [BookingController::class, 'addMedicineWellness'])->name('addmedicine.wellness');
+    Route::get('/booking/consultation/create', [BookingController::class, 'consultationBookingCreate'])->name('consultation-booking.create');
     
     // Medicine Purchase
     Route::get('/medicine-purchase/index ', [MedicinePurchaseController::class, 'index'])->name('medicine.purchase.index');

@@ -10,16 +10,22 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="patient-code" class="form-label">Patient Code:</label>
-                            <input type="text" id="patient-code" name="patient_code" class="form-control" value="{{ request('patient_code') }}">
+                            <label for="patient-code" class="form-label">Patient Code</label>
+                            <input type="text" id="patient-code" name="patient_code" class="form-control" value="{{ request('patient_code') }}" placeholder ="Enter Patient Code">
                         </div>
                         <div class="col-md-4">
-                            <label for="patient-name" class="form-label">Patient Name:</label>
-                            <input type="text" id="patient-name" name="patient_name" class="form-control" value="{{ request('patient_name') }}">
+                            <label for="patient-name" class="form-label">Patient Name</label>
+                            <input type="text" id="patient-name" name="patient_name" class="form-control" value="{{ request('patient_name') }}" placeholder ="Enter Patient Name">
                         </div>
                         <div class="col-md-4">
-                            <label for="patient-mobile" class="form-label">Patient Email:</label>
-                            <input type="text" id="patient-email" name="patient_email" class="form-control" value="{{ request('patient_email') }}">
+                            <label for="patient-mobile" class="form-label">Doctor Name</label>
+                            <input type="text" id="patient-email" name="doctor_name" class="form-control" value="{{ request('doctor_name') }}" placeholder ="Enter Doctor Name">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="patient-code" class="form-label">Booking date</label>
+                            <input type="date" id="patient-code" name="booking_date" class="form-control" value="{{ request('booking_date') }}">
                         </div>
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
@@ -52,11 +58,13 @@
                 <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                     <thead>
                         <tr>
-                            <th class="wd-50p">SL.NO</th>
-                            <th class="wd-25p">Booking Reference Code Code</th>
-                            <th class="wd-25p">Patient Code</th>
+                        <th class="wd-50p">SL.NO</th>
+                            <th class="wd-25p">Booking Code</th>
+                            <th class="wd-25p">Booking Date</th>
                             <th class="wd-25p">Patient Name</th>
-                            <th class="wd-25p">Patient Email</th>
+                            <th class="wd-25p">Doctor Name</th>
+                            <th class="wd-25p">Time Slot</th>
+                            <th class="wd-25p">Status</th>
                             <th class="wd-25p">Action</th>
                         </tr>
                     </thead>
@@ -68,9 +76,11 @@
                         <tr id="dataRow_{{$consultation->id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $consultation->booking_reference_number }}</td>
-                            <td>{{ $consultation->patient_code }}</td>
-                            <td>{{ $consultation->patient_name }}</td>
-                            <td>{{ $consultation->patient_email }}</td>
+                            <td>{{ $consultation->booking_date }}</td>
+                            <td> {{ $consultation->patient_code }} - {{ $consultation->patient_name }}</td>
+                            <td>{{ $consultation->staff_name }}</td>
+                            <td>{{ $consultation->time_from }} - {{ $consultation->time_to }}</td>
+                            <td>{{ $consultation->master_value }}</td>
                            
                             <td><a class="btn btn-secondary btn-sm" href="{{ route('viewwellness.booking',$consultation->consultation_id) }}">
                                 <i class="fa fa-eye" aria-hidden="true"></i> View </a>

@@ -86,8 +86,9 @@
         <span class="side-menu__label"> {{ __('Booking') }}</span><i class="angle fa fa-angle-right"></i>
       </a>
       <ul class="slide-menu">
-        <li><a class="slide-item" href="{{ url('/booking/wellness')}}">{{ __('Wellness Booking') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/booking/consultation')}}">{{ __('Consultation Booking') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/wellness')}}">{{ __('Wellness Booking') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/consultation')}}">{{ __('Consultation Booking') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/therapy')}}">{{ __('Therapy Booking') }}</a></li>
       </ul>
     </li>
     

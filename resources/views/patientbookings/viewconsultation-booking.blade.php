@@ -51,7 +51,7 @@
                   </ul>
                </div>
                @endif
-               <form action="{{ route('addmedicine.wellness',['id' => $consultations->consultation_id]) }}" method="POST" enctype="multipart/form-data">
+               <form action="{{ route('addmedicine.consultation',['id' => $consultations->consultation_id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" class="form-control"  required name="doctor_id" value ="{{$consultations->doctor_id }}">
                 <input type="hidden" class="form-control"  required name="consultation_id" value ="{{$consultations->consultation_id }}">
