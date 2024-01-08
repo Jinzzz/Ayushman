@@ -47,16 +47,7 @@
                   <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y') }}</td>
                   <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d-m-Y') }}</td>
                   <td>{{ $invoice->Branch->branch_name }}</td>
-                
-                  <td>{{ $invoice->sub_total }}</td>
-
-                
-                  <td>
-                     <a class="btn btn-primary btn-sm edit-custom"
-                        href="{{ route('medicinePurchaseInvoice.edit', $invoice->purchase_invoice_id ) }}"><i
-                        class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                     <!-- <a class="btn btn-secondary btn-sm" href="{{ route('medicinePurchaseInvoice.show', $invoice->purchase_invoice_id ) }}">
-                     <i class="fa fa-eye" aria-hidden="true"></i> View</a> -->
+                  <td>{{ $invoice->sub_total }}</td><td>
                      <form style="display: inline-block"
                         action="{{ route('medicinePurchaseInvoice.destroy', $invoice->purchase_invoice_id ) }}" method="post">
                         @csrf
@@ -79,87 +70,47 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-   function deleteData(dataId) {
-       swal({
-               title: "Delete selected data?",
-               text: "Are you sure you want to delete this data",
-               type: "warning",
-               showCancelButton: true,
-               confirmButtonColor: "#DD6B55",
-               confirmButtonText: "Yes",
-               cancelButtonText: "No",
-               closeOnConfirm: true,
-               closeOnCancel: true
-           },
-           function(isConfirm) {
-               if (isConfirm) {
-                   $.ajax({
-                       url: "{{ route('externaldoctors.destroy', '') }}/" + dataId,
-                       type: "DELETE",
-                       data: {
-                           _token: "{{ csrf_token() }}",
-                       },
-                       success: function(response) {
-                           // Handle the success response, e.g., remove the row from the table
-                           if (response == '1') {
-                               $("#dataRow_" + dataId).remove();
-                               flashMessage('s', 'Data deleted successfully');
-                           } else {
-                               flashMessage('e', 'An error occured! Please try again later.');
-                           }
-                       },
-                       error: function() {
-                           alert('An error occurred while deleting the external doctor.');
-                       },
-                   });
-               } else {
-                   return;
-               }
-           });
-   }
-   
-      // Change status 
-      function changeStatus(dataId) {
-        swal({
-                title: "Change Status?",
-                text: "Are you sure you want to change the status?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('externaldoctors.changeStatus', '') }}/" + dataId,
-                        type: "patch",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
-
-                                if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
-                                } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
-                                }
-
-                                flashMessage('s', 'Status changed successfully');
-                            } else {
-                                flashMessage('e', 'An error occurred! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while changing the branch status.');
-                        },
-                    });
-                }
+function flashMessage(type, message) {
+    alert(type + ': ' + message);
+}
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('medicinePurchaseInvoice.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    if (response == '1') {
+                        $("#dataRow_" + dataId).remove();
+                        swal("Success", "Invoice deleted successfully", "success");
+                    } else {
+                        flashMessage('error', 'An error occurred! Please try again later.');
+                    }
+                },
+                error: function() {
+                    flashMessage('error', 'An error occurred while deleting the invoice.');
+                },
             });
-    }
-   </script>
+        } else {
+            return;
+        }
+    });
+}
+</script>

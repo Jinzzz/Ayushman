@@ -19,7 +19,9 @@ use App\Models\Trn_Medicine_Stock_Detail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Models\Trn_Stock_Transaction;
 
 class TrnMedicinePurchaseInvoiceDetailsController extends Controller
 {
@@ -99,70 +101,46 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
         ]);
     }
 
-
-  
-    
-
     public function store(Request $request)
-    {
-    //   dd($request->all());
+    { 
+        
+        
         $validator = Validator::make($request->all(), [
             'supplier_id' => 'required',
             'invoice_no' => 'required',
             'invoice_date' => 'required',
             'branch_id' => 'required',
             'due_date' => 'required',
-            // 'credit_limit' => 'required',
-            // 'current_credit' => 'required',
             'sub_total' => 'required',
             'item_wise_discount' => 'required',
             'bill_discount' => 'required',
             'total_tax' => 'required',
-            'round_off' => 'required',
             'total_amount' => 'required',
             'paid_amount' => 'required',
             'payment_mode' => 'required',
             'deposit_to' => 'required',
             'reference_code' => 'required',
         ]);
-
-        $is_paid = $request->input('is_paid') ? 1 : 0;
-
-
-
-        $supplierId = $request->input('supplier_id');
-         // Calculate Total Amount Due
-         $totalAmountDue = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
-         ->where('is_paid', 0) // Unpaid invoices
-         ->sum('total_amount');
-
-        // Calculate Total Amount Paid
-         $totalAmountPaid = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)
-        ->where('is_paid', 1) // Paid invoices
-        ->sum('paid_amount');
-
-       // Calculate Current Credit
-       $currentCredit = $totalAmountDue - $totalAmountPaid;
-
-       $creditLimit = Mst_Supplier::where('supplier_id', $supplierId)->value('credit_limit');
-
     
-        // Begin a database transaction
-        DB::beginTransaction();
-    
-        try {
-            if ($validator->fails()) {
-                throw new \Exception("Validation failed");
-            }
-    
-            // Save data to trn_medicine_purchase_invoices table
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+
+        }
+      
+            DB::beginTransaction();
+            $supplierId = $request->input('supplier_id');
+            $totalAmountDue = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)->sum('total_amount');
+            $totalAmountPaid = Trn_Medicine_Purchase_Invoice::where('supplier_id', $supplierId)->sum('paid_amount');
+            $currentCredit = $totalAmountDue - $totalAmountPaid;
+            $creditLimit = Mst_Supplier::where('supplier_id', $supplierId)->value('credit_limit');
+
             $invoice = new Trn_Medicine_Purchase_Invoice();
             $invoice->supplier_id = $request->supplier_id;
             $invoice->purchase_invoice_no = $request->invoice_no;
             $invoice->invoice_date = $request->invoice_date;
             $invoice->branch_id = $request->branch_id;
             $invoice->due_date = $request->due_date;
-            $invoice->credit_limit =  $creditLimit;
+            $invoice->credit_limit = $creditLimit;
             $invoice->current_credit = $currentCredit;
             $invoice->sub_total = $request->sub_total;
             $invoice->item_wise_discount = $request->item_wise_discount;
@@ -174,102 +152,140 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
             $invoice->payment_mode = $request->payment_mode;
             $invoice->deposit_to = $request->deposit_to;
             $invoice->reference_code = $request->reference_code;
-            $invoice->is_paid = $is_paid;
-            $invoice->created_by = 1; // You may adjust the user ID as needed
+            $invoice->created_by = Auth::id();
             $invoice->save();
-    
-            // Get the ID of the saved invoice
+
             $invoiceId = $invoice->purchase_invoice_id;
-    
-            // Loop through products and save details and stocks
-            foreach ($request->input('product_id') as $key => $productId) {
-                if ($key != 0) {
-                    // Save data to trn_medicine_purchase_invoice_details table
-                    $detail = new Trn_Medicine_Purchase_Invoice_Detail();
-                    $detail->invoice_id = $invoiceId;
-                    $detail->product_id = $productId;
-                    $detail->medicine_code = $request->input('medicine_code')[$key];
-                    $detail->unit_id = $request->input('unit_id')[$key];
-                    $detail->quantity = $request->input('quantity')[$key];
-                    $detail->free_quantity = $request->input('free_quantity')[$key];
-                    $detail->batch_no = $request->input('batch_no')[$key];
-                    $detail->mfd = $request->input('mfd')[$key];
-                    $detail->expd = $request->input('expd')[$key];
-                    $detail->rate = $request->input('rate')[$key];
-                    $detail->tax_amount = $request->input('tax')[$key];
-                    $detail->discount = $request->input('discount')[$key];
-                    $detail->amount = $request->input('amount')[$key];
-                    $detail->save();
-    
-                    // Save data to trn_medicine_stocks table
-                    $stock = Trn_Medicine_Stock::where('medicine_id', $productId)
-                        ->where('expd', $request->input('expd')[$key])
-                        ->where('batch_no', $request->input('batch_no')[$key])
-                        ->where('purchase_rate', $request->input('rate')[$key])
-                        ->first();
-    
-                    if (!$stock) {
-                        $stock = new Trn_Medicine_Stock();
-                        $stock->stock_code = 'STK' . str_pad($stock->stock_id, 5, '0', STR_PAD_LEFT);
-                        $stock->medicine_id = $productId;
-                        $stock->branch_id = $request->branch_id;
-                        $stock->batch_no = $request->input('batch_no')[$key];
-                        $stock->mfd = $request->input('mfd')[$key];
-                        $stock->expd = $request->input('expd')[$key];
-                        $stock->purchase_rate = $request->input('rate')[$key];
-                        $stock->purchase_unit_id = $request->input('unit_id')[$key]; // Adjust as needed
-                        $stock->opening_stock = 0; // Set the initial opening stock as needed
-                        $stock->old_stock = 0;
-                        $stock->current_stock = 0; // Set the initial current stock as needed
-                     
-                        $stock->save();
+            $productIds = $request->input('product_id');
+            $medicineCodes = $request->input('medicine_code');
+            $quantities = $request->input('quantity');
+            $unitIds = $request->input('unit_id');
+            $rates = $request->input('rate');
+            $freeQuantities = $request->input('free_quantity');
+            $batchNos = $request->input('batch_no');
+            $mfdDates = $request->input('mfd');
+            $expdDates = $request->input('expd');
+            $taxes = $request->input('tax');
+            $amounts = $request->input('amount');
+            $discounts = $request->input('discount');
 
-                        $stock->stock_code = 'STK' . str_pad($stock->stock_id, 5, '0', STR_PAD_LEFT);
-                        $stock->save(); 
-                    }
+       
+            array_shift($medicineCodes);
+            array_shift($quantities);
+            array_shift($unitIds);
+            array_shift($rates);
+            array_shift($freeQuantities);
+            array_shift($batchNos);
+            array_shift($mfdDates);
+            array_shift($expdDates);
+            array_shift($taxes);
+            array_shift($amounts);
+            array_shift($discounts);
     
-                    //Update the stock quantity
-                    $stock->current_stock += $request->input('quantity')[$key];
-                    $stock->save();
-    
-                    // Save data to trn_medicine_stock_details table
-                    $stockDetail = new Trn_Medicine_Stock_Detail();
-                    $stockDetail->stock_id = $stock->stock_id;
-                    $stockDetail->unit_id = $request->input('unit_id')[$key];
-                    $stockDetail->sales_rate = $request->input('rate')[$key];
-                    $stockDetail->save();
+       //dd($freeQuantities);
+            foreach ($productIds as $key => $productId) {
+        
+                $detail = new Trn_Medicine_Purchase_Invoice_Detail();
+                $detail->invoice_id = $invoiceId;
+                $detail->product_id = $productId;
+                $detail->medicine_code = $medicineCodes[$key];
+                $detail->unit_id = $unitIds[$key];
+                $detail->quantity = $quantities[$key];
+                $detail->free_quantity = $freeQuantities[$key];
+                $detail->batch_no = $batchNos[$key];
+                $detail->mfd = $mfdDates[$key];
+                $detail->expd = $expdDates[$key];
+                $detail->rate = $rates[$key];
+                $detail->tax_amount = $taxes[$key];
+                $detail->discount = $discounts[$key];
+                $detail->amount = $amounts[$key];
+                $detail->created_by = Auth::id();
+                $detail->updated_by = Auth::id(); 
+                $detail->save();
+                $stock = Trn_Medicine_Stock::where('medicine_id', $productId)
+                            ->where('expd', $request->input('expd')[$key])
+                            ->where('batch_no', $request->input('batch_no')[$key])
+                            ->where('purchase_rate', $request->input('rate')[$key])
+                            ->first();
+                        
 
-
-                    // Perform ledger posting
-                    $ledgerEntry = new Trn_Ledger_Posting();
-                    $ledgerEntry->posting_date = now(); 
-                    $ledgerEntry->account_ledger_id = $request->supplier_id; 
-                    $ledgerEntry->branch_id = $request->branch_id;
-                    $ledgerEntry->transaction_amount = $request->total_amount;
-                    $ledgerEntry->narration = 'Purchase Invoice Payment'; 
-                  
-                
-                    $ledgerEntry->debit = 0;
-                    $ledgerEntry->credit = $request->total_amount;
-            
-                    $ledgerEntry->save();
+                if (!$stock) {
+                $current_stock = $quantities[$key] +  $freeQuantities[$key];
+                $stock = new Trn_Medicine_Stock();
+                $stock->medicine_id = $productId;
+                $stock->branch_id =  $request->branch_id;
+                $stock->batch_no = $batchNos[$key];
+                $stock->mfd = $mfdDates[$key];
+                $stock->expd = $expdDates[$key];
+                $stock->purchase_rate = $request->input('rate')[$key];
+                $stock->purchase_unit_id = $request->input('unit_id')[$key];
+                $stock->old_stock =  0;
+                $stock->current_stock =  $current_stock;
+                $stock->stock_code = 'STK' . uniqid(mt_rand(), true);
+                $stock->save();
+                $stockDetail = new Trn_Medicine_Stock_Detail();
+                $stockDetail->stock_id = $stock->stock_id;
+                $stockDetail->unit_id = $request->input('unit_id')[$key];
+                $stockDetail->sales_rate = $request->input('rate')[$key];
+                $stockDetail->mrp = $request->sub_total;
+                $stockDetail->save();
                 }
+                else{
+                    $stock_current = Trn_Medicine_Stock::where('medicine_id', $productId)
+                                ->where('expd', $request->input('expd')[$key])
+                                ->where('batch_no', $request->input('batch_no')[$key])
+                                ->where('purchase_rate', $request->input('rate')[$key])->select('current_stock')
+                                ->first();
+
+                    $stock_current = $request->input('quantity')[$key] + $request->input('free_quantity')[$key] + $stock_current->current_stock;
+
+                    $stock->current_stock = $stock_current;
+                }
+                $stockData = Trn_Medicine_Stock::where('medicine_id', $productId)
+                    ->where('expd', $request->input('expd')[$key])
+                    ->where('batch_no', $request->input('batch_no')[$key])
+                    ->where('purchase_rate', $request->input('rate')[$key])
+                    ->first();
+
+                $remarks = "Added " . $request->input('quantity')[$key] . " Quantities in Invoice #" . $invoiceId;
+
+                $log = new Trn_Stock_Transaction();
+                $log->medicine_id = $productId;
+                $log->invoice_id =  $invoiceId;
+
+                if (!$stockData) {
+                    $log->old_stock = 0;
+                    $newStock = $request->input('quantity')[$key] + $request->input('free_quantity')[$key];
+                } else {
+                    $log->old_stock = $stockData->old_stock;
+                    $newStock = $stockData->current_stock + $request->input('quantity')[$key] + $request->input('free_quantity')[$key];
+                }
+
+                $log->new_stock = $newStock;
+                $log->remark = $remarks;
+                $log->updated_by = Auth::id();
+                $log->updated_on = now();
+                $log->save();
+
             }
-    
-            // Commit the database transaction
-            DB::commit();
-    
-            // Redirect or respond as needed
-            return redirect('/medicine-purchase-invoice/index')->with('success', 'Invoice saved successfully');
-        } catch (\Exception $e) {
+
+                $ledgerEntry = new Trn_Ledger_Posting();
+                $ledgerEntry->posting_date = now();
+                $ledgerEntry->account_ledger_id = $request->supplier_id;
+                $ledgerEntry->branch_id = $request->branch_id;
+                $ledgerEntry->master_id = $invoiceId;
+                $ledgerEntry->transaction_amount = $request->total_amount;
+                $ledgerEntry->narration = 'Purchase Invoice Payment';
+                $ledgerEntry->reference_no =$request->reference_code;
+                $ledgerEntry->debit = $request->total_amount;
+                $ledgerEntry->credit = $request->supplier_id;
+                $ledgerEntry->save();
             
-            // An error occurred, rollback the transaction
-            DB::rollback();
-    
-            // Log the error or handle it as needed
-            return redirect()->back()->with('error', 'Failed to save invoice. Please try again.');
+                DB::commit();
+                return redirect('/medicine-purchase-invoice/index')->with('success', 'Invoice saved successfully');
+         
         }
-    }
+      
 
     public function getLedgerNames(Request $request)
     {
@@ -323,4 +339,63 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
         return view('medicine_purchase_invoice.edit', compact('pageTitle','medicinePurchaseInvoice','suppliers', 'branch', 'medicines', 'paymentType','products','details'));
 
     }
+    public function getCreditInfo($supplierId)
+    {
+        // Fetch credit-related data from the database based on the supplier ID
+        $medicinePurchaseInvoice = Mst_Supplier::where('supplier_id', $supplierId)->first();
+
+        if (!$medicinePurchaseInvoice) {
+            return response()->json(['error' => 'Supplier not found'], 404);
+        }
+
+        // Replace 'credit_limit' and 'current_credit' with your actual attribute names
+        $creditLimit = $medicinePurchaseInvoice->credit_limit;
+        $currentCredit = $medicinePurchaseInvoice->credit_period;
+
+        // Respond with JSON data
+        return response()->json([
+            'creditLimit' => $creditLimit,
+            'currentCredit' => $currentCredit,
+        ]);
+    }
+    public function getMedicineDetails($productId)
+    {
+        $medicineDetails = Mst_Medicine::where('mst_medicines.id', $productId)
+            ->leftJoin('mst_taxes', 'mst_medicines.tax_id', '=', 'mst_taxes.id')
+            ->select(
+                'mst_medicines.*',
+                'mst_taxes.tax_rate'
+            )
+            ->first();
+    
+        // Check if $medicineDetails is not null before accessing its properties
+        if ($medicineDetails !== null) {
+            return response()->json([
+                'medicine_code' => $medicineDetails->medicine_code,
+                'unit_id' => $medicineDetails->unit_id,
+                'unit_price' => $medicineDetails->unit_price,
+                'batch_no' => $medicineDetails->batch_no,
+                'tax_rate' => $medicineDetails->tax_rate,
+            ]);
+        } else {
+            // Handle the case where $medicineDetails is null
+            return response()->json([
+                'error' => 'Medicine details not found.', // You can customize the error message
+            ], 404); // You might use a different HTTP status code depending on your use case
+        }
+    }
+    public function destroy($id)
+    {
+
+            DB::table('trn_medicine_purchase_invoice_details')
+                    ->where('invoice_id', $id)
+                    ->delete();
+
+            Trn_Medicine_Purchase_Invoice::where('purchase_invoice_id', $id)->delete();
+
+             DB::commit();
+             return 1;     
+    }  
+
+
 }

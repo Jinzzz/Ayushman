@@ -108,20 +108,20 @@
         </ul>
     </li>
    
-    <!-- <li class="slide">
+    <li class="slide">
       <a class="side-menu__item " href="{{route('branchTransfer.index')}}"><i class="side-menu__icon fa fa-users"></i></i><span class="side-menu__label">Employee Branch Transfer</span></a>
-    </li> -->
-    {{-- <li class="slide">
+    </li>
+     <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
           <i class="side-menu__icon ti-receipt"></i>
           <span class="side-menu__label"> {{ __('Billings') }}</span><i class="angle fa fa-angle-right"></i>
     </a>
     <ul class="slide-menu">
       <li><a class="slide-item" href="{{ url('/consultation-billing/index')}}">{{__('Consultation Billing')}}</a></li>
-      <li><a class="slide-item" href="#">{{__('Wellness Billing')}}</a></li>
+      <li><a class="slide-item" href="{{ url('/wellness-billing/index')}}">{{__('Wellness Billing')}}</a></li>
       <li><a class="slide-item" href="#">{{__('Therapy Billing')}}</a></li>
       </li>
-    </ul> --}}
+    </ul> 
 
     {{-- <li class="slide">
         <a class="side-menu__item" data-toggle="slide" href="#">
