@@ -32,6 +32,7 @@ class BookingController extends Controller
         'mst_staffs.*',
         'mst_timeslots.*'
     )
+    
     ->orderBy('trn_consultation_bookings.updated_at', 'desc');
 
         // Apply filters if provided

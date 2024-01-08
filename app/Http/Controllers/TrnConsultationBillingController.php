@@ -1,211 +1,101 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Booking_Availability;
-use App\Models\Mst_Branch;
-use App\Models\Mst_External_Doctor;
-use App\Models\Trn_Consultation_Billing;
-use App\Models\Sys_Booking_Type;
-use App\Models\Mst_Patient;
-use App\Models\Mst_Therapy;
-use App\Models\Mst_TimeSlot;
-use App\Models\Mst_User;
-use App\Models\Mst_Wellness;
-use App\Models\Sys_Booking_Status;
-use App\Models\Trn_Patient_Family_Member;
-use Illuminate\Http\Request;
+use App\Models\Trn_Consultation_Booking;
+use App\Models\Trn_Billing_Invoice;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TrnConsultationBillingController extends Controller
 {
     public function index()
     {
-        $billings = Trn_Consultation_Billing::with('bookingType', 'patient', 'doctor', 'branch', 'timeSlot', 'bookingStatus', 'availability', 'therapy', 'wellness', 'externalDoctor', 'familyMember')->get();
-        return view('consultation_billing.index',compact('billings'));
-    }
-
-    public function create()
-{
-    $bookingTypes = Sys_Booking_Type::pluck('booking_type_name', 'booking_type_id');
-    $patients = Mst_Patient::pluck('patient_name', 'id');
-    $doctors = Mst_User::pluck('username', 'id');
-    $branches = Mst_Branch::pluck('branch_name', 'id');
-    $timeSlots = Mst_TimeSlot::pluck('time_slot_name', 'id');
-    $bookingStatus = Sys_Booking_Status::pluck('status_name', 'id');
-    $availability = Booking_Availability::pluck('availability_date', 'id');
-    $therapies = Mst_Therapy::pluck('therapy_name', 'id');
-    $wellness = Mst_Wellness::pluck('wellness_name', 'id');
-    $externalDoctors = Mst_External_Doctor::pluck('doctor_name', 'id');
-    $familyMember = Trn_Patient_Family_Member::pluck('family_member_name', 'id');
-
-    return view('consultation_billing.create', compact('bookingTypes', 'patients', 'doctors', 'branches', 'timeSlots', 'bookingStatus', 'availability', 'therapies', 'wellness', 'externalDoctors', 'familyMember'));
-}
-
-
-    public function store(Request $request)
-{
-    $request->validate([
-        // 'booking_reference_number' => 'required',
-        'booking_type_id' => 'required|exists:sys_booking_types,booking_type_id',
-        'patient_id' => 'required|exists:mst_patients,id',
-        'doctor_id' => 'required|exists:mst_users,id',
-        'branch_id' => 'required|exists:mst_branches,id',
-        'booking_date' => 'required',
-        'time_slot_id' => 'required|exists:mst_timeslots,id',
-        'booking_status_id' => 'required|exists:sys_booking_status,id',
-        'availability_id' => 'required|exists:booking_availabilities,id',
-        'therapy_id' => 'required|exists:mst_therapies,id',
-        'wellness_id' => 'required|exists:mst_wellness,id',
-         'is_paid' => 'required',
-         'is_otp_verified' => 'required',
-        // 'verification_otp' => 'required',
-        'external_doctor_id' => 'required|exists:mst_external_doctors,id',
-        'booking_fee' => 'required',
-        'discount' => 'required',
-        'is_for_family_member' => 'required',
-        // 'family_member_id' => 'required|exists:trn_patient_family_member,id',
-    ]);
-
-    $patient = Mst_Patient::find($request->patient_id);
-
-    $is_membership_available = $patient->available_membership ? 1 : 0;
-
-    $createdBy = 1;
-
-    $lastInsertedId = Trn_Consultation_Billing::insertGetId([
-        'booking_type_id' => $request->booking_type_id,
-        'patient_id' => $request->patient_id,
-        'is_membership_available' => $is_membership_available,
-        'doctor_id' => $request->doctor_id,
-        'branch_id' => $request->branch_id,
-        'booking_date' => $request->booking_date,
-        'time_slot_id' => $request->time_slot_id,
-        'booking_status_id' => $request->booking_status_id,
-        'availability_id' => $request->availability_id,
-        'therapy_id' => $request->therapy_id,
-        'wellness_id' => $request->wellness_id,
-        'is_paid' => $request->is_paid,
-        'is_otp_verified' => $request->is_otp_verified,
-        'verification_otp' => rand(50, 100),
-        'external_doctor_id' => $request->external_doctor_id,
-        'booking_fee' => $request->booking_fee,
-        'discount' => $request->discount,
-        'is_for_family_member' => $request->is_for_family_member,
-        'family_member_id' => $request->family_member_id,
-        'created_by' => $createdBy,
-        'booking_reference_number' => rand(50, 100),
-    ]);
-
-    $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
-    $newBookingReferenceNumber = 'BRN' . $leadingZeros . $lastInsertedId;
-
-    Trn_Consultation_Billing::where('id', $lastInsertedId)->update([
-        'booking_reference_number' => $newBookingReferenceNumber
-    ]);
-
-    return redirect()->route('consultation_billing.index');
-}
-
-
- public function edit($id)
- {
-    $billings = Trn_Consultation_Billing::findOrFail($id);
-
-    $bookingTypes = Sys_Booking_Type::pluck('booking_type_name', 'booking_type_id');
-    $patients = Mst_Patient::pluck('patient_name', 'id');
-    $doctors = Mst_User::pluck('username', 'id');
-    $branches = Mst_Branch::pluck('branch_name', 'id');
-    $timeSlots = Mst_TimeSlot::pluck('time_slot_name', 'id');
-    $bookingStatus = Sys_Booking_Status::pluck('status_name', 'id');
-    $availability = Booking_Availability::pluck('availability_date', 'id');
-    $therapies = Mst_Therapy::pluck('therapy_name', 'id');
-    $wellness = Mst_Wellness::pluck('wellness_name', 'id');
-    $externalDoctors = Mst_External_Doctor::pluck('doctor_name', 'id');
-    $familyMember = Trn_Patient_Family_Member::pluck('family_member_name', 'id');
-
-        return view('consultation_billing.edit', compact('billings','bookingTypes', 'patients', 'doctors', 'branches', 'timeSlots', 'bookingStatus', 'availability', 'therapies', 'wellness', 'externalDoctors', 'familyMember'));
- }
-
- public function update(Request $request,$id)
- {
-    $request->validate([
-        
-        'booking_type_id' => 'required|exists:sys_booking_types,booking_type_id',
-        'patient_id' => 'required|exists:mst_patients,id',
-        'doctor_id' => 'required|exists:mst_users,id',
-        'branch_id' => 'required|exists:mst_branches,id',
-        'booking_date' => 'required',
-        'time_slot_id' => 'required|exists:mst_timeslots,id',
-        'booking_status_id' => 'required|exists:sys_booking_status,id',
-        'availability_id' => 'required|exists:booking_availabilities,id',
-        'therapy_id' => 'required|exists:mst_therapies,id',
-        'wellness_id' => 'required|exists:mst_wellness,id',
-         'is_paid' => 'required',
-         'is_otp_verified' => 'required',
-        // 'verification_otp' => 'required',
-        'external_doctor_id' => 'required|exists:mst_external_doctors,id',
-        'booking_fee' => 'required',
-        'discount' => 'required',
-        'is_for_family_member' => 'required',
-        // 'family_member_id' => 'required|exists:trn_patient_family_member,id',
-    ]);
-
-    $patient = Mst_Patient::find($request->patient_id);
-
-    $is_membership_available = $patient->available_membership ? 1 : 0;
-
-    $createdBy = 1;
-
-    $update = Trn_Consultation_Billing::find($id);
-
-$update->update([
-    'booking_type_id' => $request->booking_type_id,
-    'patient_id' => $request->patient_id,
-    'is_membership_available' => $is_membership_available,
-    'doctor_id' => $request->doctor_id,
-    'branch_id' => $request->branch_id,
-    'booking_date' => $request->booking_date,
-    'time_slot_id' => $request->time_slot_id,
-    'booking_status_id' => $request->booking_status_id,
-    'availability_id' => $request->availability_id,
-    'therapy_id' => $request->therapy_id,
-    'wellness_id' => $request->wellness_id,
-    'is_paid' => $request->is_paid,
-    'is_otp_verified' => $request->is_otp_verified,
-    'verification_otp' => rand(50, 100),
-    'external_doctor_id' => $request->external_doctor_id,
-    'booking_fee' => $request->booking_fee,
-    'discount' => $request->discount,
-    'is_for_family_member' => $request->is_for_family_member,
-    'family_member_id' => $request->family_member_id,
-    'created_by' => $createdBy,
+        $pageTitle = "Consultation Billing";
+        $consultationTable = 'trn_consultation_bookings';
+        $patientTable = 'mst_patients';
     
-]);
+        $patients = DB::table($consultationTable)
+            ->join($patientTable, "$consultationTable.patient_id", '=', "$patientTable.id")
+            ->select(
+                "$consultationTable.id as consultation_id",
+                "$consultationTable.*",
+                "$patientTable.id as patient_id",
+                "$patientTable.*"
+            )
+            ->get();
+           
+        $patientNames = $patients->pluck('patient_name', 'patient_id');
+        $firstPatientId = $patients->isNotEmpty() ? $patients->first()->patient_id : null;
+        $datas = []; // Add this line to initialize $datas
+    
+        return view('consultation_billing.index', compact('pageTitle', 'patientNames', 'firstPatientId', 'datas'));
+    }
+    
+    public function patientSearch(Request $request, $id)
+    {   
+        $consultationTable = 'trn_consultation_bookings';
+        $patientTable = 'mst_patients';
+    
+        $patients = DB::table($consultationTable)
+            ->join($patientTable, "$consultationTable.patient_id", '=', "$patientTable.id")
+            ->select(
+                "$consultationTable.id as consultation_id",
+                "$consultationTable.*",
+                "$patientTable.id as patient_id",
+                "$patientTable.*"
+            )
+            ->get();
+            
+        $patientNames = $patients->pluck('patient_name', 'patient_id');
+        $patientId = $request->input('patient_id');
+        $datas = Trn_Consultation_Booking::join('mst_patients', 'trn_consultation_bookings.patient_id', '=', 'mst_patients.id')
+        ->where('trn_consultation_bookings.is_billable', 1)
+        ->where('trn_consultation_bookings.booking_type_id', '=', 84)
+        ->where('trn_consultation_bookings.patient_id', $patientId)
 
-return redirect()->route('consultation_billing.index');
-
- }
-
- public function destroy($id)
- {
-     $billing = Trn_Consultation_Billing::findOrFail($id);
-     $billing->delete();
-
-     return redirect()->route('consultation_billing.index');
- }
-
-//  public function changeStatus(Request $request, $id)
-//  {
-//      $billing = Trn_Consultation_Billing::findOrFail($id);
- 
-//      $billing->is_active = !$billing->is_active;
-//      $billing->save();
- 
-//      return redirect()->back();
-//  }
-
-
+        ->select('trn_consultation_bookings.id as consultation_id', 'trn_consultation_bookings.*', 'mst_patients.*')
+        ->get();           
+        $firstPatientId =  $patientId;
+        return view('consultation_billing.index', compact('datas', 'patientId','firstPatientId','patientNames','patients'));
+    }
+    public function create($consultation_id)
+    {
+        $pageTitle = "Create Invoice";
+        $data = Trn_Consultation_Booking::join('mst_patients', 'trn_consultation_bookings.patient_id', '=', 'mst_patients.id')
+        ->where('trn_consultation_bookings.is_billable', 1)->where('trn_consultation_bookings.id', $consultation_id)
+        ->select('trn_consultation_bookings.*','mst_patients.*')
+        ->first();
+    
+         return view('consultation_billing.create', compact('pageTitle','data','consultation_id'));
+    }
+    public function generateInvoice(Request $request)
+    {
+        {
+            // Validate the form data
+            $validatedData = $request->validate([
+                'booking_id' => 'required|string|max:255',
+                'patient_id' => 'required|string|max:255',
+                'invoice_date' => 'required|date',
+                // Add more validation rules for other fields
+            ]);
+            $consultationBilling = new Trn_Billing_Invoice;
+    
+            // Assign values from the form to the model attributes
+            $consultationBilling->booking_id = $request->input('booking_id');
+            $consultationBilling->patient_id = $request->input('patient_id');
+            $consultationBilling->created_by = Auth::id();
+            $consultationBilling->booking_date = $request->input('booking_date');
+            $consultationBilling->invoice_date = $validatedData['invoice_date'];
+            $consultationBilling->patient_name = $request->input('patient_name');
+            $consultationBilling->patient_contact = $request->input('patient_contact');
+            $consultationBilling->booking_invoice_number = 'INV' . $request->input('booking_id');
+            $consultationBilling->due_amount = $request->input('due_amount');
+            $consultationBilling->paid_amount = $request->input('due_amount');
+            $consultationBilling->save();
+            return redirect()->route('consultation_billing.index')->with('success', 'Invoice generated successfully');
+        }
+    }
+      
+    
 }

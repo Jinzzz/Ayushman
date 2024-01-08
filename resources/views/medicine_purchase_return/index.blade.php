@@ -42,7 +42,7 @@
                <tr id="dataRow_{{ $return->purchase_return_id  }}">
                   <td>{{ ++$i }}</td>
                   <td>{{ $return->purchase_return_no }}</td>
-                  <td>{{ $return->supplier->supplier_name }}</td>
+                  <td>{{ $return->supplier_id }}</td>
                   <td>{{ \Carbon\Carbon::parse($return->return_date)->format('d-m-Y') }}</td>
                   <td>{{ @$return->branch->branch_name }}</td>
                   <td>{{ $return->reason }}</td>

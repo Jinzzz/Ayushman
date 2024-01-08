@@ -66,7 +66,26 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert@2"></script>
 <script>
+
+            // Define the flashMessage function
+            function flashMessage(type, message) {
+            var alertClass = 'alert-success';
+            if (type === 'e') {
+                alertClass = 'alert-danger';
+            }
+
+            // Create an alert element and append it to the body
+            var alertElement = $('<div class="alert ' + alertClass + '" role="alert">' + message + '</div>');
+            $('body').append(alertElement);
+
+            // Automatically remove the alert after a certain time (e.g., 3 seconds)
+            setTimeout(function () {
+                alertElement.remove();
+            }, 3000);
+        }
     function deleteData(dataId) {
         swal({
                 title: "Delete selected data?",
@@ -88,8 +107,8 @@
                             _token: "{{ csrf_token() }}",
                         },
                         success: function(response) {
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response == '1') {
+            
+                      if (response == '1') {
                                 $("#dataRow_" + dataId).remove();
                                 i = 0;
                                 $("#example tbody tr").each(function() {
@@ -129,8 +148,8 @@
                         url: "{{ route('account.sub.group.changeStatus', '') }}/" + dataId,
                         type: "patch",
                         data: {
-                            _token: "{{ csrf_token() }}",
-                        },
+                        _token: "{{ csrf_token() }}",
+                    },
                         success: function(response) {
                             if (response == '1') {
                                 var cell = $('#dataRow_' + dataId).find('td:eq(2)');
@@ -153,4 +172,7 @@
                 }
             });
     }
+
+
+
 </script>

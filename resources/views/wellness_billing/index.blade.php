@@ -5,7 +5,7 @@
     <div class="col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Consultation Billing</h3>
+                <h3 class="card-title">Wellness Billing</h3>
             </div>
             <form id="searchForm" action="{{ route('patientname.search', ['id' => $firstPatientId]) }}" method="POST">
             @csrf
@@ -49,12 +49,9 @@
         </div>
     @endif
     <div class="card-header">
-        <h3 class="card-title">List Consultation Billing</h3>
+        <h3 class="card-title">List Wellness Billing</h3>
     </div>
     <div class="card-body">
-        <!-- <a href="{{ route('availableleaves.create') }}" class="btn btn-block btn-info">
-            <i class="fa fa-plus"></i> Add Employee Leave
-        </a> -->
         <div class="table-responsive">
             <table id="example" class="table table-striped table-bordered text-nowrap w-100">
                 <thead>
@@ -78,7 +75,7 @@
                         <td>{{ $data->patient_name }}</td>
                         <td>{{ $data->booking_date }}</td>
                         <td><center>
-                            <a class="btn btn-secondary btn-sm" href="{{ route('consultation_billing.create', $data->consultation_id) }}">
+                            <a class="btn btn-secondary btn-sm" href="{{ route('wellness_billing.create', $data->consultation_id) }}">
                                 <i class="fa fa-eye" aria-hidden="true"></i> Generate Invoice
                             </a>
                         </center>

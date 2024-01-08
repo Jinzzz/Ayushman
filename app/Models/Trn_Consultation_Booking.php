@@ -31,6 +31,7 @@ class Trn_Consultation_Booking extends Model
         'is_for_family_member',
         'family_member_id',
         'remaining_time',
+        'is_billable',
     ];
 
 

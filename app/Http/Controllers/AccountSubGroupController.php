@@ -59,7 +59,7 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
 
-                return redirect()->route('account.sub.group.index')->with('success', 'Sub group added successfully');
+                return redirect()->route('account.sub.group.index')->with('success', 'Subgroup added successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('account.sub.group.index')->with('error', $e->getMessage());
@@ -102,7 +102,7 @@ class AccountSubGroupController extends Controller
                 $account_sub_group->updated_at = Carbon::now();
                 $account_sub_group->save();
 
-                return redirect()->route('account.sub.group.index')->with('success', 'Sub group updated successfully');
+                return redirect()->route('account.sub.group.index')->with('success', 'Subgroup updated successfully');
             }
         } catch (QueryException $e) {
             return redirect()->route('account.sub.group.index')->with('error', 'Something went wrong');
