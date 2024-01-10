@@ -76,7 +76,7 @@ use App\Helpers\AdminHelper;
                      </div>
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Select Booking ID*</label>
+                           <label class="form-label">Select Booking ID</label>
                            <select class="form-control" name="patient_booking_id" id="patient_booking_id">
                               <option value="">Choose Booking ID</option>
                            </select>
@@ -649,54 +649,6 @@ use App\Helpers\AdminHelper;
       });
    });
 
-   // function taxCalculation() {
-   //    var tax = $('input[name="tax_rate[]"]');
-   //    var sum1 = 0;
-   //    var totalTax = 0
-   //    inputElements.each(function() {
-   //       sum1 = parseFloat($(this).val()) || 0;
-   //       var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
-   //       // alert(sum1);
-   //       // alert(x)
-   //       x = parseFloat(x) || 0;
-   //       var tax = (sum1 * x) / 100;
-   //       //alert(tax)
-   //       totalTax += tax
-   //    });
-
-   // }
-
-   function myClickFunction(bt) {
-      var x = bt.parentNode.parentNode
-      var subtotal = parseFloat($('.tot').text())
-      var totaltax = parseFloat($('.tax-amount').text())
-
-      var totalRemove = x.querySelector('input[name="amount[]"]').value;
-      var taxRemove = x.querySelector('input[name="single_tax_amount[]"]').value;
-      // alert(subtotal)
-      // alert(totaltax)
-      // alert(totalRemove)
-      // alert(taxRemove)
-
-      var subtotal = subtotal - totalRemove
-      $('.tot').text(subtotal)
-      var tax = totaltax - taxRemove
-      $('.tax-amount').text(tax)
-      var total = subtotal + tax
-      $('.total-amount').text(total)
-
-      var discount = $("#discount_percentage").val()
-      var discountT = (total * discount) / 100
-      //alert(discountT)
-      $("#discount-amount-input").val(discountT)
-      $(".discount-amount").text('' + discountT)
-      var payable = total - discountT
-
-      $(".payable-amount b").text('' + payable)
-      $(".paid-amount").val(payable)
-
-      x.remove()
-   }
 
    $(document).on('click', '#close-modal', function() {
       // ******************
@@ -783,7 +735,8 @@ use App\Helpers\AdminHelper;
          $("#discount-amount-input").val(discountT)
          $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
-
+         
+         payable = Number(payable.toFixed(2));
          $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
       }
@@ -857,7 +810,7 @@ use App\Helpers\AdminHelper;
          $("#discount-amount-input").val(discountT)
          $(".discount-amount").text('' + discountT)
          var payable = totalA - discountT
-
+         payable = Number(payable.toFixed(2));
          $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
 

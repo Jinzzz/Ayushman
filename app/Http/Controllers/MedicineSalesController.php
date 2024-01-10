@@ -17,6 +17,7 @@ use App\Models\Mst_Account_Ledger;
 use App\Models\Mst_Staff;
 use App\Models\Mst_User;
 use App\Models\Trn_Medicine_Stock;
+use App\Models\Trn_Ledger_Posting;
 use Dompdf\Dompdf;
 use View;
 use Dompdf\Options;
@@ -239,16 +240,25 @@ class MedicineSalesController extends Controller
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
-
-                // updating with invoice number 
                 $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
                 $newMedSaleInvoiceNo = 'MSI' . $leadingZeros . $lastInsertedId;
-
-                // Update reference(invoice number) code
                 Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $lastInsertedId)->update([
                     'updated_at' => Carbon::now(),
                     'sales_invoice_number' => $newMedSaleInvoiceNo
                 ]);
+
+                $stock = Trn_Medicine_Stock::where('medicine_id', $request->medicine_id)
+                        ->where('expd', $request->expd)
+                        ->where('batch_no', $request->batch_no)
+                        ->first();
+            
+                if ($stock) {
+                    $quantitySold = $request->quantity;
+                    $newCurrentStock = $stock->current_stock - $quantitySold;
+                    $stock->update([
+                        'current_stock' => $newCurrentStock,
+                    ]);
+                }
 
                 $medicines = $request->medicine_id;
                 $batches = $request->batch_no;
@@ -259,10 +269,7 @@ class MedicineSalesController extends Controller
                 $mf_dates = $request->mfd;
                 $exp_dates = $request->mfd;
                 $single_tax_amounts = $request->single_tax_amount;
-                // $current_stocks = $request->current - stock;
                 $count = count($medicines);
-                // dd($count);
-
                 for ($i = 1; $i < $count; $i++) {
                     $mf_date = Carbon::parse($mf_dates[$i])->format('Y-m-d');
                     $exp_date = Carbon::parse($exp_dates[$i])->format('Y-m-d');
@@ -283,14 +290,18 @@ class MedicineSalesController extends Controller
                             'updated_at' => Carbon::now(),
                         ]);
                     }
-
-
-                    // $remaining_stock = $current_stocks[$i] - $quantities[$i];
-                    // Trn_Medicine_Stock::where('batch_no', $batches[$i])->where('medicine_id', $medicines[$i])->where('branch_id', $branch_id)->update([
-                    //     'updated_at' => Carbon::now(),
-                    //     'current_stock' => $remaining_stock
-                    // ]);
                 }
+
+  
+                Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => $lastInsertedId,
+                    'account_ledger_id' => $request->patient_id,
+                    'debit' => 0,
+                    'credit' => $request->paid_amount,
+                    'transaction_amount' => $request->paid_amount,
+                    'narration' => 'Sales Invoice Payment'
+                ]);
                 $message = 'Medicine sales invoice details added successfully';
                 return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
             } else {
@@ -395,9 +406,13 @@ class MedicineSalesController extends Controller
             } else {
                 // dd($medicine_sale_invoices->patient_id);
                 $booking_details = Trn_Consultation_Booking::where('id', $medicine_sale_invoices->booking_id)->first();
-                $booking_id = $booking_details->booking_reference_number;
+            
+                if ($booking_details !== null) {
+                    $booking_id = $booking_details->booking_reference_number;
+                } else {
+                    $booking_id = "No booking details found";
+                }
             }
-
             $ledgerNames = Mst_Account_Ledger::find($medicine_sale_invoices->deposit_to);
             // dd($ledgerNames);
             $deposit_to = $ledgerNames->ledger_name;
@@ -420,7 +435,7 @@ class MedicineSalesController extends Controller
                 return redirect()->route('medicine.sales.invoices.view')->with('error', 'Data not found');
             }
             $patient_booking_ids = Trn_Consultation_Booking::where('patient_id', $medicine_sale_invoices->patient_id)->select('booking_reference_number', 'id')->get();
-
+            $ledgerPosting = Trn_Ledger_Posting::where('master_id', $id)->first();
             $ledgerNames = Mst_Account_Ledger::find($medicine_sale_invoices->deposit_to);
             $all_medicine_sale_details = [];
             foreach ($medicine_sale_details as $sale_details) {
@@ -451,90 +466,35 @@ class MedicineSalesController extends Controller
             }
             // dd($all_medicine_sale_details);
             $deposit_to = $ledgerNames->ledger_name;
-            return view('medicine_sales_invoice.edit', compact('patient_booking_ids', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to'));
+            return view('medicine_sales_invoice.edit', compact('patient_booking_ids', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to','id','ledgerPosting'));
         } catch (QueryException $e) {
             dd($e->getMessage());
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
         }
     }
-
     public function update(Request $request)
     {
-        try {
 
-            $user_id = 1;
-            $user_details = Mst_Staff::where('staff_id', $user_id)->first();
-            $branch_id = $user_details->branch_id;
-            $financial_year_id = 1;
-            $get_deposite_to = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $request->hdn_id)->first();
-            Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $request->hdn_id)->update([
-                'sales_invoice_number' => "MSI00GP",
-                'patient_id' => $request->patient_id,
-                'booking_id' => $request->patient_booking_id,
-                'invoice_date' => Carbon::now(),
-                'branch_id' => $branch_id,
-                'sales_person_id' => $user_id,
-                'notes' => $request->notes,
-                'terms_and_conditions' => $request->terms_condition,
-                'sub_total' => $request->sub_total_amount,
-                'total_tax_amount' => $request->total_tax_amount,
-                'total_amount' => $request->total_amount,
-                'discount_amount' => $request->discount_amount,
-                'payable_amount' => $request->paid_amount,
-                'financial_year_id' => $financial_year_id,
-                'deposit_to' => $get_deposite_to->deposit_to,
-                'payment_mode' => $get_deposite_to->payment_mode,
-                'is_deleted' => 0,
-                'created_by' => $user_id,
-                'updated_by' => $user_id,
-                'updated_at' => Carbon::now(),
-            ]);
+       $id  = $request->sales_invoice_id;
 
+        $medicineSaleInvoice = Trn_Medicine_Sales_Invoice::findOrFail($id);
+        $medicineSaleInvoice->sub_total = $request->sub_total;
+        $medicineSaleInvoice->total_tax_amount = $request->total_tax_amount;
+        $medicineSaleInvoice->total_amount = $request->total_amount;
+        $medicineSaleInvoice->discount_amount = $request->discount_amount;
+        $medicineSaleInvoice->payable_amount = $request->payable_amount;
+        $medicineSaleInvoice->save();
 
-            $medicines = $request->medicine_id;
-            $batches = $request->batch_no;
-            $quantities = $request->quantity;
-            $rates = $request->rate;
-            $amounts = $request->amount;
-
-            $mf_dates = $request->mfd;
-            $exp_dates = $request->mfd;
-            $single_tax_amounts = $request->single_tax_amount;
-            // $current_stocks = $request->current - stock;
-            $count = count($medicines);
-
-            Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $request->hdn_id)->delete();
-
-            for ($i = 0; $i < $count; $i++) {
-                $mf_date = Carbon::parse($mf_dates[$i])->format('Y-m-d');
-                $exp_date = Carbon::parse($exp_dates[$i])->format('Y-m-d');
-                $unit_id = Mst_Medicine::where('id', $medicines[$i])->first();
-
-                Trn_Medicine_Sales_Invoice_Details::create([
-                    'sales_invoice_id' => $request->hdn_id,
-                    'medicine_id' => $medicines[$i],
-                    'medicine_unit_id' => $unit_id->unit_id,
-                    'batch_id' => $batches[$i],
-                    'quantity' => $quantities[$i],
-                    'rate' => $rates[$i],
-                    'amount' => $amounts[$i],
-                    'expiry_date' => $exp_date,
-                    'manufactured_date' => $mf_date,
-                    'med_quantity_tax_amount' => $single_tax_amounts[$i],
-                    'updated_at' => Carbon::now(),
-                ]);
-                // $remaining_stock = $current_stocks[$i] - $quantities[$i];
-                // Trn_Medicine_Stock::where('batch_no', $batches[$i])->where('medicine_id', $medicines[$i])->where('branch_id', $branch_id)->update([
-                //     'updated_at' => Carbon::now(),
-                //     'current_stock' => $remaining_stock
-                // ]);
-            }
-
-            $message = 'Medicine sales invoice details updated successfully';
-            return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
-        } catch (QueryException $e) {
-            dd($e->getMessage());
-            return redirect()->route('medicine.sales.invoices.index')->with('success', 'Exception error');
-        }
+    
+            $medicineId = $request->medicine_id;
+            $saleDetail = Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $id)
+                ->where('medicine_id', $medicineId)
+                ->firstOrFail();
+            
+            $saleDetail->quantity = $request->quantity;
+            $saleDetail->save();
+        
+        $message = 'Medicine sales invoice details Updated successfully';
+        return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
     }
 }

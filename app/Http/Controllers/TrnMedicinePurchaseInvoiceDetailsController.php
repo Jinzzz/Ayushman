@@ -278,7 +278,7 @@ class TrnMedicinePurchaseInvoiceDetailsController extends Controller
                 $ledgerEntry->narration = 'Purchase Invoice Payment';
                 $ledgerEntry->reference_no =$request->reference_code;
                 $ledgerEntry->debit = $request->total_amount;
-                $ledgerEntry->credit = $request->supplier_id;
+                $ledgerEntry->credit = 0;
                 $ledgerEntry->save();
             
                 DB::commit();

@@ -573,6 +573,7 @@ Route::put('/medicine-purchase-return/update/{id}', [TrnMedicinePurchaseReturnCo
 Route::get('/medicine-purchase-return/show/{id}', [TrnMedicinePurchaseReturnController::class, 'show'])->name('medicinePurchaseReturn.show');
 Route::get('/get-purchase-invoices',[TrnMedicinePurchaseReturnController::class,'getPurchaseInvoices'])->name('getPurchaseInvoices');
 Route::get('/getPurchaseInvoiceDetails', [TrnMedicinePurchaseReturnController::class, 'getPurchaseInvoiceDetails'])->name('getPurchaseInvoiceDetails');
+Route::get('/get-invoice-branch',[TrnMedicinePurchaseReturnController::class,'getInvoiceBranch'])->name('getInvoiceBranch');
 
 
 //Medicine Stock Updation:

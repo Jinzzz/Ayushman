@@ -54,11 +54,12 @@ use App\Helpers\AdminHelper;
                @endif
                <form action="{{ route('medicine.sales.invoices.update') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                   @csrf
-                  <input type="hidden" name="hdn_id" value="{{$medicine_sale_invoices->sales_invoice_id}}">
+                  <input type="hidden" name="sales_invoice_id" value="{{$id}}">
                   <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
                      <div class="col-md-4">
+
                         <div class="form-group">
                            <label class="form-label">Select Patient*</label>
                            <select class="form-control" name="patient_id" id="patient_id" required>
@@ -136,14 +137,11 @@ use App\Helpers\AdminHelper;
                                        <td>
                                           <select class="form-control " name="ledger_id[]">
                                              <option value="">Please select account</option>
-                                             @foreach($ledgers as $ledger)
-                                             <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
-                                             @endforeach
                                           </select>
                                        </td>
                                        <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
-                                       <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
-                                       <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
+                                       <td><input type="number" min="0" class="form-control" value="{{$ledgerPosting->debit}}" name="debit[]"></td>
+                                       <td><input type="number" readonly class="form-control" value="{{$ledgerPosting->credit}}" name="credit[]"></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                     </tr>
                                     @foreach ($all_medicine_sale_details as $sale_details)
@@ -156,17 +154,17 @@ use App\Helpers\AdminHelper;
                                           </select>
                                        </td>
                                        <td class="medicine-batch-no"><input type="text" class="form-control" value="{{$sale_details['batch_id']}}" name="batch_no[]" readonly></td>
-                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" value="{{ intval($sale_details['quantity']) }}" name="quantity[]" oninput="calculateAmount(this)"></td>
+                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" value="{{ $sale_details['quantity'] }}" name="quantity" oninput="calculateAmount(this)"></td>
                                        <td class="medicine-unit-id"><input type="text" class="form-control" value="{{$sale_details['unit_name']}}" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" class="form-control" value="{{$sale_details['rate']}}" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" value="{{$sale_details['amount']}}" name="amount[]" readonly></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                        <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
-                                       <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
-                                       <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
-                                       <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
+                                       <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control"  name="current-stock[]" readonly></td>
+                                       <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control"   name="limit[]" readonly></td>
+                                       <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control"   name="tax_rate[]"></td>
                                        <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
-                                       <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
+                                       <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control"   name="mfd[]" readonly></td>
                                        <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
                                     @endforeach
@@ -218,13 +216,6 @@ use App\Helpers\AdminHelper;
                      </div>
                   </div>
 
-                  <!-- popup ends  -->
-                  <div class="row">
-                     <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="addProductBtn">Add Medicine</button>
-                     </div>
-                  </div>
-                  <!-- ROW-1 CLOSED -->
                   <div class="row">
                      <div class="col-md-6">
                         <!-- Left Div - terms_condition -->
@@ -247,7 +238,7 @@ use App\Helpers\AdminHelper;
                                  <table style="width: 100%;">
                                     <tr>
                                        <td><strong>Sub Total</strong></td>
-                                       <td style="text-align: right;"><strong class="tot">{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="get-sub-total" value="{{$medicine_sale_invoices->sub_total}}"><input type="hidden" id="sub-total-input" name="sub_total_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tot">{{$medicine_sale_invoices->sub_total}}</strong><input type="hidden" id="get-sub-total" value="{{$medicine_sale_invoices->sub_total}}"><input type="hidden" id="sub-total-input" name="sub_total" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Tax Amount</strong></td>
@@ -277,7 +268,7 @@ use App\Helpers\AdminHelper;
                         <div class="col-md-4">
                            <div class="form-group">
                               <label class="form-label">Paid Amount</label>
-                              <input type="text" class="form-control paid-amount" readonly name="paid_amount" maxlength="16" value="{{$medicine_sale_invoices->payable_amount}}" readonly placeholder="Paid Amount">
+                              <input type="text" class="form-control paid-amount" readonly name="payable_amount" maxlength="16" value="{{$medicine_sale_invoices->payable_amount}}" readonly placeholder="Paid Amount">
                            </div>
                         </div>
                         <div class="col-md-4">

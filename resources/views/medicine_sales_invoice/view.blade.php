@@ -56,9 +56,7 @@ use App\Helpers\AdminHelper;
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Select Booking ID</label>
-                           <select class="form-control" name="patient_booking_id" disabled>
-                              <option selected readonly>{{$booking_id}}</option>
-                           </select>
+                           <input type="text" class="form-control" readonly name="patient_booking_id" value="{{$booking_id}}">
                         </div>
 
 

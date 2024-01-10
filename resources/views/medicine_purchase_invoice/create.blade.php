@@ -128,17 +128,17 @@ use App\Helpers\AdminHelper;
 
 
                                        </td>
-                                       <td><input type="text" class="form-control" name="medicine_code[]"></td>
-                                       <td><input type="number" class="form-control" name="quantity[]"></td>
-                                       <td><input type="text" class="form-control" name="unit_id[]"></td>
-                                       <td><input type="text" class="form-control" name="rate[]"></td>
-                                       <td><input type="number" class="form-control" name="free_quantity[]"></td>
+                                       <td><input type="text" class="form-control" name="medicine_code[]" readonly></td>
+                                       <td><input type="text" class="form-control" name="quantity[]" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></td>
+                                       <td><input type="text" class="form-control" name="unit_id[]" readonly></td>
+                                       <td><input type="text" class="form-control" name="rate[]" readonly></td>
+                                       <td><input type="text" class="form-control" name="free_quantity[]" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></td>
                                        <td><input type="text" class="form-control" name="batch_no[]"></td>
                                        <td><input type="date" class="form-control" name="mfd[]" value="{{ now()->toDateString() }}"></td>
                                        <td><input type="date" class="form-control" name="expd[]" value="{{ now()->toDateString() }}"></td>
-                                       <td><input type="text" class="form-control" name="tax[]"></td>
-                                       <td><input type="text" class="form-control" name="amount[]"></td>
-                                       <td><input type="text" class="form-control" name="discount[]"></td>
+                                       <td><input type="text" class="form-control" name="tax[]" readonly></td>
+                                       <td><input type="text" class="form-control" name="amount[]" readonly ></td>
+                                       <td><input type="text" class="form-control" name="discount[]" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></td>
 
                                      </tr>
                                  </tbody>
@@ -162,13 +162,13 @@ use App\Helpers\AdminHelper;
                   <div class="col-md-4">
                      <div class="form-group">
                         <label class="form-label">Item-wise discount:</label>
-                        <input type="text" class="form-control" readonly name="item_wise_discount" id="item_discount" placeholder="Item Wise Discount">
+                        <input type="text" class="form-control" readonly name="item_wise_discount" id="item_discount" placeholder="Item Wise Discount"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                      </div>
                   </div>
                   <div class="col-md-4">
                      <div class="form-group">
                         <label class="form-label">Bill discount:</label>
-                        <input type="text" class="form-control" name="bill_discount" id="bill_discount" placeholder="Bill Discount" oninput="calculateTotals()">
+                        <input type="text" class="form-control" name="bill_discount" id="bill_discount" placeholder="Bill Discount"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                      </div>
                   </div>
                   <div class="col-md-4">
@@ -199,7 +199,7 @@ use App\Helpers\AdminHelper;
                   <div class="col-md-4">
                      <div class="form-group">
                         <label class="form-label">Round Off:</label>
-                        <input type="text" class="form-control" name="round_off" id="round_off" placeholder="Round Off" oninput="calculateTotals()">
+                        <input type="text" class="form-control" name="round_off" id="round_off" placeholder="Round Off"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                      </div>
                   </div>
                   <div class="col-md-4">
@@ -227,7 +227,7 @@ use App\Helpers\AdminHelper;
                         <div class="col-md-2">
                            <div class="form-group">
                               <label class="form-label">Paid Amount</label>
-                              <input type="text" class="form-control" name="paid_amount" maxlength="16" value="{{ old('paid_amount') }}" placeholder="Paid Amount">
+                              <input type="text" class="form-control" name="paid_amount" maxlength="16" value="{{ old('paid_amount') }}" placeholder="Paid Amount"  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                            </div>
                         </div>
                         <div class="col-md-2">
