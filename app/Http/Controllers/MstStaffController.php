@@ -6,7 +6,7 @@ use App\Models\Mst_Branch;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Staff;
-use App\Models\User;
+use App\Models\Mst_User;
 use App\Models\Sys_Salary_Type;
 use App\Models\Mst_Staff_Transfer_Log;
 use App\Models\Mst_Leave_Type;
@@ -24,6 +24,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Mail\PasswordEmail;
+use App\Models\Mst_Pharmacy;
+use App\Models\StaffPharmacyMapping;
 
 class MstStaffController extends Controller
 {
@@ -66,7 +68,8 @@ class MstStaffController extends Controller
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
         $branch = Salary_Head_Type::get();
         $heads = Salary_Head_Master::where('status', 1)->get();
-        return view('staffs.create',compact('pageTitle','stafftype','employmentType','gender','branchs','commissiontype','salaryType','leave_types','branch','heads'));
+        $pharmacies = Mst_Pharmacy::get();
+        return view('staffs.create',compact('pageTitle','stafftype','employmentType','gender','branchs','commissiontype','salaryType','leave_types','branch','heads','pharmacies'));
     }
 
     public function store(Request $request)
@@ -124,14 +127,37 @@ class MstStaffController extends Controller
             'is_login' => $is_login,
             'created_by' => Auth::id(),
             'staff_username' =>$request->input('staff_username'),
+        
         ]);
+
+        if ($request->input('staff_type') == 96 && $request->has('pharmacy')) {
+            $selectedPharmacies = $request->input('pharmacy');
+            if (is_array($selectedPharmacies)) {
+                foreach ($selectedPharmacies as $pharmacyId) {
+                    StaffPharmacyMapping::create([
+                        'staff_id' => $staff->staff_id,
+                        'pharmacy' => $pharmacyId,
+                    ]);
+                }
+            }
+        }
 
         if ($request->has('staff_username')) {
             // Create a user entry
-            $user = User::create([
-                'name' => $request->input('staff_username'),
+            $user = Mst_User::create([
+                'username' => $request->input('staff_username'),
                 'email' => $request->input('staff_email'),
                 'password' => bcrypt($generatedPassword),
+                'staff_id' => $staff->staff_id,
+                'date_of_birth' => $request->input('date_of_birth'),
+                'address' => $request->input('staff_address'),
+                'gender' => $request->input('gender'),
+                'user_type_id' => $request->input('employment_type'),
+                'discount_percentage' => $request->input('discount_percentage'),
+                'is_active' => $is_active,
+                'last_login_time' => now(),
+                'created_by' => Auth::id(),
+                'last_updated_by' => Auth::id(),
             ]);
 
             $email = $request->staff_email;

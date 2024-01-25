@@ -23,33 +23,35 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label class="form-label">Supplier*</label>
-                            <select class="form-control" required name="supplier_id" id="supplier_id">
-                                <option value="">Select Supplier</option>
-                                @foreach($suppliers as $id => $name)
-                                    <option value="{{ $id }}" {{ $id == $medicinePurchaseReturn->supplier_id ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
+                            <label class="form-label">Supplier</label>
+                            <select class="form-control" name="supplier_id" id="supplier_id">
+                            <option value="">Choose Branch</option>
+                            @foreach($suppliers as $supplierId => $supplierName)
+                                <option value="{{ $supplierId }}" {{ $medicinePurchaseReturn->supplier_id == $supplierId ? 'selected' : '' }}>
+                                    {{ $supplierName }}
+                                </option>
+                            @endforeach
+                        </select>
+
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Purchase Invoice Id*</label>
-                            <select class="form-control" required name="purchase_invoice_id" id="purchase_invoice_id">
-                                <option value="">Select Purchase Invoice</option>
-                            </select>
+                            <input type="text" id="return-date" required name="purchase_invoice_id" class="form-control" value="{{ $medicinePurchaseReturn->purchase_invoice_id}}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Return Date*</label>
                             <input type="date" id="return-date" required name="return_date" class="form-control" value="{{ $medicinePurchaseReturn->return_date}}">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Branch*</label>
-                            <select class="form-control" required name="branch_id" id="branch_id">
-                                <option value="">Select Branch</option>
-                                @foreach($branches as $id => $name)
-                                    <option value="{{ $id }}" {{ $id == $medicinePurchaseReturn->branch_id ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
+                        <label class="form-label">Pharmacy*</label>
+                        <select class="form-control" name="pharmacy" id="pharmacy_id" required>
+                            <option value="">Select Pharmacy</option>
+                            @foreach ($pharmacies as $id => $branchName)
+                                <option value="{{ $id }}" {{ $id == $medicinePurchaseReturn->pharmacy_id ? 'selected' : '' }}>{{ $branchName->pharmacy_name }}</option>
+                            @endforeach
+                        </select>
                         </div>
+
                     </div>
 
                     <!-- Details Table -->
@@ -59,33 +61,38 @@
                                 <thead>
                                     <tr>
                                         <th class="wd-15p">Product Name</th>
-                                        <th class="wd-15p">Quantity</th>
                                         <th class="wd-15p">Product Unit</th>
-                                        <th class="wd-15p">Rate</th>
-                                        <th class="wd-15p">Free Quantity</th>
+                                        <th class="wd-15p">Return Quantity</th>
+                                        <th class="wd-15p">Final Rate</th>
                                         <th class="wd-15p">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($details as $detail)
+                                    @foreach($medicinePurchase as $medicine)
+                           <input type="hidden" class="form-control" name="quantity[]" value="{{ $medicine->quantity_id }}">
                                     <tr id="productRowTemplate" class="product-row">
                                             <td>
                                                 <select class="form-control" readonly name="product_id[]">
                                                     @foreach($product as $id => $name)
-                                                        <option value="{{ $id }}" {{ $id == $detail->product_id ? 'selected' : '' }}>{{ $name }}</option>
+                                                        <option value="{{ $id }}" {{ $id == $medicine->product_id ? 'selected' : '' }}>{{ $name }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td><input type="text" class="form-control" name="quantity[]" value="{{ $detail->quantity_id }}"></td>
                                             <td>
-                                                <select class="form-control" readonly name="unit_id[]">
-                                                    @foreach($unit as $id => $name)
-                                                        <option value="{{ $id }}" {{ $id == $detail->unit_id ? 'selected' : '' }}>{{ $name }}</option>
-                                                    @endforeach
-                                                </select>
+                                            <select class="form-control" readonly name="unit_id[]">
+                                                @foreach($unit as $id => $name)
+                                                    <option value="{{ $id }}" {{ $id == optional($medicine)->unit_id ? 'selected' : '' }}>{{ $name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                      
+                                            <td><input type="number" class="form-control" name="return_quantity[]" value="{{ $medicine->return_quantity }}" max ="{{ $medicine->quantity_id }}">
+                                            <input type="hidden" id="hd-val" value="{{ $medicine->return_quantity }}" ></td>
+                                            <td>
+                                                <input type="text" class="form-control" name="rate[]" value="{{ $medicine->return_rate }}">
+                                                <input type="hidden" id ="hid-val"  value="{{ $medicine->return_rate }}">
                                             </td>
-                                            <td><input type="text" class="form-control" name="rate[]" value="{{ $detail->rate }}"></td>
-                                            <td><input type="text" class="form-control" name="free_quantity[]" value="{{ $detail->free_quantity }}"></td>
+                                           
                                             <td>
                                                 <button type="button" onclick="deleteRow(this)" class="btn-danger btn-sm">
                                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
@@ -95,12 +102,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button class="btn btn-primary" id="addProductBtn2" type="button">Add Product</button>
                         </div>
                     </div>
                 </div>
@@ -181,29 +182,17 @@
       //fetching product details based on the purchase invoice number:
    
 $(document).ready(function () {
-    // Event listener for purchase invoice selection
     $('#purchase_invoice_id').change(function () {
         var purchaseInvoiceId = $(this).val();
-      //alert(purchaseInvoiceId)
-        // Make an AJAX request to get details for the selected purchase invoice
-        // Update the table content with the details
-        // Example AJAX request using jQuery:
         $.ajax({
-            url: '/getPurchaseInvoiceDetails', // Replace with your route
+            url: '/getPurchaseInvoiceDetails', 
             method: 'GET',
             data: { purchase_invoice_id: purchaseInvoiceId },
             success: function (response) {
-                // Check if the response is not empty and has details
-               //  console.log(response)
                 if (response.length > 0) {
-                    // Clear the existing rows in the table body
-                  //   $('#productTable tbody').empty();
-
-                    // Loop through the response and append new rows to the table
-                    for (var i = 0; i < response.length; i++) {
+                       for (var i = 0; i < response.length; i++) {
                         var newRow = $("#productRowTemplate").clone();
                         newRow.removeAttr("style");
-                      
                         newRow.find('select[name="product_id[]"]').val(response[i].product_id);
                         newRow.find('input[name="quantity[]"]').val(response[i].quantity);
                         newRow.find('select[name="unit_id[]"]').val(response[i].unit_id);
@@ -212,8 +201,6 @@ $(document).ready(function () {
                         $('#productTable tbody').append(newRow);
                     }
                 } else {
-                    // Handle the case where there are no details for the selected invoice
-                  //   alert('No details found for the selected purchase invoice.');
                 }
             },
             error: function () {
@@ -221,5 +208,35 @@ $(document).ready(function () {
             }
         });
     });
-});
+}); 
 </script>
+<script>
+    $(document).ready(function () {
+        // Validate return quantity on input change
+        $('input[name="return_quantity[]"]').on('input', function () {
+
+              //alert("t")
+              var x = $(this).parents('td').siblings('td').find('#hid-val');
+              var y = x.val();
+              var singleVal = $(this).next('#hd-val').val();
+              var z = y/singleVal;
+            //alert(z)
+              var newV = $(this).val();
+             // alert(newV)
+            //   if(newV == '' || newV == null || newV == undefined ){
+            //     newV = singleVal
+            //   }
+            var d = $(this).parents('td').siblings('td').find('input[name="rate[]"]');
+              var newTotal = newV * z ;
+              //alert(newTotal)
+             d.val(newTotal);
+
+
+
+
+
+        });
+
+    });
+</script>
+

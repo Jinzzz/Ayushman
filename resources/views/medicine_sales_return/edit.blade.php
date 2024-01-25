@@ -151,14 +151,7 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-expd"><input type="hidden" class="form-control" value="" name="expd[]" readonly></td>
                                     </tr>
                                     <tr id="productRowTemplate" style="display: none;">
-                                       <td>
-                                          <select class="form-control " name="ledger_id[]">
-                                             <option value="">Please select account</option>
-                                             @foreach($ledgers as $ledger)
-                                             <option value="{{ $ledger->id }}">{{ $ledger->ledger_name}}</option>
-                                             @endforeach
-                                          </select>
-                                       </td>
+                     
                                        <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
                                        <td><input type="number" min="0" class="form-control" value="" name="debit[]"></td>
                                        <td><input type="number" readonly class="form-control" value="" name="credit[]"></td>
@@ -240,13 +233,7 @@ use App\Helpers\AdminHelper;
                      </div>
                   </div>
 
-                  <!-- popup ends  -->
-                  <div class="row">
-                     <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="addProductBtn">Add Medicine</button>
-                     </div>
-                  </div>
-                  <!-- ROW-1 CLOSED -->
+
                   <div class="row">
                      <div class="col-md-6">
                         <!-- Left Div - terms_condition -->

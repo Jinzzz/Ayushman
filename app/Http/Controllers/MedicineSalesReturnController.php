@@ -11,6 +11,7 @@ use App\Models\Mst_Medicine;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Patient;
 use App\Models\Trn_Medicine_Sales_Invoice;
+use App\Models\Trn_Medicine_Sales_Invoice_Details;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -18,21 +19,41 @@ use App\Models\Mst_Staff;
 use App\Models\Mst_Tax_Group_Included_Taxes;
 use App\Models\Mst_Tax;
 use App\Models\Trn_Medicine_Stock;
+use App\Models\Trn_Ledger_Posting;
+use App\Models\Mst_Pharmacy;
 use Dompdf\Dompdf;
 use View;
 use Dompdf\Options;
 
 class MedicineSalesReturnController extends Controller
 {
-    public function index()
+    public function index(Request $request)
+    
     {
-        try {
-            $pageTitle = "Medicine Sales Return";
-            $purchaseReturn = Trn_Medicine_Sales_Return::with('Staff', 'Branch')->orderBy('created_at', 'desc')->get();
-            return view('medicine_sales_return.index', compact('pageTitle', 'purchaseReturn'));
-        } catch (QueryException $e) {
-            dd('Something went wrong.');
-        }
+
+        $pageTitle = "Medicine Sales Return";
+        $pharmacies = Mst_Pharmacy::get();
+        $query = Trn_Medicine_Sales_Return::query();
+        $query->join('mst_pharmacies', 'trn__medicine__sales__returns.pharmacy_id', '=', 'mst_pharmacies.id')
+              ->select('trn__medicine__sales__returns.*', 'mst_pharmacies.*');
+
+         
+           if ($request->has('sales_return_no') && $request->sales_return_no != "") {
+                $query->where('trn__medicine__sales__returns.sales_return_no', $request->sales_return_no);
+            }
+
+            if ($request->filled('return_date')) {
+                $query->whereDate('trn__medicine__sales__returns.return_date', '=', $request->return_date);
+            }
+            
+            if ($request->has('pharmacy_id') && $request->pharmacy_id != "") {
+                $query->where('trn__medicine__sales__returns.pharmacy_id', $request->pharmacy_id);
+            }
+
+        $purchaseReturn = $query->get();
+
+        return view('medicine_sales_return.index', compact('pageTitle', 'purchaseReturn','pharmacies'));
+ 
     }
 
     public function create(Request $request)
@@ -66,7 +87,7 @@ class MedicineSalesReturnController extends Controller
 
     public function store(Request $request)
     {
-        // dd(199);
+       
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -169,6 +190,16 @@ class MedicineSalesReturnController extends Controller
                     }
                 }
 
+                Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => $lastInsertedId,
+                    'account_ledger_id' => $request->patient_id,
+                    'debit' =>$request->amount,
+                    'credit' =>0,
+                    'transaction_amount' => $request->amount,
+                    'narration' => 'Sales Invoice Return Payment'
+                ]);
+
                 $message = 'Medicine sales return details added successfully';
 
                 return redirect()->route('medicine.sales.return.index')->with('success', $message);
@@ -209,9 +240,9 @@ class MedicineSalesReturnController extends Controller
             if (!$medicine_sale_invoices) {
                 return redirect()->route('medicine.sales.invoices.view')->with('error', 'Data not found');
             }
-            $sales_invoice_number = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $medicine_sale_invoices->sales_invoice_id)
+            $sales_invoice_number = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $id)
                 ->first();
-            // dd($sales_invoice_number->sales_invoice_number);
+        
             return view('medicine_sales_return.view', compact('pageTitle','sales_invoice_number', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'medicine_sale_details'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
@@ -267,70 +298,7 @@ class MedicineSalesReturnController extends Controller
         }
     }
 
-    public function update(Request $request)
-    {
-        // dd($request->all());
-        try {
-            $user_id = 1;
-            $user_details = Mst_Staff::where('staff_id', $user_id)->first();
-            $branch_id = $user_details->branch_id;
-            $message = 'Dummy message';
-            $lastInsertedId = Trn_Medicine_Sales_Return::where('sales_return_id', $request->hdn_id)->update([
-                'sales_return_no' => "MSR00GP",
-                // 'sales_invoice_id' => $request->patient_invoice_id,
-                'sales_invoice_id' => 1,
-                'patient_id' => $request->patient_id,
-                'sales_person_id' => $user_id,
-                'return_date' => Carbon::now(),
-                'branch_id' => $branch_id,
-                'sub_total' => $request->sub_total_amount,
-                'total_tax' => $request->total_tax_amount,
-                'total_amount' => $request->total_amount,
-                'total_discount' => $request->discount_amount,
-                'notes' => $request->notes,
-                'is_deleted' => 0,
-                'created_by' => $user_id,
-                'updated_by' => $user_id,
-                'updated_at' => Carbon::now(),
-            ]);
 
-            $medicines = $request->medicine_id;
-            $batches = $request->batch_no;
-            $quantities = $request->quantity;
-            $rates = $request->rate;
-            $amounts = $request->amount;
-            $single_tax_amounts = $request->single_tax_amount;
-            // dd($request->hdn_id);
-
-            foreach ($medicines as $medicine) {
-                $delete_condition_satisfying_all_rows = Trn_Medicine_Sales_Return_Details::where('sales_return_id', $request->hdn_id)->delete();
-            }
-            $count = count($medicines);
-            for ($i = 0; $i < $count; $i++) {
-                // dd($batches[$i]);
-                $unit_id = Mst_Medicine::where('id', $medicines[$i])->first();
-
-                Trn_Medicine_Sales_Return_Details::create([
-                    'sales_return_id' => $request->hdn_id,
-                    'medicine_id' => $medicines[$i],
-                    'quantity_unit_id' => $unit_id->unit_id,
-                    'batch_id' => $batches[$i],
-                    'quantity' => $quantities[$i],
-                    'rate' => $rates[$i],
-                    'amount' => $amounts[$i],
-                    'tax_amount' => $single_tax_amounts[$i],
-                    'discount' => $request->discount_amount,
-                    'updated_at' => Carbon::now(),
-                ]);
-            }
-
-            $message = 'Medicine sales return details updated successfully';
-            return redirect()->route('medicine.sales.return.index')->with('success', $message);
-        } catch (QueryException $e) {
-            dd($e->getMessage());
-            return redirect()->route('medicine.sales.return.index')->with('success', $e->getMessage());
-        }
-    }
 
     public function generatePDF($id)
     {
@@ -388,5 +356,12 @@ class MedicineSalesReturnController extends Controller
         return response($pdfContent)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="' . $pdfFilename . '"');
+    }
+
+    public function getSaleInvoiceDetails(Request $request)
+    {
+        $purchaseInvoiceId = $request->input('patient_invoice_id');
+        $details = Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $purchaseInvoiceId)->get();
+        return response()->json($details);
     }
 }

@@ -51,10 +51,6 @@
             <p>{{$message}}</p>
         </div>
         @endif
-        <a href="{{ route('consultation-booking.create') }}" class="btn btn-block btn-info">
-                    <i class="fa fa-plus"></i>
-                    Create Consultation Booking
-                </a>
         <div class="card-header">
             <h3 class="card-title">List Consultation Booking</h3>
         </div>
@@ -67,10 +63,10 @@
                         <tr>
                             <th class="wd-50p">SL.NO</th>
                             <th class="wd-25p">Booking Code</th>
-                            <th class="wd-25p">Booking Date</th>
                             <th class="wd-25p">Patient Name</th>
                             <th class="wd-25p">Doctor Name</th>
                             <th class="wd-25p">Time Slot</th>
+                            <th class="wd-25p">Booking Date</th>
                             <th class="wd-25p">Status</th>
                             <th class="wd-25p">Action</th>
                         </tr>
@@ -83,10 +79,10 @@
                         <tr id="dataRow_{{$consultation->id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $consultation->booking_reference_number }}</td>
-                            <td>{{ $consultation->booking_date }}</td>
                             <td> {{ $consultation->patient_code }} - {{ $consultation->patient_name }}</td>
                             <td>{{ $consultation->staff_name }}</td>
                             <td>{{ $consultation->time_from }} - {{ $consultation->time_to }}</td>
+                            <td>{{ $consultation->booking_date }}</td>
                             <td>{{ $consultation->master_value }}</td>
                             <td><a class="btn btn-secondary btn-sm" href="{{ route('viewconsultation.booking', $consultation->consultation_id) }}">
                                 <i class="fa fa-eye" aria-hidden="true"></i> View </a>

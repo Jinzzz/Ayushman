@@ -4,9 +4,9 @@
     <div class="col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Search Wellness Booking</h3>
+                <h3 class="card-title">Search Therapy Booking</h3>
             </div>
-            <form action="{{ route('wellness.booking') }}" method="GET">
+            <form action="{{ route('therapy.booking') }}" method="GET">
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
@@ -31,7 +31,7 @@
                     <div class="col-md-3 d-flex align-items-end">
                         <div>
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
-                            <a class="btn btn-primary" href="{{ route('wellness.booking') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                            <a class="btn btn-primary" href="{{ route('therapy.booking') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                         </div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                             <td>{{ $consultation->booking_date }}</td>
                             <td>{{ $consultation->master_value }}</td>
                            
-                            <td><a class="btn btn-secondary btn-sm" href="{{ route('viewwellness.booking',$consultation->consultation_id) }}">
+                            <td><a class="btn btn-secondary btn-sm" href="{{ route('viewtherapy.booking',$consultation->consultation_id) }}">
                                 <i class="fa fa-eye" aria-hidden="true"></i> View </a>
                              </td>
                         </tr>

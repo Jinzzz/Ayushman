@@ -28,7 +28,7 @@ class BookingController extends Controller
         'trn_consultation_bookings.*',
         'mst_patients.id as patient_id',
         'mst_patients.*',
-        'booking_status.*', // Using alias for the second 'mst_master_values'
+        'booking_status.*', 
         'mst_staffs.*',
         'mst_timeslots.*'
     )
@@ -51,9 +51,9 @@ class BookingController extends Controller
             $consultations->where('mst_staffs.staff_name', 'LIKE', "%{$request->doctor_name}%");
         } 
 
-        $consultations = $consultations->take(5)->get(); 
+        $consultations = $consultations->get(); 
   
-        return view('patientbookings.wellness', compact('pageTitle', 'consultations'));
+        return view ('patientbookings.wellness', compact('pageTitle', 'consultations'));
 
    }
    public function consultationBooking(Request $request)
@@ -95,10 +95,55 @@ class BookingController extends Controller
                 $consultations->where('mst_staffs.staff_name', 'LIKE', "%{$request->doctor_name}%");
             } 
     
-            $consultations = $consultations->take(5)->get(); 
+            $consultations = $consultations->get(); 
           
         return view('patientbookings.consultation', compact('pageTitle', 'consultations'));
 
+   }
+
+   public function therapyBooking(Request $request)
+   {
+
+    $pageTitle = "Therapy Booking";
+    $query = Trn_Consultation_Booking::query();
+
+    $consultations = $query->join('mst_patients', 'trn_consultation_bookings.patient_id', '=', 'mst_patients.id')
+    ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
+    ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+    ->join('mst_master_values as patient_values', 'mst_patients.id', '=', 'patient_values.id')
+    ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+    ->where('trn_consultation_bookings.booking_type_id', '=', 86)
+    ->select(
+        'trn_consultation_bookings.id as consultation_id',
+        'trn_consultation_bookings.*',
+        'mst_patients.id as patient_id',
+        'mst_patients.*',
+        'booking_status.*', 
+        'mst_staffs.*',
+        'mst_timeslots.*'
+    )
+    ->orderBy('trn_consultation_bookings.updated_at', 'desc');
+
+        //filters
+
+        if ($request->has('patient_code')) {
+            $consultations->where('mst_patients.patient_code', 'LIKE', "%{$request->patient_code}%");
+        }
+        
+        if ($request->has('patient_name')) {
+            $consultations->where('mst_patients.patient_name', 'LIKE', "%{$request->patient_name}%");
+        }
+        
+        if ($request->has('booking_date')) {
+            $consultations->where('trn_consultation_bookings.booking_date', 'LIKE', "%{$request->booking_date}%");
+        } 
+        if ($request->has('doctor_name')) {
+            $consultations->where('mst_staffs.staff_name', 'LIKE', "%{$request->doctor_name}%");
+        } 
+
+        $consultations = $consultations->get(); 
+      
+    return view('patientbookings.therapy', compact('pageTitle', 'consultations'));
    }
    
    public function viewWellnessBooking($id)
@@ -109,18 +154,20 @@ class BookingController extends Controller
     $consultations = $query
         ->join('mst_patients', 'trn_consultation_bookings.patient_id', '=', 'mst_patients.id')
         ->join('mst_master_values', 'mst_patients.id', '=', 'mst_master_values.id')
+        ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
         ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
         ->where('trn_consultation_bookings.booking_type_id', '=', 85)
         ->where('trn_consultation_bookings.id', $id)
-        ->select('trn_consultation_bookings.id as consultation_id', // Alias trn_consultation_bookings.id
+        ->select('trn_consultation_bookings.id as consultation_id',
         'trn_consultation_bookings.*',
-        'mst_patients.id as patient_id', // Alias mst_Patients.id
+        'mst_patients.id as patient_id', 
         'mst_patients.*',
         'mst_master_values.*',
+        'mst_staffs.*',
         'mst_timeslots.*')
         ->first();
-        
-
+        dd($consultations);
+     
         $prescriptions = DB::table('trn__prescriptions')
         ->join('trn__prescription__details', 'trn__prescriptions.prescription_id', '=', 'trn__prescription__details.priscription_id')
         ->join('mst_medicines', 'trn__prescription__details.medicine_id', '=', 'mst_medicines.id')
@@ -174,6 +221,46 @@ class BookingController extends Controller
         $medicines = Mst_Medicine::pluck('medicine_name','id');
       
     return view('patientbookings.viewconsultation-booking', compact('pageTitle', 'consultations','medicines','prescriptions'));
+   }
+
+   public function viewTherapyBooking($id)
+   {
+    
+    $pageTitle = "Therapy Booking";
+    $query = Trn_Consultation_Booking::query();
+
+        $consultations = $query->join('mst_patients', 'trn_consultation_bookings.patient_id', '=', 'mst_patients.id')
+        ->join('mst_master_values as booking_status', 'trn_consultation_bookings.booking_status_id', '=', 'booking_status.id')
+        ->join('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+        ->join('mst_master_values as patient_values', 'mst_patients.id', '=', 'patient_values.id')
+        ->join('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+        ->where('trn_consultation_bookings.booking_type_id', '=', 86)
+        ->where('trn_consultation_bookings.id', $id)
+        ->select(
+            'trn_consultation_bookings.id as consultation_id',
+            'trn_consultation_bookings.*',
+            'mst_patients.id as patient_id',
+            'mst_patients.*',
+            'booking_status.*',  
+            'mst_timeslots.*',
+            'mst_staffs.*'
+        )
+        ->first();
+
+        $prescriptions = DB::table('trn__prescriptions')
+                        ->join('trn__prescription__details', 'trn__prescriptions.prescription_id', '=', 'trn__prescription__details.priscription_id')
+                        ->join('mst_medicines', 'trn__prescription__details.medicine_id', '=', 'mst_medicines.id')
+                        ->where('trn__prescriptions.Booking_Id', $id)
+                        ->select(
+                            'trn__prescriptions.*',
+                            'trn__prescription__details.*',
+                            'mst_medicines.medicine_name' // Add other columns from mst_medicines as needed
+                        )
+                        ->get();
+    
+        $medicines = Mst_Medicine::pluck('medicine_name','id');
+      
+    return view('patientbookings.viewtherapy', compact('pageTitle', 'consultations','medicines','prescriptions'));
    }
 
    public function addMedicineConsultation(Request $request, $id)
@@ -245,10 +332,14 @@ public function addMedicineWellness(Request $request, $id)
     return redirect()->back();
 } 
 
+
+
     public function consultationBookingCreate()
     {
         $pageTitle = "Consultation Booking Create";
         return view('patientbookings.createconsultation', compact('pageTitle'));
     }
+
+
 
 }

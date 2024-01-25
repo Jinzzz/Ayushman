@@ -24,6 +24,7 @@ class Mst_User extends Authenticatable
         'remember_token',
         'is_active',
         'last_login_time',
+        'discount_percentage',
         'created_by',
         'last_updated_by',
         'deleted_by',

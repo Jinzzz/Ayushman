@@ -9,7 +9,6 @@ class Trn_Billing_Invoice extends Model
 {
     use HasFactory;
     protected $table = 'trn_billing_invoices';
-
     protected $fillable = [
         'booking_id',
         'patient_id',
@@ -22,6 +21,5 @@ class Trn_Billing_Invoice extends Model
         'due_amount',
         'is_paid',
         'created_by'
-
     ];
 }

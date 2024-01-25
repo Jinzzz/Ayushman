@@ -73,7 +73,7 @@ use App\Helpers\AdminHelper;
 
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Select Invoice ID*</label>
+                           <label class="form-label">Select Invoice ID</label>
                            <select class="form-control" name="patient_invoice_id" id="patient_invoice_id">
                               <option value="">Choose Invoice ID</option>
                            </select>
@@ -199,14 +199,6 @@ use App\Helpers\AdminHelper;
                         </div>
                      </div>
                   </div>
-
-                  <!-- popup ends  -->
-                  <div class="row">
-                     <div class="col-md-12">
-                        <button type="button" class="btn btn-primary" id="addProductBtn">Add Medicine</button>
-                     </div>
-                  </div>
-                  <!-- ROW-1 CLOSED -->
                   <div class="row">
                      <div class="col-md-6">
                         <!-- Left Div - terms_condition -->
@@ -867,5 +859,37 @@ use App\Helpers\AdminHelper;
          $(this).closest('tr').find(".medicine-quantity span").remove()
       }
    })
+
+
+   $(document).ready(function() {
+        $('#patient_invoice_id').change(function() {
+            var purchaseInvoiceId = $(this).val();
+            $.ajax({
+               url: '/get-sale-invoice-details',
+                method: 'GET',
+                data: {
+                  patient_invoice_id: purchaseInvoiceId
+                },
+                success: function(response) {
+                    if (response.length > 0) {
+                        for (var i = 0; i < response.length; i++) {
+                            var newRow = $("#productRowTemplate").clone();
+                            newRow.removeAttr("style");
+
+                            newRow.find('select[name="product_id[]"]').val(response[i].product_id);
+                            newRow.find('input[name="quantity[]"]').val(response[i].quantity);
+                            newRow.find('select[name="unit_id[]"]').val(response[i].unit_id);
+                            newRow.find('input[name="rate[]"]').val(response[i].rate);
+                            newRow.find('input[name="free_quantity[]"]').val(response[i].free_quantity);
+                            $('#productTable tbody').append(newRow);
+                        }
+                    } else {}
+                },
+                error: function() {
+                    alert('Error fetching purchase invoice details.');
+                }
+            });
+        });
+    });
 </script>
 @endsection

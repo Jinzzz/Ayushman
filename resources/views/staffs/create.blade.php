@@ -129,6 +129,17 @@
                   </select>
                 </div>
               </div>
+              <div class="col-md-6" id="pharmacySelectBox" style="display: none;">
+              <div class="form-group">
+              <label class="form-label">Pharmacy*</label>
+                           <select class="form-control" name="pharmacy[]" multiple id="pharmacy_id" required>
+                              <option value=""selected disabled>Select Pharmacy</option>
+                              @foreach ($pharmacies as $pharmacy)
+                              <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                              @endforeach
+                           </select>
+              </div>
+          </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Employment Type*</label>
@@ -290,11 +301,17 @@
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-label">Username*</label>
+                  <label class="form-label">Staff Username*</label>
                   <input type="text" class="form-control" name="staff_username" onkeyup="checkusername()" id="staff_username_id" value="{{ old('staff_username') }}" placeholder="Staff Username">
                 </div>
                 <label class="form-label" style="color:#0d97c6;">Note: Password will be generated and shared to registerd E-mail.</label>
               </div>
+              <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Staff Discount Percentage</label>
+                <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{ old('discount_percentage') }}" placeholder="Staff Discount Percentage">
+              </div>
+            </div>
               <!-- Add other login fields here -->
             </div>
           </div>
@@ -414,6 +431,8 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<link rel="stylesheet" type="text/css" href="path/to/sweetalert.css">
+<script src="path/to/sweetalert.min.js"></script>
 
 
 
@@ -868,6 +887,40 @@ function validateCommission(input) {
       });
     });
   });
+
+  function checkDiscountPercentage() {
+  var discountInput = document.getElementById('discount_percentage');
+  var enteredValue = parseFloat(discountInput.value);
+
+  if (isNaN(enteredValue) || enteredValue < 0 || enteredValue > 100) {
+    swal({
+      title: 'Invalid Percentage',
+      text: 'Please enter a valid discount percentage between 0 and 100.',
+      icon: 'error',
+      button: 'OK',
+    });
+
+    discountInput.value = '';
+  }
+}
+
+$(document).ready(function () {
+        // Event handler for staff_type change
+        $('#staff_type').change(function () {
+            // Get the selected staff_type value
+            var selectedStaffType = $(this).val();
+
+            // Check if the selected staff_type is 96
+            if (selectedStaffType == 96) {
+                // Show the pharmacySelectBox div
+                $('#pharmacySelectBox').show();
+            } else {
+                // Hide the pharmacySelectBox div
+                $('#pharmacySelectBox').hide();
+            }
+        });
+    });
+
 </script>
 
 

@@ -17,7 +17,7 @@ class Trn_Medicine_Purchase_Invoice extends Model
         'supplier_id',
         'invoice_date',
         'due_date',
-        'branch_id',
+        'pharmacy_id',
         'credit_limit',
         'current_credit',
         'sub_total',

@@ -58,7 +58,7 @@ use App\Helpers\AdminHelper;
                   <input type="hidden" name="saved-booking-id" value="77" id="saved-booking-id">
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
-                     <div class="col-md-4">
+                     <div class="col-md-3">
 
                         <div class="form-group">
                            <label class="form-label">Select Patient*</label>
@@ -73,7 +73,7 @@ use App\Helpers\AdminHelper;
                            </select>
                         </div>
                      </div>
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Select Booking ID*</label>
                            <select class="form-control" name="patient_booking_id" id="patient_booking_id">
@@ -88,26 +88,21 @@ use App\Helpers\AdminHelper;
                      </div>
 
 
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Date</label>
                            <input type="text" class="form-control" value="{{ $medicine_sale_invoices->invoice_date }}" readonly name="due_date" id="date" placeholder="Date">
                         </div>
                      </div>
-
-                     <!-- <div class="col-md-3">
-                        <div class="form-group">
-                           <div class="form-label">Print Invoice</div>
-                           <label class="custom-switch">
-                              <input type="hidden" name="is_print" value="0">
-                              <input type="checkbox" id="is_print" name="is_print" value="1" checked="checked" onchange="toggleStatus(this)" class="custom-switch-input">
-                              <span id="statusLabel" class="custom-switch-indicator"></span>
-                              <span id="statusText" class="custom-switch-description">
-                                 Print Invoice
-                              </span>
-                           </label>
+                     <div class="col-md-3">
+                        <label class="form-label">Pharmacy*</label>
+                        <select class="form-control" name="pharmacy" id="pharmacy_id" required>
+                            <option value="">Select Pharmacy</option>
+                            @foreach ($pharmacies as $id => $branchName)
+                                <option value="{{ $id }}" {{ $id == $medicine_sale_invoices->pharmacy_id ? 'selected' : '' }}>{{ $branchName->pharmacy_name }}</option>
+                            @endforeach
+                        </select>
                         </div>
-                     </div> -->
                   </div>
                   <div class="row">
                      <div class="col-md-12 col-lg-12">
@@ -140,7 +135,7 @@ use App\Helpers\AdminHelper;
                                           </select>
                                        </td>
                                        <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
-                                       <td><input type="number" min="0" class="form-control" value="{{$ledgerPosting->debit}}" name="debit[]"></td>
+                                       <td><input type="number" min="0" class="form-control" value="{{ $ledgerPosting ? $ledgerPosting->debit : 0 }}" name="debit[]"></td>
                                        <td><input type="number" readonly class="form-control" value="{{$ledgerPosting->credit}}" name="credit[]"></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                     </tr>

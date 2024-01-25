@@ -5,7 +5,9 @@ use App\Models\Mst_Medicine;
 use App\Models\Mst_Tax_Group;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
+use App\Models\Mst_Branch;
 use App\Models\Mst_Unit;
+use App\Models\Trn_Medicine_Stock;
 use App\Models\Mst_Manufacturer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -96,7 +98,8 @@ class MstMedicineController extends Controller
         $medicines->reorder_limit = $request->input('reorder_limit');
         $medicines->created_by = Auth::id();
         $medicines->save();
-    
+
+
         return redirect()->route('medicine.index')->with('success','Medicine added successfully');
     }
     
@@ -184,6 +187,7 @@ class MstMedicineController extends Controller
      
         $pageTitle = "Medicine Stock Updation";
         $medicines = Mst_Medicine::findOrFail($id);
+        dd($medicines);
         $branchs = Mst_Branch::get();
         $meds = Mst_Medicine::get();
         return view('medicine.stockupdation',compact('pageTitle','medicines','branchs','meds'));

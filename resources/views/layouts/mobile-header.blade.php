@@ -3,8 +3,8 @@
         <div class="d-flex">
             <a aria-label="Hide Sidebar" class="app-sidebar__toggle" data-toggle="sidebar" href="#"></a><!-- sidebar-toggle-->
             <a class="header-brand" href="index.html">
-                <img src="{{asset('assets/images/brand/logo.png')}}" class="header-brand-img desktop-logo" alt="logo">
-                <img src="{{asset('assets/images/brand/logo-3.png')}}" class="header-brand-img desktop-logo mobile-light" alt="logo">
+                <img src="{{asset('assets/images/ayushman-logo.jpeg')}}" class="header-brand-img desktop-logo" alt="logo">
+                <img src="{{asset('assets/images/ayushman-logo.jpeg')}}" class="header-brand-img desktop-logo mobile-light" alt="logo">
             </a>
             <div class="d-flex order-lg-2 ml-auto header-right-icons">
                 <button class="navbar-toggler navresponsive-toggler d-md-none" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4" aria-expanded="false" aria-label="Toggle navigation">

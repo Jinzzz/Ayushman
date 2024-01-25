@@ -1,5 +1,48 @@
 @extends('layouts.app')
 @section('content')
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Search Sales Invoice</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('medicine.sales.invoices.index') }}" method="GET">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="staff-code">Sales Invoice Number</label>
+                            <input type="text" id="sales_invoice_number" name="sales_invoice_number" class="form-control" value="{{ request('sales_invoice_number') }}" placeholder="Sales Invoice Number">
+                        </div>
+                         <div class="col-md-3">
+                            <label for="staff-name">Invoice Date</label>
+                            <input type="date" id="staff-name" name="invoice_date" class="form-control" value="{{ request('invoice_date') }}" >
+                        </div>
+                        <div class="col-md-3">
+                        <label for="contact-number">Pharmacy</label>
+                            <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach($pharmacies as  $data)
+                                    <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
+                                        {{ $data->pharmacy_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                   </div>
+                   <div class="row mb-3">
+                                 
+                        <div class="col-md-12 d-flex align-items-end">
+                           
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp; &nbsp;
+                                <a class="btn btn-primary" href="{{ route('medicine.sales.invoices.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                          
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card">
     @if ($message = Session::get('success'))
     <div class="alert alert-success">
@@ -24,10 +67,10 @@
                 <thead>
                     <tr>
                         <th class="wd-15p">SL.NO</th>
-                        <th class="wd-15p">Branch</th>
+                  
                         <th class="wd-15p">Invoice No</th>
                         <th class="wd-15p">Invoice Date</th>
-                        <!-- <th class="wd-15p">Total Amount</th> -->
+                        <th class="wd-15p">Pharmacy</th>
                         <!-- <th class="wd-15p">Discount Amount</th> -->
                         <th class="wd-15p">Paid Amount</th>
                         <th class="wd-15p">Sales person</th>
@@ -41,11 +84,10 @@
                     @foreach($medicineSalesInvoice as $invoice)
                     <tr id="dataRow_{{ $invoice->sales_invoice_id }}">
                         <td>{{ ++$i }}</td>
-                        <td>{{ $invoice->branch->branch_name }}</td>
+                
                         <td>{{ $invoice->sales_invoice_number }}</td>
                         <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y') }}</td>
-                        <!-- <td>{{ $invoice->total_amount }}</td> -->
-                        <!-- <td>{{ $invoice->discount_amount }}</td> -->
+                        <td>{{ $invoice->pharmacy_name }}</td>
                         <td>{{ $invoice->payable_amount }}</td>
                         <td>{{ $invoice->staff->staff_name }}</td>
                         <td>
@@ -76,43 +118,53 @@
 </div>
 <!-- ROW-1 CLOSED -->
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
+    function flashMessage(type, message) {
+        // Replace this with your actual flash message implementation
+        Swal.fire({
+            icon: type === 'success' ? 'success' : 'error',
+            title: type.toUpperCase(),
+            text: message,
+        });
+    }
+
     function deleteData(dataId) {
         swal({
-                title: "Delete selected data?",
-                text: "Are you sure you want to delete this data",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('medicine.sales.invoices.destroy', '') }}/" + dataId,
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            // Handle the success response, e.g., remove the row from the table
-                            if (response == '1') {
-                                $("#dataRow_" + dataId).remove();
-                                flashMessage('s', 'Data deleted successfully');
-                            } else {
-                                flashMessage('e', 'An error occured! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while deleting the data.');
-                        },
-                    });
-                } else {
-                    return;
-                }
-            });
+            title: "Delete selected data?",
+            text: "Are you sure you want to delete this data",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function(isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    url: "{{ route('medicine.sales.invoices.destroy', '') }}/" + dataId,
+                    type: "DELETE",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $("#dataRow_" + dataId).remove();
+                            flashMessage('success', 'Data deleted successfully');
+                        } else {
+                            flashMessage('error', response.error || 'An error occurred! Please try again later.');
+                        }
+                    },
+                    error: function() {
+                        flashMessage('error', 'An error occurred while deleting the data.');
+                    },
+                });
+            } else {
+                return;
+            }
+        });
     }
 </script>

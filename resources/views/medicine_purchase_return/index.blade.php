@@ -1,5 +1,49 @@
 @extends('layouts.app')
 @section('content')
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Search Purchae Invoice</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('medicinePurchaseReturn.index') }}" method="GET">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="staff-code">Purchase Return Number</label>
+                            <input type="text" id="purchase_return_no" name="purchase_return_no" class="form-control" value="{{ request('purchase_return_no') }}" placeholder="Purchase Return Number">
+                        </div>
+
+                         <div class="col-md-3">
+                            <label for="contact-number">Return Date</label>
+                            <input type="date" id="return_date" name="return_date" class="form-control" value="{{ request('return_date') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="contact-number">Pharmacy</label>
+                            <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach($pharmacies as  $data)
+                                    <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
+                                        {{ $data->pharmacy_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                   </div>
+                   <div class="row mb-3">
+                                 
+                        <div class="col-md-12 d-flex align-items-end">
+                           
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button> &nbsp; &nbsp;
+                                <a class="btn btn-primary" href="{{ route('medicinePurchaseReturn.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                          
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card">
    @if ($message = Session::get('success'))
    <div class="alert alert-success">
@@ -26,11 +70,9 @@
                   <th class="wd-15p">SL.NO</th>
                   <th class="wd-15p">Purchase Return No</th>
                   <th class="wd-20p">Supplier</th>
+                  <th class="wd-20p">Pharmacy</th>
                   <th class="wd-15p">Return Date</th>
-                  <th class="wd-15p">Branch</th>
-                  <th class="wd-15p">Reason</th>
-                  <th class="wd-15p">Sub Total</th>
-                 
+                  <th class="wd-15p">Sub Total</th>  
                   <th class="wd-15p">Action</th>
                </tr>
             </thead>
@@ -42,13 +84,10 @@
                <tr id="dataRow_{{ $return->purchase_return_id  }}">
                   <td>{{ ++$i }}</td>
                   <td>{{ $return->purchase_return_no }}</td>
-                  <td>{{ $return->supplier_id }}</td>
+                  <td>{{ $return->supplier_name }}</td>
+                  <td>{{ $return->pharmacy_name }}</td>
                   <td>{{ \Carbon\Carbon::parse($return->return_date)->format('d-m-Y') }}</td>
-                  <td>{{ @$return->branch->branch_name }}</td>
-                  <td>{{ $return->reason }}</td>
-                  <td>{{ $return->sub_total }}</td>
-
-                
+                  <td>{{ $return->sub_total }}</td>     
                   <td>
                      <a class="btn btn-primary btn-sm edit-custom"
                         href="{{ route('medicinePurchaseReturn.edit', $return->purchase_return_id ) }}"><i
@@ -78,86 +117,42 @@
 <!-- ROW-1 CLOSED -->
 @endsection
 <script>
-   function deleteData(dataId) {
-       swal({
-               title: "Delete selected data?",
-               text: "Are you sure you want to delete this data",
-               type: "warning",
-               showCancelButton: true,
-               confirmButtonColor: "#DD6B55",
-               confirmButtonText: "Yes",
-               cancelButtonText: "No",
-               closeOnConfirm: true,
-               closeOnCancel: true
-           },
-           function(isConfirm) {
-               if (isConfirm) {
-                   $.ajax({
-                       url: "{{ route('externaldoctors.destroy', '') }}/" + dataId,
-                       type: "DELETE",
-                       data: {
-                           _token: "{{ csrf_token() }}",
-                       },
-                       success: function(response) {
-                           // Handle the success response, e.g., remove the row from the table
-                           if (response == '1') {
-                               $("#dataRow_" + dataId).remove();
-                               flashMessage('s', 'Data deleted successfully');
-                           } else {
-                               flashMessage('e', 'An error occured! Please try again later.');
-                           }
-                       },
-                       error: function() {
-                           alert('An error occurred while deleting the external doctor.');
-                       },
-                   });
-               } else {
-                   return;
-               }
-           });
-   }
-   
-      // Change status 
-      function changeStatus(dataId) {
-        swal({
-                title: "Change Status?",
-                text: "Are you sure you want to change the status?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('externaldoctors.changeStatus', '') }}/" + dataId,
-                        type: "patch",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
-                                if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
-                                } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
-                                }
-
-                                flashMessage('s', 'Status changed successfully');
-                            } else {
-                                flashMessage('e', 'An error occurred! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while changing the branch status.');
-                        },
-                    });
-                }
+function deleteData(dataId) {
+    swal({
+        title: "Delete selected data?",
+        text: "Are you sure you want to delete this data",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+    function(isConfirm) {
+        if (isConfirm) {
+            $.ajax({
+                url: "{{ route('medicinePurchaseReturn.destroy', '') }}/" + dataId,
+                type: "DELETE",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    if (response == '1') {
+                        $("#dataRow_" + dataId).remove();
+                        swal("Success", "Invoice Return deleted successfully", "success");
+                    } else {
+                        flashMessage('error', 'An error occurred! Please try again later.');
+                    }
+                },
+                error: function() {
+                    flashMessage('error', 'An error occurred while deleting the invoice.');
+                },
             });
-    }
-   </script>
+        } else {
+            return;
+        }
+    });
+}
+</script>

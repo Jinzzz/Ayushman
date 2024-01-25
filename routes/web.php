@@ -52,6 +52,7 @@ use App\Http\Controllers\SalaryPackageController;
 use App\Http\Controllers\AvailableLeaveController;
 use App\Http\Controllers\TherapyStockTransferController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\TrnWellnessBillingController;
 /*
 |--------------------------------------------------------------------------
@@ -183,6 +184,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/patients/{id}/toggle-otp-verification', [MstPatientController::class, 'toggleOTPVerification'])->name('patients.toggleOTPVerification');
     Route::patch('/patients/{id}/toggle-approval', [MstPatientController::class, 'toggleApproval'])->name('patients.toggleApproval');
     Route::get('/patients/{id}/membership-assigning', [MstPatientController::class, 'patientMembershipAssigning'])->name('patients.membership.assigning');
+    //Pharmacy
+    Route::get('/pharmacy/index', [PharmacyController::class, 'index'])->name('pharmacy.index');
+    Route::get('/Pharmacy/create', [PharmacyController::class, 'create'])->name('pharmacy.create');
+    Route::post('/Pharmacy/store', [PharmacyController::class, 'store'])->name('pharmacy.store');
+    Route::get('/Pharmacy/edit/{id}', [PharmacyController::class, 'edit'])->name('pharmacy.edit');
+    Route::get('/Pharmacy/show/{id}', [MstPatientController::class, 'show'])->name('pharmacy.show');
+    Route::delete('/Pharmacy/destroy/{id}', [PharmacyController::class, 'destroy'])->name('pharmacy.destroy');
+    Route::put('/Pharmacy/update/{id}', [PharmacyController::class, 'update'])->name('pharmacy.update');
 
     //Manage-Therapy-Rooms:
     Route::get('/therapyrooms/index', [MstTherapyRoomController::class, 'index'])->name('therapyrooms.index');
@@ -266,11 +275,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking-type/show/{id}', [BookingTypeController::class, 'show'])->name('booking_type.show');
 
 
-    //Wellness-Billing:
-    Route::get('/wellness-billing/index', [TrnWellnessBillingController::class, 'index'])->name('wellness_billing.index');
-    Route::get('/wellness-billing/create/{consultation_id}', [TrnWellnessBillingController::class, 'create'])->name('wellness_billing.create');
-    Route::post('/wellness-billing/store', [TrnWellnessBillingController::class, 'generateInvoice'])->name('wellness_billing.generateisnvoice');
-    Route::post('/wellness-billing/search/{id?}', [TrnWellnessBillingController::class, 'patientSearch'])->name('patientname.search');
+    // //Wellness-Billing:
+    // Route::get('/wellness-billing/index', [TrnWellnessBillingController::class, 'index'])->name('wellness_billing.index');
+    // Route::get('/wellness-billing/create/{consultation_id}', [TrnWellnessBillingController::class, 'create'])->name('wellness_billing.create');
+    // Route::post('/wellness-billing/store', [TrnWellnessBillingController::class, 'generateInvoice'])->name('wellness_billing.generateisnvoice');
+    // Route::post('/wellness-billing/search/{id?}', [TrnWellnessBillingController::class, 'patientSearch'])->name('patientname.search');
 
 
     //Booking-Type:(wellness)
@@ -470,8 +479,10 @@ Route::middleware('auth')->group(function () {
     //booking 
     Route::get('/search/wellness', [BookingController::class, 'wellnessBooking'])->name('wellness.booking');
     Route::get('/search/consultation', [BookingController::class, 'consultationBooking'])->name('consultation.booking');
+    Route::get('/search/therapy', [BookingController::class, 'therapyBooking'])->name('therapy.booking');
     Route::get('/search/viewwellness/{id}', [BookingController::class, 'viewWellnessBooking'])->name('viewwellness.booking');
     Route::get('/search/viewconsultation/{id}', [BookingController::class, 'viewConsultationBooking'])->name('viewconsultation.booking');
+    Route::get('/search/viewtherapy/{id}', [BookingController::class, 'viewTherapyBooking'])->name('viewtherapy.booking');
     Route::post('/booking/addmedicineconsultation/{id}', [BookingController::class, 'addMedicineConsultation'])->name('addmedicine.consultation');
     Route::post('/booking/addmedicinewellness/{id}', [BookingController::class, 'addMedicineWellness'])->name('addmedicine.wellness');
     Route::get('/booking/consultation/create', [BookingController::class, 'consultationBookingCreate'])->name('consultation-booking.create');
@@ -511,6 +522,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/getLedgerNames', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames');
 
     // Medicine sales return 
+    Route::get('/get-sale-invoice-details', [MedicineSalesReturnController::class, 'getSaleInvoiceDetails'])->name('getSaleInvoiceDetails');
+
     Route::get('/medicine-sales-return', [MedicineSalesReturnController::class, 'index'])->name('medicine.sales.return.index');
     Route::get('/medicine-sales-return/create', [MedicineSalesReturnController::class, 'create'])->name('medicine.sales.return.create');
     Route::post('/medicine-sales-return/store', [MedicineSalesReturnController::class, 'store'])->name('medicine.sales.return.store');
@@ -574,6 +587,7 @@ Route::get('/medicine-purchase-return/show/{id}', [TrnMedicinePurchaseReturnCont
 Route::get('/get-purchase-invoices',[TrnMedicinePurchaseReturnController::class,'getPurchaseInvoices'])->name('getPurchaseInvoices');
 Route::get('/getPurchaseInvoiceDetails', [TrnMedicinePurchaseReturnController::class, 'getPurchaseInvoiceDetails'])->name('getPurchaseInvoiceDetails');
 Route::get('/get-invoice-branch',[TrnMedicinePurchaseReturnController::class,'getInvoiceBranch'])->name('getInvoiceBranch');
+Route::delete('/medicine-purchase-return/destroy/{id}', [TrnMedicinePurchaseReturnController::class, 'destroy'])->name('medicinePurchaseReturn.destroy');
 
 
 //Medicine Stock Updation:

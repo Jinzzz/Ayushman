@@ -60,7 +60,7 @@ use App\Helpers\AdminHelper;
                   @csrf
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Select Patient*</label>
                            <select class="form-control" name="patient_id" id="patient_id" required>
@@ -74,7 +74,7 @@ use App\Helpers\AdminHelper;
                            </select>
                         </div>
                      </div>
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Select Booking ID</label>
                            <select class="form-control" name="patient_booking_id" id="patient_booking_id">
@@ -82,12 +82,21 @@ use App\Helpers\AdminHelper;
                            </select>
                         </div>
                      </div>
-
-
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Date</label>
                            <input type="date" class="form-control" readonly name="due_date" id="date" placeholder="Date">
+                        </div>
+                     </div>
+                     <div class="col-md-3">
+                        <div class="form-group">
+                           <label class="form-label">Pharmacy*</label>
+                           <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                              <option value="">Select Pharmacy</option>
+                              @foreach ($pharmacies as $pharmacy)
+                              <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                              @endforeach
+                           </select>
                         </div>
                      </div>
                   </div>
@@ -317,6 +326,7 @@ use App\Helpers\AdminHelper;
 
 
 <script>
+ 
    // total amount 
    // Get the current date
    var currentDate = new Date();
@@ -555,7 +565,7 @@ use App\Helpers\AdminHelper;
             _token: "{{ csrf_token() }}",
          },
          success: function(response) {
-            console.log(response.data);
+            console.log('response',response);
             // Clear previous data in the modal
             $('#medicineBatchDetails').empty();
 
@@ -862,5 +872,8 @@ use App\Helpers\AdminHelper;
          $(this).closest('tr').find(".medicine-quantity span").remove()
       }
    })
+
+   
 </script>
+
 @endsection

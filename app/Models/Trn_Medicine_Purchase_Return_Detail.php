@@ -18,7 +18,8 @@ class Trn_Medicine_Purchase_Return_Detail extends Model
         'quantity_id',
         'unit_id',
         'rate',
-        'free_quantity',
-        'created_at'
+        'return_quantity',
+        'created_at',
+        'pharmacy_id'
     ];
 }

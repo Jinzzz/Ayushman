@@ -15,23 +15,26 @@
                     <div class="col-md-4">
                         <label for="employee_name" class="form-label">Patient Name</label>
                         <select class="form-control" name="patient_id" id="patient_id">
-                        <option value="" disabled selected>Choose Patient</option>
-                        @foreach($patientNames as $patientId => $patientName)
-                            <option value="{{ $patientId }}">
-                                {{ $patientName }}
-                            </option>
-                        @endforeach
-                    </select>
-
-
-                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
+                            <option value="" disabled selected>Choose Patient</option>
+                            @foreach($patientNames as $patientId => $patientName)
+                                <option value="{{ $patientId }}">
+                                    {{ $patientName }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <!-- <div class="col-md-4">
+                        <label for="birthday" class="form-label">Booking date</label>
+                        <input class="form-control" type="date" id="booking_date" name="booking_date">
+                    </div> -->
+                    <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search" aria-hidden="true"></i> Search
                         </button>
                     </div>
                 </div>
             </div>
+
         </form>
         </div>
     </div>
@@ -126,4 +129,7 @@
             });
         });
     });
+    setTimeout(function() {
+                $('#success-alert').fadeOut('slow');
+            }, 3000);
 </script>

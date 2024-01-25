@@ -18,26 +18,46 @@ use App\Models\Mst_Staff;
 use App\Models\Mst_User;
 use App\Models\Trn_Medicine_Stock;
 use App\Models\Trn_Ledger_Posting;
+use App\Models\Mst_Pharmacy;
 use Dompdf\Dompdf;
 use View;
 use Dompdf\Options;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 
 class MedicineSalesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $pageTitle = "Medicine Sales Invoice";
-            $medicineSalesInvoice = Trn_Medicine_Sales_Invoice::with('Staff', 'Branch')->orderBy('created_at', 'desc')->get();
-            return view('medicine_sales_invoice.index', compact('pageTitle', 'medicineSalesInvoice'));
-        } catch (QueryException $e) {
-            dd($e->getMessage());
-        }
+
+        
+        $pageTitle = "Medicine Sales Invoice";
+        $pharmacies = Mst_Pharmacy::get();
+        $query = Trn_Medicine_Sales_Invoice::query();
+        $query->join('mst_pharmacies', 'trn__medicine__sales__invoices.pharmacy_id', '=', 'mst_pharmacies.id')
+              ->select('trn__medicine__sales__invoices.*', 'mst_pharmacies.*');
+
+         
+           if ($request->has('sales_invoice_number') && $request->sales_invoice_number != "") {
+                $query->where('trn__medicine__sales__invoices.sales_invoice_number', $request->sales_invoice_number);
+            }
+
+            if ($request->filled('invoice_date')) {
+                $query->whereDate('trn__medicine__sales__invoices.invoice_date', '=', $request->invoice_date);
+            }
+            
+            if ($request->has('pharmacy_id') && $request->pharmacy_id != "") {
+                $query->where('trn__medicine__sales__invoices.pharmacy_id', $request->pharmacy_id);
+            }
+
+        $medicineSalesInvoice = $query->get();
+
+        return view('medicine_sales_invoice.index', compact('pageTitle', 'medicineSalesInvoice','pharmacies'));
+
     }
 
     public function create(Request $request)
@@ -51,7 +71,8 @@ class MedicineSalesController extends Controller
             $staff_id = Mst_User::where('user_id', $user_id)->pluck('staff_id');
             $discount_percentage = Mst_Staff::where('staff_id', $staff_id)->pluck('max_discount_value');
             $branches = Mst_Branch::where('is_active', 1)->get();
-            return view('medicine_sales_invoice.create', compact('pageTitle', 'paymentType', 'discount_percentage', 'medicines', 'patients', 'branches'));
+            $pharmacies = Mst_Pharmacy::get();
+            return view('medicine_sales_invoice.create', compact('pageTitle', 'paymentType', 'discount_percentage', 'medicines', 'patients', 'branches','pharmacies'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
         }
@@ -74,11 +95,15 @@ class MedicineSalesController extends Controller
 
     public function getMedicineBatches($id)
     {
+        
         try {
+            // $medicine_batch_details = Mst_Medicine::join('trn_medicine_stocks', 'mst_medicines.id', '=', 'trn_medicine_stocks.medicine_id')
+
             $medicine_batch_details = Mst_Medicine::join('trn_medicine_stocks', 'mst_medicines.id', '=', 'trn_medicine_stocks.medicine_id')
                 ->join('mst_units', 'mst_medicines.unit_id', '=', 'mst_units.id')
                 ->join('mst_master_values as med_type', 'mst_medicines.medicine_type', '=', 'med_type.id')
                 ->select(
+                
                     'trn_medicine_stocks.stock_id',
                     'trn_medicine_stocks.current_stock',
                     'trn_medicine_stocks.medicine_id',
@@ -93,13 +118,14 @@ class MedicineSalesController extends Controller
                     'med_type.master_value as medicine_type'
                 )
                 ->where('trn_medicine_stocks.medicine_id', $id)
-                ->where('trn_medicine_stocks.expd', '>', Carbon::now())
-                ->where('trn_medicine_stocks.current_stock', '!=', 0)
-                ->where('mst_medicines.id', $id)
-                ->where('mst_medicines.item_type', 8)
-                ->where('mst_medicines.is_active', 1)
-                ->where('mst_units.is_active', 1)
+                // ->where('trn_medicine_stocks.expd', '>', Carbon::now())
+                // ->where('trn_medicine_stocks.current_stock', '!=', 0)
+                // ->where('mst_medicines.id', $id)
+                // ->where('mst_medicines.item_type', 8)
+                // ->where('mst_medicines.is_active', 1)
+                // ->where('mst_units.is_active', 1)
                 ->get();
+
 
             // Calculate the total tax rate using SQL query
             $medicine_details = Mst_Medicine::where('id', $id)->first();
@@ -123,7 +149,7 @@ class MedicineSalesController extends Controller
                     'medicine_tax_rate' => $total_tax_rate,
                 ];
             }
-            // dd($data);
+        
 
             return response()->json(['data' => $data]);
         } catch (QueryException $e) {
@@ -216,13 +242,14 @@ class MedicineSalesController extends Controller
                 $user_id = 1;
                 $user_details = Mst_Staff::where('staff_id', $user_id)->first();
                 $branch_id = $user_details->branch_id;
+                
                 $financial_year_id = 1;
                 $lastInsertedId = Trn_Medicine_Sales_Invoice::insertGetId([
                     'sales_invoice_number' => "MSI00GP",
                     'patient_id' => $request->patient_id,
                     'booking_id' => $request->patient_booking_id,
                     'invoice_date' => Carbon::now(),
-                    'branch_id' => $branch_id,
+                    'pharmacy_id' => $request->pharmacy_id,
                     'sales_person_id' => $user_id,
                     'notes' => $request->notes,
                     'terms_and_conditions' => $request->terms_condition,
@@ -375,15 +402,12 @@ class MedicineSalesController extends Controller
     public function destroy($id)
     {
         try {
-            $med_sales_invoice = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $id)->first();
-            if ($med_sales_invoice) {
-                $med_sales_invoice->deleted_by = 1;
-                $med_sales_invoice->save(); // Update the 'deleted_by' attribute
-                $med_sales_invoice->delete(); // Delete the record
-            }
-            return 1;
-        } catch (QueryException $e) {
-            return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
+            $med_sales_invoice = Trn_Medicine_Sales_Invoice::findOrFail($id);
+            $med_sales_invoice->delete();
+    
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
     public function show($id)
@@ -429,6 +453,7 @@ class MedicineSalesController extends Controller
             $medicines = Mst_Medicine::where('item_type', 8)->get();
             $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');
             $medicine_sale_invoices = Trn_Medicine_Sales_Invoice::where('sales_invoice_id', $id)->first();
+            $pharmacies = Mst_Pharmacy::get();
             $medicine_sale_details = Trn_Medicine_Sales_Invoice_Details::where('sales_invoice_id', $id)->with('Unit')->get();
             if (!$medicine_sale_invoices) {
                 // Handle the case where the ledger with the given ID doesn't exist
@@ -437,6 +462,7 @@ class MedicineSalesController extends Controller
             $patient_booking_ids = Trn_Consultation_Booking::where('patient_id', $medicine_sale_invoices->patient_id)->select('booking_reference_number', 'id')->get();
             $ledgerPosting = Trn_Ledger_Posting::where('master_id', $id)->first();
             $ledgerNames = Mst_Account_Ledger::find($medicine_sale_invoices->deposit_to);
+
             $all_medicine_sale_details = [];
             foreach ($medicine_sale_details as $sale_details) {
                 $batch_details = Trn_Medicine_Stock::where('batch_no', $sale_details->batch_id)->first();
@@ -466,7 +492,7 @@ class MedicineSalesController extends Controller
             }
             // dd($all_medicine_sale_details);
             $deposit_to = $ledgerNames->ledger_name;
-            return view('medicine_sales_invoice.edit', compact('patient_booking_ids', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to','id','ledgerPosting'));
+            return view('medicine_sales_invoice.edit', compact('patient_booking_ids', 'pageTitle', 'patients', 'medicines', 'paymentType', 'medicine_sale_invoices', 'all_medicine_sale_details', 'medicine_sale_details', 'deposit_to','id','ledgerPosting','pharmacies'));
         } catch (QueryException $e) {
             dd($e->getMessage());
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');

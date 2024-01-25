@@ -21,23 +21,16 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label class="form-label">Supplier*</label>
-                            <input type="text" class="form-control" readonly name="supplier_id" value="{{$viewPurchaseReturn->supplier->supplier_name}}" id="supplier_id">
+                            <label class="form-label">Supplier</label>
+                            <input type="text" class="form-control" readonly name="supplier_id" value="{{$viewPurchaseReturn->supplier_name}}" id="supplier_id">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Purchase Invoice Id*</label>
-                            <select class="form-control" readonly name="purchase_invoice_id" id="purchase_invoice_id" value="{{ $viewPurchaseReturn->purchase_invoice_id}}">
-                                <option value="">Select Purchase Invoice</option>
-                            </select>
+                            <label class="form-label">Pharmacy</label>
+                            <input type="text" class="form-control" readonly name="pharmacy_name" value="{{$viewPurchaseReturn->pharmacy_name}}" id="pharmacy_name">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Return Date*</label>
+                            <label class="form-label">Return Date</label>
                             <input type="date" id="return-date" readonly name="return_date" class="form-control" value="{{ $viewPurchaseReturn->return_date}}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Branch*</label>
-                            <input type="text" class="form-control" readonly name="branch_id" value="{{$viewPurchaseReturn->Branch->branch_name}}" >
-                              
                         </div>
                     </div>
 
@@ -50,39 +43,27 @@
                                         <th class="wd-15p">Product Name</th>
                                         <th class="wd-15p">Quantity</th>
                                         <th class="wd-15p">Product Unit</th>
-                                        <th class="wd-15p">Rate</th>
-                                        <th class="wd-15p">Free Quantity</th>
-                                        <th class="wd-15p">Action</th>
+                                        <th class="wd-15p">Return Quantity</th>
+                               
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($showDetails  as $detail)
                                     <tr id="productRowTemplate" class="product-row">
                                             <td>
-                                                <input type="text" class="form-control" readonly name="product_id[]" value="{{ $detail->product_id }}">
+                                                <input type="text" class="form-control" readonly name="product_id[]" value="{{ $detail->medicine_name }}">
                                             </td>
                                             <td><input type="text" class="form-control" readonly name="quantity[]" value="{{ $detail->quantity_id }}"></td>
                                             <td>
                                                 <input type="text" class="form-control" readonly name="unit_id[]" value="{{ $unit[$detail->unit_id] }}" />
                                                
                                             </td>
-                                            <td><input type="text" class="form-control" readonly name="rate[]" value="{{ $detail->rate }}"></td>
-                                            <td><input type="text" class="form-control" readonly name="free_quantity[]" value="{{ $detail->free_quantity }}"></td>
-                                            <td>
-                                                <button type="button" onclick="deleteRow(this)" class="btn-danger btn-sm">
-                                                    <i class="fa fa-trash" aria-hidden="true"></i> Delete
-                                                </button>
-                                            </td>
+                                            <td><input type="text" class="form-control" readonly name="free_quantity[]" value="{{ $detail->return_quantity }}"></td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button class="btn btn-primary" id="addProductBtn2" type="button">Add Product</button>
                         </div>
                     </div>
                 </div>

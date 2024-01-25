@@ -48,6 +48,7 @@
       <li><a class="slide-item" href="{{ url('wellness/index')}}">{{ __('Wellness') }}</a></li>
       <li><a class="slide-item" href="{{ url('membership/index')}}">{{ __('Membership Packages') }}</a></li>
       <li><a class="slide-item" href="{{ url('/patients/index')}}">{{ __('Patients') }}</a></li>
+      <li><a class="slide-item" href="{{ url('/pharmacy/index')}}">{{ __('Pharamacy') }}</a></li>
     <!-- <li><a class="slide-item" href="{{ url('/masters') }}">{{ __('Master Values') }}</a></li> -->
     <!-- <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li> --> 
     <!-- <li><a class="slide-item" href="{{ url('/staffs/index')}}">{{ __('Staffs') }}</a></li> -->
@@ -83,12 +84,12 @@
     <li class="slide">
       <a class="side-menu__item" data-toggle="slide" href="#">
         <i class="side-menu__icon ti-book"></i>
-        <span class="side-menu__label"> {{ __('Booking') }}</span><i class="angle fa fa-angle-right"></i>
+        <span class="side-menu__label"> {{ __('Search') }}</span><i class="angle fa fa-angle-right"></i>
       </a>
       <ul class="slide-menu">
-        <li><a class="slide-item" href="{{ url('/search/wellness')}}">{{ __('Wellness Booking') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/search/consultation')}}">{{ __('Consultation Booking') }}</a></li>
-        <li><a class="slide-item" href="{{ url('/search/therapy')}}">{{ __('Therapy Booking') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/wellness')}}">{{ __('Wellness Search') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/consultation')}}">{{ __('Consultation Search') }}</a></li>
+        <li><a class="slide-item" href="{{ url('/search/therapy')}}">{{ __('Therapy Search') }}</a></li>
       </ul>
     </li>
     
@@ -120,6 +121,7 @@
       <li><a class="slide-item" href="{{ url('/consultation-billing/index')}}">{{__('Consultation Billing')}}</a></li>
       <li><a class="slide-item" href="{{ url('/wellness-billing/index')}}">{{__('Wellness Billing')}}</a></li>
       <li><a class="slide-item" href="#">{{__('Therapy Billing')}}</a></li>
+      <li><a class="slide-item" href="#">{{__('Invoice settlement')}}</a></li>
       </li>
     </ul> 
 
@@ -239,7 +241,7 @@
       <li><a class="slide-item" href="{{ url('/medicine-purchase-invoice/index')}}">{{ __('Medicine Purchase Invoice') }}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine-purchase-return/index')}}">{{ __('Medicine Purchase Return') }}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine-stock-updation/index')}}">{{ __('Medicine Stock Updation') }}</a></li>
-        <li><a class="slide-item" href="{{ route('therapy-stock-transfers.index')}}">{{ __('Stock Transfer To Therapy') }}</a></li>
+        <!-- <li><a class="slide-item" href="{{ route('therapy-stock-transfers.index')}}">{{ __('Stock Transfer To Therapy') }}</a></li> -->
         <li><a class="slide-item" href="{{ url('/medicine-sales-invoices') }}">{{__('Medicine Sales Invoice')}}</a></li>
         <li><a class="slide-item" href="{{ url('/medicine-sales-return') }}">{{__('Medicine Sales Return')}}</a></li>
     </li>

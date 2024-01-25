@@ -279,6 +279,10 @@
               <label class="form-label">Username</label>
               <input type="text" class="form-control" name="staff_username" id="staff_username" value="{{ old('staff_username', $staffs->staff_username) }}">
           </div>
+          <div class="form-group">
+          <label class="form-label">Staff Discount Percentage</label>
+                <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{  $staffs->discount_percentage }}" placeholder="Staff Discount Percentage">
+          </div>
       </div>
         </div>
       </div>
@@ -405,7 +409,6 @@
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 
 <script>
@@ -660,6 +663,7 @@ $("#finalSubmit").click(function() {
 
 
         });
+
     </script>
     
 

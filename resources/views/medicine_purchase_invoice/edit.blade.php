@@ -67,11 +67,11 @@ use App\Helpers\AdminHelper;
                      </div>
                      <div class="col-md-3">
                         <div class="form-group">
-                           <label class="form-label">Branch*</label>
+                           <label class="form-label">Pharmacy*</label>
                            <select class="form-control" name="branch_id" id="branch_id" required>
-                              <option value="">Select Branch</option>
-                              @foreach ($branch as $id => $branchName)
-                              <option value="{{ $id }}" {{ $id == $medicinePurchaseInvoice->branch_id ? 'selected' : '' }}>{{ $branchName }}</option>
+                              <option value="">Select Pharmacy</option>
+                              @foreach ($pharmacies as $id => $branchName)
+                              <option value="{{ $id }}" {{ $id == $medicinePurchaseInvoice->pharmacy_id ? 'selected' : '' }}>{{ $branchName }}</option>
                               @endforeach
                            </select>
                         </div>
