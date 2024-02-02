@@ -86,9 +86,9 @@
                                 <td>{{ $medicine->medicineType->master_value }}</td>
                                
                                 <td>
-                                    <button type="button" onclick="changeStatus({{ $medicine->id}})" class="btn btn-sm @if($medicine->is_active == 0) btn-danger @else btn-success @endif">
+                                    <button type="button" style="width: 70px;"  onclick="changeStatus({{ $medicine->id}})" class="btn btn-sm @if($medicine->is_active == 0) btn-danger @else btn-success @endif">
                                         @if($medicine->is_active == 0)
-                                        InActive
+                                        Inactive
                                         @else
                                         Active
                                         @endif
@@ -100,6 +100,8 @@
                                             class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                                     <a class="btn btn-secondary btn-sm" href="{{ route('medicine.show', $medicine->id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View </a>
+                                        <a class="btn btn-secondary btn-sm" href="{{ route('viewMedicineStockUpdation.view',$medicine->id) }}">
+                                        <i class="fa fa-eye" aria-hidden="true"></i> Update Stock </a>
                                         <form style="display: inline-block"
                                         action="{{ route('medicine.destroy', $medicine->id ) }}" method="post">
                                         @csrf
@@ -189,9 +191,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

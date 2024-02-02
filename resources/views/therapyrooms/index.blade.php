@@ -67,6 +67,7 @@
                         <!-- <th class="wd-20p">Room Type</th>
                                     <th class="wd-20p">Room Capacity</th> -->
                         <th class="wd-20p">Room Assigning</th>
+                        <th class="wd-20p">Slot Assigning</th>
                         <th class="wd-15p">Status</th>
                         <th class="wd-15p">Action</th>
                     </tr>
@@ -78,8 +79,8 @@
                     @foreach($therapyrooms as $therapyroom)
                     <tr id="dataRow_{{ $therapyroom->id }}">
                         <td>{{ ++$i }}</td>
-                        <td>{{ $therapyroom->branch->branch_name }}</td>
-                        <td>{{ $therapyroom->room_name }}</td>
+                        <td>{{ @$assign->therapyroomName['room_name']}}</td>
+                            <td>{{ @$assign->branch['branch_name']}}</td>
                         <!-- <td>{{ $therapyroom->roomType->master_value}}</td>
                                     <td>{{ $therapyroom->room_capacity }}</td> -->
 
@@ -87,7 +88,10 @@
                             <a class="btn btn-sm  btn-outline-success " href="{{ route('therapyroomassigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>RoomAssigning</a>
                         </td>
                         <td>
-                            <button type="button" onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
+                            <a class="btn btn-sm  btn-outline-success " href="{{ route('slot_assigning.index', $therapyroom->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>SlotAssigning</a>
+                        </td>
+                        <td>
+                            <button type="button" style="width: 70px;"  onclick="changeStatus({{ $therapyroom->id }})" class="btn btn-sm @if($therapyroom->is_active == 0) btn-danger @else btn-success @endif">
                                 @if($therapyroom->is_active == 0)
                                 InActive
                                 @else
@@ -181,12 +185,12 @@
                         },
                         success: function(response) {
                             if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+                                var cell = $('#dataRow_' + dataId).find('td:eq(5)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

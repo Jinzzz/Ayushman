@@ -56,11 +56,11 @@ class MstManufacturerController extends Controller
                         'updated_by' => Auth::id(),
                         'updated_at' => Carbon::now(),
                     ]);
-                    $message = 'Qualifications updated successfully';
+                    $message = 'Manufacturer updated successfully';
                 } else {
                     $checkExists = Mst_Manufacturer::where('name', $request->manufacturer)->first();
                     if ($checkExists) {
-                        return redirect()->route('manufacturer.index')->with('exists', 'This manufacturer is aready exists.');
+                        return redirect()->route('manufacturer.index')->with('exists', 'This manufacturer is already exists.');
                     } else {
                         Mst_Manufacturer::create([
                             'name' => $request->manufacturer,
@@ -89,7 +89,7 @@ class MstManufacturerController extends Controller
     {
         try {
             $manufacturer = Mst_Manufacturer::findOrFail($id);
-            $manufacturer->deleted_by = Auth::id();
+            $manufacturer->deleted_by = 1;
             $manufacturer->save();
             $manufacturer->delete();
             return 1;

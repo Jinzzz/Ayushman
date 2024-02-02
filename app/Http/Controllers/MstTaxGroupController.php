@@ -18,10 +18,10 @@ class MstTaxGroupController extends Controller
         try {
             $pageTitle = "Tax Groups";
             $taxes = [];
-            $tax_groups = Mst_Tax_Group::get();
+            $tax_groups = Mst_Tax_Group::orderBy('created_at', 'desc')->get();
             foreach ($tax_groups as $tax) {
-                $included_tax_ids = Mst_Tax_Group_Included_Taxes::where('tax_group_id', $tax->id)->pluck('included_tax')->toArray();
-                $rate = Mst_Tax::whereIn('id', $included_tax_ids)->pluck('tax_rate')->toArray();
+                $included_tax_ids = Mst_Tax_Group_Included_Taxes::where('tax_group_id', $tax->id)->orderBy('created_at', 'desc')->pluck('included_tax')->toArray();
+                $rate = Mst_Tax::whereIn('id', $included_tax_ids)->orderBy('created_at', 'desc')->pluck('tax_rate')->toArray();
                 $rateSum = array_sum($rate);
                 $taxes[] = [
                     'id' => $tax->id,

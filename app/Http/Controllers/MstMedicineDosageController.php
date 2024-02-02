@@ -39,7 +39,7 @@ class MstMedicineDosageController extends Controller
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'medicine_dosages' => ['required'],
+                    'medicine_dosages' => 'required|unique:mst_medicine_dosages,name',
                     'is_active' => ['required'],
                 ],
                 [
@@ -60,7 +60,7 @@ class MstMedicineDosageController extends Controller
                 } else {
                     $checkExists = Mst_Medicine_Dosage::where('name', $request->medicine_dosages)->first();
                     if ($checkExists) {
-                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is aready exists.');
+                        return redirect()->route('medicine.dosage.index')->with('exists', 'This medicine dosage is already exists.');
                     } else {
                         Mst_Medicine_Dosage::create([
                             'name' => $request->medicine_dosages,
@@ -77,7 +77,7 @@ class MstMedicineDosageController extends Controller
             } else {
                 $messages = $validator->errors();
 
-                return redirect()->route('medicine.dosage.create')->with('error', $messages);
+                return redirect()->back()->with('error', $messages);
             }
         } catch (QueryException $e) {
             return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
@@ -89,7 +89,7 @@ class MstMedicineDosageController extends Controller
     {
         try {
             $medicine_dosages = Mst_Medicine_Dosage::findOrFail($id);
-            $medicine_dosages->deleted_by = Auth::id();
+            $medicine_dosages->deleted_by = 1;
             $medicine_dosages->save();
             $medicine_dosages->delete();
             return 1;

@@ -11,7 +11,7 @@
             <div class="col-lg-12 card-background" style="background-color:#fff";>
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
@@ -94,8 +94,8 @@
                         <button type="submit" class="btn btn-raised btn-primary">
                         <i class="fa fa-check-square-o"></i> Add</button>
                         <button type="reset" class="btn btn-raised btn-success">
-                        Reset</button>
-                        <a class="btn btn-danger" href="{{route('branches')}}">Cancel</a>
+                        <i class="fa fa-refresh"></i> Reset</button>
+                        <a class="btn btn-danger" href="{{route('branches')}}"> <i class="fa fa-times"></i> Cancel</a>
                      </center>
                   </div>
             </div>

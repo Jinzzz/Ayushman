@@ -31,7 +31,7 @@
                 <div class="card-header">
                     <h3 class="mb-0 card-title">Edit Membership Packages</h3>
                 </div>
-                <div class="col-lg-12">
+                <div class="col-lg-12" style="background-color:#fff">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between mb-3">
@@ -60,32 +60,31 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Duration(Days)*</label>
-                                                <input type="number" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration">
+                                                <input type="number" min="0" class="form-control" required name="membership_package_duration" value="{{ isset($membership->package_duration) ? $membership->package_duration : old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                                             </div>
                                         </div>
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Membership Package Price*</label>
-                                                <input type="number" class="form-control" required name="membership_package_price" value="{{ isset($membership->package_price) ? $membership->package_price : old('package_price') }}" placeholder="Membership Package Price">
+                                                <label class="form-label">Regular Price*</label>
+                                                <input type="number" min="0" class="form-control" required name="membership_package_price" value="{{ isset($membership->package_price) ? $membership->package_price : old('package_price') }}" placeholder="Membership Package Price">
                                             </div>
                                         </div>
 
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Offer Price*</label>
-                                                <input type="number" class="form-control" required name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Discount Price">
+                                                <label class="form-label">Offer Price</label>
+                                                <input type="number" min="0" class="form-control" name="discount_price" value="{{ isset($membership->package_discount_price) ? $membership->package_discount_price : old('package_discount_price') }}" placeholder="Offer Price">
                                             </div>
                                         </div>
 
-                                        <div class="col-md-11">
+                                        <div class="col-md-12">
                                             <div class="form-group">
                                                 <label class="form-label">Membership Package Description</label>
                                                 <textarea class="form-control ckeditor" name="membership_package_description" placeholder="Membership Package Description">{{ isset($membership->package_description) ? $membership->package_description : old('package_description') }}</textarea>
                                             </div>
                                         </div>
-
                                         <div class="col-md-1">
                                             <div class="form-group">
                                                 <div class="form-label">Status</div>
@@ -139,8 +138,8 @@
 
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label class="form-label">Max usage limit*</label>
-                                                <input type="number" class="form-control" required name="max_usage_limit" placeholder="Max usage limit">
+                                                <label class="form-label">Max limit*</label>
+                                                <input type="number" min="1" class="form-control" required name="max_usage_limit" placeholder="Max usage limit">
                                             </div>
                                         </div>
 
@@ -181,7 +180,7 @@
                                                 <td>{{ $wellness->wellness_name }}</td>
                                                 <td>{{ $wellness->maximum_usage_limit }} times</td>
                                                 <td><span class="@if($wellness->is_active == 0) badge badge-danger @else badge badge-success @endif" style="width: 60px"> @if($wellness->is_active == 0)
-                                                        InActive
+                                                        Inactive
                                                         @else
                                                         Active
                                                         @endif </span>
@@ -209,10 +208,11 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-11">
-                                            <label class="form-label">Include other benefits</label>
+                                            <label class="form-label">Include other benefits*</label>
                                             <!-- <h6 class="mb-0 card-title" style="margin-left:15px;">Include other benefits</h6><br> -->
                                             <div class="form-group">
                                                 <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefit_title" placeholder="Include other benefits">{{ old('package_description') }}</textarea>
+                                                <span style="color: red;">*Please provide benefits using bullet points only.</span>
                                             </div>
                                         </div>
 
@@ -220,7 +220,7 @@
                                             <div class="form-group">
                                                 <label class="form-label">Actions</label>
                                                 <!-- Removed the <center> tag as it's not recommended -->
-                                                <button type="submit" class="btn btn-raised btn-primary mt-5 mb-5"><i class="fa fa-check-square-o"></i> Add</button> <br>
+                                                <button type="submit" class="btn btn-raised btn-primary mb-3"><i class="fa fa-check-square-o"></i> Add</button> <br>
                                                 <a class="btn btn-danger" href="{{ route('membership.index') }}">Cancel</a>
                                             </div>
                                         </div>
@@ -251,7 +251,7 @@
                                                 <td>{!! $benefit->title !!}</td>
                                                 <td>
                                                     <span class="@if($benefit->is_active == 0) badge badge-danger @else badge badge-success @endif" style="width: 60px">
-                                                        @if($benefit->is_active == 0) InActive @else Active @endif
+                                                        @if($benefit->is_active == 0) Inactive @else Active @endif
                                                     </span>
                                                 </td>
 
@@ -287,7 +287,7 @@
             var duration = selectedOption.data('duration');
             var cost = selectedOption.data('cost');
 
-            var wellnessDetailsLabel = 'Wellness Duration: ' + (duration >= 60 ? (duration / 60) + ' hour' : duration + ' minutes') + ', Wellness Cost: ' + cost + ' ₹';
+            var wellnessDetailsLabel = 'Wellness Duration: ' + (duration >= 60 ? (duration / 60) + ' hour' : duration + ' minutes') + ', Wellness Cost: ' + ' ₹ ' + cost;
 
             $("#wellness-details").text(wellnessDetailsLabel);
         });

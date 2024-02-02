@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 use App\Models\Mst_Medicine;
 use App\Models\Mst_Tax_Group;
-use App\Models\Mst_Branch;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
-use App\Models\Mst_Tax;
+use App\Models\Mst_Branch;
 use App\Models\Mst_Unit;
+use App\Models\Trn_Medicine_Stock;
+use App\Models\Mst_Manufacturer;
+use App\Models\Mst_Pharmacy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class MstMedicineController extends Controller
 {
@@ -51,51 +55,55 @@ class MstMedicineController extends Controller
         $itemType = Mst_Master_Value::where('master_id',13)->pluck('master_value','id');
         $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
         // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
-        $Manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
-        // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
+        $Manufacturer = Mst_Manufacturer::where('is_active',  1)
+        ->whereNull('deleted_at') 
+        ->get();
+    // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
         $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
-        $units = Mst_Unit::pluck('unit_name','id');
 
-        return view('medicine.create', compact('pageTitle','taxes','itemType','medicineType','Manufacturer','units'));
+        $units = Mst_Unit::pluck('unit_name','id');
+        $randomMedicineCode = 'MED_' . Str::random(8);
+        return view('medicine.create', compact('pageTitle','taxes','itemType','medicineType','Manufacturer','units','randomMedicineCode'));
     }
 
     public function store(Request $request)
     {
+  
         $request->validate([
-          
             'medicine_name' => 'required',
             'generic_name' => 'required',
             'item_type' => 'required',
             'medicine_type' => 'required',
-            'tax_id' => 'required|exists:mst_taxes,id',
+            'tax_id' => 'required|exists:mst__tax__groups,id',
             'unit_price' => 'required',
             'description' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
             'is_active' => 'required',
-          
-           
-            ]);
+            'medicine_code' => 'unique:mst_medicines,medicine_code|required',
+        ]);
+    
+        $medicines = new Mst_Medicine();
         $is_active = $request->input('is_active') ? 1 : 0;
-    
-         $medicines = new Mst_Medicine();
-         $medicines->medicine_name = $request->input('medicine_name');
-         $medicines->generic_name = $request->input('generic_name');
-         $medicines->item_type = $request->input('item_type');
-         $medicines->medicine_type = $request->input('medicine_type');
-         $medicines->Hsn_code = $request->input('Hsn_code');
-         $medicines->tax_id = $request->input('tax_id');
-         $medicines->manufacturer = $request->input('manufacturer');
-         $medicines->unit_price = $request->input('unit_price');
-         $medicines->description = $request->input('description');
-         $medicines->unit_id = $request->input('unit_id');
-         $medicines->is_active =  $is_active ;
-         $medicines->reorder_limit = $request->input('reorder_limit');
-         $medicines->created_by = auth()->id();
-         $medicines->save();
-       
-    
-         return redirect()->route('medicine.index')->with('success','Medicine added successfully');
+        $medicines->medicine_code = $request->input('medicine_code');
+        $medicines->medicine_name = $request->input('medicine_name');
+        $medicines->generic_name = $request->input('generic_name');
+        $medicines->item_type = $request->input('item_type');
+        $medicines->medicine_type = $request->input('medicine_type');
+        $medicines->Hsn_code = $request->input('Hsn_code');
+        $medicines->tax_id = $request->input('tax_id');
+        $medicines->manufacturer = $request->input('manufacturer');
+        $medicines->unit_price = $request->input('unit_price');
+        $medicines->description = $request->input('description');
+        $medicines->unit_id = $request->input('unit_id');
+        $medicines->is_active =  $is_active ;
+        $medicines->reorder_limit = $request->input('reorder_limit');
+        $medicines->created_by = Auth::id();
+        $medicines->save();
+
+
+        return redirect()->route('medicine.index')->with('success','Medicine added successfully');
     }
+    
 
     public function edit($id)
     {
@@ -103,13 +111,13 @@ class MstMedicineController extends Controller
         $medicine = Mst_Medicine::findOrFail($id);
         $itemType = Mst_Master_Value::where('master_id',13)->pluck('master_value','id');
         $medicineType =  Mst_Master_Value::where('master_id',14)->pluck('master_value','id');
-       // $dosageForm =  Mst_Master_Value::where('master_id',15)->pluck('master_value','id');
-        $manufacturer =  Mst_Master_Value::where('master_id',16)->pluck('master_value','id');
-        //$branches = Mst_Branch::pluck('branch_name','branch_id'); 
+        $Manufacturer = Mst_Manufacturer::where('is_active',  1)
+                        ->whereNull('deleted_at') 
+                        ->get();
         $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
         $units = Mst_Unit::pluck('unit_name','id');
 
-        return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','manufacturer','units'));
+        return view('medicine.edit', compact('pageTitle','medicine','taxes','itemType','medicineType','Manufacturer','units'));
     }
 
     public function update(Request $request,$id)
@@ -120,12 +128,12 @@ class MstMedicineController extends Controller
             'generic_name' => 'required',
             'item_type' => 'required',
             'medicine_type' => 'required',
-            'tax_id' => 'required|exists:mst_taxes,id',      
+            'tax_id' => 'required|exists:mst__tax__groups,id',      
             'unit_price' => 'required',
             'description' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
             'is_active' => 'required',         
-            //'branch_id' =>  'required|exists:mst_branches,branch_id',
+            //'Hsn_code' =>  'required|exists:mst_branches,branch_id',
            
            
             ]);
@@ -133,21 +141,18 @@ class MstMedicineController extends Controller
     
        
         $medicine = Mst_Medicine::findOrFail($id);
-
         $medicine->medicine_name = $request->input('medicine_name');
         $medicine->generic_name = $request->input('generic_name');
         $medicine->item_type = $request->input('item_type');
         $medicine->medicine_type = $request->input('medicine_type');
         $medicine->Hsn_code = $request->input('Hsn_code');
         $medicine->tax_id = $request->input('tax_id');
-        //$medicine->dosage_form = $request->input('dosage_form');
         $medicine->manufacturer = $request->input('manufacturer');
         $medicine->unit_price = $request->input('unit_price');
         $medicine->description = $request->input('description');
         $medicine->unit_id = $request->input('unit_id');
         $medicine->is_active =  $is_active ;
         $medicine->reorder_limit = $request->input('reorder_limit');
-       //$medicine->branch_id = $request->input('branch_id');
         $medicine->save();
     
         return redirect()->route('medicine.index')->with('success','Medicine updated successfully'); 
@@ -157,7 +162,9 @@ class MstMedicineController extends Controller
     {
         $pageTitle = "View medicine details";
         $show = Mst_Medicine::findOrFail($id);
-        return view('medicine.show',compact('pageTitle','show'));
+        $medicineStock = Trn_Medicine_Stock::where('medicine_id', $id)->get();
+        return view('medicine.show',compact('pageTitle','show','medicineStock'));
+
     }
      
     public function destroy($id)
@@ -178,5 +185,93 @@ class MstMedicineController extends Controller
         return 1;
         return redirect()->back()->with('success','Status changed successfully');
     }
+    public function viewStockUpdation($id)
+    {
+     
+        $pageTitle = "Medicine Initial Stock Updation";
+        $medicines = Mst_Medicine::findOrFail($id);
 
+        $stock = Trn_Medicine_Stock::join('mst_medicines', 'trn_medicine_stocks.medicine_id', '=', 'mst_medicines.id')
+                    ->where('trn_medicine_stocks.medicine_id', $id)
+                    ->select('trn_medicine_stocks.*')->first();
+        $pharmacies = Mst_Pharmacy::get();
+        $branchs = Mst_Branch::get();
+        $meds = Mst_Medicine::get();
+        return view('medicine.stockupdation',compact('pageTitle','medicines','branchs','meds','pharmacies','stock'));
+    }
+    public function getBatchNumbers(Request $request)
+{
+    // Retrieve batch numbers based on the selected medicine ID
+    $medicineId = $request->input('medicine_id');
+    $batchNumbers = Trn_Medicine_Stock::where('medicine_id', $medicineId)->pluck('batch_no');
+
+    return response()->json(['batchNumbers' => $batchNumbers]);
+}
+    public function getCurrentStock($medicineId, $batchNo)
+    {
+    
+        // Fetch current stock based on the provided parameters
+        $currentStock = Trn_Medicine_Stock::where('medicine_id', $medicineId)
+            ->where('batch_no', $batchNo)
+            ->value('current_stock');
+
+        // Return the current stock as JSON
+        return response()->json(['current_stock' => $currentStock]);
+    }
+
+    public function updateStockMedicine(Request $request)
+    {
+
+        $request->validate([
+            'medicine' => 'required',
+            'batch_no' => 'required',
+            'new_stock' => 'required|numeric|min:0',
+            // 'remarks' => 'required',
+            'pharmacy_id' => 'required',
+        ]);
+
+        $pharmacyId = $request->input('pharmacy_id');
+        $medicineId = $request->input('medicine');
+        $batchNo = $request->input('batch_no'); 
+        $newStock = $request->input('new_stock');
+        $remarks = $request->input('remarks');
+        $mfd = $request->input('mfd');
+        $expd = $request->input('expd');
+        $purchase_rate = $request->input('purchase_rate');
+        $sale_rate = $request->input('sale_rate');
+        $purchase_unit_id = $request->input('purchase_unit_id');
+        //$total_stock = $request->current_stock + $request->new_stock;
+
+        // $stock = Trn_Medicine_Stock::where('medicine_id', $medicineId)
+        //     ->where('batch_no', $batchNo)
+        //     ->where('mfd', $mfd)
+        //     ->where('expd', $expd)
+        //     ->first();
+
+            // if ($stock) {
+                // $stock->current_stock = $newStock; 
+                // $stock->save();
+            // } else {
+                $newStockRecord = Trn_Medicine_Stock::create([
+                    'medicine_id' => $medicineId,
+                    'pharmacy_id' => $pharmacyId,
+                    'batch_no' => $batchNo,
+                    'mfd' => $mfd,
+                    'expd' => $expd,
+                    'purchase_rate' => $purchase_rate,
+                    'sale_rate' => $sale_rate,
+                    'purchase_unit_id' => $purchase_unit_id,
+                    'opening_stock' => 0,
+                    'old_stock' => $request->new_stock,
+                    'current_stock' => $request->new_stock,
+                    'remarks' => $remarks,
+                ]);
+                
+                $stockCode = 'STK' . $newStockRecord->stock_id ; 
+                $newStockRecord->update(['stock_code' => $stockCode]);
+         return redirect()->route('medicine.index')->with('success', 'Stock updated/created successfully');
+
+    //   }
+
+  }
 }

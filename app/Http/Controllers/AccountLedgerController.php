@@ -9,6 +9,7 @@ use App\Models\Mst_Account_Sub_Head;
 use App\Models\Mst_Account_Ledger;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 
 class AccountLedgerController extends Controller
 {
@@ -46,7 +47,6 @@ class AccountLedgerController extends Controller
                 'account_group_id' => 'required',
                 'account_sub_group_id' => 'required',
                 'ledger_name' => 'required',
-                'ledger_notes' => 'required',
                 'is_active' => 'required',
             ]);
 
@@ -62,8 +62,8 @@ class AccountLedgerController extends Controller
                     'ledger_code' => 1,
                     'notes' => $request->input('ledger_notes'),
                     'is_active' => $is_active,
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
+                    'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -88,13 +88,17 @@ class AccountLedgerController extends Controller
     public function edit($id)
     {
         try {
+            $subgroup_options =NULL;
             $pageTitle = "Edit Account Ledger";
             $account_groups = Sys_Account_Group::where('is_active', 1)->get();
             $account_ledger = Mst_Account_Ledger::find($id);
             $account_sub_group = Mst_Account_Sub_Head::find($account_ledger->account_sub_group_id);
+            if($account_sub_group)
+            {
             $subgroup_options = Mst_Account_Sub_Head::where('account_group_id', $account_sub_group->account_group_id)
                 ->where('is_active', 1)
                 ->get();
+            }
             if (!$account_ledger) {
                 // Handle the case where the ledger with the given ID doesn't exist
                 return redirect()->route('account.ledger.index')->with('error', 'Account ledger not found');
@@ -131,8 +135,8 @@ class AccountLedgerController extends Controller
                 $account_ledger->ledger_code = 1;
                 $account_ledger->notes = $request->input('ledger_notes');
                 $account_ledger->is_active = $is_active;
-                $account_ledger->created_by = auth()->id();
-                $account_ledger->updated_by = auth()->id();
+                $account_ledger->created_by = Auth::id();
+                $account_ledger->updated_by = Auth::id();
                 $account_ledger->created_at = Carbon::now();
                 $account_ledger->updated_at = Carbon::now();
                 $account_ledger->save();

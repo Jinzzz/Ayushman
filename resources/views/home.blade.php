@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+
+@php
+use App\Models\Mst_Branch;
+use App\Models\Mst_Staff;
+use App\Models\Mst_Supplier;
+use App\Models\Trn_Consultation_Booking;
+use App\Models\Trn_Medicine_Stock;
+
+@endphp
+
 <style>
 	.bg-primary {
 		background: #5e2dd8 !important;
@@ -25,26 +35,26 @@
 @endif
 <div class="container">
 	<div class="row">
-		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
-			<div class="card bg-primary img-card box-primary-shadow">
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
 				<div class="card-body bg-transparent">
 					<div class="d-flex">
 						<div class="text-white">
-							<h2 class="mb-0 number-font">200</h2>
-							<p class="text-white mb-0">Total Sales </p>
+							<h2 class="mb-0 number-font">{{Mst_Staff::count()}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Total Staffs </p>
 						</div>
-						<div class="ml-auto"> <i class="fa fa-send-o text-white fs-30 mr-2 mt-2"></i> </div>
+						<div class="ml-auto"> <i class="fa fa-users text-white fs-30 mr-2 mt-2"></i> </div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
-			<div class="card bg-secondary img-card box-secondary-shadow">
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
 				<div class="card-body bg-transparent">
 					<div class="d-flex">
 						<div class="text-white">
-							<h2 class="mb-0 number-font">100</h2>
-							<p class="text-white mb-0">Total Purchase</p>
+							<h2 class="mb-0 number-font">{{Trn_Medicine_Stock::where('current_stock','<',5)->count()}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Low Stock Medicines</p>
 						</div>
 						<div class="ml-auto">
 							<i class="fa fa-bar-chart text-white fs-30 mr-2 mt-2"></i>
@@ -53,13 +63,13 @@
 				</div>
 			</div>
 		</div><!-- COL END -->
-		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
 			<div class="card bg-success img-card box-success-shadow">
 				<div class="card-body bg-transparent">
 					<div class="d-flex">
 						<div class="text-white">
-							<h2 class="mb-0 number-font">5000</h2>
-							<p class="text-white mb-0">Total Credit</p>
+							<h2 class="mb-0 number-font">{{@$dailySale->daily_sales ?? '0'}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Today's Sales</p>
 						</div>
 						<div class="ml-auto">
 							<i class="fa fa-dollar text-white fs-30 mr-2 mt-2"></i>
@@ -68,25 +78,101 @@
 				</div>
 			</div>
 		</div><!-- COL END -->
-		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
-			<div class="card bg-info img-card box-info-shadow">
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
 				<div class="card-body bg-transparent">
 					<div class="d-flex">
 						<div class="text-white">
-							<h2 class="mb-0 number-font">5</h2>
-							<p class="text-white mb-0">Todays Booking</p>
+							<h2 class="mb-0 number-font">{{@$medicineSaleWeekly->weekly_sales ?? '0'}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Weekly Sales</p>
 						</div>
 						<div class="ml-auto">
-							<i class="fa fa-cart-plus text-white fs-30 mr-2 mt-2"></i>
+							<i class="fa fa-dollar text-white fs-30 mr-2 mt-2"></i>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div><!-- COL END -->
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
+				<div class="card-body bg-transparent">
+					<div class="d-flex">
+						<div class="text-white">
+							<h2 class="mb-0 number-font">{{@$medicineSaleMonthly->monthly_sales ?? '0'}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Monthly Sales</p>
+						</div>
+						<div class="ml-auto">
+							<i class="fa fa-dollar text-white fs-30 mr-2 mt-2"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- COL END -->
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
+				<div class="card-body bg-transparent">
+					<div class="d-flex">
+						<div class="text-white">
+							<h2 class="mb-0 number-font">{{@$totalSales->sales ?? '0'}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Total Sales</p>
+						</div>
+						<div class="ml-auto">
+							<i class="fa fa-dollar text-white fs-30 mr-2 mt-2"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- COL END -->
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
+				<div class="card-body bg-transparent">
+					<div class="d-flex">
+						<div class="text-white">
+							<h2 class="mb-0 number-font">{{@$purchases}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Total Purchases</p>
+						</div>
+						<div class="ml-auto">
+							<i class="fa fa-credit-card text-white fs-30 mr-2 mt-2"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- COL END -->
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
+				<div class="card-body bg-transparent">
+					<div class="d-flex">
+						<div class="text-white">
+							<h2 class="mb-0 number-font">{{Mst_Supplier::count()}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Total Suppliers</p>
+						</div>
+						<div class="ml-auto">
+							<i class="fa fa-truck text-white fs-30 mr-2 mt-2"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- COL END -->
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+			<div class="card bg-success img-card box-success-shadow">
+				<div class="card-body bg-transparent">
+					<div class="d-flex">
+						<div class="text-white">
+							<h2 class="mb-0 number-font">{{@$currentDayLeave}}</h2>
+							<p class="text-white mb-0" style="font-size:12px;">Staffs On Leave</p>
+						</div>
+						<div class="ml-auto">
+							<i class="fa fa-calendar text-white fs-30 mr-2 mt-2"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- COL END -->
+		
 	</div>
 	<!-- ROW -->
 
-	<div class="row">
+	<div class="row" style="display:none;">
 		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
 			<div class="card">
 				<div class="card-header">
@@ -103,7 +189,7 @@
 			</div>
 		</div><!-- COL END -->
 
-		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+		<div class="col-sm-12 col-md-6 col-lg-6 col-xl-6" style="display:none;">
 			<div class="card">
 				<div class="card-header">
 					<h3 class="card-title">Earnings</h3>
@@ -120,7 +206,7 @@
 		</div><!-- COL END -->
 	</div>
 
-	<div class="row">
+	<div class="row" style="display:none;">
 		<div class="col-lg-12 col-md-12">
 			<div class="card">
 				<div class="card-header">
@@ -134,7 +220,7 @@
 	</div>
 
 
-	<div class="row row-deck">
+	<div class="row row-deck" style="display:none;">
 		<div class="col-lg-6">
 			<div class="card">
 				<div class="card-header">
@@ -198,7 +284,7 @@
 		</div><!-- COL END -->
 
 
-		<div class="col-md-12 col-lg-6">
+		<div class="col-md-12 col-lg-6" style="display:none;">
 			<div class="card">
 				<div class="card-header">
 					<h3 class="card-title">Basic Table</h3>

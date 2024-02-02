@@ -32,7 +32,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Account Group*</label>
-                                    <select class="form-control" name="account_group_id" id="account_group_id">
+                                    <select required class="form-control" name="account_group_id" id="account_group_id">
                                         <option value="">Choose Account Group</option>
                                         @foreach($account_groups as $account_group)
                                         <option value="{{ $account_group->id }}" {{$account_sub_group->account_group_id == $account_group->id ? 'selected' : '' }}>{{ $account_group->account_group_name }}</option>
@@ -43,7 +43,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Account Sub Group*</label>
-                                    <select class="form-control" name="account_sub_group_id" id="account_sub_group_id">
+                                    <select required class="form-control" name="account_sub_group_id" id="account_sub_group_id">
                                     <option value="">Choose Account Sub Group</option>
                                     @foreach($subgroup_options as $subgroup_option)
                                         <option value="{{$subgroup_option->id}}" {{$subgroup_option->id == $account_ledger->account_sub_group_id ? 'selected' : '' }}>{{ $subgroup_option->account_sub_group_name }}</option>

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-<link rel="stylesheet" type="text/css" href="{{ asset('plugins/date-picker/spectrum.css') }}">
-<script src="{{ asset('js/form-elements.js') }}"></script>
+   <link rel="stylesheet" type="text/css" href="{{ asset('plugins/date-picker/spectrum.css') }}">
+   <script src="{{ asset('js/form-elements.js') }}"></script>
 
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -44,44 +44,44 @@
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Membership Package Duration(Days)*</label>
-                              <input type="number" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration">
+                              <input type="number" min="0" class="form-control" required name="membership_package_duration" value="{{ old('package_duration') }}" placeholder="Membership Package Duration(Days)">
                            </div>
                         </div>
 
                         <div class="col-md-6">
                            <div class="form-group">
                               <label class="form-label">Regular Price*</label>
-                              <input type="number" class="form-control" required name="membership_package_price" value="{{ old('package_price') }}" placeholder="Membership Package Price">
-                           </div>
-                        </div>
-
-
-                        <div class="col-md-6">
-                           <div class="form-group">
-                              <label class="form-label">Offer Price*</label>
-                              <input type="number" class="form-control" required name="discount_price" value="{{ old('package_discount_price') }}" placeholder="Discount Price">
+                              <input type="number" id="regularPrice" min="0" class="form-control" required name="membership_package_price" value="{{ old('package_price') }} pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"" placeholder="Regular Price">
                            </div>
                         </div>
 
                         <div class="col-md-6">
                            <div class="form-group">
-                              <label class="form-label">Gradient start*</label>
-                              <input type="text" class="form-control colorPicker" name="gradient_start" placeholder="Regular Price Color">
+                              <label class="form-label">Offer Price</label>
+                              <input type="number" id="offerPrice" min="0" class="form-control" name="discount_price"   pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="{{ old('package_discount_price') }}" placeholder="Offer Price" oninput="validatePrices()">
+                              <span id="priceError" style="color: red;"></span>
                            </div>
                         </div>
-
-                        <div class="col-md-6">
-                           <div class="form-group">
-                              <label class="form-label">Gradient end*</label>
-                              <input type="text" class="form-control colorPicker" name="gradient_end" placeholder="Offer Price Color">
-                           </div>
-                        </div>
-
 
                         <div class="col-md-11">
                            <div class="form-group">
                               <label class="form-label">Membership Package Description</label>
                               <textarea class="form-control ckeditor" id="benefitsDescription" name="membership_package_description" placeholder="Membership Package Description">{{ old('package_description') }}</textarea>
+                           </div>
+                        </div>
+
+                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
+                           <h6 class="mb-0 card-title" style="margin-left:15px;">Include Wellness</h6>
+                        </div>
+                        <div class="col-md-12">
+                           <div class="container" id="include_wellness" style="padding-left:0;padding-right:0;"></div>
+                        </div>
+
+                        <div class="col-md-12">
+                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits*</h6><br>
+                           <div class="form-group">
+                              <textarea class="form-control ckeditor" required id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
+                              <span style="color: red;">*Please provide benefits using bullet points only.</span>
                            </div>
                         </div>
 
@@ -97,25 +97,6 @@
                               </label>
                            </div>
                         </div>
-
-
-                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Include Wellness</h6>
-                        </div>
-                        <div class="col-md-12">
-                           <div class="container" id="include_wellness" style="padding-left:0;padding-right:0;"></div>
-                        </div>
-                        <!-- 
-                        <div class="row wizard-title" style="margin-left:0;margin-right:0;">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6>
-                        </div> -->
-                        <div class="col-md-12">
-                           <h6 class="mb-0 card-title" style="margin-left:15px;">Package Benefits</h6><br>
-                           <div class="form-group">
-                              <textarea class="form-control ckeditor" id="benefitsEditor" name="benefits" placeholder="Membership Package Benefits">{{ old('package_description') }}</textarea>
-                           </div>
-                        </div>
-
 
                         <div class="col-md-12">
                            <div class="form-group">
@@ -143,13 +124,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
 
 <script type="text/javascript">
+   function validatePrices() {
+      var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+      var offerPrice = parseFloat(document.getElementById('offerPrice').value);
+      var priceError = document.getElementById('priceError');
+
+      if (offerPrice >= regularPrice) {
+         priceError.textContent = 'Offer Price must be less than Regular Price';
+      } else {
+         priceError.textContent = '';
+      }
+   }
    $(document).ready(function() {
-      $(".colorPicker").spectrum({
-            preferredFormat: "hex",
-            showInput: true,
-            showPalette: true,
-            palette: ["#ff0000", "#00ff00", "#0000ff"] // Example palette
-         });
 
       CKEDITOR.replace('benefitsDescription', {
          removePlugins: 'image',
@@ -165,7 +151,7 @@
       });
 
       // Initialize the color pickers
-      
+
 
 
       CKEDITOR.replace('benefitsEditor', {
@@ -224,16 +210,16 @@
       data += '<div class="row">';
       data += '<div class="col-md-6 col-sm-offset-1">';
       data += '<div class="form-group label-floating">';
-      data += '<label class="form-label">Select wellness</label>';
-      data += '<select name="wellness_id[]" class="form-control" required>';
+      data += '<label class="form-label">Select wellness*</label>';
+      data += '<select required name="wellness_id[]" class="form-control" required>';
       data += '<option disabled selected value="">Select wellness</option>'; // Add the first option
       @foreach($wellnesses as $wellness)
-      data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{ $wellness->wellness_cost  . " ₹" }}">{{ $wellness->wellness_name }}</option>';
+      data += '<option value="{{ $wellness->wellness_id }}" data-duration="{{ $wellness->wellness_duration >= 60 ? ($wellness->wellness_duration / 60) . " hour" : $wellness->wellness_duration . " minutes" }}" data-cost="{{" ₹ ". $wellness->wellness_cost }}">{{ $wellness->wellness_name }}</option>';
       @endforeach
       data += '</select>';
       data += "<label class='form-label'>Duration: <span class='selected_duration'></span>, Cost: <span class='selected_cost'></span></label>";
       data += '</div></div>';
-      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit</label><input type='number' name='max_limit[]' class='form-control dob' required></div></div>";
+      data += "<div class='col-md-5'><div class='form-group label-floating'><label class='form-label'>Max limit*</label><input min='1' required type='number' name='max_limit[]' class='form-control dob' required></div></div>";
       data += "<div style='align-self:center;' class='col-md-1 remove_field add-btn'><a href='javascript:void(0);'><span class='glyphicon glyphicon-plus' style='color:green;'></span></a></div>";
       data += "</div>";
 

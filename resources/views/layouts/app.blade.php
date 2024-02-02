@@ -14,7 +14,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/ayushman-logo.jpeg')}}" />
 
     <!-- TITLE -->
-    <title>Ayushman Ayurveda - </title>
+    <title>Ayushman Ayurveda</title>
      <!-- DATA TABLE CSS --> 
 		<link href="{{('assets/plugins/datatable/dataTables.bootstrap4.min.css" rel="stylesheet')}}"/>
     <!-- BOOTSTRAP CSS -->
@@ -64,12 +64,38 @@
 
 
    
-    {{-- <link href="{{asset('assets/plugins/select2/select2.full.min.js')}}" rel="stylesheet" />
-    <link href="{{asset('assets/plugins/select2/select2.min.css')}}" rel="stylesheet" />
-    <link href="{{asset('assets/plugins/multipleselect/multi-select.js')}}" rel="stylesheet" />
-    <link href="{{asset('assets/plugins/multipleselect/multiple-select.css')}}" rel="stylesheet" />
-    <link href="{{asset('assets/plugins/multipleselect/multiple-select.js')}}" rel="stylesheet" /> --}}
     @yield('css')
+    
+        <style>
+        .leave_request_table a{
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 0!important;
+            margin-right: 0;
+        }
+        .leave_request_table form{
+            display: inline-block;
+            vertical-align: top;
+            margin-bottom: 0;
+        }
+        .leave_request_table form button{
+            padding-top: 4.5px;
+            padding-bottom: 4.5px;
+            border: 1px solid #000;
+        }
+        .page input[type=text]::placeholder{
+            color:#000;
+        }
+        .page input[type=text]::-ms-input-placeholder{
+            color:#000;
+        }
+        textarea.form-control::placeholder{
+            color:#000;
+        }
+        textarea.form-control::-ms-input-placeholder{
+            color:#000;
+        }
+    </style>
    
 </head>
 

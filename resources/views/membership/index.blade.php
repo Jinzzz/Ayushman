@@ -48,19 +48,15 @@
                             <td>{{ $membership->package_duration }} days</td>
                             <!-- <td>{{ $membership->package_description }}</td> -->
                             <td>{{ $membership->package_price }}</td>
-                            <td>{{ $membership->package_discount_price }}</td>
+                            <td>{{ $membership->package_discount_price ?? 'No offers presently.' }}</td>
                             <td>
-                                <form action="{{ route('membership.changeStatus', $membership->membership_package_id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" onclick="return confirm('Do you want to Change status?');" class="btn btn-sm @if($membership->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if($membership->is_active == 0)
-                                        InActive
-                                        @else
-                                        Active
-                                        @endif
-                                    </button>
-                                </form>
+                            <button type="button" style="width: 70px;"  onclick="changeStatus({{ $membership->membership_package_id }})" class="btn btn-sm @if($membership->is_active == 0) btn-danger @else btn-success @endif">
+                                    @if($membership->is_active == 0)
+                                    Inactive
+                                    @else
+                                    Active
+                                    @endif
+                                </button>
                             </td>
 
                             <td>
@@ -139,6 +135,50 @@
                     });
                 } else {
                     return;
+                }
+            });
+    }
+
+        // Change status 
+        function changeStatus(dataId) {
+        swal({
+                title: "Change Status?",
+                text: "Are you sure you want to change the status?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{{ route('membership.changeStatus', '') }}/" + dataId,
+                        type: "patch",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                        },
+                        success: function(response) {
+                            if (response == '1') {
+                                var cell = $('#dataRow_' + dataId).find('td:eq(5)');
+
+                                if (cell.find('.btn-success').length) {
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                } else {
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                }
+
+                                flashMessage('s', 'Status changed successfully');
+                            } else {
+                                flashMessage('e', 'An error occurred! Please try again later.');
+                            }
+                        },
+                        error: function() {
+                            alert('An error occurred while changing the qualification status.');
+                        },
+                    });
                 }
             });
     }

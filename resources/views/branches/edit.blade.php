@@ -17,7 +17,7 @@
       <div class="col-lg-12" style="background-color:#fff";>
          @if ($errors->any())
          <div class="alert alert-danger">
-            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
             <ul>
                @foreach ($errors->all() as $error)
                <li>{{ $error }}</li>
@@ -104,8 +104,10 @@
                <div class="col-md-12">
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-info">Update</button>
-                        <a class="btn btn-danger" href="{{ route('branches') }}">Cancel</a>
+                        <button type="submit" class="btn btn-raised btn-info"><i class="fa fa-edit" aria-hidden="true"></i>
+ Update</button>
+                        <a class="btn btn-danger" href="{{ route('branches') }}"><i class="fa fa-times" aria-hidden="true"></i>
+ Cancel</a>
                      </center>
                   </div>
                </div>
