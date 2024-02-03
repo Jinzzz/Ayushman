@@ -109,7 +109,7 @@
         <li><a class="slide-item" href="{{ url('/tax-group/index')}}">{{ __('Tax Groups') }}</a></li>
         <li style="display:none;"><a class="slide-item" href="{{ url('/journel-entry')}}">{{__('Journel Entry')}}</a></li>
         <!-- <li><a class="slide-item" href="#">{{__('Attendence View-Biometric')}}</a></li> -->
-        <!-- <li><a class="slide-item" href="#">{{__('Income/Expense')}}</a></li> -->
+        <li><a class="slide-item" href="{{url('/income-expense/index')}}">{{__('Income/Expense')}}</a></li> 
     </li>
     </ul>
     <!-- <li class="slide">

@@ -161,31 +161,20 @@ class MedicineSalesController extends Controller
     // ledgers 
     public function getLedgerNames(Request $request)
     {
-        // Retrieve the selected payment mode from the request
+       
         $paymentMode = $request->input('payment_mode');
-
-        // Set the default sub group id to 44 (for Card or Bank)
-        $subGroupId = 44;
-
-        // If the payment mode is 'Cash', set the sub group id to 45
         if ($paymentMode == '117') {
             $subGroupId = 45;
         }
-
-        //  if the payment mode is through  Card or Bank set the sub group id to 44
         if ($paymentMode == '118') {
             $subGroupId = 44;
         }
-
         if ($paymentMode == '119') {
-            // If the payment mode is UPI, set the sub group id to 51
             $subGroupId = 51;
         }
 
-        // Perform a query to fetch ledger names based on the selected payment mode
         $ledgerNames = Mst_Account_Ledger::where('account_sub_group_id', $subGroupId)
             ->pluck('ledger_name', 'id');
-
         return response()->json($ledgerNames);
     }
 

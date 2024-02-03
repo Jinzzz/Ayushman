@@ -363,7 +363,7 @@ use App\Helpers\AdminHelper;
          // alert(selectedPaymentMode);
          // Make an AJAX request to fetch the ledger names based on the selected payment mode
          $.ajax({
-            url: '{{ route("getLedgerNames") }}',
+            url: '{{ route("getLedgerNames1") }}',
             type: 'GET',
             data: {
                payment_mode: selectedPaymentMode

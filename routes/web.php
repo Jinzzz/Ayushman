@@ -50,6 +50,7 @@ use App\Http\Controllers\SalaryPackageController;
 use App\Http\Controllers\AvailableLeaveController;
 use App\Http\Controllers\TherapyStockTransferController;
 use App\Http\Controllers\PharmacyController;
+use App\Http\Controllers\IncomeExpenseController;
 
 
 
@@ -488,7 +489,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/medicine-sales-invoices/update', [MedicineSalesController::class, 'update'])->name('medicine.sales.invoices.update');
     Route::patch('/get-patient-booking-ids/{id}', [MedicineSalesController::class, 'getPatientBookingIds'])->name('get.patient.booking.ids');
     Route::patch('/get-medicine-batches/{id}', [MedicineSalesController::class, 'getMedicineBatches'])->name('get.medicine.batches');
-    Route::get('/getLedgerNames', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames');
+    Route::get('/getLedgerNames1', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames1');
 
     // Medicine sales return 
      Route::get('/get-sale-invoice-details', [MedicineSalesReturnController::class, 'getSaleInvoiceDetails'])->name('getSaleInvoiceDetails');
@@ -620,6 +621,10 @@ Route::get('/therapy-stock-transfer/create', [TherapyStockTransferController::cl
 Route::post('/therapy-stock-transfer/store', [TherapyStockTransferController::class, 'store'])->name('therapy-stock-transfers.store');
 Route::get('/get-medicine-batch/{id}', [TherapyStockTransferController::class, 'getMedicineBatch'])->name('getMedicineBatch');
 Route::get('/get-current-medicine-stock/{medicineId}/{batchNo}', [TherapyStockTransferController::class, 'getCurrentMedicineStock'])->name('getCurrentMedicineStock');
+
+//Income-Expense
+Route::get('/income-expense/index', [IncomeExpenseController::class, 'index'])->name('income-expense.index');
+Route::get('/income-expense/create', [IncomeExpenseController::class, 'create'])->name('income-expense.create');
 
 });
 
