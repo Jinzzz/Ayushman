@@ -250,6 +250,17 @@
             return false;
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            $(".displayfilter").click(function() {
+                $('.displaycard').toggleClass("ShowFilterBox");
+                $(this).find('span').text(function(i, text) {
+                    return text === "More Filters" ? "Hide Filters" : "More Filters";
+                });
+            });
+        });
+
+    </script>
     @yield('js')
 </body>
 

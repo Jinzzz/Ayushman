@@ -51,6 +51,8 @@ use App\Http\Controllers\AvailableLeaveController;
 use App\Http\Controllers\TherapyStockTransferController;
 use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\IncomeExpenseController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\GeneralController;
 
 
 
@@ -68,6 +70,10 @@ use App\Http\Controllers\IncomeExpenseController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+//General - Public 
+Route::get('/general/index/{branch_code}', [GeneralController::class, 'generalIndex'])->name('general.index');
+
 
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
@@ -158,7 +164,7 @@ Route::middleware('auth')->group(function () {
     //Manage-TimeSlots:
     Route::post('/timeslot/store', [MstTimeSlotController::class, 'store'])->name('timeslot.store');
     Route::patch('timeslot/change-status/{id}', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
-    Route::resource('timeslot', MstTimeSlotController::class);
+    Route::get('timeslot/edit/{id}', [MstTimeSlotController::class,'timeSlotEdit'])->name('timeslot.edit');
 
 
 
@@ -625,6 +631,17 @@ Route::get('/get-current-medicine-stock/{medicineId}/{batchNo}', [TherapyStockTr
 //Income-Expense
 Route::get('/income-expense/index', [IncomeExpenseController::class, 'index'])->name('income-expense.index');
 Route::get('/income-expense/create', [IncomeExpenseController::class, 'create'])->name('income-expense.create');
+
+
+//General Feedback
+Route::get('/patient/feedback/index', [FeedbackController::class, 'index'])->name('customer.feedback.index');
+Route::get('/patient/feedback/create', [FeedbackController::class, 'create'])->name('customer.feedback.create');
+Route::get('/patient/feedback/save', [FeedbackController::class, 'saveFeedback'])->name('customer.feedback.save');
+Route::get('feedback/change-status/{feedback_id}', [FeedbackController::class, 'changeStatus'])->name('feedback.changeStatus');
+Route::delete('/feedback/destroy/{feedback_id}', [FeedbackController::class, 'destroy'])->name('feedback.destroy');
+
+
+
 
 });
 
