@@ -47,7 +47,7 @@
                                 @foreach ($feedData as $feedDatas)
                                     <tr id="dataRow_{{ $feedDatas->id }}">
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $feedDatas->booking['booking_reference_number'] }}</td>
+                                        <td>{{ @$feedDatas->booking['booking_reference_number'] }}</td>
                                         <td>
                                             Consultant : {{ $feedDatas->consultancy_rating }} / 5
                                             <br>

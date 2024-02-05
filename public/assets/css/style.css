@@ -26356,7 +26356,7 @@ span{
 .ShowFilterBox{
 	display:none !important;
 }
-button.btn.btn-primary.displayfilter {
+button.btn.btn-blue.displayfilter {
     padding: 5px 20px !important;
     margin-bottom: 15px;
 }
