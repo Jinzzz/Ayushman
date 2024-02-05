@@ -25577,13 +25577,13 @@ ul.side-menu li {
 
 .side-menu__item,
 .slide.is-expanded a {
-	color: #efefef !important;
-	color: grey !important;
+	/* color: #efefef !important; */
+	color: #000 !important;
 }
 
 .side-menu .side-menu__icon {
 	color: #efefef !important;
-	color: #68798b !important;
+	color: #000 !important;
 }
 
 .side-menu__item.active,
@@ -26359,5 +26359,12 @@ span{
 button.btn.btn-blue.displayfilter {
     padding: 5px 20px !important;
     margin-bottom: 15px;
+}
+.slide{
+	padding-bottom: 15px!important;
+}
+.slide i{
+	font-size: 20px!important;
+	margin-right: 8px!important;
 }
 /* End */
