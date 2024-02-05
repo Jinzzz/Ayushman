@@ -5,6 +5,8 @@ use App\Models\Mst_External_Doctor;
 use App\Models\Mst_Branch;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class MstExternalDoctorController extends Controller
 {

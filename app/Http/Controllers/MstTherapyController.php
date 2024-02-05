@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Mst_Therapy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MstTherapyController extends Controller
 {
@@ -20,25 +21,34 @@ class MstTherapyController extends Controller
     }
 
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'therapy_name' => 'required',
-            'therapy_cost' => 'required|numeric',
-            'is_active' => 'required',
-        ]);
-        $is_active = $request->input('is_active') ? 1 : 0;
-    
-       
-        $therapy = new Mst_Therapy();
-        $therapy->therapy_name = $request->input('therapy_name');
-        $therapy->therapy_cost = $request->input('therapy_cost');
-        $therapy->remarks = $request->input('remarks');
-        $therapy->is_active = $is_active;
-        $therapy->save();
-    
-        return redirect()->route('therapy.index')->with('success','Therapy added successfully'); 
+public function store(Request $request)
+{
+    $request->validate([
+        'therapy_name' => 'required|unique:mst_therapies',
+        'therapy_cost' => 'required|numeric',
+        'is_active' => 'required',
+    ]);
+
+    $is_active = $request->input('is_active') ? 1 : 0;
+
+    // Check for duplicate entry
+    $existingTherapy = Mst_Therapy::where('therapy_name', $request->input('therapy_name'))->first();
+
+    if ($existingTherapy) {
+        return redirect()->route('therapy.index')->with('error', 'Therapy with the same name already exists');
     }
+
+    // If no duplicate, proceed with saving the new record
+    $therapy = new Mst_Therapy();
+    $therapy->therapy_name = $request->input('therapy_name');
+    $therapy->therapy_cost = $request->input('therapy_cost');
+    $therapy->remarks = $request->input('remarks');
+    $therapy->is_active = $is_active;
+    $therapy->save();
+
+    return redirect()->route('therapy.index')->with('success', 'Therapy added successfully');
+}
+
 
     public function edit($id)
     {
@@ -49,26 +59,26 @@ class MstTherapyController extends Controller
     }
 
 
-    public function update(Request $request,$id)
-    {
-        $request->validate([
-            'therapy_name' => 'required',
-            'therapy_cost' => 'required|numeric',
-            'remarks' => 'required',
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'therapy_name' => 'required|unique:mst_therapies,therapy_name,' . $id,
+        'therapy_cost' => 'required|numeric',
+        'remarks' => 'required',
+    ]);
 
-        ]);
-        $is_active = $request->input('is_active') ? 1 : 0;
-    
-       
-        $therapy =  Mst_Therapy::findOrFail($id);
-        $therapy->therapy_name = $request->input('therapy_name');
-        $therapy->therapy_cost = $request->input('therapy_cost');
-        $therapy->remarks = $request->input('remarks');
-        $therapy->is_active = $is_active;
-        $therapy->save();
-    
-        return redirect()->route('therapy.index')->with('success','Therapy updated successfully'); 
-    }
+    $is_active = $request->input('is_active') ? 1 : 0;
+
+    $therapy = Mst_Therapy::findOrFail($id);
+    $therapy->therapy_name = $request->input('therapy_name');
+    $therapy->therapy_cost = $request->input('therapy_cost');
+    $therapy->remarks = $request->input('remarks');
+    $therapy->is_active = $is_active;
+    $therapy->save();
+
+    return redirect()->route('therapy.index')->with('success', 'Therapy updated successfully');
+}
+
 
 
     public function destroy($id)

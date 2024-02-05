@@ -17,6 +17,32 @@ class MstAuthController extends Controller
     {
         return view('auth.login');
     }
+    
+    public function showPharmacyLoginForm()
+    {
+        return view('auth.pharmacy.login');
+    }
+    
+    public function Pharmacylogin(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+
+        if (Auth::guard('mst_users_guard')->attempt($credentials)) {
+             $user = Auth::guard('mst_users_guard')->user();
+            if ($user->user_type_id == 96) {
+                return redirect()->intended('/home');
+            } else {
+                Auth::guard('mst_users_guard')->logout();
+            return back()->withInput()->withErrors(['login' => 'Invalid Pharmacy User Credentials']);
+            }
+        } else {
+            // Authentication failed
+            return back()->withInput()->withErrors(['login' => 'Invalid credentials']);
+        }
+    }
+    
+    
 
     // Process the login form
     public function login(Request $request)
@@ -25,8 +51,13 @@ class MstAuthController extends Controller
 
 
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
-            // Authentication successful
-            return redirect()->intended('/home'); // Replace '/dashboard' with your desired destination
+             $user = Auth::guard('mst_users_guard')->user();
+            if ($user->user_type_id == 1) {
+                return redirect()->intended('/home');
+            } else {
+                Auth::guard('mst_users_guard')->logout();
+            return back()->withInput()->withErrors(['login' => 'Invalid Admin User Credentials']);
+            }
         } else {
             // Authentication failed
             return back()->withInput()->withErrors(['login' => 'Invalid credentials']);
@@ -36,8 +67,18 @@ class MstAuthController extends Controller
     // Log the user out
     public function logout()
     {
-        Auth::guard('mst_users_guard')->logout();
-        return redirect('/login'); // Redirect to the login page
+       
+        $user = Auth::guard('mst_users_guard')->user();
+       
+       if ($user && $user->user_type_id == 1) {
+            Auth::guard('mst_users_guard')->logout();
+            return redirect('/login');
+        } elseif ($user && $user->user_type_id == 96) {
+            Auth::guard('mst_users_guard')->logout();
+            return redirect('/pharmacy-login');
+        } else {
+            return redirect('/login');
+        }
     }
 
     public function verificationRequest()

@@ -2,22 +2,25 @@
 @section('content')
 <div class="container">
    <div class="row" style="min-height: 70vh;">
+   @if ($message = Session::get('status'))
+               <div class="col-md-12 alert alert-success">
+                  <p>{{$message}}</p>
+               </div>
+               @endif
+               @if ($message = Session::get('error'))
+               <div class="col-md-12 alert alert-danger">
+                  <p>{{$message}}</p>
+               </div>
+               @endif
       <div class="col-md-12">
          <div class="card">
             <div class="card-header">
                <h3 class="mb-0 card-title">Create Tax</h3>
             </div>
-            <div class="card-body">
-               @if ($message = Session::get('status'))
-               <div class="alert alert-success">
-                  <p></p>
-               </div>
-               @endif
-            </div>
             <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
@@ -38,7 +41,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Rate(%)*</label>
-                           <input type="text" class="form-control" required name="tax_rate" value="{{ old('tax_rate') }}" placeholder="Tax Rate">
+                           <input type="number" max="100" class="form-control" required name="tax_rate" value="{{ old('tax_rate') }}" placeholder="Tax Rate">
                         </div>
                      </div>
 
@@ -46,7 +49,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Type*</label>
-                           <select class="form-control" name="tax_type" id="branch_id">
+                           <select required class="form-control" name="tax_type" id="branch_id">
                               <option value="">Select Tax Type</option>
                               @foreach($taxes as $tax)
                               <option value="{{ $tax->id }}" {{ old('tax_type') == $tax->id ? 'selected' : '' }}>
@@ -56,15 +59,18 @@
                            </select>
                         </div>
                      </div>
+
+
+
                      <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>
                            <label class="custom-switch">
                               <input type="hidden" name="is_active" value="0"> <!-- Hidden field for false value -->
-                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($qualification->is_active) && $qualification->is_active == 0 ? '' : 'checked' }}>
+                              <input type="checkbox" id="is_active" name="is_active" value="1" onchange="toggleStatus(this)" class="custom-switch-input" {{ isset($tax->is_active) && $tax->is_active == 0 ? '' : 'checked' }}>
                               <span id="statusLabel" class="custom-switch-indicator"></span>
                               <span id="statusText" class="custom-switch-description">
-                                 {{ isset($qualification->is_active) && $qualification->is_active ? 'Active' : 'Inactive' }}
+                                 {{ isset($tax->is_active) && $tax->is_active ? 'Active' : 'Inactive' }}
                               </span>
                            </label>
                         </div>
@@ -109,9 +115,9 @@
                         <td>{{ $tax->tax_rate }} %</td>
                         <td>{{ $tax->tax }}</td>
                         <td>
-                           <button type="button" onclick="changeStatus({{ $tax->id }})" class="btn btn-sm @if($tax->is_active == 0) btn-danger @else btn-success @endif">
+                           <button type="button" style="width: 70px;"  onclick="changeStatus({{ $tax->id }})" class="btn btn-sm @if($tax->is_active == 0) btn-danger @else btn-success @endif">
                               @if($tax->is_active == 0)
-                              InActive
+                              Inactive
                               @else
                               Active
                               @endif
@@ -177,9 +183,9 @@
                         var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
                         if (cell.find('.btn-success').length) {
-                           cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                           cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                         } else {
-                           cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                           cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                         }
 
                         flashMessage('s', 'Status changed successfully');

@@ -31,7 +31,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Account Group*</label>
-                                    <select class="form-control" name="account_group_id" id="account_group_id">
+                                    <select required class="form-control" name="account_group_id" id="account_group_id">
                                         <option value="">Choose Account Group</option>
                                         @foreach($account_groups as $account_group)
                                         <option value="{{ $account_group->id }}" {{ old('branch') == $account_group->id ? 'selected' : '' }}>{{ $account_group->account_group_name }}</option>

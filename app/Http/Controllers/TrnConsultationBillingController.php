@@ -73,7 +73,7 @@ class TrnConsultationBillingController extends Controller
 
     $is_membership_available = $patient->available_membership ? 1 : 0;
 
-    $createdBy = Auth::id();
+    $createdBy = 1;
 
     $lastInsertedId = Trn_Consultation_Billing::insertGetId([
         'booking_type_id' => $request->booking_type_id,
@@ -157,7 +157,7 @@ class TrnConsultationBillingController extends Controller
 
     $is_membership_available = $patient->available_membership ? 1 : 0;
 
-    $createdBy = Auth::id();
+    $createdBy = 1;
 
     $update = Trn_Consultation_Billing::find($id);
 

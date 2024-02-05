@@ -11,7 +11,7 @@
                @endif
                  @if ($message = Session::get('error'))
                <div class="alert alert-danger">
-                  <p></p>
+                  <p>{{$message}}</p>
                </div>
                @endif
 
@@ -33,7 +33,6 @@
                                     <th class="wd-15p">SL.NO</th>
                                     <th class="wd-15p">Therapy Name</th>
                                     <th class="wd-20p">Therapy Cost </th>
-                                    <th class="wd-15p">Remarks</th>
                                     <th class="wd-15p">Status</th>
                                     <th class="wd-15p">Action</th>
                                 </tr>
@@ -47,11 +46,10 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $therapy->therapy_name }}</td>
                                     <td>{{ $therapy->therapy_cost }}</td>
-                                    <td>{{ $therapy->remarks}}</td>
                                     <td>
-                                        <button type="button" onclick="changeStatus({{$therapy->id }})" class="btn btn-sm @if($therapy->is_active == 0) btn-danger @else btn-success @endif">
+                                        <button type="button" style="width: 70px;"  onclick="changeStatus({{$therapy->id }})" class="btn btn-sm @if($therapy->is_active == 0) btn-danger @else btn-success @endif">
                                             @if($therapy->is_active == 0)
-                                            InActive
+                                            Inactive
                                             @else
                                             Active
                                             @endif
@@ -150,9 +148,9 @@
                                 var cell = $('#dataRow_' + dataId).find('td:eq(4)');
 
                                 if (cell.find('.btn-success').length) {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-danger">Inactive</button>');
                                 } else {
-                                    cell.html('<button type="button" onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
+                                    cell.html('<button type="button" style="width: 70px;"  onclick="changeStatus(' + dataId + ')" class="btn btn-sm btn-success">Active</button>');
                                 }
 
                                 flashMessage('s', 'Status changed successfully');

@@ -11,14 +11,14 @@
             <div class="card-body">
                @if ($message = Session::get('status'))
                <div class="alert alert-success">
-                  <p></p>
+                  <p>{{$message}}</p>
                </div>
                @endif
             </div>
             <div class="col-lg-12">
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>

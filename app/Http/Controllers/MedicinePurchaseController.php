@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use App\Models\Mst_Supplier;
 use App\Models\TrnMedicinePurchaseInvoice;
-use App\Models\TrnMedicinePurchaseInvoiceDetails;
-use App\Models\TrnLedgerPosting;
 use App\Models\Mst_Branch;
+use Illuminate\Support\Facades\Auth;
 
 class MedicinePurchaseController extends Controller
 {

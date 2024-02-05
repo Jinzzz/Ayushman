@@ -23,7 +23,7 @@
                             <label for="pat-mobile">Patient Mobile:</label>
                             <input type="text" id="pat-mobile" name="pat_mobile" class="form-control" value="{{ request('pat_mobile') }}">
                         </div>
-                        
+                        </div>
                         <div class="col-md-4 d-flex align-items-center">
                             <div>
                                 <button type="submit" class="btn btn-secondary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+               
             </form>
         </div>
 
@@ -65,9 +65,11 @@
                                 <td>{{ $patient->patient_mobile}}</td>
                                 <td>
                                 
-                                    <a class="btn btn-secondary" href="{{ route('patient_search.show',$patient->id) }}">
-                                        <i class="fa fa-eye" aria-hidden="true"></i> View
-                                    </a>
+                    <a class="btn btn-secondary" href="{{ route('patient_search.show', $patient->id) }}">
+    <i class="fa fa-eye" aria-hidden="true"></i> View
+</a>
+
+                                    
                                 </td>
                             </tr>
                             @endforeach

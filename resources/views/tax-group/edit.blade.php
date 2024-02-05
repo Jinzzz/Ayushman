@@ -10,14 +10,14 @@
             <div class="card-body">
                @if ($message = Session::get('status'))
                <div class="alert alert-success">
-                  <p></p>
+                  <p>{{$message}}</p>
                </div>
                @endif
             </div>
             <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
@@ -56,14 +56,15 @@
                   </div>
 
 
-
-                  <div class="form-group">
+                  <div class="col-md-12 mt-5">
+                     <div class="form-group">
                      <center>
                         <button type="submit" class="btn btn-raised btn-primary">
                            <i class="fa fa-check-square-o"></i> Update
                         </button>
                         <a class="btn btn-danger" href="{{ route('tax.group.index') }}">Cancel</a>
                      </center>
+                     </div>
                   </div>
                </form>
 

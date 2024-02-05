@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Passport\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+
 
 class Mst_User extends Authenticatable
 {
-    use HasFactory,HasApiTokens;
+    use HasFactory,Notifiable;
     protected $table = 'mst_users';
 
     protected $primaryKey = 'user_id';
@@ -19,10 +20,15 @@ class Mst_User extends Authenticatable
         'password',
         'staff_id',
         'user_type_id',
-        'user_email',
+        'email',
+        'remember_token',
         'is_active',
         'last_login_time',
+        'discount_percentage',
         'created_by',
+        'last_updated_by',
+        'deleted_by',
+        'is_deleted',
     ];
 
     public function userType()
@@ -33,7 +39,5 @@ class Mst_User extends Authenticatable
     public function staff()
     {
         return $this->belongsTo(Mst_Staff::class, 'staff_id', 'staff_id');
-    }
-    
-    
+    }   
 }

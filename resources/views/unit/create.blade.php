@@ -18,7 +18,7 @@
             <div class="col-lg-12" style="background-color:#fff">
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
                   <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
@@ -26,7 +26,7 @@
                   </ul>
                </div>
                @endif
-               
+               <!-- test  -->
                <form action="{{ route('unit.store') }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
@@ -38,7 +38,7 @@
                      </div>
                      <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Unit Short Name</label>
+                           <label class="form-label">Unit Short Name (Max 5 characters)</label>
                            <input maxlength="5" pattern=".{1,5}" title="Maximum 5 characters allowed" type="text" class="form-control" name="unit_short_name" value="{{old('unit_short_name ')}}" placeholder="Unit Short Name">
                         </div>
                      </div>

@@ -3095,7 +3095,7 @@ body.fixed-header .page {
 
 .table td {
 	padding: 0.75rem;
-	vertical-align: top;
+	/*vertical-align: middle;*/
 }
 
 .border {
@@ -25926,7 +25926,7 @@ button.btn.btn-sm.btn-success:hover{
 }
 
 .btn:not(:disabled):not(.disabled) {
-	padding: 4.5px 10px;
+	/*padding: 4.5px 10px;*/
 	
 	margin-top: -2px;
 }
@@ -25963,7 +25963,7 @@ button.btn.btn-sm.btn-danger:hover{
 }
 
 #example tr td {
-	vertical-align: middle;
+	/*vertical-align: middle;*/
 }
 
 .btn-info {
@@ -26250,7 +26250,7 @@ border-color: #3cb35a!important;
 color: #fff!important;
 }
 .fa-eye:before {
-    color: #fff!important;
+    /*color: #fff!important;*/
 }
 .btn-secondary {
     background: rgb(48 209 88)!important;
@@ -26281,5 +26281,74 @@ color: #fff!important;
 .package-info li{
 	margin-bottom: 0 !important;
 
+}
+.btn:not(:disabled):not(.disabled) {
+    padding: 0 10px;
+    margin-top: 0;
+    border-radius: 5px;
+    font-size: 12px;
+}
+.btn.btn-block{
+        padding: 3px 10px!important;
+}
+button.btn.btn-sm.btn-success {
+    padding: 4px 14px;
+}
+button.btn.btn-sm.btn-danger {
+    padding: 4px 14px;
+}
+.btn.btn-primary.btn-sm.edit-custom{
+    padding: 4px 14px!important;
+}
+.btn.btn-secondary.btn-sm{
+    padding: 4px 14px!important;
+}
+.form-check {
+    text-indent: 5px;
+}
+.btn.btn-danger{
+     font-size:10px;
+}
+.btn-secondary {
+    margin-right: 0;
+}
+select{
+    font-size:12px!important;
+}
+input{
+    font-size:12px!important;
+}
+select::placeholder{
+    font-size:12px!important;
+}
+input::placeholder{
+    font-size:12px!important;
+}
+textarea{
+    font-size:12px!important;
+}
+.btn.btn-sm.btn-outline-success{
+    padding: 4px 14px!important; 
+} 
+table tr td{
+    font-size:12px!important;
+}
+span{
+    font-size:12px!important;
+}
+.btn.btn-primary.btn-sm{
+      padding: 4px 14px!important;
+}
+.side-menu__label {
+    font-size: 14px!important;
+}
+.slide ul.slide-menu li a{
+      font-size: 14px!important;
+}
+.breadcrumb-item.active {
+    color: #2cc92b !important;
+}
+.user-info .text-muted {
+    font-size: 18px!important;
 }
 /* End */

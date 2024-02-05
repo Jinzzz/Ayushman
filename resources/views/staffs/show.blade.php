@@ -42,8 +42,8 @@
             <div class="tab-menu-heading">
                <div class="tabs-menu1">
                   <ul class="nav">
-                     <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Basic Details</a></li>
-                     <li><a href="#tab-61" data-toggle="tab" class="">Qualification</a></li>
+                     <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Personale Details</a></li>
+                     <li><a href="#tab-61" data-toggle="tab" class="">Available Leaves</a></li>
                      <li><a href="#tab-71" data-toggle="tab" class="">Salary Details</a></li>
                   </ul>
                </div>
@@ -132,9 +132,7 @@
                                  <td><strong>Booking Fee :</strong> {{ $show->staff_booking_fee }}</td>
                               </tr>
                               @endif
-                              <tr>
-                                 <td><strong>Last Login Time :</strong>{{ $show->last_login_time}}</td>
-                              </tr>
+
                            </tbody>
                         </table>
                      </div>
@@ -143,14 +141,21 @@
                </div>
                <div class="tab-pane" id="tab-61">
                   <div class="media-heading">
-                     <h5><strong>Staff Qualification</strong></h5>
+                     <h5><strong>Staff Available Leave</strong></h5>
                   </div>
                   <ul class="widget-users row">
                      <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                         <div class="card">
-                           <div class="card-body text-center">
-                              <h4 class="h4 mb-0 mt-3">{{ $show->staff_name??''}}</h4>
-                              <p class="card-text">{{ $show->staff_qualification??''}}</p>
+                           <div class="card-body">
+                           <tr>
+                                 <td><strong>Leave Type:</strong>{{ str_replace(['[', ']', '"'], '', $leave_type) }}</td>
+                              </tr> </br>
+                              <tr>
+                                 <td><strong>Credit Period:</strong>{{ $show->credit_period}}</td>
+                              </tr></br>
+                              <tr>
+                                 <td><strong>Credit Limit:</strong>{{ $show->credit_limit}}</td>
+                              </tr>
                            </div>
                         </div>
                      </li>
@@ -163,10 +168,17 @@
                   <ul class="widget-users row">
                   <li class="col-lg-4  col-md-6 col-sm-12 col-12">
                      <div class="card">
-                        <div class="card-body text-center">
-                           <h4 class="h5 mb-0 mt-3">{{ $show->salaryType->salary_type ?? ''}}</h4>
-                           <p class="card-text">₹{{ $show->salary_amount ?? ''}}</p>
-                        </div>
+                     <div class="card-body">
+                           <tr>
+                                 <td><strong>Salary Type :</strong>{{ str_replace(['[', ']','"'], '', $salary) }}</td>
+                              </tr> </br>
+                              <tr>
+                                 <td><strong>Salary HeadType:</strong>{{ $show->salary_head_type}}</td>
+                              </tr></br>
+                              <tr>
+                                 <td><strong>Amount:</strong>{{ $show->amount}}</td>
+                              </tr>
+                           </div>
                      </div>
                   </li>
                   {{-- 
