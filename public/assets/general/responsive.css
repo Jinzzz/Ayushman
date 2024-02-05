@@ -1,0 +1,22 @@
+@media (max-width: 991px) {
+    .feedback-main {
+      padding: 0;
+      background-color: #fff;
+    }
+    .feedback-inner {
+      width: 100%;
+    }
+    .feedback-inner {
+      padding: 10px;
+    }
+    .feedback-form p {
+      padding: 5px;
+    }
+    .feedback td {
+      font-size: 12px;
+    }
+    .feedback th {
+      font-size: 12px;
+    }
+  }
+  

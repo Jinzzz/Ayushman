@@ -73,7 +73,9 @@ Route::get('/', function () {
 
 //General - Public 
 Route::get('/general/index/{branch_code}', [GeneralController::class, 'generalIndex'])->name('general.index');
-
+Route::get('/patient/feedback/submit/{id}', [FeedbackController::class, 'create'])->name('customer.feedback.create');
+Route::post('/patient/feedback/save', [FeedbackController::class, 'saveFeedback'])->name('customer.feedback.save');
+Route::get('/feedback/success', [FeedbackController::class, 'successPage'])->name('feedback.success');
 
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
@@ -635,8 +637,6 @@ Route::get('/income-expense/create', [IncomeExpenseController::class, 'create'])
 
 //General Feedback
 Route::get('/patient/feedback/index', [FeedbackController::class, 'index'])->name('customer.feedback.index');
-Route::get('/patient/feedback/create', [FeedbackController::class, 'create'])->name('customer.feedback.create');
-Route::get('/patient/feedback/save', [FeedbackController::class, 'saveFeedback'])->name('customer.feedback.save');
 Route::get('feedback/change-status/{feedback_id}', [FeedbackController::class, 'changeStatus'])->name('feedback.changeStatus');
 Route::delete('/feedback/destroy/{feedback_id}', [FeedbackController::class, 'destroy'])->name('feedback.destroy');
 

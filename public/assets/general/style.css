@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Titillium Web', sans-serif;
+  }
+  .feedback-main {
+    padding: 30px 0;
+    background-color: #f5f3f3;
+  }
+  .logo-feedback img {
+    height: auto;
+    margin: 0 auto;
+    width: 190px;
+    display: block;
+  }
+  .feedback-form {
+    margin: 20px auto;
+    padding: 10px;
+    background: #ebfaf3;
+    width: 100%;
+    border-radius: 5px;
+  }
+  .feedback-form h3 {
+    text-align: center;
+    font-size: 22px;
+    padding: 5px 0;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #4b4c4c;
+  }
+  .feedback-form p {
+    text-align: center;
+    font-size: 14px;
+    padding: 5px 150px;
+    color: #4b4c4c;
+    line-height: normal;
+  }
+  .feedback {
+    padding: 10px 0;
+  }
+  .feedback th {
+    font-size: 14px;
+    color: #4b4c4c;
+    font-weight: normal;
+    text-align: center;
+    text-transform: capitalize;
+  }
+  .table-right {
+    text-align: right;
+  }
+  .feedback td {
+    font-size: 14px;
+    color: #4b4c4c;
+    font-weight: normal;
+    text-transform: capitalize;
+  }
+  .bakground-checkbox {
+    background-color: #f6f7fb;
+    padding: 20px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th,
+  td {
+    padding: 5px;
+    text-align: left;
+  }
+  
+  .table-right {
+    text-align: right;
+  }
+  
+  .background-checkbox {
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+  }
+  .containerr input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .checkmark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 16px;
+    width: 16px;
+    background-color: transparent;
+    border-radius: 50%;
+    transform: translate(-50%);
+    border: 2px solid #e0e0e3;
+  }
+  
+  .containerr input:checked ~ .checkmark {
+    background-color: #3cab33;
+    border: none;
+  }
+  
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  .containerr input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  .containerr .checkmark:after {
+    top: 4px;
+    left: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    transform: translateX(-50%);
+  }
+  .containerr {
+    display: block;
+    position: relative;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .feedback-inner {
+    width: 60%;
+    background-color: #fff;
+    margin: auto;
+    display: block;
+    padding: 30px 20px;
+    border-radius: 5px;
+  }
+  .feedback-textarea {
+    padding: 20px 0;
+  }
+  .feedback-textarea textarea {
+    width: 100%;
+    border: 1px solid #afaeae;
+    border-radius: 5px;
+    height: 100px;
+    resize: none;
+    padding: 10px;
+    outline: 0;
+    font-size: 12px;
+    color: #000;
+  }
+  .feedback-textarea label {
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #4b4c4c;
+  }
+  .feedback-name label{
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: #4b4c4c;
+      margin-bottom: 0;
+  }
+  .feedback-name input{
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid #afaeae;
+      outline: 0;
+      padding: 0 5px;
+      font-size: 12px;
+      color: #000;
+  }
+  .submit-button{
+      margin: auto;
+      display: block;
+      text-align: center;
+      padding: 10px 30px;
+      outline: 0;
+      background: linear-gradient(180deg,rgba(61,170,51,.5),rgba(0,79,39,.5)),#3daa33;
+      border: none;
+      border-radius: 30px;
+      color: #fff;
+      display: block;
+      font-family: Titillium Web;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: normal;
+  }
+  .submit-button:hover{
+      background: linear-gradient(180deg,rgba(0,79,39,.5),rgba(61,170,51,.5)),#3daa33;
+      outline: 0!important;
+  }
