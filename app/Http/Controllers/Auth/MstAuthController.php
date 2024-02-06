@@ -31,7 +31,7 @@ class MstAuthController extends Controller
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
              $user = Auth::guard('mst_users_guard')->user();
             if ($user->user_type_id == 96) {
-                return redirect()->intended('/home');
+                return redirect()->intended('/pharmacy-home');
             } else {
                 Auth::guard('mst_users_guard')->logout();
             return back()->withInput()->withErrors(['login' => 'Invalid Pharmacy User Credentials']);
