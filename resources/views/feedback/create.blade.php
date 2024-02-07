@@ -48,177 +48,202 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="table-right">Consultant <br>Doctor</td>
+                                    <td class="table-right">Consultant <br>Doctor* 
+                                        <br>
+                                        @if ($errors->has('consultancy_rating'))
+                                        <span class="text-danger errbk">{{ $errors->first('consultancy_rating') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="bakground-checkbox">
                                             <label class="containerr">
-                                                <input type="radio"  name="consultancy_rating" value="5">
+                                                <input type="radio"  name="consultancy_rating" value="5" {{ old('consultancy_rating') == '5' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="consultancy_rating" value="4">
+                                                <input type="radio"  name="consultancy_rating" value="4" {{ old('consultancy_rating') == '4' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="consultancy_rating" value="3">
+                                                <input type="radio"  name="consultancy_rating" value="3" {{ old('consultancy_rating') == '3' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="consultancy_rating" value="2">
+                                                <input type="radio"  name="consultancy_rating" value="2" {{ old('consultancy_rating') == '2' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="consultancy_rating" value="1">
+                                                <input type="radio"  name="consultancy_rating" value="1" {{ old('consultancy_rating') == '1' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="table-right">The overall visit<br> experience</td>
+                                    <td class="table-right">The overall visit<br> experience* 
+                                        <br>
+                                        @if ($errors->has('visit_rating'))
+                                        <span class="text-danger errbk">{{ $errors->first('visit_rating') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="bakground-checkbox">
                                             <label class="containerr">
-                                                <input type="radio"  name="visit_rating" value="5">
+                                                <input type="radio"  name="visit_rating" value="5" {{ old('visit_rating') == '5' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="visit_rating" value="4">
+                                                <input type="radio"  name="visit_rating" value="4" {{ old('visit_rating') == '4' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="visit_rating" value="3">
+                                                <input type="radio"  name="visit_rating" value="3" {{ old('visit_rating') == '3' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="visit_rating" value="2">
+                                                <input type="radio"  name="visit_rating" value="2" {{ old('visit_rating') == '2' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="visit_rating" value="1">
+                                                <input type="radio"  name="visit_rating" value="1" {{ old('visit_rating') == '1' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="table-right" style="width: 13%;">The service you received<br>from staff
-                                        members</td>
+                                        members* 
+                                        <br>
+                                        @if ($errors->has('service_rating'))
+                                        <span class="text-danger errbk">{{ $errors->first('service_rating') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="bakground-checkbox">
                                             <label class="containerr">
-                                                <input type="radio"  name="service_rating" value="5">
+                                                <input type="radio"  name="service_rating" value="5" {{ old('service_rating') == '5' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="service_rating" value="4">
+                                                <input type="radio"  name="service_rating" value="4" {{ old('service_rating') == '4' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="service_rating" value="3">
+                                                <input type="radio"  name="service_rating" value="3" {{ old('service_rating') == '3' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="service_rating" value="2">
+                                                <input type="radio"  name="service_rating" value="2" {{ old('service_rating') == '2' ? 'checked' : '' }}> 
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="service_rating" value="1">
+                                                <input type="radio"  name="service_rating" value="1" {{ old('service_rating') == '1' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="table-right">Pharmacy</td>
+                                    <td class="table-right">Pharmacy* 
+                                        <br>
+                                        @if ($errors->has('pharmacy_rating'))
+                                        <span class="text-danger errbk">{{ $errors->first('pharmacy_rating') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="bakground-checkbox">
                                             <label class="containerr">
-                                                <input type="radio"  name="pharmacy_rating" value="5">
+                                                <input type="radio"  name="pharmacy_rating" value="5" {{ old('pharmacy_rating') == '5' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="pharmacy_rating" value="4">
+                                                <input type="radio"  name="pharmacy_rating" value="4" {{ old('pharmacy_rating') == '4' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="pharmacy_rating" value="3">
+                                                <input type="radio"  name="pharmacy_rating" value="3" {{ old('pharmacy_rating') == '3' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="pharmacy_rating" value="2">
+                                                <input type="radio"  name="pharmacy_rating" value="2" {{ old('pharmacy_rating') == '2' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="pharmacy_rating" value="1">
+                                                <input type="radio"  name="pharmacy_rating" value="1" {{ old('pharmacy_rating') == '1' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="table-right">Ease of getting an<br>appointment</td>
+                                    <td class="table-right">Ease of getting an<br>appointment* 
+                                        <br>
+                                        @if ($errors->has('appointment_rating'))
+                                        <span class="text-danger errbk">{{ $errors->first('appointment_rating') }}</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="bakground-checkbox">
                                             <label class="containerr">
-                                                <input type="radio"  name="appointment_rating" value="5">
+                                                <input type="radio"  name="appointment_rating" value="5" {{ old('appointment_rating') == '5' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="appointment_rating" value="4">
+                                                <input type="radio"  name="appointment_rating" value="4" {{ old('appointment_rating') == '4' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="appointment_rating" value="3">
+                                                <input type="radio"  name="appointment_rating" value="3" {{ old('appointment_rating') == '3' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="appointment_rating" value="2">
+                                                <input type="radio"  name="appointment_rating" value="2" {{ old('appointment_rating') == '2' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
                                     <td>
                                         <div class="bakground-checkbox"><label class="containerr">
-                                                <input type="radio"  name="appointment_rating" value="1">
+                                                <input type="radio"  name="appointment_rating" value="1" {{ old('appointment_rating') == '1' ? 'checked' : '' }}>
                                                 <span class="checkmark"></span>
                                             </label></div>
                                     </td>
@@ -226,7 +251,7 @@
                             </tbody>
                         </table>
                         <div class="feedback-textarea">
-                            <label>TELL US HOW WE CAN IMPROVE</label>
+                            <label>Tell us how we can improve</label>
                             <textarea id="w3review" name="feedback"></textarea>
                         </div>
                         <!-- <div class="feedback-name">

@@ -30,6 +30,8 @@ class MstAuthController extends Controller
 
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
              $user = Auth::guard('mst_users_guard')->user();
+                $user->last_login_time = now();
+                $user->save();
             if ($user->user_type_id == 96) {
                 return redirect()->intended('/pharmacy-home');
             } else {
@@ -52,6 +54,8 @@ class MstAuthController extends Controller
 
         if (Auth::guard('mst_users_guard')->attempt($credentials)) {
              $user = Auth::guard('mst_users_guard')->user();
+                $user->last_login_time = now();
+                $user->save();
             if ($user->user_type_id == 1) {
                 return redirect()->intended('/home');
             } else {

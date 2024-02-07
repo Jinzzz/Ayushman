@@ -23,8 +23,8 @@
                   </select>
                 </div>
               </div>
-            </div>
-            <div class="row">
+            {{-- </div>
+            <div class="row"> --}}
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label branch" id="branchLabel">Medicine*</label>
@@ -35,8 +35,8 @@
                   </select>
                 </div>
               </div>
-            </div>
-            <div class="row">
+            {{-- </div>
+            <div class="row"> --}}
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Batch No*</label>
@@ -46,31 +46,32 @@
                   </select>
                 </div>
               </div>
-            </div>
-            <div class="row">
+            {{-- </div>
+            <div class="row"> --}}
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Current Stock *</label>
                   <input type="text" class="form-control" required name="current_stock" id="current_stock" placeholder="Current Stock" readonly>
                 </div>
               </div>
-            </div>
-            <div class="row">
+            {{-- </div>
+            <div class="row"> --}}
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Transfer Quantity*</label>
                   <input type="number" class="form-control" required pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="transfer_quantity" id="transfer_quantity" placeholder="Transfer Quantity">
                 </div>
               </div>
-            </div>
-            <div class="row">
+            {{-- </div>
+            <div class="row"> --}}
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Transfer Date*</label>
                   <input type="date" class="form-control" required name="transfer_date" id="transfer_date" placeholder="Transfer Date">
                 </div>
               </div>
-            </div>
+            {{-- </div> --}}
+            <div class="col-md-12">
             <div class="form-group">
               <center>
                 <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
@@ -78,6 +79,7 @@
                 <a class="btn btn-success" href="{{ route('therapy-stock-transfers.create') }}">Reset</a>
                 <a class="btn btn-danger" href="{{ route('therapy-stock-transfers.index') }}">Cancel</a>
               </center>
+            </div>
             </div>
           </form>
         </div>

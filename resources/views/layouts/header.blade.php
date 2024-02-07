@@ -1,11 +1,13 @@
 <div class="page-header">
-    <a aria-label="Hide Sidebar" class="app-sidebar__toggle close-toggle" data-toggle="sidebar" href="#"></a><!-- sidebar-toggle-->
-    
+    <a aria-label="Hide Sidebar" class="app-sidebar__toggle close-toggle" data-toggle="sidebar"
+        href="#"></a><!-- sidebar-toggle-->
+
     <div>
         <h1 class="page-title"></h1>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ isset($pageTitle) ? $pageTitle : 'Default Text' }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ isset($pageTitle) ? $pageTitle : 'Default Text' }}
+            </li>
         </ol>
     </div>
     <div class="d-flex  ml-auto header-right-icons header-search-icon">
@@ -36,9 +38,10 @@
         <div class="dropdown profile-1">
             <a href="#" data-toggle="dropdown" class="nav-link pr-2 leading-none d-flex">
                 <span>
-                   
-                    <img src="{{asset('assets/images/avatar.png')}}" alt="profile-user" class="avatar  profile-user brround cover-image">
-            
+
+                    <img src="{{ asset('assets/images/avatar.png') }}" alt="profile-user"
+                        class="avatar  profile-user brround cover-image">
+
                 </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
@@ -49,22 +52,19 @@
                     </div>
                 </div>
                 <div class="dropdown-divider m-0"></div>
-                {{--<a class="dropdown-item" href="#">
+                {{-- <a class="dropdown-item" href="#">
                     <i class="dropdown-icon mdi mdi-account-outline"></i> Profile
-                </a>--}}
-                <a class="dropdown-item"  onclick="event.preventDefault();
-                 document.getElementById('logout-form').submit();" >
+                </a> --}}
+                <a class="dropdown-item"
+                    onclick="event.preventDefault();
+                 document.getElementById('logout-form').submit();">
                     <i class="dropdown-icon mdi  mdi-logout-variant"></i> Sign Out
                 </a>
-                 <a class="dropdown-item"  onclick="event.preventDefault();
-                 document.getElementById('logout-form').submit();" >
-                    <i class="dropdown-icon mdi  mdi-logout-variant"></i> Change Password
-                </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
+                    @csrf
+                </form>
             </div>
         </div>
-       
+
     </div>
 </div>

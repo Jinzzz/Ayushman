@@ -21,6 +21,7 @@ class Trn_income_expense extends Model
         'transaction_account_id',
         'reference',
         'notes',
+        'reference_file',
         'created_by',
         'created_at',
         'updated_by',

@@ -8,31 +8,39 @@
             </div>
             <form action="{{ route('therapy-stock-transfers.index') }}" method="GET">
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
                             <label for="medicine_name" class="form-label">Medicine Name</label>
                             <select class="form-control" name="medicine_name" id="medicine_name">
                             <option value="" disabled selected>Choose Medicine</option> 
                             @foreach($medicines as $medicine) 
                             <option value="{{ $medicine->medicine_name }}">{{ $medicine->medicine_name }}</option>
                              @endforeach
-                        </select>
+                            </select>
+                          </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                          <div class="form-group">
                             <label for="therapy_name" class="form-label">Therapy Name</label>
                             <select class="form-control" name="therapy_name" id="therapy_name">
                             <option value="" disabled selected>Choose Therapy</option>
                              @foreach($therapys as $therapy)
                               <option value="{{ $therapy->therapy_name }}">{{ $therapy->therapy_name }}</option>
                                @endforeach
-                        </select>
+                            </select>
+                          </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                          <div class="form-group">
                             <label for="transfer_date" class="form-label">Transfer Date</label>
                             <input type="date" id="transfer_date" name="transfer_date" class="form-control" value="{{ request('transfer_date') }}">
+                          </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
+                    
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <center>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-filter" aria-hidden="true"></i> Filter
                         </button>
@@ -40,7 +48,10 @@
                         <a class="btn btn-primary" href="{{ route('therapy-stock-transfers.index') }}">
                             <i class="fa fa-times" aria-hidden="true"></i> Reset
                         </a>
+                        <center>
+                      </div>
                     </div>
+                  </div>
                 </div>
             </form>
         </div>
