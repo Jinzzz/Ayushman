@@ -53,6 +53,11 @@ use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\IncomeExpenseController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\GeneralController;
+use App\Http\Controllers\SalaryProcessingController;
+use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\SettingsController;
+
+
 
 
 
@@ -98,6 +103,19 @@ Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPass
 
 //Authentication:
 Route::middleware('auth')->group(function () {
+
+    Route::middleware(['role:96'])->group(function () {
+        Route::get('/pharmacy-home', [DashboardController::class, 'pharmaIndex'])->name('pharmacy.home');
+    });
+
+    //Route access for admin-pharmacist
+    Route::middleware(['role:1|role:96'])->group(function () {
+
+    });
+
+    // Dashboard 
+    Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');
+
     // Medicine dosage - Screen for medicine dosges
     Route::get('/medicine-dosage', [MstMedicineDosageController::class, 'index'])->name('medicine.dosage.index');
     Route::get('/medicine-dosage/create', [MstMedicineDosageController::class, 'create'])->name('medicine.dosage.create');
@@ -105,9 +123,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/medicine-dosage/destroy/{id}', [MstMedicineDosageController::class, 'destroy'])->name('medicine.dosage.destroy');
     Route::get('/medicine-dosage/edit/{id}', [MstMedicineDosageController::class, 'edit'])->name('medicine.dosage.edit');
     Route::patch('medicine-dosage/change-status/{id}', [MstMedicineDosageController::class, 'changeStatus'])->name('medicine.dosage.changeStatus');
-
-    // Dashboard 
-    Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
     //Manage-Branches:
     Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
@@ -639,6 +654,29 @@ Route::get('/income-expense/create', [IncomeExpenseController::class, 'create'])
 Route::get('/patient/feedback/index', [FeedbackController::class, 'index'])->name('customer.feedback.index');
 Route::get('feedback/change-status/{feedback_id}', [FeedbackController::class, 'changeStatus'])->name('feedback.changeStatus');
 Route::delete('/feedback/destroy/{feedback_id}', [FeedbackController::class, 'destroy'])->name('feedback.destroy');
+
+
+//Salary Processing
+
+Route::get('/staff/salary-processing/index', [SalaryProcessingController::class, 'index'])->name('salary-processing.index');
+Route::get('/staff/salary-processing/create', [SalaryProcessingController::class, 'create'])->name('create.salary-processing');
+Route::get('/getWorkingDays', [SalaryProcessingController::class, 'getWorkingDays'])->name('getWorkingDays');
+Route::get('/getStaffs/{branch_id}', [SalaryProcessingController::class, 'getStaffs'])->name('getStaffs');
+Route::get('/getStaffSalary/{staff_id}', [SalaryProcessingController::class, 'getStaffSalary'])->name('getStaffSalary');
+Route::get('getStaffLeaves/{staff_id}/{month}', [SalaryProcessingController::class, 'getStaffLeaves'])->name('get.staff.leaves');
+Route::get('/getDeductibleLeaveCount/{staff_id}/{month}', [SalaryProcessingController::class, 'getDeductibleLeaveCount'])->name('getDeductibleLeaveCount');
+Route::get('/get-salary-heads/{staff_id}', [SalaryProcessingController::class, 'getSalaryHeads'])->name('get-salary-heads');
+
+
+//Settings
+Route::get('/profile', [SettingsController::class, 'ProfileIndex'])->name('profile');
+Route::get('/change-password', [SettingsController::class, 'ChangePassword'])->name('change.password');
+Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->name('profile.update_password');
+
+
+
+
+
 
 
 
