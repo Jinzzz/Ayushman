@@ -90,14 +90,14 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Unit Price</label>
-                           <input type="text" class="form-control" required name="unit_price" maxlength="14" value="{{$medicine->unit_price}}" placeholder="Unit Price" oninput="validateNumericValue(this);">
+                           <label class="form-label">Unit Price* (Excluding GST)</label>
+                           <input type="text" class="form-control" required name="unit_price" value="{{$medicine->unit_price}}" placeholder="Unit Price" oninput="validateNumericValuedec(this);">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Description</label>
-                           <textarea class="form-control" required name="description" placeholder="Description">{{ $medicine->description}}</textarea>
+                           <textarea class="form-control" name="description" placeholder="Description">{{ $medicine->description}}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -178,7 +178,7 @@
                      number: true,
                      maxlength: 10
                   },
-                  description: "required",
+                 
                },
                messages: {
                   medicine_name: {
@@ -199,9 +199,7 @@
                      number: 'Please enter a valid integer.',
                      maxlength: 'Reorder limit must not exceed 10 characters.'
                   },
-                  description: {
-                     required: 'Please enter description.',
-                  },
+                 
                },
                errorPlacement: function(label, element) {
                   label.addClass('text-danger');
@@ -246,4 +244,11 @@
             input.value = input.value.replace(/[^0-9.]/g, '');
          }
       </script>
+      <script>
+         function validateNumericValuedec(input) {
+            input.value = input.value.replace(/[^0-9.]/g, ''); 
+            input.value = input.value.replace(/^(\d*\.\d{0,2})\d*$/, '$1');
+         }
+      </script>
+
       @endsection

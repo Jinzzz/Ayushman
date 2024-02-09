@@ -1,5 +1,15 @@
 @extends('layouts.app')
 @section('content')
+<style>
+   .card-header {
+   display: flex;
+   justify-content: space-between;
+}
+
+.card-title {
+   margin-top: 0; /* Optional: Adjust margin if needed */
+}
+   </style>
 <div class="container">
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -15,7 +25,12 @@
             </div>
             @endif
             <div class="card-header">
-               <h3 class="mb-0 card-title">Medicine Initital Stock Updation</h3>
+                  <div class="col-md-6">
+                     <h3 class="mb-0 card-title">Medicine Initial Stock Updation</h3>
+                  </div>
+                  <div class="col-md-6 d-flex justify-content-end">
+                     <a class="btn btn-raised btn-primary" href="{{route('medicine.index')}}">BACK</a>
+                  </div>
             </div>
             <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())

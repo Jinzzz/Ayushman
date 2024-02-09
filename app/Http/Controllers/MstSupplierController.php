@@ -70,9 +70,8 @@ class MstSupplierController extends Controller
                     'supplier_city' => 'required',
                     'state' => 'required',
                     'country' => 'required',
-                    'pincode' => 'required',
                     'phone_1' => 'required|numeric',
-                    'email' => 'required|email',
+                    'email' => 'email',
                     'is_active' => 'required',
                 ],
                 [
@@ -82,9 +81,7 @@ class MstSupplierController extends Controller
                     'supplier_city.required' => 'City is required.',
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
-                    'pincode.required' => 'Pincode is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.required' => 'Email ID is required.',
                     'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]
@@ -226,9 +223,8 @@ class MstSupplierController extends Controller
                     'supplier_city' => 'required',
                     'state' => 'required',
                     'country' => 'required',
-                    'pincode' => 'required',
                     'phone_1' => 'required|numeric',
-                    'email' => 'required|email',
+                    'email' => 'email',
                     'is_active' => 'required',
                 ],
                 [
@@ -238,9 +234,7 @@ class MstSupplierController extends Controller
                     'supplier_city.required' => 'City is required.',
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
-                    'pincode.required' => 'Pincode is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.required' => 'Email ID is required.',
                     'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]

@@ -86,8 +86,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Pincode*</label>
-                                    <input type="number" class="form-control" max="999999" min="100000" required name="pincode" placeholder="Pincode">
+                                    <label class="form-label">Pincode</label>
+                                    <input type="number" class="form-control" max="999999" min="100000" name="pincode" placeholder="Pincode">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -106,7 +106,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Alternative Mobile Number*</label>
+                                    <label class="form-label">Alternative Mobile Number</label>
                                     <input type="number" max="9999999999" min="1000000000" class="form-control" name="phone_2" value="{{ old('phone_2') }}" placeholder="Alternative Number">
                                 </div>
                             </div>
@@ -114,8 +114,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Email*</label>
-                                    <input type="email" class="form-control" required name="email" value="{{ old('email') }}" placeholder="Email">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="Email">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -142,13 +142,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Opening Balance*</label>
-                                    <input type="number" class="form-control" max="999999" min="0" pattern="\d*" name="opening_balance" value="{{ old('opening_balance') }}" placeholder="Opening Balance">
+                                    <label class="form-label">Opening Balance</label>
+                                    <input type="number" class="form-control" max="999999" min="0" pattern="\d*" name="opening_balance" value="{{ old('opening_balance', '0') }}" placeholder="Opening Balance">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Opening Balance Type*</label>
+                                    <label class="form-label">Opening Balance Type</label>
                                     <select class="form-control" name="opening_balance_type" id="opening_balance_type">
                                         <option value="">Select Balance Type</option>
                                         <option value="1">Debit</option>

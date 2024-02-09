@@ -31,7 +31,11 @@
 
     <ul class="side-menu">
         <li class="slide">
+            @if (Auth::user()->user_type_id == 96)
+            <a class="side-menu__item {{ Request::is('pharmacy-home') ? 'active' : '' }}" href="{{ route('pharmacy.home') }}">
+            @else
             <a class="side-menu__item {{ Request::is('home') ? 'active' : '' }}" href="{{ route('home') }}">
+            @endif
                 <i class="side-menu__icon ti-home"></i>
                 <span class="side-menu__label">Dashboard</span>
             </a>

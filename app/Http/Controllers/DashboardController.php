@@ -9,6 +9,9 @@ use App\Models\Trn_Medicine_Purchase_Invoice;
 use App\Models\Staff_Leave;
 use Carbon\Carbon;
 use DB;
+use App\Models\Mst_Staff;
+use App\Models\Mst_Pharmacy;
+use App\Models\Trn_Medicine_Stock;
 
 
 class DashboardController extends Controller
@@ -43,17 +46,23 @@ class DashboardController extends Controller
     public function pharmaIndex()
     {
         $pageTitle="Pharmacy Dashboard";
-        $dailySale = Trn_Medicine_Sales_Invoice::whereDate('invoice_date', Carbon::today())->select(DB::raw('ROUND(SUM(total_amount), 2) as daily_sales'))
+
+        $staffId = auth()->user()->staff_id;
+        $branchId = Mst_Staff::where('staff_id', $staffId)->value('branch_id');
+        $pharmacyId = Mst_Pharmacy::where('branch', $branchId)->value('id');
+
+        $lowStock = Trn_Medicine_Stock::where('pharmacy_id',$pharmacyId)->where('current_stock','<',5)->count();
+        $dailySale = Trn_Medicine_Sales_Invoice::where('pharmacy_id',$pharmacyId)->whereDate('invoice_date', Carbon::today())->select(DB::raw('ROUND(SUM(total_amount), 2) as daily_sales'))
          ->first();
-        $medicineSaleWeekly = Trn_Medicine_Sales_Invoice::whereBetween('invoice_date', [Carbon::now()->startOfWeek()->format('Y-m-d'),Carbon::now()->endOfWeek()->format('Y-m-d')])
+        $medicineSaleWeekly = Trn_Medicine_Sales_Invoice::where('pharmacy_id',$pharmacyId)->whereBetween('invoice_date', [Carbon::now()->startOfWeek()->format('Y-m-d'),Carbon::now()->endOfWeek()->format('Y-m-d')])
         ->select(DB::raw('ROUND(SUM(total_amount), 2) as weekly_sales'))
          ->first();
-        $medicineSaleMonthly = Trn_Medicine_Sales_Invoice::whereBetween('invoice_date',[Carbon::now()->startOfMonth()->format('Y-m-d'),Carbon::now()->endOfMonth()->format('Y-m-d')])
+        $medicineSaleMonthly = Trn_Medicine_Sales_Invoice::where('pharmacy_id',$pharmacyId)->whereBetween('invoice_date',[Carbon::now()->startOfMonth()->format('Y-m-d'),Carbon::now()->endOfMonth()->format('Y-m-d')])
          ->select(DB::raw('ROUND(SUM(total_amount), 2) as monthly_sales'))
          ->first();
-        $totalSales = Trn_Medicine_Sales_Invoice::select(DB::raw('ROUND(SUM(total_amount), 2) as sales'))
+        $totalSales = Trn_Medicine_Sales_Invoice::where('pharmacy_id',$pharmacyId)->select(DB::raw('ROUND(SUM(total_amount), 2) as sales'))
          ->first();
         
-        return view('auth.pharmacy.home',compact('pageTitle','dailySale','medicineSaleWeekly','medicineSaleMonthly','totalSales'));
+        return view('auth.pharmacy.home',compact('pageTitle','lowStock','dailySale','medicineSaleWeekly','medicineSaleMonthly','totalSales'));
     }
 }

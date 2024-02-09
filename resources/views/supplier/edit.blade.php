@@ -92,8 +92,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Pincode*</label>
-                                    <input type="number" class="form-control" required name="pincode" max="999999" min="100000" value="{{$supplier->pincode}}" placeholder="Pincode">
+                                    <label class="form-label">Pincode</label>
+                                    <input type="number" class="form-control" name="pincode" max="999999" min="100000" value="{{$supplier->pincode}}" placeholder="Pincode">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -120,8 +120,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Email*</label>
-                                    <input type="email" class="form-control" required name="email" value="{{$supplier->email}}" placeholder="Email">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" value="{{$supplier->email}}" placeholder="Email">
                                 </div>
                             </div>
                             <div class="col-md-6">

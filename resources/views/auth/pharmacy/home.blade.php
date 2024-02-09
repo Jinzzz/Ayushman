@@ -40,7 +40,7 @@ use App\Models\Trn_Medicine_Stock;
 				<div class="card-body bg-transparent">
 					<div class="d-flex">
 						<div class="text-white">
-							<h2 class="mb-0 number-font">{{Trn_Medicine_Stock::where('current_stock','<',5)->count()}}</h2>
+							<h2 class="mb-0 number-font">{{@$lowStock}}</h2>
 							<p class="text-white mb-0" style="font-size:12px;">Low Stock Medicines</p>
 						</div>
 						<div class="ml-auto">

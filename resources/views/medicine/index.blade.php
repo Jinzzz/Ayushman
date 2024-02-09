@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12 col-lg-12">
             <button class="btn btn-blue displayfilter"><i class="fa fa-filter" aria-hidden="true"></i>
-                <span>More Filters</span></button>
+                <span>Show Filters</span></button>
             <div class="card displaycard ShowFilterBox">
                 <div class="card-header">
                     <h3 class="card-title">Search Medicine</h3>

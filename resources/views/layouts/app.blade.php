@@ -255,7 +255,7 @@
             $(".displayfilter").click(function() {
                 $('.displaycard').toggleClass("ShowFilterBox");
                 $(this).find('span').text(function(i, text) {
-                    return text === "More Filters" ? "Hide Filters" : "More Filters";
+                    return text === "Show Filters" ? "Hide Filters" : "Show Filters";
                 });
             });
         });
