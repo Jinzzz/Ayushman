@@ -56,6 +56,7 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\SalaryProcessingController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ReportController;
 
 
 
@@ -513,7 +514,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/get-patient-booking-ids/{id}', [MedicineSalesController::class, 'getPatientBookingIds'])->name('get.patient.booking.ids');
     Route::patch('/get-medicine-batches/{id}', [MedicineSalesController::class, 'getMedicineBatches'])->name('get.medicine.batches');
     Route::get('/getLedgerNames1', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames1');
-
+    Route::post('/medicine-sales-invoices/patient-store', [MedicineSalesController::class, 'patientStore'])->name('medicine.sales.invoices.patient-store');
+    
     // Medicine sales return 
      Route::get('/get-sale-invoice-details', [MedicineSalesReturnController::class, 'getSaleInvoiceDetails'])->name('getSaleInvoiceDetails');
     Route::get('/medicine-sales-return', [MedicineSalesReturnController::class, 'index'])->name('medicine.sales.return.index');
@@ -672,6 +674,11 @@ Route::get('/get-salary-heads/{staff_id}', [SalaryProcessingController::class, '
 Route::get('/profile', [SettingsController::class, 'ProfileIndex'])->name('profile');
 Route::get('/change-password', [SettingsController::class, 'ChangePassword'])->name('change.password');
 Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->name('profile.update_password');
+
+//Reports
+Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sales.report');
+Route::get('/sales/report/detail/{id}', [ReportController::class, 'SalaryReportDetail'])->name('sales.report.detail');
+
 
 
 
