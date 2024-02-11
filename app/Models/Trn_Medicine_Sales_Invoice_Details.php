@@ -31,6 +31,11 @@ class Trn_Medicine_Sales_Invoice_Details extends Model
         return $this->belongsTo(Mst_Unit::class, 'medicine_unit_id');
     }
 
+    public function invoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Sales_Invoice::class, 'sales_invoice_id', 'sales_invoice_id');
+    }
+
     public function Medicine()
     {
         return $this->belongsTo(Mst_Medicine::class, 'medicine_id');

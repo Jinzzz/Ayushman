@@ -11,12 +11,17 @@ use App\Helpers\AdminHelper;
          border: 1px solid #b0b0b0;
          /* Adjust the color as needed */
       }
+      
+      .breadcrumb {
+            margin-top: 1rem; !important;
+            background-color: #fff !important;
+      }
 
       td.medicine-quantity span {
          color: red;
          font-size: 10px;
          position: absolute;
-         bottom: -2px;
+         bottom: -1px;
          left: 00;
          text-align: center;
          width: 100%;
@@ -29,14 +34,23 @@ use App\Helpers\AdminHelper;
       .display-med-row {
          display: none;
       }
-   
-.card-table {
-    margin-bottom: 15px;
-}
-
-      .table th {   font-size: 12px;} select.medicine-name { display: none !important; } span.current {
-    font-size: 10px!important; } .table td {padding: 5px 3px;} .pricecard .form-group label {font-size: 12px;margin:0;} .pricecard .form-group span, .pricecard .form-group input {width: auto;padding: 0;border: unset;line-height: 1;height:auto;} .pricecard .form-group input:focus {outline: unset !important;border: none !important;} .pricecard .form-group {display: flex;align-items: center;gap: 16px;margin: 5px 0;}.pricecard .col-md-4 {margin-left: auto;}.dropdown-select {background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);background-repeat: repeat-x;filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#40FFFFFF', endColorstr='#00FFFFFF', GradientType=0);background-color: #fff;border-radius: 6px;box-sizing: border-box;cursor: pointer;display: block;float: left;font-size: 14px;font-weight: normal;outline: none;padding-left: 18px;padding-right: 30px;position: relative;text-align: left !important;transition: all 0.2s ease-in-out;-webkit-user-select: none;-moz-user-select: none; -ms-user-select: none;user-select: none;white-space: nowrap; width: auto;}.dropdown-select:focus {background-color: #fff;}.dropdown-select:hover {background-color: #fff;}.dropdown-select:active,.dropdown-select.open {background-color: #fff !important;border-color: #bbb;box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) inset;}.dropdown-select:after {height: 0; width: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid #777;-webkit-transform: origin(50% 20%); transform: origin(50% 20%); transition: all 0.125s ease-in-out; content: ''; display: block; margin-top: -2px; pointer-events: none; position: absolute; right: 10px; top: 50%;}.dropdown-select.open:after { -webkit-transform: rotate(-180deg); transform: rotate(-180deg);}.dropdown-select.open .list { -webkit-transform: scale(1); transform: scale(1); opacity: 1; pointer-events: auto;}.dropdown-select.open .option {cursor: pointer;}.dropdown-select.wide {width: 100%;}.dropdown-select.wide .list {left: 0 !important;right: 0 !important;}.dropdown-select .list {box-sizing: border-box; transition: all 0.15s cubic-bezier(0.25, 0, 0.25, 1.75), opacity 0.1s linear; -webkit-transform: scale(0.75); transform: scale(0.75); -webkit-transform-origin: 50% 0; transform-origin: 50% 0; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.09); background-color: #fff; border-radius: 6px; margin-top: 4px; padding: 3px 0; opacity: 0; overflow: hidden; pointer-events: none; position: absolute; top: 100%; left: 0; z-index: 999; max-height: 250px; overflow: auto; border: 1px solid #ddd;}.dropdown-select .list:hover .option:not(:hover) { background-color: transparent !important;}.dropdown-select .dd-search{overflow:hidden;display:flex;align-items:center;justify-content:center;margin:5px 0;}.dropdown-select .dd-searchbox{width:90%;padding:0.5rem;border:1px solid #999;border-color:#999;border-radius:4px;outline:none;line-height: 1;}.dropdown-select .dd-searchbox:focus{border-color:#12CBC4;}.dropdown-select .list ul { padding: 0;}.dropdown-select .option {cursor: default; font-weight: 400; line-height: 2; outline: none; padding-left: 10px; padding-right: 25px; text-align: left; transition: all 0.2s; list-style: none; font-size: 10px;}.dropdown-select .option:hover,.dropdown-select .option:focus {background-color: #f6f6f6 !important;}.dropdown-select .option.selected { font-weight: 600; color: #12cbc4;}.dropdown-select .option.selected:focus {background: #f6f6f6;}.dropdown-select a {color: #aaa; text-decoration: none; transition: all 0.2s ease-in-out;}.dropdown-select a:hover {
-    color: #666;}
+    .alert-div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+        background: #c40e0e;
+        padding: 25px;
+        color: white;
+        width: 370px;
+        height: 200px;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+    }
    </style>
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -64,13 +78,193 @@ use App\Helpers\AdminHelper;
                   </ul>
                </div>
                @endif
+                         <!-- Modal -->
+                    <div class="modal fade" id="addPatientModal" tabindex="-1" role="dialog" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <!-- Add your form or content for adding a new patient here -->
+                            <!-- Example: -->
+                                 <form action="{{ route('medicine.sales.invoices.patient-store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Name*</label>
+                                    <input type="text" class="form-control" required name="patient_name" maxlength="100"
+                                        value="{{ old('patient_name') }}" placeholder="Patient Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Email</label>
+                                    <input type="email" class="form-control" value="{{ old('patient_email') }}" maxlength="200"
+                                        name="patient_email" placeholder="Patient Email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Mobile*</label>
+                                    <input type="text" class="form-control" required name="patient_mobile"  maxlength="10" oninput="validateInput(this)"
+                                        value="{{ old('patient_mobile') }}" placeholder="Patient Mobile">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Address</label>
+                                    <textarea class="form-control" name="patient_address" 
+                                        placeholder="Patient Address">{{ old('patient_address') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="patient_gender" class="form-label">Gender*</label>
+                                    <select class="form-control" name="patient_gender" id="patient_gender" required>
+                                        <option value="">Choose Gender</option>
+                                        @foreach($gender as $id => $gender)
+                                        <option value="{{ $id }}">{{ $gender }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Date Of Birth*</label>
+                                    <input type="date" class="form-control" name="patient_dob" required
+                                        placeholder="Patient Dob">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="patient_blood_group_id" class="form-label">Blood Group</label>
+                                    <select class="form-control" name="patient_blood_group_id"
+                                        id="patient_blood_group_id">
+                                        <option value="">Choose Blood Group</option>
+                                        @foreach($bloodgroup as $id => $bloodgroup)
+                                        <option value="{{ $id }}">{{ $bloodgroup }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Emergency Contact Person</label>
+                                    <input type="text" class="form-control" name="emergency_contact_person" maxlength="100"
+                                        placeholder="Emergency Contact Person">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Emergency Contact</label>
+                                    <input type="text" class="form-control" name="emergency_contact"  maxlength="10" oninput="validateInput(this)"
+                                        placeholder="Emergency Contact">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Marital Status</label>
+                                    <select class="form-control" name="marital_status" id="marital_status">
+                                        <option value="">Choose Marital Status</option>
+                                        @foreach($maritialstatus as $masterId => $masterValue)
+                                        <option value="{{ $masterId }}">{{ $masterValue }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Registration Type</label>
+                                    <select class="form-control" name="patient_registration_type" id="patient_registration_type" required>
+                                        <option value="self" selected>Self</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Whatsapp Number</label>
+                                    <input type="text" class="form-control" value="{{ old('whatsapp_number') }}"  maxlength="10" oninput="validateInput(this)"
+                                        name="whatsapp_number" placeholder="Whatsapp Number">
+                                        <p class="error-message" style="color: red; display: none;">Only numbers are allowed.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Medical History</label>
+                                    <textarea class="form-control" required name="patient_medical_history" id="medicalHistory"
+                                        placeholder="Medical History">{{ old('patient_medical_history') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Current Medication</label>
+                                    <textarea class="form-control" required name="patient_current_medications" id="currentMedication"
+                                        placeholder="Patient Current Medication">{{ old('patient_current_medications') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-label">Status</div>
+                                    <label class="custom-switch">
+                                        <input type="hidden" name="is_active" value="0">
+                                        <input type="checkbox" id="is_active" name="is_active"
+                                            onchange="toggleStatus(this)" class="custom-switch-input" checked>
+                                        <span id="statusLabel" class="custom-switch-indicator"></span>
+                                        <span id="statusText" class="custom-switch-description">Active</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <center>
+                                <button type="submit" class="btn btn-raised btn-primary">
+                                    <i class="fa fa-check-square-o"></i> Add
+                                </button>
+                                <button type="reset" class="btn btn-raised btn-success">
+                                    Reset
+                                </button>
+                                <a class="btn btn-danger" href="{{ route('patients.index') }}">Cancel</a>
+                            </center>
+                        </div>
+                    </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Modal -->
+                     
                <form action="{{ route('medicine.sales.invoices.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                   @csrf
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
+                    
                   <div class="row">
                      <div class="col-md-3">
+                        
                         <div class="form-group">
                            <label class="form-label">Select Patient*</label>
+                           <div class="input-group">
                            <select class="form-control" name="patient_id" id="patient_id" required>
                               <option value="">Select Patient</option>
                               <option value="0">Guest Patient</option>
@@ -80,8 +274,14 @@ use App\Helpers\AdminHelper;
                               </option>
                               @endforeach
                            </select>
+                           <span class="input-group-append">
+                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPatientModal">+</button>
+                           </span>
+                           </div>
                         </div>
+                       
                      </div>
+       
                      <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Select Booking ID</label>
@@ -122,13 +322,7 @@ use App\Helpers\AdminHelper;
                                        <th>Rate</th>
                                        <th>Amount</th>
                                        <th>Actions</th>
-                                       <!-- <th>Stock ID</th>
-                                       <th>Current stock</th>
-                                       <th>Order limit</th>
-                                       <th>Tax Rate</th>
-                                       <th>Tax Amount</th>
-                                       <th>Manufacture Date</th>
-                                       <th>Expiry Date</th> -->
+
                                     </tr>
                                  </thead>
                                  <tbody>
@@ -145,7 +339,7 @@ use App\Helpers\AdminHelper;
                                        <td class="medicine-unit-id"><input type="text" class="form-control" value="" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" class="form-control" value="" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" class="form-control" value="" name="amount[]" readonly></td>
-                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
+                                       <td><button type="button" onclick="removeFn(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                        <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
                                        <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
                                        <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
@@ -154,29 +348,29 @@ use App\Helpers\AdminHelper;
                                        <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
                                        <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
-                                    <tr id="productRowTemplate" style="display: none">
-                                       <td>
-                                          <select class="form-control " name="medicine_id[]" dis>
-                                             <option value="">Please select medicine</option>
-                                             @foreach($medicines as $medicine)
-                                             <option value="{{ $medicine->id }}">{{ $medicine->medicine_name}}</option>
-                                             @endforeach
-                                          </select>
-                                       </td>
-                                       <td class="medicine-batch-no"><input type="text" class="form-control" name="batch_no[]" readonly></td>
-                                       <td class="medicine-quantity"><input type="number" min="1" class="form-control" name="quantity[]" oninput="calculateAmount(this)"></td>
-                                       <td class="medicine-unit-id"><input type="text" class="form-control" name="unit_id[]" readonly></td>
-                                       <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
-                                       <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
-                                       <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
-                                       <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
-                                       <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>
-                                       <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>
-                                       <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>
-                                       <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>
-                                       <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
-                                       <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
-                                    </tr>
+                                    <!--<tr id="productRowTemplate" style="display: none">-->
+                                    <!--   <td>-->
+                                    <!--      <select class="form-control " name="medicine_id[]" dis>-->
+                                    <!--         <option value="">Please select medicine</option>-->
+                                    <!--         @foreach($medicines as $medicine)-->
+                                    <!--         <option value="{{ $medicine->id }}">{{ $medicine->medicine_name}}</option>-->
+                                    <!--         @endforeach-->
+                                    <!--      </select>-->
+                                    <!--   </td>-->
+                                    <!--   <td class="medicine-batch-no"><input type="text" class="form-control" name="batch_no[]" readonly></td>-->
+                                    <!--   <td class="medicine-quantity"><input type="number" min="1" class="form-control" name="quantity[]" oninput="calculateAmount(this)"></td>-->
+                                    <!--   <td class="medicine-unit-id"><input type="text" class="form-control" name="unit_id[]" readonly></td>-->
+                                    <!--   <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>-->
+                                    <!--   <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>-->
+                                    <!--   <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>-->
+                                    <!--   <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>-->
+                                    <!--   <td class="display-med-row medicine-current-stock"><input type="hidden" class="form-control" name="current-stock[]" readonly></td>-->
+                                    <!--   <td class="display-med-row medicine-reorder-limit"><input type="hidden" class="form-control" name="limit[]" readonly></td>-->
+                                    <!--   <td class="display-med-row medicine-tax-rate"><input type="hidden" class="form-control" name="tax_rate[]"></td>-->
+                                    <!--   <td class="display-med-row medicine-tax-amount"><input type="hidden" class="form-control" name="single_tax_amount[]" readonly></td>-->
+                                    <!--   <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>-->
+                                    <!--   <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>-->
+                                    <!--</tr>-->
                                  </tbody>
                               </table>
                            </div>
@@ -200,15 +394,13 @@ use App\Helpers\AdminHelper;
                                  <thead>
                                     <tr>
                                        <th>#</th>
-                                       <th>Stock ID</th>
                                        <th>Batch Number</th>
                                        <th>Type</th>
                                        <th>MFD</th>
                                        <th>EXPD</th>
                                        <th>Current Stock</th>
-                                       <th>Reorder Limit</th>
                                        <th>Unit</th>
-                                       <th>Unit Price</th>
+                                       <th>Sales Price</th>
                                        <th>Tax Rate</th>
                                        <th>Select</th>
                                     </tr>
@@ -265,8 +457,9 @@ use App\Helpers\AdminHelper;
                                        <td style="text-align: right;"><strong class="total-amount">0</strong><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
                                     </tr>
                                     <tr>
-                                       <td><strong>Discount Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="discount-amount">0</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
+                                       <td><strong>Discount Percentage</strong></td>
+                                       <label class="form-label">Maximum Discount: {{ $discount_percentage}}%</label>
+                                       <td style="text-align: right;"><strong class="discount-amount"></strong><input type="text"class="form-control" id="discount-amount-input" name="discount_amount" placeholder = "0"></td>
                                     </tr>
                                  </table>
                                  <hr>
@@ -328,9 +521,14 @@ use App\Helpers\AdminHelper;
 </div>
 @endsection
 @section('js')
-<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 
 <script>
@@ -438,8 +636,10 @@ use App\Helpers\AdminHelper;
       $("#productTable tbody").on("input", 'input[name="amount[]"], input[name="discount[]"]', function() {
          calculateTotals();
       });
-
+ });
+ $(document).ready(function() {
       $("#addProductBtn").click(function(event) {
+          
          event.preventDefault();
          // Clone the product row template
          var newRow = $("#productRowTemplate").clone();
@@ -579,16 +779,15 @@ use App\Helpers\AdminHelper;
 
             // Populate the modal with the received data
             response.data.forEach(function(item, index) {
-               //alert(item.id)
+              //alert(item.id)
                var row = `<tr>
                     <td class="batch-index">${index+1}</td>
-                    <td class="medicine-stock-id">${item.id}</td>
+                    <td style="display:none" class="medicine-stock-id">${item.id}</td>
                     <td class="batch-medicine-batch-number">${item.medicine_batch_number}</td>
                     <td class="batch-medicine-type">${item.medicine_type}</td>
                     <td class="batch-medicine-mfd">${item.medicine_mfd}</td>
                     <td class="batch-medicine-expd">${item.medicine_expd}</td>
                     <td class="batch-current-stock">${item.medicine_current_stock}</td>
-                    <td class="batch-medicine-reorder-limit">${item.medicine_reorder_limit}</td>
                     <td class="batch-medicine-unit">${item.medicine_unit}</td>
                     <td class="batch-medicine-unit-price">${item.medicine_unit_price}</td>
                     <td class="batch-medicine-tax-rate">${item.medicine_tax_rate}</td>
@@ -671,21 +870,25 @@ use App\Helpers\AdminHelper;
    $(document).on('click', '#close-modal', function() {
       // ******************
       var selectedValue = $("input[name='selected_batch']:checked")
-      // console.log("test"+ selectedValue)
+       //console.log("test"+ selectedValue)
+       //alert(selectedValue.length)
       if (selectedValue.length != 0) {
          var id = selectedValue.closest('tr').find('.medicine-stock-id').text();
-         var ids = $('input[name="med_stock_id[]"]');
+         var ids = $('#productTable .medicine-stock-id:not(:first-child) input[name="med_stock_id[]"]');
+        // console.log(ids)
          var j = 0
          var max = parseFloat(selectedValue.closest('tr').find('.batch-current-stock').text());
          // var v2 = selectedValue.closest('tr').find('.batch-medicine-unit-price').text();
          //    $(".selectedCls").find(".medicine-amount input").val(v2)
          var selected = null
+         //alert(id)
          selected = ids.filter(function() {
             return $(this).val() === id;
          });
          j = selected.length
          var amt = 0
          if (j > 1) {
+            
             selected.each(function(index) {
                if (index == j - 1) {
                   $(this).closest('tr').find(".medicine-quantity input").val(j)
@@ -704,18 +907,18 @@ use App\Helpers\AdminHelper;
          var quantity = parseFloat($(".selectedCls").find(".medicine-quantity input").val());
          //$(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
          var checkVal = 0
-         if (stck > lmt) {
-            checkVal = stck - lmt
-            $(".selectedCls").find(".medicine-quantity span").remove()
-         } else {
-            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-         }
-         if (checkVal != 0 && checkVal <= quantity) {
-            $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-         }
-         if (checkVal > quantity) {
-            $(".selectedCls").find(".medicine-quantity span").remove()
-         }
+        //  if (stck > lmt) {
+        //     checkVal = stck - lmt
+        //     $(".selectedCls").find(".medicine-quantity span").remove()
+        //  } else {
+        //     $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+        //  }
+        //  if (checkVal != 0 && checkVal <= quantity) {
+        //     $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
+        //  }
+        //  if (checkVal > quantity) {
+        //     $(".selectedCls").find(".medicine-quantity span").remove()
+        //  }
          // ****************
          var inputElements = $('input[name="amount[]"]');
          var sum = 0;
@@ -747,12 +950,8 @@ use App\Helpers\AdminHelper;
          $('#total-amount-input').val(sum + totalTax);
 
          var totalA = parseFloat($(".total-amount").text())
-         var discount = $("#discount_percentage").val()
-         var discountT = (totalA * discount) / 100
-         //alert(discountT)
-         $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('' + discountT)
-         var payable = totalA - discountT
+  
+         var payable = totalA
          
          payable = Number(payable.toFixed(2));
          $(".payable-amount b").text('' + payable)
@@ -825,8 +1024,7 @@ use App\Helpers\AdminHelper;
          var discount = $("#discount_percentage").val()
          var discountT = (totalA * discount) / 100
          //alert(discountT)
-         $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('' + discountT)
+   
          var payable = totalA - discountT
          payable = Number(payable.toFixed(2));
          $(".payable-amount b").text('' + payable)
@@ -856,144 +1054,170 @@ use App\Helpers\AdminHelper;
 
    });
 
-   $(document).on('change', '.medicine-quantity input', function() {
+   $(document).on('input', '.medicine-quantity input', function() {
       var stck = parseFloat($(this).closest('tr').find('.medicine-current-stock input').val());
       var lmt = parseFloat($(this).closest('tr').find('.medicine-reorder-limit input').val());
       var quantity = parseFloat($(this).val());
       // $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      // alert(lmt)
+      //alert(stck)
       // alert(quantity)
 
 
       var checkVal = 0
-      if (stck > lmt) {
-         checkVal = stck - lmt
-         //alert(checkVal)
-         $(this).closest('tr').find(".medicine-quantity span").remove()
-      } else {
-         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
-      if (checkVal != 0 && checkVal <= quantity) {
-         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
-      }
-      if (checkVal > quantity) {
-         $(this).closest('tr').find(".medicine-quantity span").remove()
-      }
+    //   if (stck > lmt) {
+    //      checkVal = stck - lmt
+    //      //alert(checkVal)
+    //      $(this).closest('tr').find(".medicine-quantity span").remove()
+    //   } else {
+    //      $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+    //   }
+    //   if (checkVal != 0 && checkVal <= quantity) {
+    //      $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+    //   }
+    //   if (checkVal > quantity) {
+    //      $(this).closest('tr').find(".medicine-quantity span").remove()
+    //   }
+    
+    if(stck < quantity) {
+        // $(this).closest('tr').find(".medicine-quantity").append('<div class="alert-div">Limited Stock</div>')
+         var alertDiv = $('<div>').text('Value must be less than '+ stck).addClass('alert-div');
+                $(this).closest('tr').find(".medicine-quantity").append(alertDiv);
+        
+                setTimeout(function () {
+                    alertDiv.remove();
+                }, 1000);
+    }
+    else {
+        $(this).closest('tr').find(".medicine-quantity div").remove()
+    }
    })
 
    
 </script>
-
 <script>
+    $(document).ready(function () {
+        // Add an event listener to the discount amount input
+        $('#discount-amount-input').on('input', function () {
+            var enteredAmount = parseFloat($(this).val());
+            var maxDiscount = parseFloat('{{ $discount_percentage }}');
 
-   function create_custom_dropdowns() {
-    $('select.medicine-name').each(function (i, select) {
-        if (!$(this).next().hasClass('dropdown-select')) {
-            $(this).after('<div class="dropdown-select wide ' + ($(this).attr('class') || '') + '" tabindex="0"><span class="current"></span><div class="list"><ul></ul></div></div>');
-            var dropdown = $(this).next();
-            var options = $(select).find('option');
-            var selected = $(this).find('option:selected');
-            dropdown.find('.current').html(selected.data('display-text') || selected.text());
-            options.each(function (j, o) {
-                var display = $(o).data('display-text') || '';
-                dropdown.find('ul').append('<li class="option ' + ($(o).is(':selected') ? 'selected' : '') + '" data-value="' + $(o).val() + '" data-display-text="' + display + '">' + $(o).text() + '</li>');
-            });
-        }
-        $(this).next().find('ul').before('<div class="dd-search"><input id="" autocomplete="off" onkeyup="filter(this)" class="dd-searchbox txtSearchValue" type="text"></div>');
+            // Check if the entered amount is greater than the maximum discount percentage
+            if (enteredAmount > maxDiscount) {
+                // Show a popup error message (you can customize this part)
+                                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Entered discount cannot be greater than ' + maxDiscount + '%',
+                });
+
+                // Reset the input value to the maximum discount
+                $(this).val(maxDiscount);
+            }
+        });
     });
+</script>
+<script>
+    $(document).ready(function () {
+        // Add event listeners to the discount and total amount inputs
+        $('#discount-amount-input, #total-amount-input').on('input', function () {
+            // Get the values of discount and total amount
+            var discountAmount = parseFloat($('#discount-amount-input').val()) || 0;
+            
+            var totalAmount = parseFloat($('#total-amount-input').val()) || 0;
+            
 
-    
-}
-
-// Event listeners
-
-// Open/close
-$(document).on('click', '.dropdown-select', function (event) {
-    if($(event.target).hasClass('dd-searchbox')){
-        return;
-    }
-    $('.dropdown-select').not($(this)).removeClass('open');
-    $(this).toggleClass('open');
-    if ($(this).hasClass('open')) {
-        $(this).find('.option').attr('tabindex', 0);
-        $(this).find('.selected').focus();
-    } else {
-        $(this).find('.option').removeAttr('tabindex');
-        $(this).focus();
-    }
-});
-
-// Close when clicking outside
-$(document).on('click', function (event) {
-    if ($(event.target).closest('.dropdown-select').length === 0) {
-        $('.dropdown-select').removeClass('open');
-        $('.dropdown-select .option').removeAttr('tabindex');
-    }
-    event.stopPropagation();
-});
-
-function filter(i){
-    var valThis = $(i).val();
-    $(i).closest('.dropdown-select').find('ul > li').each(function(){
-     var text = $(this).text();
-        (text.toLowerCase().indexOf(valThis.toLowerCase()) > -1) ? $(this).show() : $(this).hide();         
-   });
-};
-// Search
-
-// Option click
-$(document).on('click', '.dropdown-select .option', function (event) {
-    $(this).closest('.list').find('.selected').removeClass('selected');
-    $(this).addClass('selected');
-    var text = $(this).data('display-text') || $(this).text();
-    $(this).closest('.dropdown-select').find('.current').text(text);
-    $(this).closest('.dropdown-select').prev('select').val($(this).data('value')).trigger('change');
-});
-
-// Keyboard events
-$(document).on('keydown', '.dropdown-select', function (event) {
-    var focused_option = $($(this).find('.list .option:focus')[0] || $(this).find('.list .option.selected')[0]);
-    // Space or Enter
-    //if (event.keyCode == 32 || event.keyCode == 13) {
-    if (event.keyCode == 13) {
-        if ($(this).hasClass('open')) {
-            focused_option.trigger('click');
-        } else {
-            $(this).trigger('click');
-        }
-        return false;
-        // Down
-    } else if (event.keyCode == 40) {
-        if (!$(this).hasClass('open')) {
-            $(this).trigger('click');
-        } else {
-            focused_option.next().focus();
-        }
-        return false;
-        // Up
-    } else if (event.keyCode == 38) {
-        if (!$(this).hasClass('open')) {
-            $(this).trigger('click');
-        } else {
-            var focused_option = $($(this).find('.list .option:focus')[0] || $(this).find('.list .option.selected')[0]);
-            focused_option.prev().focus();
-        }
-        return false;
-        // Esc
-    } else if (event.keyCode == 27) {
-        if ($(this).hasClass('open')) {
-            $(this).trigger('click');
-        }
-        return false;
-    }
-});
-
-$(document).ready(function () {
-    create_custom_dropdowns();
-    $("#addProductBtn").click();
-});
-
+            // Calculate payable amount
+            var payableAmount = totalAmount - (totalAmount * discountAmount / 100);
+console.log(payableAmount);
+            // Update the payable amount in the UI
+            // $('#payable-amount').text(payableAmount.toFixed(2));
+            $(".payable-amount b").text('' + payableAmount.toFixed(2));
+             $(".paid-amount").val(payableAmount.toFixed(2));
+        });
+    });
 </script>
 
+<script>
+    $(document).ready(function () {
+        // Add event listeners to the discount, total amount, and percentage inputs
+        $('#discount-amount-input, #total-amount-input, #percentage-input').on('input', function () {
+            // Calculate total amount and update UI
+            var sum = calculateTotalAmount();
+            $(".total-amount").text(sum.toFixed(2));
+            $('#total-amount-input').val(sum.toFixed(2));
+
+            // Calculate payable amount
+            var payable = calculatePayableAmount();
+
+            // Update the payable amount in the UI
+            $('#payable-amount').text(payable.toFixed(2));
+
+            // Update the paid amount based on the percentage
+            var percentage = parseFloat($('#percentage-input').val()) || 0;
+            var paidAmount = (percentage / 100) * payable;
+
+            // Update the paid amount in the UI
+            $(".payable-amount b").text(paidAmount.toFixed(2));
+            $(".paid-amount").val(paidAmount.toFixed(2));
+        });
+
+        function calculateTotalAmount() {
+            // Your existing code to calculate total amount
+            // ...
+            return sum;
+        }
+
+        function calculatePayableAmount() {
+            // Your existing code to calculate payable amount
+            var totalA = parseFloat($(".total-amount").text());
+            var payable = totalA;
+            payable = Number(payable.toFixed(2));
+            return payable;
+        }
+    });
+     function removeFn(parm) {
+        //   alert("test")
+         var currentRow = $(parm).closest('tr');
+        currentRow.remove();
+      
+             var inputElements = $('input[name="amount[]"]');
+         var sum = 0;
+         inputElements.each(function() {
+            sum += parseFloat($(this).val()) || 0;
+         });
+
+         $(".tot").text(sum);
+         $('#sub-total-input').val(sum);
+
+         //   tax 
+         // var inputElements = $('input[name="rate[]"]');
+         var tax = $('input[name="tax_rate[]"]');
+         var sum1 = 0;
+         var totalTax = 0
+         inputElements.each(function() {
+            sum1 = parseFloat($(this).val()) || 0;
+            var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
+            x = parseFloat(x) || 0;
+            var tax = (sum1 * x) / 100;
+            var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
+            y.val(tax)
+            totalTax += tax
+         });
+         1
+         $(".tax-amount").text(totalTax);
+         $('#tax-amount-input').val(totalTax);
+         $(".total-amount").text(sum + totalTax);
+         $('#total-amount-input').val(sum + totalTax);
+
+         var totalA = parseFloat($(".total-amount").text())
+  
+         var payable = totalA
+         
+         payable = Number(payable.toFixed(2));
+         $(".payable-amount b").text('' + payable)
+         $(".paid-amount").val(payable)
+     }
+    
+</script>
 
 @endsection

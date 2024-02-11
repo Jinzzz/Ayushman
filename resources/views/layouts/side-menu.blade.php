@@ -88,6 +88,16 @@
           </li>
           <li class="slide">
             <a class="side-menu__item" data-toggle="slide" href="#">
+                <i class="side-menu__icon ti-bar-chart"></i>
+                <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
+            </a>
+            <ul class="slide-menu">
+                <li><a class="slide-item" href="{{url('/sales-report')}}">{{ __('Sales Report') }}</a>
+                </li>
+            </ul>
+        </li>
+          <li class="slide">
+            <a class="side-menu__item" data-toggle="slide" href="#">
                 <i class="side-menu__icon ti-settings"></i>
                 <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
             </a>
@@ -215,6 +225,16 @@
                 </a>
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/patient/feedback/index') }}">{{ __('Feedbacks') }}</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-bar-chart"></i>
+                    <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{url('/sales-report')}}">{{ __('Sales Report') }}</a>
                     </li>
                 </ul>
             </li>

@@ -89,7 +89,7 @@
                         <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y') }}</td>
                         <td>{{ $invoice->pharmacy_name }}</td>
                         <td>{{ $invoice->payable_amount }}</td>
-                        <td>{{ $invoice->staff->staff_name }}</td>
+                        <td>{{ @$invoice->staff->staff_name }}</td>
                         <td>
                             <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.invoices.edit', $invoice->sales_invoice_id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                             <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.invoices.print', $invoice->sales_invoice_id) }}"><i class="fa fa-print" aria-hidden="true"></i>

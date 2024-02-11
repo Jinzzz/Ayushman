@@ -71,7 +71,6 @@ class MstSupplierController extends Controller
                     'state' => 'required',
                     'country' => 'required',
                     'phone_1' => 'required|numeric',
-                    'email' => 'email',
                     'is_active' => 'required',
                 ],
                 [
@@ -82,7 +81,6 @@ class MstSupplierController extends Controller
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]
             );
@@ -224,7 +222,6 @@ class MstSupplierController extends Controller
                     'state' => 'required',
                     'country' => 'required',
                     'phone_1' => 'required|numeric',
-                    'email' => 'email',
                     'is_active' => 'required',
                 ],
                 [
@@ -235,7 +232,6 @@ class MstSupplierController extends Controller
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]
             );

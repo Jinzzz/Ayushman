@@ -13,11 +13,12 @@ class Trn_Medicine_Sales_Invoice extends Model
     protected $primaryKey = 'sales_invoice_id';
 
     protected $fillable = [
+        'sales_invoice_id',
         'sales_invoice_number',
         'patient_id',
         'booking_id',
         'invoice_date',
-        'branch_id',
+        'pharmacy_id',
         'sales_person_id',
         'notes',
         'terms_and_conditions',
@@ -41,8 +42,19 @@ class Trn_Medicine_Sales_Invoice extends Model
         return $this->belongsTo(Mst_Staff::class, 'sales_person_id');
     }
     
-    public function Branch()
+    // public function Branch()
+    // {
+    //     return $this->belongsTo(Mst_Branch::class, 'branch_id');
+    // }
+
+    public function pharmacy()
     {
-        return $this->belongsTo(Mst_Branch::class, 'branch_id');
+        return $this->belongsTo(Mst_Pharmacy::class, 'pharmacy_id','id');
+    }
+
+
+    public function salesInvoiceDetails()
+    {
+        return $this->hasMany(Trn_Medicine_Sales_Invoice_Details::class, 'sales_invoice_id', 'sales_invoice_id');
     }
 }

@@ -19,6 +19,7 @@ use App\Models\Mst_User;
 use App\Models\Trn_Medicine_Stock;
 use App\Models\Trn_Ledger_Posting;
 use App\Models\Mst_Pharmacy;
+use App\Models\Mst_Membership;
 use Dompdf\Dompdf;
 use View;
 use Dompdf\Options;
@@ -26,6 +27,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -40,7 +43,8 @@ class MedicineSalesController extends Controller
         $pharmacies = Mst_Pharmacy::get();
         $query = Trn_Medicine_Sales_Invoice::query();
         $query->join('mst_pharmacies', 'trn__medicine__sales__invoices.pharmacy_id', '=', 'mst_pharmacies.id')
-              ->select('trn__medicine__sales__invoices.*', 'mst_pharmacies.*');
+              ->join('mst_users', 'trn__medicine__sales__invoices.sales_person_id', '=', 'mst_users.user_id')
+              ->select('trn__medicine__sales__invoices.*', 'mst_pharmacies.*','mst_users.username');
 
          
            if ($request->has('sales_invoice_number') && $request->sales_invoice_number != "") {
@@ -55,7 +59,7 @@ class MedicineSalesController extends Controller
                 $query->where('trn__medicine__sales__invoices.pharmacy_id', $request->pharmacy_id);
             }
 
-        $medicineSalesInvoice = $query->get();
+        $medicineSalesInvoice = $query->latest('trn__medicine__sales__invoices.created_at')->get();
 
         return view('medicine_sales_invoice.index', compact('pageTitle', 'medicineSalesInvoice','pharmacies'));
 
@@ -68,12 +72,19 @@ class MedicineSalesController extends Controller
             $patients = Mst_Patient::where('is_active', 1)->get();
             $medicines = Mst_Medicine::get();
             $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');
-            $user_id = 1;
+             $user_id = auth()->id();
+             
             $staff_id = Mst_User::where('user_id', $user_id)->pluck('staff_id');
-            $discount_percentage = Mst_Staff::where('staff_id', $staff_id)->pluck('max_discount_value');
+            
+            $discount_percentage = Mst_User::where('user_id', $user_id)->value('discount_percentage');
+       
             $branches = Mst_Branch::where('is_active', 1)->get();
             $pharmacies = Mst_Pharmacy::get();
-            return view('medicine_sales_invoice.create', compact('pageTitle', 'paymentType', 'discount_percentage', 'medicines', 'patients', 'branches','pharmacies'));
+            $gender =  Mst_Master_Value::where('master_id', 17)->pluck('master_value', 'id');
+            $membership = Mst_Membership::pluck('membership_name', 'id');
+            $bloodgroup = Mst_Master_Value::where('master_id', 19)->pluck('master_value', 'id');
+            $maritialstatus = Mst_Master_Value::where('master_id', 12)->pluck('master_value', 'id');
+            return view('medicine_sales_invoice.create', compact('pageTitle', 'paymentType', 'discount_percentage', 'medicines', 'patients', 'branches','pharmacies','gender','membership','bloodgroup','maritialstatus'));
         } catch (QueryException $e) {
             return redirect()->route('medicine.sales.invoices.index')->with('error', 'Something went wrong');
         }
@@ -159,7 +170,7 @@ class MedicineSalesController extends Controller
     }
 
     // ledgers 
-    public function getLedgerNames(Request $request)
+   public function getLedgerNames(Request $request)
     {
        
         $paymentMode = $request->input('payment_mode');
@@ -180,7 +191,8 @@ class MedicineSalesController extends Controller
 
     public function store(Request $request)
     {
-        try {
+  
+       
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -196,7 +208,6 @@ class MedicineSalesController extends Controller
                     'sub_total_amount' => ['required'],
                     'total_tax_amount' => ['required'],
                     'total_amount' => ['required'],
-                    'discount_amount' => ['required'],
                     'paid_amount' => ['required'],
                     'payment_mode' => ['required'],
                     'deposit_to' => ['required'],
@@ -214,7 +225,6 @@ class MedicineSalesController extends Controller
                     'sub_total_amount.required' => 'Sub total is required',
                     'total_tax_amount.required' => 'Tax amount is required',
                     'total_amount.required' => 'Total amount is required',
-                    'discount_amount.required' => 'Discount amount is required',
                     'paid_amount.required' => 'Paid amount is required',
                     'payment_mode.required' => 'Payment mode is required',
                     'deposit_to.required' => ' Ledger is required',
@@ -224,14 +234,10 @@ class MedicineSalesController extends Controller
 
             if (!$validator->fails()) {
                 $medicines = $request->medicine_id;
-                $count = count($medicines);
-                if ($count <= 1) {
-                    return redirect()->route('medicine.sales.invoices.create')->with('error', 'Please add atleast one medicine');
-                }
-
-                $user_id = 1;
+                $user_id = Auth::id();
                 $user_details = Mst_Staff::where('staff_id', $user_id)->first();
-                $branch_id = $user_details->branch_id;
+                // $branch_id = $user_details->branch_id;
+                $branch_id = "1";
                 
                 $financial_year_id = 1;
                 $lastInsertedId = Trn_Medicine_Sales_Invoice::insertGetId([
@@ -246,7 +252,7 @@ class MedicineSalesController extends Controller
                     'sub_total' => $request->sub_total_amount,
                     'total_tax_amount' => $request->total_tax_amount,
                     'total_amount' => $request->total_amount,
-                    'discount_amount' => $request->discount_amount,
+                    'discount_amount' => "0",
                     'payable_amount' => $request->paid_amount,
                     'financial_year_id' => $financial_year_id,
                     'deposit_to' => $request->deposit_to,
@@ -263,21 +269,8 @@ class MedicineSalesController extends Controller
                     'updated_at' => Carbon::now(),
                     'sales_invoice_number' => $newMedSaleInvoiceNo
                 ]);
-
-                $stock = Trn_Medicine_Stock::where('medicine_id', $request->medicine_id)
-                        ->where('expd', $request->expd)
-                        ->where('batch_no', $request->batch_no)
-                        ->first();
-            
-                if ($stock) {
-                    $quantitySold = $request->quantity;
-                    $newCurrentStock = $stock->current_stock - $quantitySold;
-                    $stock->update([
-                        'current_stock' => $newCurrentStock,
-                    ]);
-                }
-
-                $medicines = $request->medicine_id;
+                
+                                $medicines = $request->medicine_id;
                 $batches = $request->batch_no;
                 $quantities = $request->quantity;
                 $rates = $request->rate;
@@ -287,6 +280,31 @@ class MedicineSalesController extends Controller
                 $exp_dates = $request->mfd;
                 $single_tax_amounts = $request->single_tax_amount;
                 $count = count($medicines);
+                
+                $stock = Trn_Medicine_Stock::where('medicine_id', $request->medicine_id)
+                    ->where('expd', $request->expd)
+                    ->where('batch_no', $request->batch_no)
+                    ->first();
+                
+                if ($stock) {
+                    $quantitySold = $quantitySold = (int) $request->quantity[0];
+                
+                    // Assuming $stock->current_stock is an integer
+                    $currentStock = $stock->current_stock;
+                
+                    // Subtract $quantitySold from the current stock
+                    $newCurrentStock = $currentStock - $quantitySold;
+                
+                    // Update the stock
+                    $stock->update([
+                        'current_stock' => $newCurrentStock,
+                    ]);
+                }
+
+
+
+
+
                 for ($i = 1; $i < $count; $i++) {
                     $mf_date = Carbon::parse($mf_dates[$i])->format('Y-m-d');
                     $exp_date = Carbon::parse($exp_dates[$i])->format('Y-m-d');
@@ -321,14 +339,10 @@ class MedicineSalesController extends Controller
                 ]);
                 $message = 'Medicine sales invoice details added successfully';
                 return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
-            } else {
-                $messages = $validator->errors();
-                return redirect()->route('medicine.sales.invoices.create')->with('errors', $messages);
             }
-        } catch (QueryException $e) {
-            return redirect()->route('medicine.sales.invoices.index')->with('success', 'Exception error');
-        }
-    }
+        } 
+    
+
 
     public function generatePDF($id)
     {
@@ -512,5 +526,71 @@ class MedicineSalesController extends Controller
         
         $message = 'Medicine sales invoice details Updated successfully';
         return redirect()->route('medicine.sales.invoices.index')->with('success', $message);
+    }
+    public function patientStore(Request $request)
+    {
+
+              $request->validate([
+
+            'patient_name' => 'required',
+            // 'patient_email' => 'required',
+            'patient_mobile' => 'required|digits:10|numeric',
+            // 'patient_address' => 'required',
+            // 'patient_gender' => 'required',
+            // 'patient_dob' => 'required', 
+            // 'patient_blood_group_id' => 'required',
+            // 'emergency_contact_person' => 'required',
+            // 'emergency_contact' => 'required',
+            'marital_status' => 'required',
+            'patient_medical_history' => 'required',
+            'patient_current_medications' => 'required',
+            'patient_registration_type' => 'required',
+            // 'is_otp_verified' => 'required',
+            // 'is_approved' => 'required',
+            // 'password' => 'required',
+            // 'confirm_password' => 'required|same:password',
+            // 'whatsapp_number' => 'required',
+            // 'available_membership' => 'required',
+            'is_active' => 'required',
+        ]);
+        $is_active = $request->input('is_active') ? 1 : 0;
+        $available_membership = $request->has('available_membership') ? 1 : 0;
+        $generatedPassword = Str::random(8);
+
+        $lastInsertedId = Mst_Patient::insertGetId([
+
+            'patient_code' => rand(50, 100),
+            'patient_name' => $request->patient_name,
+            'patient_email' => $request->patient_email,
+            'patient_mobile' => $request->patient_mobile,
+            'patient_address' => $request->patient_address,
+            'patient_gender' => $request->patient_gender,
+            'patient_dob' => $request->patient_dob,
+            'patient_blood_group_id' => $request->patient_blood_group_id,
+            'emergency_contact_person' => $request->emergency_contact_person,
+            'emergency_contact' => $request->emergency_contact,
+            'maritial_status' => $request->marital_status,
+            'patient_medical_history' => $request->patient_medical_history,
+            'patient_current_medications' => $request->patient_current_medications,
+            'patient_registration_type' => $request->patient_registration_type,
+            'is_otp_verified' => 1,
+            'is_approved' => 1,
+            'password' => Hash::make($generatedPassword),
+            'whatsapp_number' => $request->whatsapp_number,
+            'available_membership' =>  $available_membership,
+            'is_active' =>  $is_active,
+            'created_by' => Auth::id(),
+        ]);
+
+        $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
+        $patientCode = 'PAT' . $leadingZeros . $lastInsertedId;
+
+        Mst_Patient::where('id', $lastInsertedId)->update([
+            'patient_code' => $patientCode
+        ]);
+
+
+       return redirect()->back()->with('success', 'Patient added successfully');
+
     }
 }
