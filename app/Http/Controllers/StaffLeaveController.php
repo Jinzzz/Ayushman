@@ -25,26 +25,22 @@ class StaffLeaveController extends Controller
         ->join('mst_staffs', 'staff_leave.staff_id', '=', 'mst_staffs.staff_id')
         ->join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
         ->orderBy('staff_leave.updated_at', 'desc');
-    
-    // Apply filters if provided
-    if ($request->has('staff_name')) {
-        $staffleaves->where('mst_staffs.staff_name', 'LIKE', "%{$request->staff_name}%");
-    }
-    
-    if ($request->has('from_date')) {
-        $staffleaves->where('staff_leave.from_date', 'LIKE', "%{$request->from_date}%");
-    }
-    
-    if ($request->has('to_date')) {
-        $staffleaves->where('staff_leave.to_date', 'LIKE', "%{$request->to_date}%");
-    }
-
-    
-    $staffleaves = $staffleaves->get();
-    
-    // Rest of your code...
-    
-                       
+        if (Auth::user()->user_type_id != 1) {
+            $staffId = Auth::user()->staff_id;
+            $branchId = Mst_Staff::where('staff_id', $staffId)->value('branch_id');
+            $staffleaves->where('mst_staffs.branch_id', $branchId);
+        }
+        // Apply filters if provided
+        if ($request->has('staff_name')) {
+            $staffleaves->where('mst_staffs.staff_name', 'LIKE', "%{$request->staff_name}%");
+        }
+        if ($request->has('from_date')) {
+            $staffleaves->where('staff_leave.from_date', 'LIKE', "%{$request->from_date}%");
+        }
+        if ($request->has('to_date')) {
+            $staffleaves->where('staff_leave.to_date', 'LIKE', "%{$request->to_date}%");
+        }
+        $staffleaves = $staffleaves->get();
 
         return view('staffleave.index', compact('pageTitle', 'staffleaves'));
     }
@@ -57,9 +53,15 @@ class StaffLeaveController extends Controller
     public function create()
     {
         $pageTitle = "Create Leave Request";
+        $userTypeId = Auth::user()->user_type_id;
+        $branchId = null;
+        if ($userTypeId != 1) {
+            $staffId = Auth::user()->staff_id;
+            $branchId = Mst_Staff::where('staff_id', $staffId)->value('branch_id');
+        }
         $branches = Mst_Branch::get();
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
-        return view('staffleave.create', compact('pageTitle','branches','leave_types'));
+        return view('staffleave.create', compact('pageTitle','branches','leave_types','branchId'));
     }
 
     /**

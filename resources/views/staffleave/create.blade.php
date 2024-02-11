@@ -329,6 +329,17 @@ $(document).ready(function () {
             }
         });
     </script>
+    <script>
+        $(document).ready(function() {
+    var branchId = "{{ $branchId }}";
+
+    if (branchId !== '') {
+        $('#branch_id').val(branchId).trigger('change');
+    }
+});
+</script>
+
+
 @endsection
 
 

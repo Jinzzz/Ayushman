@@ -107,6 +107,9 @@ class MstAuthController extends Controller
         } elseif ($user && $user->user_type_id == 96) {
             Auth::guard('mst_users_guard')->logout();
             return redirect('/pharmacy-login');
+        } elseif ($user && $user->user_type_id == 18) {
+            Auth::guard('mst_users_guard')->logout();
+            return redirect('/receptionist-login');
         } else {
             return redirect('/login');
         }

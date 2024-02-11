@@ -110,6 +110,7 @@ class MstPatientController extends Controller
             'available_membership' =>  $available_membership,
             'is_active' =>  $is_active,
             'created_by' => Auth::id(),
+            'created_at' => Carbon::now(),
         ]);
 
         $leadingZeros = str_pad('', 3 - strlen($lastInsertedId), '0', STR_PAD_LEFT);
@@ -161,6 +162,7 @@ class MstPatientController extends Controller
             'whatsapp_number' => $request->whatsapp_number,
             'available_membership' => $request->available_membership,
             'is_active' =>  $is_active,
+            'updated_at' => Carbon::now(),
         ]);
 
         return redirect()->route('patients.index')->with('success', 'Patient updated successfully');
