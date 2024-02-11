@@ -23,6 +23,33 @@ class MstAuthController extends Controller
         return view('auth.pharmacy.login');
     }
     
+    public function showReceptionistLoginForm()
+    {
+        return view('auth.receptionist.login');
+    }
+
+    public function Receptionistlogin(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+
+        if (Auth::guard('mst_users_guard')->attempt($credentials)) {
+             $user = Auth::guard('mst_users_guard')->user();
+                $user->last_login_time = now();
+                $user->save();
+            if ($user->user_type_id == 18) {
+                return redirect()->intended('/reception-home');
+            } else {
+                Auth::guard('mst_users_guard')->logout();
+            return back()->withInput()->withErrors(['login' => 'Invalid Receptionist User Credentials']);
+            }
+        } else {
+            // Authentication failed
+            return back()->withInput()->withErrors(['login' => 'Invalid credentials']);
+        }
+    }
+
+
     public function Pharmacylogin(Request $request)
     {
         $credentials = $request->only('username', 'password');

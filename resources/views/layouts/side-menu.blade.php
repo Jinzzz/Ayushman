@@ -1,3 +1,6 @@
+@php
+    $userType = Auth::user()->user_type_id;
+@endphp
 <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
 <aside class="app-sidebar">
     <div class="side-header">
@@ -19,11 +22,23 @@
                 <img src="{{ asset('assets/images/avatar.png') }}" alt="user-img" class="avatar-xl rounded-circle">
             </div>
             <div class="user-info">
-              @if (Auth::user()->user_type_id == 1)
-                <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
-              @elseif(Auth::user()->user_type_id == 96)
-               <span class="text-muted app-sidebar__user-name text-sm">Pharmacist</span>
-              @endif
+                @switch($userType)
+                    @case(1)
+                        <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
+                    @break
+
+                    @case(96)
+                        <span class="text-muted app-sidebar__user-name text-sm">Pharmacist</span>
+                    @break
+
+                    @case(18)
+                        <span class="text-muted app-sidebar__user-name text-sm">Receptionist</span>
+                    @break
+
+                    @default
+                        <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
+                    @break
+                @endswitch
             </div>
         </div>
     </div>
@@ -31,13 +46,17 @@
 
     <ul class="side-menu">
         <li class="slide">
-            @if (Auth::user()->user_type_id == 96)
-            <a class="side-menu__item {{ Request::is('pharmacy-home') ? 'active' : '' }}" href="{{ route('pharmacy.home') }}">
-            @else
-            <a class="side-menu__item {{ Request::is('home') ? 'active' : '' }}" href="{{ route('home') }}">
+            @if (Auth::user()->user_type_id == 1)
+                <a class="side-menu__item {{ Request::is('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                @elseif(Auth::user()->user_type_id == 96)
+                    <a class="side-menu__item {{ Request::is('pharmacy-home') ? 'active' : '' }}"
+                        href="{{ route('pharmacy.home') }}">
+                    @elseif(Auth::user()->user_type_id == 18)
+                        <a class="side-menu__item {{ Request::is('pharmacy-home') ? 'active' : '' }}"
+                            href="{{ route('reception.home') }}">
             @endif
-                <i class="side-menu__icon ti-home"></i>
-                <span class="side-menu__label">Dashboard</span>
+            <i class="side-menu__icon ti-home"></i>
+            <span class="side-menu__label">Dashboard</span>
             </a>
         </li>
         <!-- Other menu items -->
@@ -45,15 +64,15 @@
 
     <div class="container">
         @if (Auth::user()->user_type_id == 96)
-        <li class="slide">
-          <a class="side-menu__item" data-toggle="slide" href="#"><i
-                  class="side-menu__icon ti-crown"></i><span
-                  class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
-          <ul class="slide-menu">
-              <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
-              <li><a class="slide-item" href="{{ route('supplier.index') }}">{{ __('Suppliers') }}</a></li>
-          </li>
-        </ul>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#"><i
+                        class="side-menu__icon ti-crown"></i><span
+                        class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
+                    <li><a class="slide-item" href="{{ route('supplier.index') }}">{{ __('Suppliers') }}</a></li>
+            </li>
+            </ul>
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#">
                     <i class="side-menu__icon ti-bar-chart"></i>
@@ -76,50 +95,97 @@
                             href="{{ url('/medicine-sales-return') }}">{{ __('Medicine Sales Return') }}</a></li>
                     {{-- <li><a class="slide-item"
                                 href="{{ url('/therapy-stock-transfer') }}">{{ __('Stock Transfer To Therapy') }}</a></li> Hidden as per discussion with client. Reference: Ayushman group --}}
-                            
+
                 </ul>
             </li>
             <li class="slide">
-              <a class="side-menu__item {{ Request::is('prescriptions.index') ? 'active' : '' }}"
-                  href="{{ route('prescriptions.index') }}">
-                  <i class="fa-solid ti ti-file"></i>
-                  <span class="side-menu__label">Prescriptions</span>
-              </a>
-          </li>
-          <li class="slide">
-            <a class="side-menu__item" data-toggle="slide" href="#">
-                <i class="side-menu__icon ti-bar-chart"></i>
-                <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
-            </a>
-            <ul class="slide-menu">
-                <li><a class="slide-item" href="{{url('/sales-report')}}">{{ __('Sales Report') }}</a>
-                </li>
+                <a class="side-menu__item {{ Request::is('prescriptions.index') ? 'active' : '' }}"
+                    href="{{ route('prescriptions.index') }}">
+                    <i class="fa-solid ti ti-file"></i>
+                    <span class="side-menu__label">Prescriptions</span>
+                </a>
+            </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-bar-chart"></i>
+                    <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-settings"></i>
+                    <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/profile') }}">{{ __('Profile') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/change-password') }}">{{ __('Change Password') }}</a>
+                    </li>
+                </ul>
+            </li>
+        @elseif (Auth::user()->user_type_id == 18)
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#"><i
+                        class="side-menu__icon ti-crown"></i><span
+                        class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/patients/index') }}">{{ __('Patients') }}</a></li>
+                    <li><a class="slide-item"
+                            href="{{ url('membership/index') }}">{{ __('Membership Packages') }}</a>
+                    </li>
+            </li>
             </ul>
-        </li>
-          <li class="slide">
-            <a class="side-menu__item" data-toggle="slide" href="#">
-                <i class="side-menu__icon ti-settings"></i>
-                <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
-            </a>
-            <ul class="slide-menu">
-                <li><a class="slide-item" href="{{url('/profile')}}">{{ __('Profile') }}</a>
-                </li>
-                <li><a class="slide-item" href="{{url('/change-password')}}">{{ __('Change Password') }}</a>
-                </li>
+            <!-- HRMS  -->
+
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon fa fa-users"></i>
+                    <span class="side-menu__label"> {{ __('HRMS') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item"
+                            href="{{ route('staffleave.index') }}">{{ __('Staff Leave Marking') }}</a></li>
+                    <li><a class="slide-item" href="{{ route('attendance.view') }}">{{ __('Attendance') }}</a></li>
+            </li>
             </ul>
-        </li>
+            <li class="slide">
+                <a class="side-menu__item {{ Request::is('prescriptions.index') ? 'active' : '' }}"
+                    href="{{ route('prescriptions.index') }}">
+                    <i class="fa-solid ti ti-file"></i>
+                    <span class="side-menu__label">Prescriptions</span>
+                </a>
+            </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-settings"></i>
+                    <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/profile') }}">{{ __('Profile') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/change-password') }}">{{ __('Change Password') }}</a>
+                    </li>
+                </ul>
+            </li>
         @else
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#"><i
                         class="side-menu__icon ti-crown"></i><span
-                        class="side-menu__label">{{ __('Masters') }}</span><i class="angle fa fa-angle-right"></i></a>
+                        class="side-menu__label">{{ __('Masters') }}</span><i
+                        class="angle fa fa-angle-right"></i></a>
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/unit/index') }}">{{ __('Units') }}</a></li>
                     <li><a class="slide-item"
                             href="{{ route('medicine.dosage.index') }}">{{ __('Medicine Dosage') }}</a></li>
                     <li><a class="slide-item" href="{{ url('/medicine/index') }}">{{ __('Medicines') }}</a></li>
                     <li><a class="slide-item" href="{{ url('/timeslot') }}">{{ __('Timeslots') }}</a></li>
-                    <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a></li>
+                    <li><a class="slide-item" href="{{ route('leave.type.index') }}">{{ __('Leave Types') }}</a>
+                    </li>
                     <li><a class="slide-item" href="{{ url('/therapies/index') }}">{{ __('Therapy') }}</a></li>
                     <li><a class="slide-item" href="{{ url('/therapyrooms/index') }}">{{ __('Therapy Rooms') }}</a>
                     </li>
@@ -128,7 +194,8 @@
                     <li><a class="slide-item" href="{{ route('supplier.index') }}">{{ __('Suppliers') }}</a></li>
                     <li><a class="slide-item" href="{{ url('/branches') }}">{{ __('Branches') }}</a></li>
                     <li><a class="slide-item" href="{{ url('wellness/index') }}">{{ __('Wellness') }}</a></li>
-                    <li><a class="slide-item" href="{{ url('membership/index') }}">{{ __('Membership Packages') }}</a>
+                    <li><a class="slide-item"
+                            href="{{ url('membership/index') }}">{{ __('Membership Packages') }}</a>
                     </li>
                     <li><a class="slide-item" href="{{ url('/patients/index') }}">{{ __('Patients') }}</a></li>
                     <li><a class="slide-item" href="{{ url('/pharmacy/index') }}">{{ __('Pharamacy') }}</a></li>
@@ -221,32 +288,36 @@
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#">
                     <i class="side-menu__icon ti-world"></i>
-                    <span class="side-menu__label"> {{ __('General') }}</span><i class="angle fa fa-angle-right"></i>
+                    <span class="side-menu__label"> {{ __('General') }}</span><i
+                        class="angle fa fa-angle-right"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item" href="{{ url('/patient/feedback/index') }}">{{ __('Feedbacks') }}</a>
+                    <li><a class="slide-item"
+                            href="{{ url('/patient/feedback/index') }}">{{ __('Feedbacks') }}</a>
                     </li>
                 </ul>
             </li>
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#">
                     <i class="side-menu__icon ti-bar-chart"></i>
-                    <span class="side-menu__label"> {{ __('Reports') }}</span><i class="angle fa fa-angle-right"></i>
+                    <span class="side-menu__label"> {{ __('Reports') }}</span><i
+                        class="angle fa fa-angle-right"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item" href="{{url('/sales-report')}}">{{ __('Sales Report') }}</a>
+                    <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
                     </li>
                 </ul>
             </li>
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#">
                     <i class="side-menu__icon ti-settings"></i>
-                    <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
+                    <span class="side-menu__label"> {{ __('Settings') }}</span><i
+                        class="angle fa fa-angle-right"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item" href="{{url('/profile')}}">{{ __('Profile') }}</a>
+                    <li><a class="slide-item" href="{{ url('/profile') }}">{{ __('Profile') }}</a>
                     </li>
-                    <li><a class="slide-item" href="{{url('/change-password')}}">{{ __('Change Password') }}</a>
+                    <li><a class="slide-item" href="{{ url('/change-password') }}">{{ __('Change Password') }}</a>
                     </li>
                 </ul>
             </li>

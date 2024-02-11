@@ -23,6 +23,8 @@ class CheckRole
                 return redirect()->route('mst_login');
             } elseif (in_array(96, $role)) {
                 return redirect()->route('mst_login.pharmacy');
+            } elseif (in_array(18, $role)) {
+                return redirect()->route('mst_login.receptionist');
             } else {
                 return redirect()->route('mst_login');
             }

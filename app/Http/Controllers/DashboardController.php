@@ -12,6 +12,7 @@ use DB;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Pharmacy;
 use App\Models\Trn_Medicine_Stock;
+use App\Models\Trn_Consultation_Booking;
 
 
 class DashboardController extends Controller
@@ -64,5 +65,23 @@ class DashboardController extends Controller
          ->first();
         
         return view('auth.pharmacy.home',compact('pageTitle','lowStock','dailySale','medicineSaleWeekly','medicineSaleMonthly','totalSales'));
+    }
+
+    
+    public function receptionIndex()
+    {
+        $pageTitle="Reception Dashboard";
+        $currentDate = Carbon::now()->toDateString();
+        $staffId = auth()->user()->staff_id;
+        $branchId = Mst_Staff::where('staff_id', $staffId)->value('branch_id');
+        $currentDayLeave = Staff_Leave::where('branch_id', $branchId)->where(function ($query) {
+            $query->whereDate('from_date', '<=', Carbon::today())
+            ->whereDate('to_date', '>=', Carbon::today());
+        })->count();
+        $bookingCount = Trn_Consultation_Booking::where('branch_id', $branchId)
+                ->whereDate('created_at', $currentDate)
+                ->count();
+
+        return view('auth.receptionist.home',compact('pageTitle','branchId','currentDayLeave','bookingCount'));
     }
 }

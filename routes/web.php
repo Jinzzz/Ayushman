@@ -85,13 +85,19 @@ Route::get('/feedback/success', [FeedbackController::class, 'successPage'])->nam
 
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
-Route::get('/pharmacy-login', [MstAuthController::class, 'showPharmacyLoginForm'])->name('mst_login.pharmacy');
-Route::post('/pharmacy-login-post', [MstAuthController::class, 'Pharmacylogin'])->name('pharmacy.login.redirect');
 Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
 Route::match(['get', 'post'], '/logout', [MstAuthController::class, 'logout'])->name('logout');
 Route::get('/verification-request', [MstAuthController::class, 'verificationRequest'])->name('verification.request');
 // Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
 Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->name('reset.password');
+
+//pharmacy id = 96
+Route::get('/pharmacy-login', [MstAuthController::class, 'showPharmacyLoginForm'])->name('mst_login.pharmacy');
+Route::post('/pharmacy-login-post', [MstAuthController::class, 'Pharmacylogin'])->name('pharmacy.login.redirect');
+
+//Receptionist id = 18
+Route::get('/receptionist-login', [MstAuthController::class, 'showReceptionistLoginForm'])->name('mst_login.receptionist');
+Route::post('/receptionist-login-post', [MstAuthController::class, 'Receptionistlogin'])->name('receptionist.login.redirect');
 
 // Auth::routes();
 
@@ -109,10 +115,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/pharmacy-home', [DashboardController::class, 'pharmaIndex'])->name('pharmacy.home');
     });
 
+    Route::middleware(['role:18'])->group(function () {
+        Route::get('/reception-home', [DashboardController::class, 'receptionIndex'])->name('reception.home');
+    });
+
     //Route access for admin-pharmacist
     Route::middleware(['role:1|role:96'])->group(function () {
 
     });
+
+     //Route access for admin-receptionist
+     Route::middleware(['role:1|role:18'])->group(function () {
+
+     });
 
     // Dashboard 
     Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');

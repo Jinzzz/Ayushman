@@ -23,11 +23,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-12">
+                        {{-- <div class="col-lg-6 col-md-12">
                             <div class="wideget-user-info">
                                 <a href="" style="float:right;" class="btn btn-primary mt-1 mb-1"><i class="fa fa-edit"></i> Edit Profile</a>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
