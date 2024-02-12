@@ -93,8 +93,8 @@
                             href="{{ url('/medicine-sales-invoices') }}">{{ __('Medicine Sales Invoice') }}</a></li>
                     <li><a class="slide-item"
                             href="{{ url('/medicine-sales-return') }}">{{ __('Medicine Sales Return') }}</a></li>
-                    {{-- <li><a class="slide-item"
-                                href="{{ url('/therapy-stock-transfer') }}">{{ __('Stock Transfer To Therapy') }}</a></li> Hidden as per discussion with client. Reference: Ayushman group --}}
+                    <li><a class="slide-item"
+                                href="{{ url('/branch/stock-transfer') }}">{{ __('Stock Transfer To Branches') }}</a></li> 
 
                 </ul>
             </li>
@@ -271,8 +271,8 @@
                     </li>
                     <li><a class="slide-item"
                             href="{{ url('/medicine-sales-return') }}">{{ __('Medicine Sales Return') }}</a></li>
-                    {{-- <li><a class="slide-item"
-                            href="{{ url('/therapy-stock-transfer') }}">{{ __('Stock Transfer to Therapy') }}</a></li> Hidden as per discussion with client. Reference: Ayushman group --}}
+                    <li><a class="slide-item"
+                        href="{{ url('/branch/stock-transfer') }}">{{ __('Stock Transfer To Branches') }}</a></li> 
                 </ul>
             </li>
 

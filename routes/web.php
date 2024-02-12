@@ -57,6 +57,7 @@ use App\Http\Controllers\SalaryProcessingController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BranchStockTransferController;
 
 
 
@@ -693,6 +694,13 @@ Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->
 //Reports
 Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sales.report');
 Route::get('/sales/report/detail/{id}', [ReportController::class, 'SalaryReportDetail'])->name('sales.report.detail');
+
+//stock transfer to branches
+Route::get('/branch/stock-transfer', [BranchStockTransferController::class, 'index'])->name('branch-transfer.index');
+Route::get('/branch/stock-transfer/create', [BranchStockTransferController::class, 'create'])->name('create.branch-stock-transfer');
+Route::get('/getBatchDetails', [BranchStockTransferController::class, 'getBatchDetails'])->name('getBatchDetails');
+
+
 
 
 

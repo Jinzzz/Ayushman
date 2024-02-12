@@ -109,9 +109,11 @@
                                 </a></td>
                             </tr>
                         @endforeach
-                        {{ $sales->links() }}
                     </tbody>
                 </table>
+                <div class="pagination" style="justify-content:flex-end;margin-top:-10px">
+                    {{ $sales->onEachSide(1)->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -122,7 +124,8 @@
         $(document).ready(function() {
        
         $('#report').DataTable({
-            dom: 'Bfrtip',
+            paging: false,
+            dom: 'Bfrtip<"pagination"lp>',
             buttons: [
             {
                 extend: 'excel',

@@ -858,7 +858,6 @@ use App\Helpers\AdminHelper;
          var v1 = selectedValue.closest('tr').find('.batch-medicine-reorder-limit').text();
          $(".selectedCls").find(".medicine-reorder-limit input").val(v1)
 
-
          // med_stock_id 
          // taxCalculation() 
 
