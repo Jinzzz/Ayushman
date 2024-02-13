@@ -113,6 +113,8 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/purchase-report') }}">{{ __('Purchase Report') }}</a>
+                    </li>
                 </ul>
             </li>
             <li class="slide">
@@ -305,6 +307,8 @@
                 </a>
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/purchase-report') }}">{{ __('Purchase Report') }}</a>
                     </li>
                 </ul>
             </li>

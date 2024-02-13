@@ -694,6 +694,9 @@ Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->
 //Reports
 Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sales.report');
 Route::get('/sales/report/detail/{id}', [ReportController::class, 'SalaryReportDetail'])->name('sales.report.detail');
+Route::get('/purchase-report', [ReportController::class, 'PurchaseReport'])->name('purchase-report');
+Route::get('/purchase/report/detail/{id}', [ReportController::class, 'PurchaseReportDetail'])->name('purchase.report.detail');
+
 
 //stock transfer to branches
 Route::get('/branch/stock-transfer', [BranchStockTransferController::class, 'index'])->name('branch-transfer.index');

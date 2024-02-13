@@ -13,6 +13,7 @@ class Trn_Medicine_Purchase_Invoice extends Model
     protected $primaryKey = 'purchase_invoice_id';
 
     protected $fillable = [
+        'purchase_invoice_id',
         'purchase_invoice_no',
         'supplier_id',
         'invoice_date',
@@ -38,9 +39,19 @@ class Trn_Medicine_Purchase_Invoice extends Model
     {
         return $this->belongsTo(Mst_Supplier::class, 'supplier_id');
     }
+
+    public function Pharmacy()
+    {
+        return $this->belongsTo(Mst_Pharmacy::class, 'pharmacy_id','id');
+    }
     
     public function Branch()
     {
         return $this->belongsTo(Mst_Branch::class, 'branch_id');
+    }
+
+    public function purchaseInvoiceDetails()
+    {
+        return $this->hasMany(Trn_Medicine_Purchase_Invoice_Detail::class, 'invoice_id','purchase_invoice_id');
     }
 }
