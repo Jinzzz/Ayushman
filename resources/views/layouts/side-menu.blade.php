@@ -113,7 +113,11 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/sales-return-report') }}">{{ __('Sales Return Report') }}</a>
+                    </li>
                     <li><a class="slide-item" href="{{ url('/purchase-report') }}">{{ __('Purchase Report') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/purchase-return-report') }}">{{ __('Purchase Return Report') }}</a>
                     </li>
                 </ul>
             </li>
@@ -308,7 +312,11 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/sales-report') }}">{{ __('Sales Report') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/sales-return-report') }}">{{ __('Sales Return Report') }}</a>
+                    </li>
                     <li><a class="slide-item" href="{{ url('/purchase-report') }}">{{ __('Purchase Report') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/purchase-return-report') }}">{{ __('Purchase Return Report') }}</a>
                     </li>
                 </ul>
             </li>

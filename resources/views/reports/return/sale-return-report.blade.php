@@ -31,23 +31,23 @@
                 <div class="card-header">
                     <h3 class="card-title">Search Reports</h3>
                 </div>
-                <form action="{{ route('purchase-report') }}" method="GET" class="card-body">
+                <form action="{{ route('sales.return.report') }}" method="GET" class="card-body">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="invoice_from_date" class="form-label">Invoice From:</label>
-                                <input type="date" class="form-control" name="invoice_from_date" id="invoice_from_date" value="{{request()->invoice_from_date}}">
+                                <label for="return_from_date" class="form-label">Return From:</label>
+                                <input type="date" class="form-control" name="return_from_date" id="return_from_date" value="{{request()->return_from_date}}">
                             </div>
                             <div class="col-md-6">
-                                <label for="invoice_to_date" class="form-label">Invoice To:</label>
-                                <input type="date" class="form-control" name="invoice_to_date" id="invoice_to_date" value="{{request()->invoice_to_date}}">
+                                <label for="return_to_date" class="form-label">Return To:</label>
+                                <input type="date" class="form-control" name="return_to_date" id="return_to_date" value="{{request()->return_to_date}}">
                             </div>
-                            <div class="col-md-4">
-                                <label for="purchase_invoice_no" class="form-label">Invoice No:</label>
-                                <input type="text" id="purchase_invoice_no" name="purchase_invoice_no" class="form-control"
-                                value="{{ request()->input('purchase_invoice_no') }}">
+                            <div class="col-md-6">
+                                <label for="sales_return_no" class="form-label">Return No:</label>
+                                <input type="text" id="sales_return_no" name="sales_return_no" class="form-control"
+                                value="{{ request()->input('sales_return_no') }}">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Pharmacy</label>
                                     <select class="form-control" name="pharmacy_id" id="pharmacy_id">
@@ -58,23 +58,12 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label class="form-label">Supplier</label>
-                                    <select class="form-control" name="supplier_id" id="supplier_id">
-                                        <option value="">Select supplier</option>
-                                        @foreach ($suppliers as $key => $supplier)
-                                        <option value="{{$supplier->supplier_id}}" {{request()->input('supplier_id') == $supplier->supplier_id ? 'selected':''}}>{{$supplier->supplier_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <center>
                                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i>
                                             Filter</button>&nbsp;
-                                        <a class="btn btn-primary" href="{{ route('purchase-report') }}"><i class="fa fa-times"
+                                        <a class="btn btn-primary" href="{{ route('sales.return.report') }}"><i class="fa fa-times"
                                                 aria-hidden="true"></i> Reset</a>
                                     </center>
                                 </div>
@@ -85,7 +74,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Purchase Report</h3>
+            <h3 class="card-title">Sales Return Report</h3>
         </div>
         <div class="card-body">
 
@@ -94,10 +83,11 @@
                     <thead>
                         <tr>
                             <th>SL.NO</th>
+                            <th>Return<br>Number</th>
                             <th>Invoice<br>Number</th>
-                            <th>Invoice<br>Date</th>
+                            <th>Return<br>Date</th>
                             <th>Pharmacy</th>
-                            <th>Supplier</th>
+                            <th>Patient</th>
                             <th>Total<br>Items</th>
                             <th>Total<br>Amount</th>
                             <th>Action</th>
@@ -107,17 +97,23 @@
                         @php
                         $i = 0;
                         @endphp
-                        @foreach ($purchase as $key=>$purchases)
-                        <tr id="dataRow_{{ $purchases->purchase_invoice_id  }}">
+                        @foreach ($sales_returns as $key=>$return)
+                        <tr id="dataRow_{{ $return->sales_return_id  }}">
                             <td>{{ $key+1 }}</td>
-                            <td>{{$purchases->purchase_invoice_no}}</td>
-                            <td>{{ \Carbon\Carbon::parse($purchases->invoice_date)->format('d-m-Y') }} </td>
-                            <td>{{@$purchases->Pharmacy['pharmacy_name']}}</td>
-                            <td>{{@$purchases->Supplier['supplier_name']}}</td>
-                            <td>{{$purchases->purchase_invoice_details_count }}</td>
-                            <td>{{$purchases->total_amount }}</td>
-                            
-                            <td><a class="btn btn-primary btn-sm" href="{{ route('purchase.report.detail', ['id' => $purchases->purchase_invoice_id]) }}">
+                            <td>{{$return->sales_return_no}}</td>
+                            <td>{{@$return->Invoice['sales_invoice_number']}}</td>
+                            <td>{{ \Carbon\Carbon::parse($return->return_date)->format('d-m-Y') }} </td>
+                            <td>{{@$return->Pharmacy['pharmacy_name']}}</td>
+                            <td>
+                                @if($return->patient_id == 0)
+                                Guest Patient
+                                @else
+                                {{@$return->Patient['patient_name']}}
+                                @endif
+                            </td>
+                            <td>{{$return->sales_return_detail_count }}</td>
+                            <td>{{$return->total_amount }}</td>
+                            <td><a class="btn btn-primary btn-sm" href="{{ route('sales.return.report.detail', ['id' => $return->sales_return_id]) }}">
                                 Detail
                             </a></td>
                         </tr>
@@ -125,7 +121,7 @@
                     </tbody>
                 </table>
                 <div class="pagination" style="justify-content:flex-end;margin-top:-10px">
-                    {{ $purchase->onEachSide(1)->links() }}
+                    {{ $sales_returns->onEachSide(1)->links() }}
                 </div>
             </div>
         </div>
@@ -143,29 +139,29 @@
             {
                 extend: 'excel',
                 text: 'Export to Excel',
-                title: 'Purchase Report',
+                title: 'Sales Return Report',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5,6]
+                    columns: [0,1,2,3,4,5,6,7]
                 }
             },
             {
                 extend: 'pdf',
                 text: 'Export to PDF',
-                title: 'Purchase Report',
+                title: 'Sales Return Report',
                 footer: true,
                 orientation : 'landscape',
                 pageSize : 'LEGAL',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5,6],
+                    columns: [0,1,2,3,4,5,6,7],
                     alignment: 'right',
                 },
                     customize: function(doc) {
                     doc.content[1].margin = [ 100, 0, 100, 0 ]; //left, top, right, bottom
                     doc.content.forEach(function(item) {
                     if (item.table) {
-                        item.table.widths = [40, '*','*','*','*','*','*']
+                        item.table.widths = [40, '*','*','*','*','*','*','*']
                     }
                     })
                     }

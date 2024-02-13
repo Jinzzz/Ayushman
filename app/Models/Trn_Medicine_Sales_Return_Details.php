@@ -33,5 +33,9 @@ class Trn_Medicine_Sales_Return_Details extends Model
     {
         return $this->belongsTo(Mst_Medicine::class, 'medicine_id');
     }
+    public function returnInvoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Sales_Return::class, 'sales_return_id', 'sales_return_id');
+    }
     
 }

@@ -696,6 +696,11 @@ Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sal
 Route::get('/sales/report/detail/{id}', [ReportController::class, 'SalaryReportDetail'])->name('sales.report.detail');
 Route::get('/purchase-report', [ReportController::class, 'PurchaseReport'])->name('purchase-report');
 Route::get('/purchase/report/detail/{id}', [ReportController::class, 'PurchaseReportDetail'])->name('purchase.report.detail');
+Route::get('/purchase-return-report', [ReportController::class, 'PurchaseReturnReport'])->name('purchase.return.report');
+Route::get('/purchase/return/report/detail/{id}', [ReportController::class, 'PurchaseReturnReportDetail'])->name('purchase.return.report.detail');
+Route::get('/sales-return-report', [ReportController::class, 'SalesReturnReport'])->name('sales.return.report');
+Route::get('/sales/return/report/detail/{id}', [ReportController::class, 'SalesReturnReportDetail'])->name('sales.return.report.detail');
+
 
 
 //stock transfer to branches

@@ -27,13 +27,30 @@ class Trn_Medicine_Purchase_Return extends Model
     ];
 
     public function supplier()
-{
-    return $this->belongsTo(Mst_Supplier::class, 'supplier_id');
-}
+    {
+        return $this->belongsTo(Mst_Supplier::class, 'supplier_id');
+    }
 
-public function Branch()
-{
-    return $this->belongsTo(Mst_Branch::class, 'branch_id');
-}
+    public function Branch()
+    {
+        return $this->belongsTo(Mst_Branch::class, 'branch_id');
+    }
+
+    public function pharmacy()
+    {
+        return $this->belongsTo(Mst_Pharmacy::class, 'pharmacy_id','id');
+    }
+
+    public function PurchaseInvoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Purchase_Invoice::class, 'purchase_invoice_id','purchase_invoice_id');
+    }
+
+    public function PurchaseReturnDetails()
+    {
+        return $this->hasMany(Trn_Medicine_Purchase_Return_Detail::class, 'purchase_return_id', 'purchase_return_id');
+    }
+
+
 
 }

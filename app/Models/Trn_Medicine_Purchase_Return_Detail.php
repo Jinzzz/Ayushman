@@ -22,4 +22,20 @@ class Trn_Medicine_Purchase_Return_Detail extends Model
         'created_at',
         'pharmacy_id'
     ];
+
+    public function Unit()
+    {
+        return $this->belongsTo(Mst_Unit::class, 'unit_id','id');
+    }
+
+    public function returnInvoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Purchase_Return::class, 'purchase_return_id', 'purchase_return_id');
+    }
+
+    public function Medicine()
+    {
+        return $this->belongsTo(Mst_Medicine::class, 'product_id','id');
+    }
+
 }
