@@ -51,6 +51,11 @@ class Trn_Medicine_Sales_Return extends Model
 
     public function salesReturnDetails()
     {
-        return $this->hasMany(Trn_Medicine_Sales_Return_Details::class, 'sales_return_id ', 'sales_return_id');
+        return $this->hasMany(Trn_Medicine_Sales_Return_Details::class, 'sales_return_id', 'sales_return_id');
+    }
+
+    public function Invoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Sales_Invoice::class, 'sales_invoice_id', 'sales_invoice_id');
     }
 }

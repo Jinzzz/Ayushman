@@ -209,7 +209,7 @@ class ReportController extends Controller
             'sales_return_id',
             'sales_return_no',
             'sales_invoice_id',
-            'patient_id ',
+            'patient_id',
             'pharmacy_id',
             'return_date',
             'total_amount'
