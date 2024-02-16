@@ -17,6 +17,7 @@ use App\Models\Trn_Medicine_Sales_Return;
 use App\Models\Trn_Medicine_Sales_Return_Details;
 use App\Models\Trn_branch_stock_transfer;
 use App\Models\Trn_branch_stock_transfer_detail;
+use App\Models\Trn_Medicine_Stock;
 
 class ReportController extends Controller
 {
@@ -335,6 +336,50 @@ class ReportController extends Controller
             'stock_transfer_detail' => $stocktransferDetail,
         ]);
     }
+
+    //current stock report
+
+    
+    public function CurrentStockReport(Request $request)
+    {
+        $currentStock = Trn_Medicine_Stock::select(
+            'stock_id',
+            'stock_code',
+            'medicine_id',
+            'pharmacy_id',
+            'batch_no',
+            'mfd',
+            'expd',
+            'purchase_rate',
+            'sale_rate',
+            'current_stock',
+        )
+        ->with(['medicines','pharmacy']);
+
+        if ($request->filled('pharmacy_id')) {
+            $currentStock->where('pharmacy_id', $request->input('pharmacy_id'));
+        }
+
+        if ($request->filled('medicine_name')) {
+            $currentStock->whereHas('medicines', function ($query) use ($request) {
+                $query->where('medicine_name', 'like', '%' . $request->input('medicine_name') . '%');
+            });
+        }
+
+        if ($request->filled('medicine_code')) {
+            $currentStock->whereHas('medicines', function ($query) use ($request) {
+                $query->where('medicine_code', 'like', '%' . $request->input('medicine_code') . '%');
+            });
+        }
+
+        $queryData = $currentStock->orderBy('created_at','DESC')->get();
+        return view('reports.current-stock-report', [
+            'pageTitle' => 'Current Stock Report',
+            'pharmacy' => Mst_Pharmacy::orderBy('created_at','DESC')->get(),
+            'current_stocks' => $queryData,
+        ]);
+    }
+
 
 
 

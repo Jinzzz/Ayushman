@@ -706,6 +706,8 @@ Route::get('/sales-return-report', [ReportController::class, 'SalesReturnReport'
 Route::get('/sales/return/report/detail/{id}', [ReportController::class, 'SalesReturnReportDetail'])->name('sales.return.report.detail');
 Route::get('/stock-transfer-report', [ReportController::class, 'StockTransferReport'])->name('stock.transfer.report');
 Route::get('/stock-transfer-report/detail/{id}', [ReportController::class, 'StockTransferReportDetail'])->name('stock-transfer.report.detail');
+Route::get('/current-stocks-report', [ReportController::class, 'CurrentStockReport'])->name('current.stock.report');
+
 
 
 
