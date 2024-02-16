@@ -413,7 +413,7 @@ class MstPatientController extends Controller
                 // Ledger posting happening between payment mode ledger and membership purchase ledger(21), There should add two rows one for debit and another for credit.
                 TrnLedgerPosting::insertGetId([
                     'posting_date' => Carbon::now()->toDateString(),
-                    'voucher_type_id' => 5,
+                    // 'voucher_type_id' => 5,
                     'master_id' => 1,
                     'account_ledger_id' => $request->deposit_to,
                     'debit' => $selectedMembership->package_price,
@@ -428,7 +428,7 @@ class MstPatientController extends Controller
 
                 TrnLedgerPosting::insertGetId([
                     'posting_date' => Carbon::now()->toDateString(),
-                    'voucher_type_id' => 5,
+                    // 'voucher_type_id' => 5,
                     'master_id' => 1,
                     'account_ledger_id' => 21,
                     'debit' => 0,

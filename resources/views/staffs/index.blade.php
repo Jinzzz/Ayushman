@@ -152,11 +152,11 @@
                                         </form>
                                         <br>
                                         @if($staff->staff_type == '20')
-                                        <!-- <a class="btn btn-sm  btn-primary"
+                                        <a class="btn btn-sm  btn-primary"
                                         href="{{ route('staff.slot', $staff->staff_id) }}" style="    font-size: 0.65rem;
                                         margin-right: 0;
                                         margin-top: 2px;"><i
-                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a> -->
+                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>Slot</a>
                                             @endif
                                     </td>
                                 </tr>

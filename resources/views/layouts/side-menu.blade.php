@@ -281,6 +281,17 @@
                         href="{{ url('/branch/stock-transfer') }}">{{ __('Stock Transfer To Branches') }}</a></li> 
                 </ul>
             </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-layout"></i>
+                    <span class="side-menu__label"> {{ __('Bookings') }}</span><i
+                        class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/booking/consultation-booking') }}">{{ __('Consultation Booking') }}</a>
+                    </li>
+                </ul>
+            </li>
 
 
             <li class="slide" style="display:none;">

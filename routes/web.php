@@ -58,7 +58,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BranchStockTransferController;
-
+use App\Http\Controllers\BookingController;
 
 
 
@@ -199,12 +199,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/timeslot/store', [MstTimeSlotController::class, 'store'])->name('timeslot.store');
     Route::patch('timeslot/change-status/{id}', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
     Route::get('timeslot/edit/{id}', [MstTimeSlotController::class,'timeSlotEdit'])->name('timeslot.edit');
+    Route::resource('timeslot', MstTimeSlotController::class);
 
 
 
     //Assigning timeslot for a particular staff:
     Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
     Route::post('/timeslot-staff/store', [MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
+    Route::get('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
+    
+
 
     // Assigning timeslot for a particular therapy room
     Route::get('/therapyroom-slot-assigning/index/{id}', [MstTherapyRoomSlotController::class, 'index'])->name('slot_assigning.index');
@@ -707,6 +711,17 @@ Route::get('/sales/return/report/detail/{id}', [ReportController::class, 'SalesR
 Route::get('/branch/stock-transfer', [BranchStockTransferController::class, 'index'])->name('branch-transfer.index');
 Route::get('/branch/stock-transfer/create', [BranchStockTransferController::class, 'create'])->name('create.branch-stock-transfer');
 Route::get('/getBatchDetails', [BranchStockTransferController::class, 'getBatchDetails'])->name('getBatchDetails');
+
+
+//Bookings
+Route::get('/booking/consultation-booking', [BookingController::class, 'ConsultationIndex'])->name('bookings.consultation.index');
+Route::get('/booking/consultation-booking/create', [BookingController::class, 'ConsultationCreate'])->name('create.consultation.booking');
+Route::get('/consultation/get-staffs', [BookingController::class, 'getDoctors'])->name('consultation.getStaffs');
+Route::get('/consultation/get-bookingfee', [BookingController::class, 'getBookingFee'])->name('getBookingFee');
+Route::get('/consultation/getMembershipDetails', [BookingController::class, 'getMembershipDetails'])->name('getMembershipDetails');
+Route::get('/consultation/getMembershipAndBookingFee', [BookingController::class, 'getMembershipAndBookingFee'])->name('getMembershipAndBookingFee');
+
+
 
 
 

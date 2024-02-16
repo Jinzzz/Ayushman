@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mst_Master_Value;
+use App\Models\Mst_Staff;
 use Illuminate\Database\QueryException;
 use App\Models\Mst_TimeSlot;
+use App\Models\Mst_Staff_Timeslot;
 use Illuminate\Http\Request;
 use carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -141,12 +143,12 @@ class MstTimeSlotController extends Controller
 
     public function slotIndex($id)
     {
-        $pageTitle = "Timeslots";
-        $timeslot = Mst_TimeSlot::where('staff_id', $id)->with('weekDay', 'timeSlot')->latest()->get();
+        $pageTitle = "Staff Timeslots";
+        $staff = Mst_Staff::where('staff_id',$id)->first();
+        $timeslot = Mst_Staff_Timeslot::where('staff_id', $id)->with('weekDay', 'timeSlot')->latest()->get();
         $weekday = Mst_Master_Value::where('master_id', 3)->pluck('master_value', 'id');
-        $slot = Mst_Master_Value::where('master_id', 24)->pluck('master_value', 'id');
-
-        return view('timeslot.slot', compact('pageTitle', 'timeslot', 'weekday', 'slot', 'id'));
+        $slot = Mst_TimeSlot::where('is_active', 1)->select('id','slot_name','time_from','time_to')->get();
+        return view('timeslot.slot', compact('pageTitle', 'timeslot', 'weekday', 'slot', 'id', 'staff'));
     }
 
     public function slotStore(Request $request)
@@ -159,31 +161,30 @@ class MstTimeSlotController extends Controller
             'tokens' => 'required',
 
         ]);
-        $is_exists = Mst_TimeSlot::where('week_day', $request->input('week_day'))->where('time_slot', $request->input('slot'))->first();
+        $is_exists = Mst_Staff_Timeslot::where('staff_id',$request->staff_id)->where('week_day', $request->input('week_day'))->where('timeslot', $request->input('slot'))->first();
         if ($is_exists) {
             return redirect()->back()->with('error', 'This timeslot is already assigned.');
         } else {
 
-            $staffslot = new Mst_TimeSlot();
+            $staffslot = new Mst_Staff_Timeslot();
 
             $staffslot->staff_id = $request->input('staff_id');
             $staffslot->week_day = $request->input('week_day');
-            $staffslot->time_slot = $request->input('slot');
-            $staffslot->max_tokens = $request->input('tokens');
+            $staffslot->timeslot = $request->input('slot');
+            $staffslot->no_tokens = $request->input('tokens');
             $staffslot->is_available = 1;
             $staffslot->is_active = 1;
             $staffslot->created_by  = 1;
             $staffslot->save();
 
 
-            return redirect()->route('staff.slot', ['id' => $request->input('staff_id')])->with('success', 'Timeslot added successfully');
+            return redirect()->route('staff.slot', ['id' => $request->input('staff_id')])->with('success', 'Timeslot mapped successfully');
         }
     }
 
     public function slotDelete(Request $request, $id)
     {
-        $delete = Mst_TimeSlot::findOrFail($id);
-        $delete->delete();
-        return redirect()->back()->with('success', 'Timeslot deleted successfully');
+        $delete = Mst_Staff_Timeslot::where('id',$id)->delete();
+        return redirect()->back()->with('success', 'Timeslot mapping deleted successfully');
     }
 }
