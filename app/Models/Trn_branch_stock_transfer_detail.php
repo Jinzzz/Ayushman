@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Trn_branch_stock_transfer_detail extends Model
 {
     use HasFactory;
-    protected $table = 'trn_branch_stock_transfers';
+    protected $table = 'trn_branch_stock_transfer_details';
     protected $fillable = [
         'stock_transfer_id',
         'medicine_id',
@@ -19,5 +19,15 @@ class Trn_branch_stock_transfer_detail extends Model
     public function stockTransfer()
     {
         return $this->belongsTo(Trn_branch_stock_transfer::class, 'stock_transfer_id');
+    }
+
+    public function stockInfo()
+    {
+        return $this->belongsTo(Trn_Medicine_Stock::class, 'stock_id','stock_id');
+    }
+
+    public function Medicine()
+    {
+        return $this->belongsTo(Mst_Medicine::class, 'medicine_id');
     }
 }

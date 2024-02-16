@@ -31,4 +31,16 @@ class Trn_branch_stock_transfer extends Model
     }
 
     
+    public function pharmacy()
+    {
+        return $this->belongsTo(Mst_Pharmacy::class, 'from_pharmacy_id','id');
+    }
+
+    public function pharmacys()
+    {
+        return $this->belongsTo(Mst_Pharmacy::class, 'to_pharmacy_id','id');
+    }
+
+
+    
 }

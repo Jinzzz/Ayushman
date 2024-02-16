@@ -329,6 +329,8 @@
                     </li>
                     <li><a class="slide-item" href="{{ url('/purchase-return-report') }}">{{ __('Purchase Return Report') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/stock-transfer-report') }}">{{ __('Stock Transfer Report') }}</a>
+                    </li>
                 </ul>
             </li>
             <li class="slide">

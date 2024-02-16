@@ -185,7 +185,7 @@
                                                 <i class="fa fa-check-square-o"></i> Add</button>
                                             <button type="reset" class="btn btn-raised btn-success">
                                                 <i class="fa fa-refresh"></i> Reset</button>
-                                            <a class="btn btn-danger" href=""> <i class="fa fa-times"></i>
+                                            <a class="btn btn-danger" href="{{route('bookings.consultation.index')}}"> <i class="fa fa-times"></i>
                                                 Cancel</a>
                                         </center>
                                     </div>

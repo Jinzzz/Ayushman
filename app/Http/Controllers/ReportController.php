@@ -15,6 +15,8 @@ use App\Models\Trn_Medicine_Purchase_Return;
 use App\Models\Trn_Medicine_Purchase_Return_Detail;
 use App\Models\Trn_Medicine_Sales_Return;
 use App\Models\Trn_Medicine_Sales_Return_Details;
+use App\Models\Trn_branch_stock_transfer;
+use App\Models\Trn_branch_stock_transfer_detail;
 
 class ReportController extends Controller
 {
@@ -266,6 +268,75 @@ class ReportController extends Controller
             'sale_return_detail' => $saleReturnDetail,
         ]);
     }
+    
+    //stock transfer report
+    
+    public function StockTransferReport(Request $request)
+    {
+        $transferQuery = Trn_branch_stock_transfer::select(
+            'id',
+            'transfer_code',
+            'transfer_date',
+            'from_pharmacy_id',
+            'to_pharmacy_id',
+        )
+        ->with(['pharmacy','pharmacys'])
+        ->withCount([
+            'stockTransferDetails as transfer_item_count' => function ($query) {
+                $query->select(DB::raw('count(*)'));
+            }
+        ]);
+
+        if ($request->filled('from_pharmacy_id')) {
+            $transferQuery->where('from_pharmacy_id', $request->input('from_pharmacy_id'));
+        }
+
+        if ($request->filled('to_pharmacy_id')) {
+            $transferQuery->where('to_pharmacy_id', $request->input('to_pharmacy_id'));
+        }
+
+        if ($request->filled('transfer_code')) {
+            $transferQuery->where('transfer_code', $request->input('transfer_code'));
+        }
+        $transferQuery->where(function ($query) use ($request) {
+            if ($request->filled('transfer_from_date') && $request->filled('transfer_to_date')) {
+                $query->whereBetween('transfer_date', [$request->input('transfer_from_date'), $request->input('transfer_to_date')]);
+            } elseif ($request->filled('transfer_from_date')) {
+                $query->where('transfer_date', '>=', $request->input('transfer_from_date'));
+            } elseif ($request->filled('transfer_to_date')) {
+                $query->where('transfer_date', '<=', $request->input('transfer_to_date'));
+            }
+        });
+
+        $queryData = $transferQuery->orderBy('created_at','DESC')->get();
+        return view('reports.stock-transfer-report', [
+            'pageTitle' => 'Stock Transfer Report',
+            'pharmacy' => Mst_Pharmacy::orderBy('created_at','DESC')->get(),
+            'stock_transfers' => $queryData,
+        ]);
+    }
+
+    public function StockTransferReportDetail(Request $request, $id)
+    {
+
+        $stocktransferQuery = Trn_branch_stock_transfer_detail::join('trn_branch_stock_transfers', 'trn_branch_stock_transfers.id', '=', 'trn_branch_stock_transfer_details.stock_transfer_id')
+            ->join('mst_medicines', 'trn_branch_stock_transfer_details.medicine_id', '=', 'mst_medicines.id')
+            ->where('trn_branch_stock_transfer_details.stock_transfer_id', $request->id);
+    
+        if ($request->filled('medicine_name')) {
+            $stocktransferQuery->where('medicine_name', 'like', '%' . $request->input('medicine_name') . '%');
+        }
+    
+        $stocktransferDetail = $stocktransferQuery->get();
+
+        return view('reports.stock-transfer-report-detail', [
+            'pageTitle' => 'Stock Transfer Report Detail',
+            'transfer_id' => $id,
+            'stock_transfer_detail' => $stocktransferDetail,
+        ]);
+    }
+
+
 
 
 }
