@@ -17,6 +17,9 @@ use App\Models\Mst_TimeSlot;
 use App\Models\Mst_Patient_Membership_Booking;
 use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
+use App\Models\Mst_Wellness;
+use App\Models\Mst_Wellness_Therapyrooms;
+use App\Models\Mst_Therapy_Room_Slot;
 
 class BookingController extends Controller
 {
@@ -124,6 +127,103 @@ class BookingController extends Controller
             ->with('membershipPackage')
             ->first();
     }
+
+    
+    public function WellnessIndex(Request $request)
+    {
+        return view('booking.wellness.index', [
+            'bookings' => Trn_Consultation_Booking::where('booking_type_id',85)->orderBy('created_at','DESC')->get(),
+            'pageTitle' => 'Wellness Bookings'
+        ]);
+    }
+
+    
+    public function WellnessCreate(Request $request)
+    {
+        return view('booking.wellness.create', [
+            'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
+            'patients' => Mst_Patient::orderBy('patient_name','ASC')->get(),
+            'paymentType' => Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id'),
+            'pageTitle' => 'Add Wellness Booking'
+        ]);
+    }
+
+    public function getWellnessList(Request $request)
+    {
+        $branchId = $request->input('branch_id');
+        $wellness = Mst_Wellness::where('is_active', 1)
+            ->select('wellness_id', 'wellness_name')
+            ->get();
+        return response()->json($wellness);
+    }
+
+    public function wellnessFee(Request $request)
+    {
+        $wellnessID = $request->input('wellness_id');
+        $bookingDate = $request->input('booking_date');      
+
+        $Wellness = Mst_Wellness::find($wellnessID);
+        $wellnessCost = $Wellness->wellness_cost;
+        $wellnessOffer = $Wellness->offer_price;
+        $bookingFee = ($wellnessOffer !== null && $wellnessOffer < $wellnessCost) ? $wellnessOffer : $wellnessCost;
+
+        $therapyRooms = Mst_Wellness_Therapyrooms::where('wellness_id', $wellnessID)
+                    ->pluck('therapy_room_id');
+        $timeslots = Mst_Therapy_Room_Slot::whereIn('therapy_room_id', $therapyRooms)
+                    ->with(['slot'])
+                    ->get();
+        $timeslotInfo = [];
+        foreach ($timeslots as $slots) {
+            $timeslotInfo[] = [
+                'therapy_room_name' => $slots->therapyRoom->room_name,
+                'time_from' => $slots->slot->time_from,
+                'time_to' => $slots->slot->time_to,
+            ];
+        }
+        //wellness Info
+        $wellnessName = $Wellness->wellness_name;
+        $wellnessDuration = $Wellness->wellness_duration;
+        $wellnessDescription = $Wellness->wellness_description;
+        return response()->json([
+            'booking_fee' => $bookingFee,
+            'timeslots' => $timeslotInfo,
+            'wellness_name' => $wellnessName,
+            'wellness_duration' => $wellnessDuration,
+            'wellness_cost' => $wellnessCost,
+            'offer_price' => $wellnessOffer,
+            'wellness_description' => $wellnessDescription
+        ]);
+    }
+
+    
+    public function wellnessMembershipandFee(Request $request)
+    {
+        $patientId = $request->input('patient_id');
+        $wellnessID = $request->input('wellness_id');
+        
+        $membership = $this->getpatientInfo($patientId);
+        if ($membership) {
+            $payableAmount = 0.00;
+        } else {
+            $Wellness = Mst_Wellness::find($wellnessID);
+            $wellnessCost = $Wellness->wellness_cost;
+            $wellnessOffer = $Wellness->offer_price;
+            $bookingFee = ($wellnessOffer !== null && $wellnessOffer < $wellnessCost) ? $wellnessOffer : $wellnessCost;
+        
+            $payableAmount = $wellnessOffer ?? $wellnessCost;
+        }
+
+        $familyMembers = Trn_Patient_Family_Member::where('patient_id', $patientId)
+                        ->orderBy('created_at', 'DESC')
+                        ->get();
+
+        return response()->json(['payable_amount' => $payableAmount, 'family_members' => $familyMembers]);
+    }
+
+
+
+
+
 
 
 }

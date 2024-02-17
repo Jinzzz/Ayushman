@@ -79,8 +79,9 @@
                     @foreach($therapyrooms as $therapyroom)
                     <tr id="dataRow_{{ $therapyroom->id }}">
                         <td>{{ ++$i }}</td>
-                        <td>{{ @$assign->therapyroomName['room_name']}}</td>
-                            <td>{{ @$assign->branch['branch_name']}}</td>
+                        <td>{{ @$therapyroom->branch['branch_name']}}</td>
+                        <td>{{ @$therapyroom->room_name}}</td>
+                           
                         <!-- <td>{{ $therapyroom->roomType->master_value}}</td>
                                     <td>{{ $therapyroom->room_capacity }}</td> -->
 

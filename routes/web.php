@@ -726,6 +726,13 @@ Route::get('/consultation/get-bookingfee', [BookingController::class, 'getBookin
 Route::get('/consultation/getMembershipDetails', [BookingController::class, 'getMembershipDetails'])->name('getMembershipDetails');
 Route::get('/consultation/getMembershipAndBookingFee', [BookingController::class, 'getMembershipAndBookingFee'])->name('getMembershipAndBookingFee');
 
+//wellness booking
+Route::get('/booking/wellness-booking', [BookingController::class, 'WellnessIndex'])->name('bookings.wellness.index');
+Route::get('/booking/wellness-booking/create', [BookingController::class, 'WellnessCreate'])->name('create.wellness.booking');
+Route::get('/booking/getWellness', [BookingController::class, 'getWellnessList'])->name('booking.getWellness');
+Route::get('/booking/wellness/bookingfee', [BookingController::class, 'wellnessFee'])->name('wellness.getBookingFee');
+Route::get('/wellness/getMembershipAndBookingFee', [BookingController::class, 'wellnessMembershipandFee'])->name('wellness.getMembershipAndBookingFee');
+
 
 
 

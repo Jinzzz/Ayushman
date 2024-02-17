@@ -294,6 +294,8 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/booking/consultation-booking') }}">{{ __('Consultation Booking') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/booking/wellness-booking') }}">{{ __('Wellness Booking') }}</a>
+                    </li>
                 </ul>
             </li>
 

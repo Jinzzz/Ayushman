@@ -55,10 +55,10 @@
                 <p>{{$message}}</p>
             </div>
             @endif
-            <!-- <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title mb-0">{{$pageTitle}}</h3>
                 <a class="btn btn-success" href="{{ route('wellness.room.assign') }}">Assign Therapy Rooms</a>
-            </div> -->
+            </div>
 
             <div class="card-body">
                 <a href="{{ route('wellness.create') }}" class="btn btn-block btn-info">

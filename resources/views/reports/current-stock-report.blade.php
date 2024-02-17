@@ -46,7 +46,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="form-label">Pharmacy From</label>
+                                    <label class="form-label">Pharmacy</label>
                                     <select class="form-control" name="pharmacy_id" id="pharmacy_id">
                                         <option value="">Select Pharmacy</option>
                                         @foreach ($pharmacy as $key => $pharmacies)
@@ -82,14 +82,13 @@
                     <thead>
                         <tr>
                             <th>SL.NO</th>
-                            <th>Medicine<br>Name</th>
                             <th>Medicine<br>Code</th>
-                            <th>Stock Code</th>
+                            <th>Medicine<br>Name</th>
+                            <th>Batch</th>
+                            <th>Sales Rate</th>
+                            <th>Purchase Rate</th>
                             <th>Pharmacy</th>
                             <th>Current<br>Stock</th>
-                            <th>Batch</th>
-                            <th>Purchase Rate</th>
-                            <th>Sales Rate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,18 +98,16 @@
                         @foreach ($current_stocks as $key=>$current_stock)
                         <tr id="dataRow_{{ $current_stock->stock_id  }}">
                             <td>{{ $key+1 }}</td>
-                            <td>{{@$current_stock->medicines['medicine_name']}}</td>
                             <td>{{@$current_stock->medicines['medicine_code']}}</td>
-                            
-                            <td>{!! chunk_split($current_stock->stock_code, 15, "<br>") !!}</td>
-                            <td>{{@$current_stock->pharmacy['pharmacy_name']}}</td>
-                            <td>{{$current_stock->current_stock }}</td>
+                            <td>{{@$current_stock->medicines['medicine_name']}}</td>
                             <td>Batch: {{$current_stock->batch_no }} <br>
                                 MFD: {{$current_stock->mfd }} <br>
                                 EXP: {{$current_stock->expd }}
                             </td>
-                            <td>{{$current_stock->purchase_rate }}</td>
                             <td>{{$current_stock->sale_rate }}</td>
+                            <td>{{$current_stock->purchase_rate }}</td>
+                            <td>{{@$current_stock->pharmacy['pharmacy_name']}}</td>
+                            <td>{{$current_stock->current_stock }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -133,7 +130,7 @@
                 title: 'Current Stocks Report',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5,6,7,8]
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
                 }
             },
             {
@@ -144,13 +141,13 @@
                 orientation: 'landscape',
                 pageSize: 'LEGAL',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
                 },
                 customize: function(doc) {
                     doc.content[1].margin = [20, 0, 20, 0]; //left, top, right, bottom
                     doc.content.forEach(function(item) {
                         if (item.table) {
-                            item.table.widths = ['auto', '*', '*', 'auto', '*', 'auto', '*', '*', '*']; // Set width to auto for all columns
+                            item.table.widths = ['auto', 'auto', '*', 'auto', 'auto', 'auto', '*', 'auto']; // Set width to auto for all columns
                         }
                     });
                 }
