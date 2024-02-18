@@ -100,6 +100,11 @@ Route::post('/pharmacy-login-post', [MstAuthController::class, 'Pharmacylogin'])
 Route::get('/receptionist-login', [MstAuthController::class, 'showReceptionistLoginForm'])->name('mst_login.receptionist');
 Route::post('/receptionist-login-post', [MstAuthController::class, 'Receptionistlogin'])->name('receptionist.login.redirect');
 
+
+//Doctor id = 20
+Route::get('/doctor-login', [MstAuthController::class, 'showDoctorLoginForm'])->name('mst_login.doctor');
+Route::post('/receptionist-login-post', [MstAuthController::class, 'Doctorlogin'])->name('doctor.login.redirect');
+
 // Auth::routes();
 
 // Routes to reset password starts
@@ -120,16 +125,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/reception-home', [DashboardController::class, 'receptionIndex'])->name('reception.home');
     });
 
+    Route::middleware(['role:20'])->group(function () {
+        Route::get('/doctor-home', [DashboardController::class, 'doctorIndex'])->name('doctor.home');
+    });
+
     //Route access for admin-pharmacist
     Route::middleware(['role:1|role:96'])->group(function () {
 
     });
 
-     //Route access for admin-receptionist
-     Route::middleware(['role:1|role:18'])->group(function () {
+    //Route access for admin-receptionist
+    Route::middleware(['role:1|role:18'])->group(function () {
 
-     });
+    });
 
+    //Route access for admin-doctor
+    Route::middleware(['role:1|role:20'])->group(function () {
+
+    });
+    
     // Dashboard 
     Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');
 

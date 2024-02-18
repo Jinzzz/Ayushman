@@ -35,6 +35,10 @@
                         <span class="text-muted app-sidebar__user-name text-sm">Receptionist</span>
                     @break
 
+                    @case(20)
+                        <span class="text-muted app-sidebar__user-name text-sm">Doctor</span>
+                    @break
+
                     @default
                         <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
                     @break
@@ -54,6 +58,8 @@
                     @elseif(Auth::user()->user_type_id == 18)
                         <a class="side-menu__item {{ Request::is('pharmacy-home') ? 'active' : '' }}"
                             href="{{ route('reception.home') }}">
+                @elseif(Auth::user()->user_type_id == 20)
+                    <a class="side-menu__item {{ Request::is('doctor-home') ? 'active' : '' }}" href="{{ route('doctor.home') }}">
             @endif
             <i class="side-menu__icon ti-home"></i>
             <span class="side-menu__label">Dashboard</span>
@@ -170,6 +176,19 @@
                     <span class="side-menu__label">Prescriptions</span>
                 </a>
             </li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="#">
+                    <i class="side-menu__icon ti-settings"></i>
+                    <span class="side-menu__label"> {{ __('Settings') }}</span><i class="angle fa fa-angle-right"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/profile') }}">{{ __('Profile') }}</a>
+                    </li>
+                    <li><a class="slide-item" href="{{ url('/change-password') }}">{{ __('Change Password') }}</a>
+                    </li>
+                </ul>
+            </li>
+        @elseif (Auth::user()->user_type_id == 20)  
             <li class="slide">
                 <a class="side-menu__item" data-toggle="slide" href="#">
                     <i class="side-menu__icon ti-settings"></i>

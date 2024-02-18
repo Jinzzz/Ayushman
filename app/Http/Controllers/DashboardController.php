@@ -84,4 +84,25 @@ class DashboardController extends Controller
 
         return view('auth.receptionist.home',compact('pageTitle','branchId','currentDayLeave','bookingCount'));
     }
+
+    public function doctorIndex()
+    {
+        $pageTitle="Doctor Dashboard";
+        $currentDate = Carbon::now()->toDateString();
+        $staffId = auth()->user()->staff_id;
+        $branchId = Mst_Staff::where('staff_id', $staffId)->value('branch_id');
+        $currentDayBooking = Trn_Consultation_Booking::where('branch_id', $branchId)
+                ->whereDate('created_at', $currentDate)
+                ->where('doctor_id', $staffId)
+                ->where('booking_type_id', 84) //consultation
+                ->count();
+        $upComingBooking = Trn_Consultation_Booking::where('branch_id', $branchId)
+                ->whereDate('created_at','>', $currentDate)
+                ->where('doctor_id', $staffId)
+                ->where('booking_type_id', 84) //consultation
+                ->count();
+        
+
+        return view('auth.doctor.home',compact('pageTitle','branchId','currentDayBooking','upComingBooking'));
+    }
 }
