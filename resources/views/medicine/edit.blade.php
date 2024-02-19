@@ -23,13 +23,19 @@
                   @csrf
                   @method('PUT')
                   <div class="row">
-                     <div class="col-md-6">
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Medicine Name</label>
                            <input type="text" class="form-control" required name="medicine_name" maxlength="100" value="{{$medicine->medicine_name}}" placeholder="Medicine Name">
                         </div>
                      </div>
-                     <div class="col-md-6">
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="form-label">Medicine Code*</label>
+                           <input type="text" class="form-control" required name="medicine_code" value="{{$medicine->medicine_code}}" placeholder="Medicine Code">
+                        </div>
+                     </div>
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Generic Name</label>
                            <input type="text" class="form-control" required name="generic_name" maxlength="100" value="{{$medicine->generic_name}}" placeholder="Generic Name">

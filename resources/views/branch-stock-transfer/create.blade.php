@@ -216,7 +216,7 @@ $(document).ready(function() {
                 
                 if (response && response.length > 0) {
                     $.each(response, function(index, item) {
-                        batchSelect.append('<option value="' + item.stock_id + '">' + item.batch_no + ' (MFD: ' + item.mfd + ', EXP: ' + item.expd + ', Stock: ' + item.current_stock + ')</option>');
+                        batchSelect.append('<option value="' + item.stock_id + '">' + item.batch_no + ' (MFD: ' + item.mfd + ', EXP: ' + item.expd + ', Stock: ' + item.current_stock + ', Sale Rate: '+ item.sale_rate + ')</option>');
                     });
                 } else {
                     console.log('No batch details found.');

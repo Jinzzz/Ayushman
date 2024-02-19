@@ -12,7 +12,7 @@ class TrnMedicineStockUpdationController extends Controller
 {
     public function index()
     {
-        $pageTitle = "Medicine Stock Updation";
+        $pageTitle = "Medicine Stock Correction";
         $medicines = Mst_Medicine::pluck('medicine_name', 'id');
         $pharmacies = Mst_Pharmacy::get();
         return view('medicine_stock_updation.index', compact('pageTitle', 'medicines', 'pharmacies'));

@@ -41,17 +41,16 @@ class Trn_Medicine_Sales_Invoice extends Model
     {
         return $this->belongsTo(Mst_Staff::class, 'sales_person_id');
     }
-    
-    // public function Branch()
-    // {
-    //     return $this->belongsTo(Mst_Branch::class, 'branch_id');
-    // }
 
     public function pharmacy()
     {
         return $this->belongsTo(Mst_Pharmacy::class, 'pharmacy_id','id');
     }
 
+    public function paymentMode()
+    {
+        return $this->belongsTo(Mst_Master_Value::class,'payment_mode','id');
+    }
 
     public function salesInvoiceDetails()
     {

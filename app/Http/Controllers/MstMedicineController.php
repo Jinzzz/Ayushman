@@ -121,6 +121,7 @@ class MstMedicineController extends Controller
 
     public function update(Request $request,$id)
     {
+        $medicine = Mst_Medicine::findOrFail($id);
         $request->validate([
         
             'medicine_name' => 'required',
@@ -130,7 +131,8 @@ class MstMedicineController extends Controller
             'tax_id' => 'required|exists:mst__tax__groups,id',      
             'unit_price' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
-            'is_active' => 'required',         
+            'is_active' => 'required',  
+            'medicine_code' => 'required|unique:mst_medicines,medicine_code,' . $medicine->id,
             //'Hsn_code' =>  'required|exists:mst_branches,branch_id',
            
            
@@ -138,7 +140,7 @@ class MstMedicineController extends Controller
         $is_active = $request->input('is_active') ? 1 : 0;
     
        
-        $medicine = Mst_Medicine::findOrFail($id);
+        
         $medicine->medicine_name = $request->input('medicine_name');
         $medicine->generic_name = $request->input('generic_name');
         $medicine->item_type = $request->input('item_type');

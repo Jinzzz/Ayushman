@@ -84,6 +84,7 @@
                         <tr>
                             <th>SL.NO</th>
                             <th>Medicine Name</th>
+                            <th>Code</th>
                             <th>Generic Name</th>
                             <th>Medicine Type</th>
                             <th>Status</th>
@@ -97,10 +98,8 @@
                         @foreach ($medicines as $medicine)
                             <tr id="dataRow_{{ $medicine->id }}">
                                 <td>{{ ++$i }}</td>
-                                <td>{!! wordwrap($medicine->medicine_name, 25, '<br>') !!}
-                                    <br>
-                                    <span style="font-weight: bold;">Code:</span> {!! wordwrap($medicine->medicine_code, 25, '<br>') !!}
-                                </td>
+                                <td>{!! wordwrap($medicine->medicine_name, 25, '<br>') !!} </td>    
+                                <td>{!! wordwrap($medicine->medicine_code, 25, '<br>') !!}</td>
                                 <td>{!! wordwrap($medicine->generic_name, 25, '<br>') !!}</td>
                                 <td>{{ $medicine->medicineType->master_value }}</td>
 

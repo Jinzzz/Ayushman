@@ -100,6 +100,7 @@
                             <th>Supplier</th>
                             <th>Total<br>Items</th>
                             <th>Total<br>Amount</th>
+                            <th>Payment<br>Mode</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -116,6 +117,7 @@
                             <td>{{@$purchases->Supplier['supplier_name']}}</td>
                             <td>{{$purchases->purchase_invoice_details_count }}</td>
                             <td>{{$purchases->total_amount }}</td>
+                            <td>{{@$purchases->paymentMode['master_value'] }}</td>
                             
                             <td><a class="btn btn-primary btn-sm" href="{{ route('purchase.report.detail', ['id' => $purchases->purchase_invoice_id]) }}">
                                 Detail
@@ -146,7 +148,7 @@
                 title: 'Purchase Report',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5,6]
+                    columns: [0,1,2,3,4,5,6,7]
                 }
             },
             {
@@ -158,14 +160,14 @@
                 pageSize : 'LEGAL',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5,6],
+                    columns: [0,1,2,3,4,5,6,7],
                     alignment: 'right',
                 },
                     customize: function(doc) {
                     doc.content[1].margin = [ 100, 0, 100, 0 ]; //left, top, right, bottom
                     doc.content.forEach(function(item) {
                     if (item.table) {
-                        item.table.widths = [40, '*','*','*','*','*','*']
+                        item.table.widths = [40, '*','*','*','*','*','*','*']
                     }
                     })
                     }

@@ -18,6 +18,7 @@ use App\Models\Trn_Medicine_Sales_Return_Details;
 use App\Models\Trn_branch_stock_transfer;
 use App\Models\Trn_branch_stock_transfer_detail;
 use App\Models\Trn_Medicine_Stock;
+use App\Models\Mst_Master_Value;
 
 class ReportController extends Controller
 {
@@ -29,14 +30,16 @@ class ReportController extends Controller
             'sales_invoice_number',
             'invoice_date',
             'pharmacy_id',
-            'total_amount'
+            'total_amount',
+            'payment_mode'
         )
-        ->with('pharmacy')
+        ->with('pharmacy','paymentMode')
         ->withCount([
             'salesInvoiceDetails as sales_invoice_details_count' => function ($query) {
                 $query->select(DB::raw('count(*)'));
             }
         ]);
+       
         $saleQuery->where(function ($query) {
             
             if (request()->has('pharmacy_id')) {
@@ -46,12 +49,13 @@ class ReportController extends Controller
                 $query->orWhere('sales_invoice_number', 'like', '%' . request()->sales_invoice_number . '%');
             }
         });
-        $salesInvoices = $saleQuery->paginate(10);
-
+        $sumTotalAmount = $saleQuery->sum('total_amount');
+        $salesInvoices = $saleQuery->get();
         return view('reports.sales-report', [
             'pageTitle' => 'Sales Reports',
             'pharmacy' => Mst_Pharmacy::orderBy('created_at','DESC')->get(),
             'sales' => $salesInvoices,
+            'sumTotalAmount' => $sumTotalAmount
         ]);
     }
 
@@ -76,9 +80,10 @@ class ReportController extends Controller
             'supplier_id',
             'invoice_date',
             'pharmacy_id',
-            'total_amount'
+            'total_amount',
+            'payment_mode'
         )
-        ->with(['Pharmacy', 'Supplier'])
+        ->with(['Pharmacy', 'Supplier','paymentMode'])
         ->withCount([
             'purchaseInvoiceDetails as purchase_invoice_details_count' => function ($query) {
                 $query->select(DB::raw('count(*)'));

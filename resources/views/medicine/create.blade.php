@@ -21,13 +21,19 @@
                <form id="addFm" action="{{ route('medicine.store') }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
-                     <div class="col-md-6">
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Medicine Name*</label>
                            <input type="text" class="form-control" required name="medicine_name" value="{{ old('medicine_name') }}" placeholder="Medicine Name">
                         </div>
                      </div>
-                     <div class="col-md-6">
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="form-label">Medicine Code*</label>
+                           <input type="text" class="form-control" required name="medicine_code" value="{{ old('medicine_code') }}" placeholder="Medicine Code">
+                        </div>
+                     </div>
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Generic Name*</label>
                            <input type="text" class="form-control" required name="generic_name" value="{{ old('generic_name') }}" placeholder="Generic Name">
@@ -113,9 +119,6 @@
                            <input type="number" class="form-control" name="reorder_limit" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"  maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit">
                         </div>
                      </div>
-   
-                           <input type="hidden" class="form-control" name="medicine_code" value="{{ old('medicine_code', $randomMedicineCode) }}" readonly>
-                   
                      <div class="col-md-6">
                         <div class="form-group">
                            <div class="form-label">Status</div>

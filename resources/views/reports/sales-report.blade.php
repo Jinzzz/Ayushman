@@ -74,7 +74,14 @@
     </div>
     <div class="card">
         <div class="card-header">
+            <div class="col-md-6">
             <h3 class="card-title">Sales Report</h3>
+            </div>
+            <div class="col-md-6 d-flex justify-content-end">
+                @if(!empty($sumTotalAmount))
+                <button class="btn btn-raised btn-warning">Total Sales : {{ $sumTotalAmount }}</button>
+                @endif
+             </div>
         </div>
         <div class="card-body">
 
@@ -88,6 +95,7 @@
                             <th>Pharmacy</th>
                             <th>Total<br>Items</th>
                             <th>Total<br>Amount</th>
+                            <th>Payment<br>Mode</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -103,6 +111,7 @@
                                 <td>{{$medicine_sales->pharmacy['pharmacy_name']}}</td>
                                 <td>{{$medicine_sales->sales_invoice_details_count }}</td>
                                 <td>{{$medicine_sales->total_amount }}</td>
+                                <td>{{@$medicine_sales->paymentMode['master_value'] }}</td>
                                 
                                 <td><a class="btn btn-primary btn-sm" href="{{ route('sales.report.detail', ['id' => $medicine_sales->sales_invoice_id]) }}">
                                     Detail
@@ -111,9 +120,8 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="pagination" style="justify-content:flex-end;margin-top:-10px">
-                    {{ $sales->onEachSide(1)->links() }}
-                </div>
+                {{-- <div class="pagination" style="justify-content:flex-end;margin-top:-10px">
+                </div> --}}
             </div>
         </div>
     </div>
@@ -124,8 +132,7 @@
         $(document).ready(function() {
        
         $('#report').DataTable({
-            paging: false,
-            dom: 'Bfrtip<"pagination"lp>',
+            dom: 'Bfrtip',
             buttons: [
             {
                 extend: 'excel',
@@ -133,7 +140,7 @@
                 title: 'Sales Report',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5]
+                    columns: [0,1,2,3,4,5,6]
                 }
             },
             {
@@ -145,14 +152,14 @@
                 pageSize : 'LEGAL',
                 exportOptions: 
                 {
-                    columns: [0,1,2,3,4,5],
+                    columns: [0,1,2,3,4,5,6],
                     alignment: 'right',
                 },
                     customize: function(doc) {
                     doc.content[1].margin = [ 100, 0, 100, 0 ]; //left, top, right, bottom
                     doc.content.forEach(function(item) {
                     if (item.table) {
-                        item.table.widths = [40, '*','*','*','*','*']
+                        item.table.widths = [40, '*','*','*','*','*','*']
                     }
                     })
                     }

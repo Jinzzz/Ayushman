@@ -54,4 +54,9 @@ class Trn_Medicine_Purchase_Invoice extends Model
     {
         return $this->hasMany(Trn_Medicine_Purchase_Invoice_Detail::class, 'invoice_id','purchase_invoice_id');
     }
+
+    public function paymentMode()
+    {
+        return $this->belongsTo(Mst_Master_Value::class,'payment_mode','id');
+    }
 }

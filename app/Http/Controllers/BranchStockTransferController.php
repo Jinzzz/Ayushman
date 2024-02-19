@@ -37,7 +37,7 @@ class BranchStockTransferController extends Controller
         $pharmacyId = $request->input('pharmacy_id');
         $stockDetails = Trn_Medicine_Stock::where('medicine_id', $medicineId)
             ->where('pharmacy_id', $pharmacyId)
-            ->get(['stock_id', 'batch_no', 'mfd', 'expd', 'current_stock']);
+            ->get(['stock_id', 'batch_no', 'mfd', 'expd', 'current_stock','sale_rate']);
         return response()->json($stockDetails);
     }
 }

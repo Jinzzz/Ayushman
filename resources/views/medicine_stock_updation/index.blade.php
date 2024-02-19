@@ -9,13 +9,13 @@
                <p>{{$message}}</p>
             </div>
             @endif
-            @if ($message = Session::get('error'))
+            @if ($message1 = Session::get('msg'))
             <div class="alert alert-danger">
-               <p></p>
+               <p>{{$message1}}</p>
             </div>
             @endif
             <div class="card-header">
-               <h3 class="mb-0 card-title">Medicine Stock Updation</h3>
+               <h3 class="mb-0 card-title">Medicine Stock Correction</h3>
             </div>
             <div class="col-lg-12" style="background-color: #fff;">
                @if ($errors->any())
@@ -36,7 +36,7 @@
                         <div class="form-group">
                             <label class="form-label">Pharmacy*</label>
                             <select class="form-control" required name="pharmacy_id" id="pharmacy_id">
-                                <option value="">Choose Branch</option>
+                                <option value="">Choose Pharmacy</option>
                                 @foreach($pharmacies as  $pharmacy)
                                 <option value="{{ $pharmacy->id  }}">{{ $pharmacy->pharmacy_name }}</option>
                                 @endforeach
@@ -92,17 +92,37 @@
                             <input type="text" class="form-control" required name="current_stock" id="current_stock" placeholder="Current Stock" readonly>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group col-auto">
+                            <label class="form-label">Adjustments *</label>
+                            <label class="selectgroup-item" style="width: 80px">
+                                <input type="checkbox" name="increment_current_stock" value="1" class="selectgroup-input">
+                                <span class="selectgroup-button"> + </span>
+                            </label>
+                            <label class="selectgroup-item" style="width: 80px">
+                                <input type="checkbox" name="decrement_current_stock" value="2" class="selectgroup-input">
+                                <span class="selectgroup-button"> - </span>
+                            </label>
+                        </div>
+                    </div>
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">New Stock *</label>
-                           <input type="number" class="form-control" min="0" required name="new_stock" placeholder="New Stock">
+                           <input type="number" class="form-control" min="0" required name="new_stock" placeholder="New Stock" required>
                         </div>
                      </div>
 
-                     <div class="col-md-4">
+                     <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Purchase Rate*</label>
-                           <input type="text" class="form-control" pattern="[0-9]+(\.[0-9]+)?" required name="purchase_rate" placeholder="Purchase Rate">
+                           <input type="text" class="form-control" pattern="[0-9]+(\.[0-9]+)?" required id="purchase_rate" name="purchase_rate" placeholder="Purchase Rate">
+
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="form-label">Sales Rate*</label>
+                           <input type="text" class="form-control" pattern="[0-9]+(\.[0-9]+)?" required name="sale_rate" placeholder="Sales Rate">
                         </div>
                      </div>
 
@@ -213,6 +233,20 @@
                 console.error('Error fetching current stock:', error);
             }
         });
+
+        // Make an AJAX request to get the purchase rate
+        $.ajax({
+            url: '/get-purchase-rate/' + medicineId + '/' + batchNo,
+            type: 'GET',
+            success: function (data) {
+                // Update the value of the 'purchase_rate' input field
+                document.getElementById('purchase_rate').value = data.purchase_rate;
+            },
+            error: function (error) {
+                console.error('Error fetching purchase rate:', error);
+            }
+        });
+
     });
 
     $(document).ready(function () {
