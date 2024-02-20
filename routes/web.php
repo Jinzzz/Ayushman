@@ -316,7 +316,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/medicine/destroy/{id}', [MstMedicineController::class, 'destroy'])->name('medicine.destroy');
     Route::patch('medicine/{id}/change-status', [MstMedicineController::class, 'changeStatus'])->name('medicine.changeStatus');
     Route::post('/validate-hsn-code', [MstMedicineController::class, 'validateHsnCode'])->name('validate.hsn_code');
-    Route::get('/medicine-stock-updations/{id}',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
+    // Route::get('/medicine-stock-updations/{id}',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
+    Route::get('/medicine-stock-updations',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
     Route::post('/getBatchNumbers', [MstMedicineController::class, 'getBatchNumbers'])->name('getBatchNumbers'); 
     Route::get('/get-current-stock/{medicineId}/{batchNo}', [MstMedicineController::class, 'getCurrentStock']);
     Route::put('/updatestockmedicine', [MstMedicineController::class, 'updateStockMedicine'])->name('updatestockmedicine'); 

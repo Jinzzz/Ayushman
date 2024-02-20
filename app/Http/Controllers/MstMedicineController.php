@@ -185,19 +185,16 @@ class MstMedicineController extends Controller
         return 1;
         return redirect()->back()->with('success','Status changed successfully');
     }
-    public function viewStockUpdation($id)
+    public function viewStockUpdation()
     {
      
         $pageTitle = "Medicine Initial Stock Updation";
-        $medicines = Mst_Medicine::findOrFail($id);
-
         $stock = Trn_Medicine_Stock::join('mst_medicines', 'trn_medicine_stocks.medicine_id', '=', 'mst_medicines.id')
-                    ->where('trn_medicine_stocks.medicine_id', $id)
                     ->select('trn_medicine_stocks.*')->first();
         $pharmacies = Mst_Pharmacy::get();
         $branchs = Mst_Branch::get();
         $meds = Mst_Medicine::get();
-        return view('medicine.stockupdation',compact('pageTitle','medicines','branchs','meds','pharmacies','stock'));
+        return view('medicine.stockupdation-v2',compact('pageTitle','branchs','meds','pharmacies','stock'));
     }
     public function getBatchNumbers(Request $request)
 {

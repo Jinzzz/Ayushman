@@ -96,12 +96,14 @@
                             href="{{ url('/medicine-stock-updation/index') }}">{{ __('Medicine Stock Correction') }}</a>
                     </li>
                     <li><a class="slide-item"
+                        href="{{ url('/medicine-stock-updations') }}">{{ __('Initial Stock Update') }}</a></li> 
+                    <li><a class="slide-item"
                             href="{{ url('/medicine-sales-invoices') }}">{{ __('Medicine Sales Invoice') }}</a></li>
                     <li><a class="slide-item"
                             href="{{ url('/medicine-sales-return') }}">{{ __('Medicine Sales Return') }}</a></li>
                     <li><a class="slide-item"
                                 href="{{ url('/branch/stock-transfer') }}">{{ __('Stock Transfer To Pharmacy') }}</a></li> 
-
+                                
                 </ul>
             </li>
             <li class="slide">
@@ -295,6 +297,9 @@
                     <li><a class="slide-item"
                             href="{{ url('/medicine-stock-updation/index') }}">{{ __('Medicine Stock Correction') }}</a>
                     </li>
+                    <li><a class="slide-item"
+                        href="{{ url('/medicine-stock-updations') }}">{{ __('Initial Stock Update') }}</a>
+                    </li> 
                     <li><a class="slide-item"
                             href="{{ url('/medicine-sales-invoices') }}">{{ __('Medicine Sales Invoice') }}</a>
                     </li>
