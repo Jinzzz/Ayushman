@@ -269,6 +269,34 @@
         });
 
     </script>
+
+@if(!Session::has('pharmacy_id'))
+<script>
+	$(document).ready(function() {
+		$('#pharmacyModal').modal({ backdrop: 'static', keyboard: false }).modal('show');
+	});
+</script>
+@endif
+<script>
+    $(document).ready(function() {
+        $('#pharmacyForm').submit(function(event) {
+            event.preventDefault(); 
+            var formData = $(this).serialize(); 
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+					console.log("success");
+                    window.location.reload(); 
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
     @yield('js')
 </body>
 

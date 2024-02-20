@@ -1,3 +1,8 @@
+<?php 
+use App\Models\Mst_Pharmacy;
+$pharmacyList = Mst_Pharmacy::where('status','=',1)->orderBy('pharmacy_name','ASC')->get();
+?>
+
 <div class="page-header">
     <a aria-label="Hide Sidebar" class="app-sidebar__toggle close-toggle" data-toggle="sidebar"
         href="#"></a><!-- sidebar-toggle-->
@@ -10,22 +15,53 @@
             </li>
         </ol>
     </div>
+   
     <div class="d-flex  ml-auto header-right-icons header-search-icon">
-        <!-- <div class="dropdown d-sm-flex">
-            <a href="#" class="nav-link icon" data-toggle="dropdown">
-                <i class="fe fe-search"></i>
-            </a>
-            <div class="dropdown-menu header-search dropdown-menu-left">
-                <div class="input-group w-100 p-2">
-                    <input type="text" class="form-control " placeholder="Search....">
-                    <div class="input-group-append ">
-                        <button type="button" class="btn btn-primary ">
-                            <i class="fa fa-search" aria-hidden="true"></i>
-                        </button>
+        @if (Auth::user()->user_type_id == 1)
+        @if(Session::has('pharmacy_id'))
+            {{-- <div class="card overflow-hidden"> --}}
+                <div class="card-header" style="background-color: #0d97c673;border-bottom: 1px solid #eaedf100;">
+                    <h3 class="card-title" style="font-size: 12px;
+                    color: #0d97c6;">PHARMACY: {{ Session::get('pharmacy_name') }} &nbsp;</h3>
+                    <div class="card-options">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pharmacyModal">Change</button>
                     </div>
                 </div>
-            </div>
-        </div> -->
+            {{-- </div> --}}
+    @endif
+    {{-- pharmacy selection --}}
+<div class="modal fade" id="pharmacyModal" tabindex="-1" role="dialog" aria-labelledby="pharmacyModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">PHARMACY</h5>
+			</div>
+			<form id="pharmacyForm" action="{{ route('save-default-pharmacy') }}" method="POST" enctype="multipart/form-data">
+			@csrf
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<label class="form-label">Choose Pharmacy*</label>
+							<select class="form-control" required name="pharmacy_id" id="pharmacy_id">
+								<option value="">--Select Pharmacy--</option>
+								@foreach ($pharmacyList as $id => $List)
+									<option value="{{ $List->id }}">{{ $List->pharmacy_name }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary">Save changes</button>
+			</div>
+		</form>
+		</div>
+	</div>
+</div>
+{{-- pharmacy selection ends --}}
+@endif
 
         <!-- SEARCH -->
         <div class="dropdown d-md-flex">

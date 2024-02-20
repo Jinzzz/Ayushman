@@ -34,6 +34,7 @@ class ReportController extends Controller
             'payment_mode'
         )
         ->with('pharmacy','paymentMode')
+        ->whereDate('invoice_date', Carbon::today())
         ->withCount([
             'salesInvoiceDetails as sales_invoice_details_count' => function ($query) {
                 $query->select(DB::raw('count(*)'));

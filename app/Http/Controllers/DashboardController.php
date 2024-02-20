@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use App\Models\Trn_Medicine_Sales_Invoice;
 use App\Models\Trn_Medicine_Purchase_Invoice;
 use App\Models\Staff_Leave;
@@ -41,6 +42,16 @@ class DashboardController extends Controller
                             ->whereDate('to_date', '>=', Carbon::today());
                         })->count();
         return view('home',compact('pageTitle','dailySale','medicineSaleWeekly','medicineSaleMonthly','totalSales','purchases','currentDayLeave'));
+    }
+
+    public function savePharmacy(Request $request)
+    {
+        $pharmacyId = $request->input('pharmacy_id');
+        $pharmacy = Mst_Pharmacy::find($pharmacyId);
+        $pharmacyName = $pharmacy->pharmacy_name;
+        Session::put('pharmacy_id', $pharmacyId);
+        Session::put('pharmacy_name', $pharmacyName);
+        return response()->json(['message' => 'Pharmacy ID saved successfully']);
     }
 
     

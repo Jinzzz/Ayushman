@@ -146,6 +146,7 @@ Route::middleware('auth')->group(function () {
     
     // Dashboard 
     Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');
+    Route::middleware('role:1')->post('/save-default-pharmacy', [DashboardController::class, 'savePharmacy'])->name('save-default-pharmacy');
 
     // Medicine dosage - Screen for medicine dosges
     Route::get('/medicine-dosage', [MstMedicineDosageController::class, 'index'])->name('medicine.dosage.index');

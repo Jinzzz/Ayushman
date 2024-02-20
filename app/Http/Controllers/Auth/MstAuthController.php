@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use App\Models\Mst_User;
 use Illuminate\Support\Facades\Validator;
@@ -128,6 +129,7 @@ class MstAuthController extends Controller
         $user = Auth::guard('mst_users_guard')->user();
        
        if ($user && $user->user_type_id == 1) {
+            Session::flush();
             Auth::guard('mst_users_guard')->logout();
             return redirect('/login');
         } elseif ($user && $user->user_type_id == 96) {
