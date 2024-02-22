@@ -31,6 +31,7 @@
                         <th class="wd-15p">Ledger Code</th>
                         <th class="wd-15p">Ledger Name</th>
                         <th class="wd-15p">Status</th>
+                        <th class="wd-15p">Is System</th>
                         <th class="wd-15p">Action</th>
                     </tr>
                 </thead>
@@ -41,7 +42,7 @@
                     @foreach($account_ledgers as $account_ledgers)
                     <tr id="dataRow_{{ $account_ledgers->id }}">
                         <td id="sl_no">{{ ++$i }}</td>
-                        <td> {{ $account_ledgers->account_group_id }} </td>
+                        <td> {{ @$account_ledgers->subGroups->Group['account_group_name'] }} </td>
                         <td>{{ $account_ledgers->account_sub_group_name }}</td>
                         <td>{{ $account_ledgers->ledger_code }}</td>
                         <td>{{ $account_ledgers->ledger_name }}</td>
@@ -54,6 +55,16 @@
                                 @endif
                             </button>
                         </td>
+                        <td>
+                            <button type="button" style="width: 70px;">
+                                @if($account_ledgers->is_system == 0)
+                                No
+                                @else
+                                Yes
+                                @endif
+                            </button>
+                        </td>
+                        
                         <td>
                             <a class="btn btn-secondary" href="{{ route('account.ledger.edit', $account_ledgers->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                             <button type="button" onclick="deleteData({{ $account_ledgers->id }})" class="btn btn-danger">

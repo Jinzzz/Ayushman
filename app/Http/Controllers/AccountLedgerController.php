@@ -18,7 +18,7 @@ class AccountLedgerController extends Controller
         try {
             $pageTitle = "Account Ledger";
             $account_ledgers = Mst_Account_Ledger::join('mst_account_sub_head', 'mst__account__ledgers.account_sub_group_id', 'mst_account_sub_head.id')
-            ->select('mst__account__ledgers.id', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_code', 'mst__account__ledgers.is_active', 'mst_account_sub_head.account_sub_group_name')
+            ->select('mst__account__ledgers.id', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_name', 'mst__account__ledgers.ledger_code', 'mst__account__ledgers.is_active', 'mst_account_sub_head.account_sub_group_name','mst__account__ledgers.account_sub_group_id')
             ->orderBy('mst__account__ledgers.created_at', 'desc')
             ->get();
         

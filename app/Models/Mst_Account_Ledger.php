@@ -16,8 +16,14 @@ class Mst_Account_Ledger extends Model
         'account_sub_group_id',
         'ledger_code',
         'ledger_name',
+        'is_system',
         'created_by',
         'updated_by',
         'deleted_by',
     ];
+
+    public function subGroups()
+    {
+        return $this->belongsTo(Mst_Account_Sub_Head::class, 'account_sub_group_id', 'id');
+    }
 }

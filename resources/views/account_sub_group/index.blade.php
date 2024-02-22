@@ -27,6 +27,7 @@
                         <th class="wd-15p">SL.NO</th>
                         <th class="wd-15p">Account Sub Group Name</th>
                         <th class="wd-15p">Status</th>
+                        <th class="wd-15p">Is System</th>
                         <th class="wd-15p">Action</th>
                     </tr>
                 </thead>
@@ -44,6 +45,15 @@
                                 Inactive
                                 @else
                                 Active
+                                @endif
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" style="width: 70px;">
+                                @if($account_sub_group->is_system == 0)
+                                No
+                                @else
+                                Yes
                                 @endif
                             </button>
                         </td>
