@@ -91,7 +91,9 @@ class BookingController extends Controller
     public function getMembershipDetails(Request $request)
     {
         $patientId = $request->input('patient_id');
+        $currentDate = Carbon::now();
         $membership = Mst_Patient_Membership_Booking::where('patient_id', $patientId)
+            ->where('membership_expiry_date', '>', $currentDate)
             ->orderBy('created_at', 'desc')
             ->with('membershipPackage')
             ->first();
@@ -122,7 +124,9 @@ class BookingController extends Controller
 
     private function getpatientInfo($patientId)
     {
+        $currentDate = Carbon::now();
         return Mst_Patient_Membership_Booking::where('patient_id', $patientId)
+            ->where('membership_expiry_date', '>', $currentDate)
             ->orderBy('created_at', 'desc')
             ->with('membershipPackage')
             ->first();

@@ -39,7 +39,7 @@ class Mst_Medicine extends Model
     
     public function tax()
     {
-        return $this->belongsTo(Mst_Tax::class, 'tax_id', 'id');
+        return $this->belongsTo(Mst_Tax_Group::class, 'tax_id', 'id');
     }
     public function unit()
     {

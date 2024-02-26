@@ -73,28 +73,49 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="form-label">Wellness*</label>
-                                        <select class="form-control" required name="wellness_id" id="wellness_id">
-                                            <option value="">--Select Wellness--</option>
-                                        </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="card">
+                                        <div class="table-responsive">
+                                            <table class="table card-table table-vcenter text-nowrap" id="productTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Wellness</th>
+                                                        <th>Booking Fee</th>
+                                                        <th>Wellness Timeslot</th>
+                                                        <th>Actions</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr id="productRowTemplate" class="product-row">
+                                                        <td>
+                                                            <select class="form-control wellness_id" required name="wellness_id[]" id="wellness_id">
+                                                                <option value="">--Select Wellness--</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="booking_fee" class="form-control booking_fee" required
+                                            name="booking_fee[]" placeholder="Booking Fee" value="" readonly>
+                                                    </td>
+                                                        <td><select class="form-control timeslots" required name="timeslots[]" id="timeslots">
+                                                            <option value="">--Select Timeslot--</option>
+                                                        </select></td>
+                                                        <td><button type="button" disabled onclick="removeFn(this)"
+                                                                style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button>
+                                                        </td>
+                                                        <td class="display-med-row"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="form-label">Booking Fee*</label>
-                                        <input type="text" id="booking_fee" class="form-control" required
-                                            name="booking_fee" placeholder="Booking Fee" value="" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="form-label">Wellness Timeslot*</label>
-                                        <select class="form-control" required name="timeslots" id="timeslots">
-                                            <option value="">--Select Timeslot--</option>
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12" style="padding: 10px;">
+                                    <button type="button" class="btn btn-primary" id="addProductBtn">Add Row</button>
                                 </div>
                             </div>
                             <div class="row" id="wellness_details" style="display:none;">
@@ -231,177 +252,267 @@
             });
             
         });
-
-        $(document).ready(function() {
-            $('#branch_id').on('change', function() {
-                var branchId = $(this).val();
-                if (branchId) {
-                    $.ajax({
-                        url: '{{ route('booking.getWellness') }}',
-                        type: "GET",
-                        data: {
-                            branch_id: branchId,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        dataType: "json",
-                        success: function(data) {
-                            $('#wellness_id').empty();
-                            $('#booking_fee').val('');
-                            $('#wellness_id').append(
-                            '<option value="">--Select Wellness--</option>');
-                            $.each(data, function(key, value) {
-                                $('#wellness_id').append('<option value="' + value
-                                    .wellness_id + '">' + value.wellness_name +
-                                    '</option>');
-                            });
-                        }
-                    });
-                } else {
-                    $('#wellness_id').empty();
-                    $('#booking_fee').val('');
-                    $('#wellness_id').append('<option value="">--Select Wellness--</option>');
-                }
-            });
-            //get booking fee
-
-            $('#wellness_id').on('change', function() {
-                var wellnessID = $(this).val();
-                var bookingDate = $('#booking_date').val();
-                if (wellnessID && bookingDate) {
-                    $.ajax({
-                        url: '{{ route('wellness.getBookingFee') }}',
-                        type: "GET",
-                        data: {
-                            wellness_id: wellnessID,
-                            booking_date: bookingDate,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        dataType: "json",
-                        success: function(data) {
-                            if (data.error) {
-                                alert(data.error);
-                                $('#wellness_id').val('');
-                                $('#booking_fee').val('');
-                                $('#timeslots').val();
-                            } else {
-                                $('#booking_fee').val(data.booking_fee);
-                                $('#timeslots').empty();
-                                $.each(data.timeslots, function(key, value) {
-                                    var optionText = value.therapy_room_name + ' : ' + value.time_from + ' - ' + value.time_to;
-                                    $('#timeslots').append($('<option>', {
-                                        value: value.timeslot,
-                                        text: optionText
-                                    }));
-                                });
-                                if (data.wellness_name && data.wellness_duration !== null &&
-                                data.wellness_cost !== null ) {
-                                    $('#wellness_details').show();
-                                    $('#wellness_name').text(data.wellness_name);
-                                    $('#wellness_duration').text(data.wellness_duration);
-                                    $('#wellness_cost').text(data.wellness_cost);
-                                    $('#offer_price').text(data.offer_price);
-                                    $('#wellness_description').text(data.wellness_description);
-                                } else {
-                                    $('#wellness_details').hide(); 
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    $('#booking_fee').val('');
-                    $('#wellness_details').hide();
-                }
-            });
-
-            //get membership if any 
-            $('#patient_id').on('change', function() {
-                var patientId = $(this).val();
-                if (patientId) {
-                    $.ajax({
-                        url: '{{ route('getMembershipDetails') }}',
-                        type: "GET",
-                        data: {
-                            patient_id: patientId,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        dataType: "json",
-                        success: function(data) {
-                            if (data.membership && data.membership.package_title !== null &&
-                                data.membership.start_date !== null && data.membership
-                                .expiry_date !== null) {
-                                $('#membership_details').show(); // Show membership details div
-                                $('#package_name').text(data.membership.package_title);
-                                $('#start_date').text(data.membership.start_date);
-                                $('#expiry_date').text(data.membership.expiry_date);
-                            } else {
-                                $('#membership_details')
-                            .hide(); // Hide membership details div if no membership found
-                            }
-                        }
-                    });
-                } else {
-                    $('#membership_details').hide(); // Hide membership details div if no patient selected
-                }
-            });
-
-            //membership based booking fee
-            $('#patient_id, #wellness_id').on('change', function() {
-                var patientId = $('#patient_id').val();
-                var wellnessID = $('#wellness_id').val();
-                if (patientId || wellnessID) {
-                    $.ajax({
-                        url: '{{ route('wellness.getMembershipAndBookingFee') }}',
-                        type: "GET",
-                        data: {
-                            patient_id: patientId,
-                            wellness_id: wellnessID,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        dataType: "json",
-                        success: function(data) {
-                            console.log("Data received:", data);
-                            var payableAmount = data.payable_amount ? parseFloat(data
-                                .payable_amount).toFixed(2) : '0.00';
-                            console.log("Payable amount:", payableAmount);
-                            $('#payable_amount').val(payableAmount);
-                            //family members get
-                            var familyMembers = data.family_members;
-                            var dropdown = $('#family_id');
-                            dropdown.empty();
-                            dropdown.append('<option value="">--Select member--</option>');
-                            if (familyMembers.length > 0) {
-                                familyMembers.forEach(function(member) {
-                                    dropdown.append('<option value="' + member.id + '">' + member.family_member_name + '</option>');
-                                });
-                            }
-
-                        }
-                    });
-                }
-            });
-
-            //payment mode
-            $('#payment_mode').change(function() {
-                var selectedPaymentMode = $(this).val();
-                $.ajax({
-                    url: '{{ route('getLedgerNames1') }}',
-                    type: 'GET',
-                    data: {
-                        payment_mode: selectedPaymentMode
-                    },
-                    success: function(data) {
-                        $('#deposit_to').empty();
-                        $('#deposit_to').append('<option value="">Deposit To</option>');
-                        $.each(data, function(key, value) {
-                            $('#deposit_to').append('<option value="' + key + '">' +
-                                value + '</option>');
-                        });
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
+        </script>
+        <script>
+            $(document).ready(function() {
+                $("#addProductBtn").click(function(event) {
+                    event.preventDefault();
+                    var newRow = $("#productRowTemplate").clone().removeAttr("style");
+                    newRow.find('select').addClass('medicine-select');
+                    newRow.find('input').val('').prop('readonly', false);
+                    newRow.find('button').prop('disabled', false);
+                    newRow.find('input span').remove();
+                    $("#productTable tbody").append(newRow);
+                    fetchBatchDetailsForRow(newRow);
+                    attachHandlersToRow(newRow);
                 });
             });
+
+            function attachHandlersToRow(row) {
+                row.find('.wellness_id').on('change', function() {
+                    selectedWellness = $(this).val();
+                    $('.wellness_id').not(this).find('option[value="' + selectedWellness + '"]').hide();
+                });
+            }
+            function removeFn(parm) {
+                    var currentRow = $(parm).closest('tr');
+                    currentRow.remove();
+                    //calculatePayableAmount(0);
+                    var totalBookingFee = 0;
+                
+                $('.product-row').each(function() {
+                    var bookingFee = parseFloat($(this).find('.booking_fee').val()) 
+                    //alert($(this).find('.booking_fee').val())
+                    totalBookingFee += bookingFee;
+                });
+                $('#payable_amount').val(totalBookingFee.toFixed(2));
+                }
+        </script>
+
+
+
+
+
+
+
+
+
+
+<script>
+$(document).ready(function() {
+    var selectedWellness = null;
+    $('#branch_id').on('change', function() {
+        var branchId = $(this).val();
+        if (branchId) {
+            $.ajax({
+                url: '{{ route('booking.getWellness') }}',
+                type: "GET",
+                data: {
+                    branch_id: branchId,
+                    _token: '{{ csrf_token() }}'
+                },
+                dataType: "json",
+                success: function(data) {
+                    $('.wellness_id').empty();
+                    $('.booking_fee').val('');
+                    $('.wellness_id').append(
+                    '<option value="">--Select Wellness--</option>');
+                    $.each(data, function(key, value) {
+                        $('.wellness_id').append('<option value="' + value
+                            .wellness_id + '">' + value.wellness_name +
+                            '</option>');
+                    });
+                }
+            });
+        } else {
+            $('.wellness_id').empty();
+            $('.booking_fee').val('');
+            $('.wellness_id').append('<option value="">--Select Wellness--</option>');
+        }
+    });
+    $(document).on('change', '.wellness_id', function() {
+        selectedWellness = $(this).val();
+        $('.wellness_id').not(this).find('option[value="' + selectedWellness + '"]').hide();
+    });
+    //get booking fee
+
+    $(document).on('change', '.wellness_id', function() {
+    var row = $(this).closest('.product-row');
+    var wellnessID = $(this).val();
+    var bookingDate = $('#booking_date').val();
+
+    if (wellnessID && bookingDate) {
+        $.ajax({
+            url: '{{ route('wellness.getBookingFee') }}',
+            type: "GET",
+            data: {
+                wellness_id: wellnessID,
+                booking_date: bookingDate,
+                _token: '{{ csrf_token() }}'
+            },
+            dataType: "json",
+            success: function(data) {
+                var bookingFeeInput = row.find('.booking_fee');
+                var timeslotsSelect = row.find('.timeslots');
+
+                if (data.error) {
+                    alert(data.error);
+                    $(this).val('');
+                    bookingFeeInput.val('');
+                    timeslotsSelect.empty();
+                } else {
+                    bookingFeeInput.val(data.booking_fee);
+                    timeslotsSelect.empty().append('<option value="">--Select Timeslot--</option>');
+                    $.each(data.timeslots, function(key, value) {
+                        var optionText = value.therapy_room_name + ' : ' + value.time_from + ' - ' + value.time_to;
+                        timeslotsSelect.append($('<option>', {
+                            value: value.timeslot,
+                            text: optionText
+                        }));
+                    });
+
+                    if (data.wellness_name && data.wellness_duration !== null && data.wellness_cost !== null ) {
+                        $('#wellness_details').show();
+                        $('#wellness_name').text(data.wellness_name);
+                        $('#wellness_duration').text(data.wellness_duration);
+                        $('#wellness_cost').text(data.wellness_cost);
+                        $('#offer_price').text(data.offer_price);
+                        $('#wellness_description').text(data.wellness_description);
+                    } else {
+                        $('#wellness_details').hide(); 
+                    }
+                }
+            }
         });
-    </script>
+        calculatePayableAmount();
+    } else {
+        var bookingFeeInput = row.find('.booking_fee');
+        var timeslotsSelect = row.find('.timeslots');
+
+        bookingFeeInput.val('');
+        timeslotsSelect.empty();
+        $('#wellness_details').hide();
+    }
+});
+
+    //get membership if any 
+    $('#patient_id').on('change', function() {
+        var patientId = $(this).val();
+        if (patientId) {
+            $.ajax({
+                url: '{{ route('getMembershipDetails') }}',
+                type: "GET",
+                data: {
+                    patient_id: patientId,
+                    _token: '{{ csrf_token() }}'
+                },
+                dataType: "json",
+                success: function(data) {
+                    if (data.membership && data.membership.package_title !== null &&
+                        data.membership.start_date !== null && data.membership
+                        .expiry_date !== null) {
+                        $('#membership_details').show(); // Show membership details div
+                        $('#package_name').text(data.membership.package_title);
+                        $('#start_date').text(data.membership.start_date);
+                        $('#expiry_date').text(data.membership.expiry_date);
+                    } else {
+                        $('#membership_details')
+                    .hide();
+                    calculatePayableAmount(0)
+                    }
+                }
+            });
+            $('#payable_amount').val('0.00');
+        } else {
+            $('#membership_details').hide();
+           calculatePayableAmount(0)
+        }
+
+        
+    });
+
+    function calculatePayableAmount(e) {
+       // alert(e)
+    var totalBookingFee = 0;
+    if (typeof e === 'undefined' || e === null) {
+        e = 0;
+    }
+    $('.product-row').each(function() {
+        var bookingFee = parseFloat($(this).find('.booking_fee').val()) || parseFloat(e);
+        //alert($(this).find('.booking_fee').val())
+        totalBookingFee += bookingFee;
+    });
+    if ($('#membership_details').is(':visible')) {
+        $('#payable_amount').val('0.00');
+    } else {
+        $('#payable_amount').val(totalBookingFee.toFixed(2));
+    }
+}
+
+$(document).on('change', ' .wellness_id', function() {
+        var patientId = $('#patient_id').val();
+        var wellnessID = $(this).val();
+        if (patientId && wellnessID) {
+            $.ajax({
+                url: '{{ route('wellness.getMembershipAndBookingFee') }}',
+                type: "GET",
+                data: {
+                    patient_id: patientId,
+                    wellness_id: wellnessID,
+                    _token: '{{ csrf_token() }}'
+                },
+                dataType: "json",
+                success: function(data) {
+                    console.log("Data received:", data);
+                    var payableAmount = data.payable_amount ? parseFloat(data
+                        .payable_amount).toFixed(2) : '0.00';
+                    console.log("Payable amount:", payableAmount);
+                    $('#payable_amount').val(payableAmount);
+                    //alert(payableAmount)
+                    if (typeof payableAmount !== 'undefined' || payableAmount > 0) {
+                    //alert(payableAmount)
+                    calculatePayableAmount(payableAmount);
+                    }
+
+                    //family members get
+                    var familyMembers = data.family_members;
+                    var dropdown = $('#family_id');
+                    dropdown.empty();
+                    dropdown.append('<option value="">--Select member--</option>');
+                    if (familyMembers.length > 0) {
+                        familyMembers.forEach(function(member) {
+                            dropdown.append('<option value="' + member.id + '">' + member.family_member_name + '</option>');
+                        });
+                    }
+
+                }
+            });
+        }
+        //calculatePayableAmount();
+    });
+
+    //payment mode
+    $('#payment_mode').change(function() {
+        var selectedPaymentMode = $(this).val();
+        $.ajax({
+            url: '{{ route('getLedgerNames1') }}',
+            type: 'GET',
+            data: {
+                payment_mode: selectedPaymentMode
+            },
+            success: function(data) {
+                $('#deposit_to').empty();
+                $('#deposit_to').append('<option value="">Deposit To</option>');
+                $.each(data, function(key, value) {
+                    $('#deposit_to').append('<option value="' + key + '">' +
+                        value + '</option>');
+                });
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }); 
+});
+</script>
 @endsection

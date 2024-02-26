@@ -79,6 +79,11 @@
                                 {{ Session::get('status') }}
                             </div>
                             @endif
+                            @if (Session::has('verification'))
+                            <div class="alert alert-danger">
+                                {{ Session::get('verification') }}
+                            </div>
+                            @endif
                             @if(isset($response))
                             print_r($response);
                             @endif
@@ -89,13 +94,6 @@
                                     <div class="card-header-home">Verify Email Address</div>
 
                                     <div class="card-home">
-                                    @if ($verification = Session::get('verification'))
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                <li>{{ $verification }}</li>
-                                            </ul>
-                                        </div>
-                                        @endif
                                         @if ($messages = Session::get('error'))
                                         <div class="alert alert-danger">
                                             <ul>
