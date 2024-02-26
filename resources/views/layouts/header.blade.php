@@ -1,5 +1,6 @@
 <?php 
 use App\Models\Mst_Pharmacy;
+use App\Models\Mst_Staff;
 $pharmacyList = Mst_Pharmacy::where('status','=',1)->orderBy('pharmacy_name','ASC')->get();
 ?>
 
@@ -61,6 +62,20 @@ $pharmacyList = Mst_Pharmacy::where('status','=',1)->orderBy('pharmacy_name','AS
 	</div>
 </div>
 {{-- pharmacy selection ends --}}
+@elseif(Auth::user()->user_type_id == 96)  {{-- if pharmacy --}}
+
+@php
+    $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+    $pharmacies = $staff->pharmacies()->pluck('pharmacy_name')->toArray();
+@endphp
+
+<div class="card-header" style="background-color: #0d97c673;border-bottom: 1px solid #eaedf100;">
+    <h3 class="card-title" style="font-size: 10px; margin:-15px; 
+    color: #0d97c6;">PHARMACIES: @foreach ($pharmacies as $pharmacy)
+            <li style="list-style: circle;">{{ $pharmacy }}</li>
+        @endforeach &nbsp;</h3>
+</div>
+
 @endif
 
         <!-- SEARCH -->

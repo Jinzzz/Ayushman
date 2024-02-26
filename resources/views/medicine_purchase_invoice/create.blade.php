@@ -2,6 +2,7 @@
 @section('content')
 @php
 use App\Helpers\AdminHelper;
+use App\Models\Mst_Staff;
 // dd(AdminHelper::getProductId($value->medicine_code));
 @endphp
 <style>
@@ -95,12 +96,33 @@ use App\Helpers\AdminHelper;
                      <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Pharmacy*</label>
-                           <select class="form-control" name="pharmacy_id" id="pharmacy_id" required @if(session()->has('pharmacy_id')) disabled @endif>
-                              <option value="">Select Pharmacy</option>
-                              @foreach ($pharmacies as $pharmacy)
-                              <option value="{{ $pharmacy->id }}" @if(session()->has('pharmacy_id') && session('pharmacy_id') == $pharmacy->id) selected @endif>{{ $pharmacy->pharmacy_name }}</option>
-                              @endforeach
+                           @if(Auth::check() && Auth::user()->user_type_id == 96)
+                           @php
+                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                           @endphp
+                           @if(session()->has('pharmacy_id') && session()->has('pharmacy_name'))
+                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required readonly>
+                                   <option value="{{ session('pharmacy_id') }}">{{ session('pharmacy_name') }}</option>
+                               </select>
+                           @else
+                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                                   <option value="">Select Pharmacy</option>
+                                   @foreach ($pharmacies as $pharmacy)
+                                       @if(in_array($pharmacy->id, $mappedpharma))
+                                           <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                                       @endif
+                                   @endforeach
+                               </select>
+                           @endif
+                       @else
+                           <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                               <option value="">Select Pharmacy</option>
+                               @foreach ($pharmacies as $pharmacy)
+                                   <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                               @endforeach
                            </select>
+                       @endif
                         </div>
                      </div>
                      <div class="col-md-2">

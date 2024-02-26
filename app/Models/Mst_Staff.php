@@ -97,4 +97,9 @@ class Mst_Staff extends Model
         return $this->hasOne(Mst_Leave_Config::class, 'staff_id', 'staff_id');
     }
 
+    public function pharmacies()
+    {
+        return $this->belongsToMany('App\Models\Mst_Pharmacy', 'staff_pharmacy_mapping', 'staff_id', 'pharmacy');
+    }
+
 }

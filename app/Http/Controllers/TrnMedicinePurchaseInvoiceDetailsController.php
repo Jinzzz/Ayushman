@@ -23,39 +23,47 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Trn_Stock_Transaction;
+use App\Models\Mst_Staff;
 
 
 class TrnMedicinePurchaseInvoiceDetailsController extends Controller
 {
     public function index(Request $request)
     {
-        try {
+        // try {
             $pageTitle = "Medicine Purchase Invoice";
             $pharmacies = Mst_Pharmacy::get();
-    
+            
+            if(Auth::check() && Auth::user()->user_type_id == 96) {
+                $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+
+            $query = Trn_Medicine_Purchase_Invoice::query();
+            $query->join('mst_pharmacies', 'trn_medicine_purchase_invoices.pharmacy_id', '=', 'mst_pharmacies.id')
+                ->whereIn('trn_medicine_purchase_invoices.pharmacy_id', $mappedpharma)
+                ->select('trn_medicine_purchase_invoices.*', 'mst_pharmacies.*');
+            }else{
             $query = Trn_Medicine_Purchase_Invoice::query();
             $query->join('mst_pharmacies', 'trn_medicine_purchase_invoices.pharmacy_id', '=', 'mst_pharmacies.id')
                   ->select('trn_medicine_purchase_invoices.*', 'mst_pharmacies.*');
-
-    
-            if ($request->has('invoice_date') && $request->invoice_date != "") {
-                $query->whereRaw('trn_medicine_purchase_invoices.invoice_date = ?', [$request->invoice_date]);
             }
             
+
+            if ($request->has('invoice_date') && $request->invoice_date != "") {
+                $query->whereRaw('trn_medicine_purchase_invoices.invoice_date = ?', [$request->invoice_date]);
+            }  
             if ($request->has('due_date') && $request->due_date != "") {
                 $query->whereRaw('trn_medicine_purchase_invoices.due_date = ?', [$request->due_date]);
             }
-            
             if ($request->has('pharmacy_id') && $request->pharmacy_id != "") {
                 $query->where('trn_medicine_purchase_invoices.pharmacy_id', $request->pharmacy_id);
             }
-    
             $purchaseInvoice = $query->get();
         
             return view('medicine_purchase_invoice.index', compact('pageTitle', 'purchaseInvoice', 'pharmacies'));
-        } catch (\Exception $e) {
-            return response()->view('errors.custom', ['error' => $e->getMessage()], 500);
-        }
+        // } catch (\Exception $e) {
+        //     return response()->view('errors.custom', ['error' => $e->getMessage()], 500);
+        // }
     }
     
     
