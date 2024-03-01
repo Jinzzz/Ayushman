@@ -69,6 +69,7 @@
                <tr>
                   <th class="wd-15p">SL.NO</th>
                   <th class="wd-15p">Purchase Return No</th>
+                  <th class="wd-15p">Invoice ID</th>
                   <th class="wd-20p">Supplier</th>
                   <th class="wd-20p">Pharmacy</th>
                   <th class="wd-15p">Return Date</th>
@@ -84,6 +85,7 @@
                <tr id="dataRow_{{ $return->purchase_return_id  }}">
                   <td>{{ ++$i }}</td>
                   <td>{{ $return->purchase_return_no }}</td>
+                  <td>{{ @$return->PurchaseInvoice['purchase_invoice_no'] }}</td>
                   <td>{{ $return->supplier_name }}</td>
                   <td>{{ $return->pharmacy_name }}</td>
                   <td>{{ \Carbon\Carbon::parse($return->return_date)->format('d-m-Y') }}</td>

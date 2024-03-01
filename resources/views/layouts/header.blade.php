@@ -46,6 +46,7 @@ $pharmacyList = Mst_Pharmacy::where('status','=',1)->orderBy('pharmacy_name','AS
 							<label class="form-label">Choose Pharmacy*</label>
 							<select class="form-control" required name="pharmacy_id" id="pharmacy_id">
 								<option value="">--Select Pharmacy--</option>
+                                <option value="all">All Pharmacies</option>
 								@foreach ($pharmacyList as $id => $List)
 									<option value="{{ $List->id }}">{{ $List->pharmacy_name }}</option>
 								@endforeach
