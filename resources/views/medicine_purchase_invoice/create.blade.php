@@ -97,32 +97,37 @@ use App\Models\Mst_Staff;
                         <div class="form-group">
                            <label class="form-label">Pharmacy*</label>
                            @if(Auth::check() && Auth::user()->user_type_id == 96)
-                           @php
-                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
-                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
-                           @endphp
-                           @if(session()->has('pharmacy_id') && session()->has('pharmacy_name'))
-                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required readonly>
-                                   <option value="{{ session('pharmacy_id') }}">{{ session('pharmacy_name') }}</option>
-                               </select>
+                                           @php
+                                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                                           @endphp
+                           
+                            <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                              <option value="">Select Pharmacy</option>
+                             
+                              @foreach ($pharmacies as $pharmacy)
+                               @if(in_array($pharmacy->id, $mappedpharma))
+                             <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                              @endif
+                              @endforeach
+                             
+                           </select>
                            @else
-                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
-                                   <option value="">Select Pharmacy</option>
-                                   @foreach ($pharmacies as $pharmacy)
-                                       @if(in_array($pharmacy->id, $mappedpharma))
-                                           <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
-                                       @endif
-                                   @endforeach
+                               @if(session()->has('pharmacy_id') && session()->has('pharmacy_name') && session('pharmacy_id') != "all")
+                                <select class="form-control" name="pharmacy_id" id="pharmacy_id" required readonly>
+                                 
+                                 <option value="{{ session('pharmacy_id') }}">{{ session('pharmacy_name') }}</option>
+                                 
                                </select>
-                           @endif
-                       @else
-                           <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                               @else
+                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
                                <option value="">Select Pharmacy</option>
                                @foreach ($pharmacies as $pharmacy)
                                    <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
                                @endforeach
                            </select>
-                       @endif
+                            @endif
+                         @endif
                         </div>
                      </div>
                      <div class="col-md-2">

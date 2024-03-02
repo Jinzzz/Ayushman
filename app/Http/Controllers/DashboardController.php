@@ -47,10 +47,16 @@ class DashboardController extends Controller
     public function savePharmacy(Request $request)
     {
         $pharmacyId = $request->input('pharmacy_id');
-        $pharmacy = Mst_Pharmacy::find($pharmacyId);
-        $pharmacyName = $pharmacy->pharmacy_name;
+        if($pharmacyId == "all")
+        {
+            $pharmacyName = "All Pharmacies";   
+        }else{
+            $pharmacy = Mst_Pharmacy::find($pharmacyId);
+            $pharmacyName = $pharmacy->pharmacy_name;   
+        }
         Session::put('pharmacy_id', $pharmacyId);
         Session::put('pharmacy_name', $pharmacyName);
+        
         return response()->json(['message' => 'Pharmacy ID saved successfully']);
     }
 
