@@ -15,8 +15,10 @@
                </div>
                @endif
 
-            <div class="card-header">
-                <h3 class="card-title">List Therapies</h3>
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">List {{$pageTitle}}</h3>
+                <a class="btn btn-success" href="{{ url('therapyroom-therapymapping') }}">Assign Therapy Rooms</a>
             </div>
             <div class="card-body">
                 <a href="{{ route('therapy.create') }}" class="btn btn-block btn-info">
@@ -57,6 +59,7 @@
                                     </td>
                                        
                                     <td>
+                                        
                                         <a class="btn btn-primary btn-sm edit-custom"
                                             href="{{ route('therapy.edit', $therapy->id) }}"><i
                                                 class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>

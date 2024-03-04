@@ -19,7 +19,9 @@ use App\Models\Mst_Master_Value;
 use App\Models\Trn_Patient_Family_Member;
 use App\Models\Mst_Wellness;
 use App\Models\Mst_Wellness_Therapyrooms;
+use App\Models\Mst_Therapy_Therapyrooms;
 use App\Models\Mst_Therapy_Room_Slot;
+use App\Models\Mst_Therapy;
 
 class BookingController extends Controller
 {
@@ -223,6 +225,72 @@ class BookingController extends Controller
 
         return response()->json(['payable_amount' => $payableAmount, 'family_members' => $familyMembers]);
     }
+
+    
+    public function TherapyBooking(Request $request)
+    {
+        return view('booking.therapy.index', [
+            'bookings' => Trn_Consultation_Booking::where('booking_type_id',86)->orderBy('created_at','DESC')->get(),
+            'pageTitle' => 'Therapy Bookings'
+        ]);
+    }
+
+    
+    public function TherapyCreate(Request $request)
+    {
+        return view('booking.therapy.create', [
+            'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
+            'patients' => Mst_Patient::orderBy('patient_name','ASC')->get(),
+            'paymentType' => Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id'),
+            'pageTitle' => 'Add Therapy Booking'
+        ]);
+    }
+
+    public function getTherapyList(Request $request)
+    {
+        $branchId = $request->input('branch_id');
+        $therapy = Mst_Therapy::where('is_active', 1)
+            ->select('id', 'therapy_name')
+            ->get();
+        return response()->json($therapy);
+    }
+
+    
+    public function getTherapyBookingFee(Request $request)
+    {
+        $therapyID = $request->input('therapy_id');
+        $bookingDate = $request->input('booking_date');      
+
+        $Therapy = Mst_Therapy::find($therapyID);
+        $therapyCost = $Therapy->therapy_cost;
+        $bookingFee = $therapyCost;
+
+        $therapyRooms = Mst_Therapy_Therapyrooms::where('therapy_id', $therapyID)
+                    ->pluck('therapy_room_id');
+        $timeslots = Mst_Therapy_Room_Slot::whereIn('therapy_room_id', $therapyRooms)
+                    ->with(['slot'])
+                    ->get();
+        $timeslotInfo = [];
+        foreach ($timeslots as $slots) {
+            $timeslotInfo[] = [
+                'therapy_room_name' => $slots->therapyRoom->room_name,
+                'time_from' => $slots->slot->time_from,
+                'time_to' => $slots->slot->time_to,
+            ];
+        }
+        //wellness Info
+        $therapyName = $Therapy->therapy_name;
+
+        return response()->json([
+            'booking_fee' => $bookingFee,
+            'timeslots' => $timeslotInfo,
+            'therapy_name' => $therapyName,
+            'therapy_cost' => $therapyCost,
+        ]);
+    }
+
+
+
 
 
 

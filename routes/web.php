@@ -226,7 +226,7 @@ Route::middleware('auth')->group(function () {
 
 
     // Assigning timeslot for a particular therapy room
-    Route::get('/therapyroom-slot-assigning/index/{id}', [MstTherapyRoomSlotController::class, 'index'])->name('slot_assigning.index');
+    Route::get('therapyroom-slot-assigning/index/{id}', [MstTherapyRoomSlotController::class, 'index'])->name('therapy.slot_assigning.index');
     Route::post('/therapyroom-slot/store', [MstTherapyRoomSlotController::class, 'store'])->name('room.slot.store');
     Route::delete('/therapyroom-slot//destroy/{id}', [MstTherapyRoomSlotController::class, 'destroy'])->name('room.slot.destroy');
     Route::patch('therapyroom-slot//change-status/{id}', [MstTherapyRoomSlotController::class, 'changeStatus'])->name('room.slot.changeStatus');
@@ -367,7 +367,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/specialization/destroy/{id}', [MstStaffSpecializationController::class, 'destroy'])->name('specialization.destroy');
     Route::patch('specialization/{id}/change-status', [MstStaffSpecializationController::class, 'changeStatus'])->name('specialization.changeStatus');
 
-    //therapy-room-assigning:
+    //therapy-room-assigning to staff:
     Route::get('/therapyroom-assigning/index/{id}', [MstTherapyRoomAssigningController::class, 'index'])->name('therapyroomassigning.index');
     Route::get('/therapyroom-assigning/create', [MstTherapyRoomAssigningController::class, 'create'])->name('therapyroomassigning.create');
     Route::post('/therapyroom-assigning/store', [MstTherapyRoomAssigningController::class, 'store'])->name('therapyroomassigning.store');
@@ -376,6 +376,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/therapyroom-assigning/destroy/{id}', [MstTherapyRoomAssigningController::class, 'destroy'])->name('therapyroomassigning.destroy');
     Route::patch('therapyroom-assigning/change-status/{id}', [MstTherapyRoomAssigningController::class, 'changeStatus'])->name('therapyroomassigning.changeStatus');
     Route::get('/get-therapy-rooms/{branchId}', [MstTherapyRoomAssigningController::class, 'getTherapyRooms']);
+
+    
+    Route::get('/therapyroom-therapymapping', [MstTherapyRoomAssigningController::class, 'roomMappingIndex'])->name('therapymapping.index');
+    Route::post('/therapymap-room/store', [MstTherapyRoomAssigningController::class, 'roomMappingStore'])->name('therapy-map.room.store');
+    Route::get('/check-therapyroom-availability', [MstTherapyRoomAssigningController::class, 'therapyRoomAvailability'])->name('therapyRoomAvailability');
+    Route::delete('/therapy/room/destroy/{therapy_id}', [MstTherapyRoomAssigningController::class, 'roomDestroy'])->name('therapy.room.destroy');
+
+    
+
 
 
 
@@ -394,6 +403,9 @@ Route::middleware('auth')->group(function () {
     //adding timeslot for a particular staff:
     Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
     Route::post('/timeslot-staff/store', [MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
+
+   
+
 
 
 
@@ -748,6 +760,15 @@ Route::get('/booking/wellness-booking/create', [BookingController::class, 'Welln
 Route::get('/booking/getWellness', [BookingController::class, 'getWellnessList'])->name('booking.getWellness');
 Route::get('/booking/wellness/bookingfee', [BookingController::class, 'wellnessFee'])->name('wellness.getBookingFee');
 Route::get('/wellness/getMembershipAndBookingFee', [BookingController::class, 'wellnessMembershipandFee'])->name('wellness.getMembershipAndBookingFee');
+
+//Therapy Booking
+Route::get('/booking/therapy-booking', [BookingController::class, 'TherapyBooking'])->name('bookings.therapy.index');
+Route::get('/booking/therapy-booking/create', [BookingController::class, 'TherapyCreate'])->name('create.therapy.booking');
+Route::get('/booking/getTherapy', [BookingController::class, 'getTherapyList'])->name('booking.getTherapy');
+Route::get('/booking/therapy/getTherapyBookingFee', [BookingController::class, 'getTherapyBookingFee'])->name('therapy.getTherapyBookingFee');
+
+
+
 
 
 

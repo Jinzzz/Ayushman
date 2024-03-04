@@ -320,6 +320,8 @@
                     </li>
                     <li><a class="slide-item" href="{{ url('/booking/wellness-booking') }}">{{ __('Wellness Booking') }}</a>
                     </li>
+                    <li><a class="slide-item" href="{{ url('/booking/therapy-booking') }}">{{ __('Therapy Booking') }}</a>
+                    </li>
                 </ul>
             </li>
 
