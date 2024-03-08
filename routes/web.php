@@ -59,6 +59,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BranchStockTransferController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ConsultationController;
 
 
 
@@ -773,6 +774,11 @@ Route::get('/booking/therapy-refund', [BookingController::class, 'TherapyRefundi
 Route::get('/booking/therapy-refund/create', [BookingController::class, 'TherapyRefundCreate'])->name('create.therapy-refund');
 Route::get('/booking/therapy-refund/fetchRefundBookings', [BookingController::class, 'fetchRefundBookings'])->name('fetch.refund.bookings');
 Route::get('/booking/therapy-refund/fetchtherapyInfo', [BookingController::class, 'fetchtherapyInfo'])->name('fetch.refund.fetchtherapyInfo');
+
+//Doctor - Consultation 
+Route::get('/doctor/consultation/index', [ConsultationController::class, 'ConsultIndex'])->name('consultation.index');
+Route::get('/doctor/consultation/precription/add/{id}', [ConsultationController::class, 'PrescriptionAdd'])->name('doctor.precription.add');
+
 
 
 

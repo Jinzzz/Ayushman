@@ -327,6 +327,14 @@
                 </ul>
             </li>
 
+            <li class="slide">
+                <a class="side-menu__item {{ Request::is('consultation.index') ? 'active' : '' }}"
+                    href="{{ route('consultation.index') }}">
+                    <i class="fa-solid ti ti-file"></i>
+                    <span class="side-menu__label">Consultations</span>
+                </a>
+            </li>
+
 
             <li class="slide" style="display:none;">
                 <a class="side-menu__item {{ Request::is('prescriptions.index') ? 'active' : '' }}"
