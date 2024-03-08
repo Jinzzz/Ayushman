@@ -767,6 +767,15 @@ Route::get('/booking/therapy-booking/create', [BookingController::class, 'Therap
 Route::get('/booking/getTherapy', [BookingController::class, 'getTherapyList'])->name('booking.getTherapy');
 Route::get('/booking/therapy/getTherapyBookingFee', [BookingController::class, 'getTherapyBookingFee'])->name('therapy.getTherapyBookingFee');
 
+//Therapy Refund
+
+Route::get('/booking/therapy-refund', [BookingController::class, 'TherapyRefundindex'])->name('bookings.therapy-refund.index');
+Route::get('/booking/therapy-refund/create', [BookingController::class, 'TherapyRefundCreate'])->name('create.therapy-refund');
+Route::get('/booking/therapy-refund/fetchRefundBookings', [BookingController::class, 'fetchRefundBookings'])->name('fetch.refund.bookings');
+Route::get('/booking/therapy-refund/fetchtherapyInfo', [BookingController::class, 'fetchtherapyInfo'])->name('fetch.refund.fetchtherapyInfo');
+
+
+
 
 
 

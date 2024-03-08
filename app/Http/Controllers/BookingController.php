@@ -22,6 +22,7 @@ use App\Models\Mst_Wellness_Therapyrooms;
 use App\Models\Mst_Therapy_Therapyrooms;
 use App\Models\Mst_Therapy_Room_Slot;
 use App\Models\Mst_Therapy;
+use App\Models\Trn_Booking_Therapy_detail;
 
 class BookingController extends Controller
 {
@@ -289,7 +290,48 @@ class BookingController extends Controller
         ]);
     }
 
+    public function TherapyRefundindex(Request $request)
+    {
+        return view('booking.therapy-refund.index', [
+            'bookings' => Trn_Consultation_Booking::where('booking_type_id',86)->orderBy('created_at','DESC')->get(),
+            'pageTitle' => 'Therapy Refunds'
+        ]);
+    }
 
+    
+    public function TherapyRefundCreate(Request $request)
+    {
+        return view('booking.therapy-refund.create', [
+            'patients' => Mst_Patient::orderBy('patient_name','ASC')->get(),
+            'paymentType' => Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id'),
+            'pageTitle' => 'Add Therapy Refund'
+        ]);
+    }
+
+    public function fetchRefundBookings(Request $request)
+    {
+        $patientId = $request->input('patient_id');
+
+        $bookings = Trn_Consultation_Booking::where('patient_id', $patientId)
+            ->where('booking_type_id', 86)
+            ->where('is_paid', 1)
+            ->where('booking_status_id', 88) //confirmed
+            ->pluck('booking_reference_number', 'id');
+
+        return response()->json($bookings);
+    }
+
+    public function fetchtherapyInfo(Request $request)
+    {
+        $bookingId = $request->input('booking_id');
+        $booking = Trn_Consultation_Booking::with(['branch', 'bookingStatus'])
+            ->findOrFail($bookingId);
+        $therapies = Trn_Booking_Therapy_detail::with('therapy')
+            ->where('booking_id', $bookingId)
+            ->get();
+
+        return response()->json(['booking' => $booking, 'therapies' => $therapies]);
+    }
 
 
 

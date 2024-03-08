@@ -21,7 +21,8 @@ class Trn_Consultation_Booking extends Model
 
     public function bookingType()
     {
-        return $this->belongsTo(Sys_Booking_Type::class, 'booking_type_id', 'booking_type_id');
+        // return $this->belongsTo(Sys_Booking_Type::class, 'booking_type_id', 'booking_type_id');
+        return $this->belongsTo(Mst_Master_Value::class,'booking_type_id','id');
     }
 
     public function patient()
@@ -46,7 +47,8 @@ class Trn_Consultation_Booking extends Model
 
     public function bookingStatus()
     {
-        return $this->belongsTo(Sys_Booking_Status::class, 'booking_status_id', 'id');
+        // return $this->belongsTo(Sys_Booking_Status::class, 'booking_status_id', 'id');
+        return $this->belongsTo(Mst_Master_Value::class,'booking_status_id','id');
     }
 
     public function availability()
@@ -57,6 +59,11 @@ class Trn_Consultation_Booking extends Model
     public function therapy()
     {
         return $this->belongsTo(Mst_Therapy::class, 'therapy_id', 'id');
+    }
+
+    public function therapyBookings()
+    {
+        return $this->hasMany(Trn_Booking_Therapy_detail::class, 'id','booking_id');
     }
 
     public function wellness()

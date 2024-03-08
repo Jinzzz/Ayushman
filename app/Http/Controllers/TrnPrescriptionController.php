@@ -179,7 +179,10 @@ class TrnPrescriptionController extends Controller
     public function getPatientBookingIds($id)
     {
         try {
-            $allBookings = Trn_Consultation_Booking::where('patient_id', $id)->select('booking_reference_number', 'id')->get();
+            $allBookings = Trn_Consultation_Booking::where('patient_id', $id)
+            ->where('booking_type_id','=',84)  // consultation bookingonly
+            ->where('booking_status_id','89')  //completed bookings only . a booking will be marked as completed once the doctor enters prescription and mark consultation done.
+            ->select('booking_reference_number', 'id')->get();
             $data = [];
             foreach ($allBookings as $bookings) {
                 $data[$bookings->id] = $bookings->booking_reference_number;

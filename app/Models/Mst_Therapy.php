@@ -18,4 +18,9 @@ class Mst_Therapy extends Model
         'is_active',
         'deleted_at',
     ];
+
+    public function bookingTherapyDetails()
+    {
+        return $this->hasMany(Trn_Booking_Therapy_detail::class, 'therapy_id', 'id');
+    }
 }
