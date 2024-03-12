@@ -778,6 +778,7 @@ Route::get('/booking/therapy-refund/fetchtherapyInfo', [BookingController::class
 //Doctor - Consultation 
 Route::get('/doctor/consultation/index', [ConsultationController::class, 'ConsultIndex'])->name('consultation.index');
 Route::get('/doctor/consultation/precription/add/{id}', [ConsultationController::class, 'PrescriptionAdd'])->name('doctor.precription.add');
+Route::get('/doctor/patient/history/{id}', [ConsultationController::class, 'PatientHistory'])->name('doctor.patient.history');
 
 
 

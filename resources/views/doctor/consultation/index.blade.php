@@ -48,6 +48,7 @@
                                         <td></td>
                                         <td></td>
                                         <td>
+                                            <a class="btn btn-primary" href="{{ route('doctor.patient.history', $booking->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Patient History </a>
                                             <a class="btn btn-primary" href="{{ route('doctor.precription.add', $booking->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Prescription </a>
                                         </td>
                                     </tr>

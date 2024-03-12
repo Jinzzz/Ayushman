@@ -45,4 +45,15 @@ class ConsultationController extends Controller
             'bookingInfo' => $bookingInfo,
         ]);
     }
+
+    
+    public function PatientHistory($id, Request $request)
+    {
+        $bookingInfo = Trn_Consultation_Booking::findOrFail($id);
+        return view('doctor.consultation.patient-history', [
+            'pageTitle' => 'Patient History',
+        ]);
+    }
+
+
 }
