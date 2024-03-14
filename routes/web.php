@@ -106,6 +106,10 @@ Route::post('/receptionist-login-post', [MstAuthController::class, 'Receptionist
 Route::get('/doctor-login', [MstAuthController::class, 'showDoctorLoginForm'])->name('mst_login.doctor');
 Route::post('/receptionist-login-post', [MstAuthController::class, 'Doctorlogin'])->name('doctor.login.redirect');
 
+//Accountant id= 21
+Route::get('/accountant-login', [MstAuthController::class, 'showAccountantLoginForm'])->name('mst_login.accountant');
+Route::post('/accountant-login-post', [MstAuthController::class, 'Accountantlogin'])->name('accountant.login.redirect');
+
 // Auth::routes();
 
 // Routes to reset password starts
@@ -130,6 +134,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/doctor-home', [DashboardController::class, 'doctorIndex'])->name('doctor.home');
     });
 
+    Route::middleware(['role:21'])->group(function () {
+        Route::get('/accountant-home', [DashboardController::class, 'accountantIndex'])->name('accountant.home');
+    });
+
     //Route access for admin-pharmacist
     Route::middleware(['role:1|role:96'])->group(function () {
 
@@ -144,6 +152,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:1|role:20'])->group(function () {
 
     });
+
+     //Route access for admin-accountant
+     Route::middleware(['role:1|role:21'])->group(function () {
+
+     });
     
     // Dashboard 
     Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');

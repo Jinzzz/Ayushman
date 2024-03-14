@@ -222,7 +222,6 @@ class MstStaffController extends Controller
 
     public function edit($staff_id)
     {
-        
         $pageTitle = "Edit Staff";
         // $staffs = Mst_Staff::findOrFail($staff_id)
         // ->join('mst_salary', 'mst_staffs.staff_id', '=', 'mst_salary.staff_id')
@@ -231,12 +230,11 @@ class MstStaffController extends Controller
         //     'mst_staffs.*','mst_salary.*','mst_leave_config.*'
         // )
         // ->first();
-        $staffs = Mst_Staff::where('mst_staffs.staff_id','=',$staff_id)
-                ->join('mst_salary', 'mst_salary.staff_id',  '=',  'mst_staffs.staff_id')
-                ->join('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
-                 ->select('mst_staffs.*','mst_salary.*','mst_leave_config.*')
+        $staffs = Mst_Staff::where('mst_staffs.staff_id', '=', $staff_id)
+        ->leftJoin('mst_salary', 'mst_salary.staff_id', '=', 'mst_staffs.staff_id')
+        ->leftJoin('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
+        ->select('mst_staffs.*', 'mst_salary.*', 'mst_leave_config.*','mst_staffs.staff_id')
         ->first();
-   
        
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
         $selectedLeaveTypes = DB::table('mst_leave_config')

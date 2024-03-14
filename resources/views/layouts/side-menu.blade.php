@@ -39,6 +39,10 @@
                         <span class="text-muted app-sidebar__user-name text-sm">Doctor</span>
                     @break
 
+                    @case(21)
+                        <span class="text-muted app-sidebar__user-name text-sm">Acoountant</span>
+                    @break
+
                     @default
                         <span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
                     @break

@@ -34,6 +34,33 @@ class MstAuthController extends Controller
         return view('auth.doctor.login');
     }
 
+    public function showAccountantLoginForm()
+    {
+        return view('auth.accountant.login');
+    }
+
+    public function Accountantlogin(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+
+        if (Auth::guard('mst_users_guard')->attempt($credentials)) {
+             $user = Auth::guard('mst_users_guard')->user();
+                $user->last_login_time = now();
+                $user->save();
+            if ($user->user_type_id == 21) {
+                return redirect()->intended('/accountant-home');
+            } else {
+                Auth::guard('mst_users_guard')->logout();
+            return back()->withInput()->withErrors(['login' => 'Invalid Accountant User Credentials']);
+            }
+        } else {
+            // Authentication failed
+            return back()->withInput()->withErrors(['login' => 'Invalid credentials']);
+        }
+    }
+
+
     public function Doctorlogin(Request $request)
     {
         $credentials = $request->only('username', 'password');
@@ -141,6 +168,9 @@ class MstAuthController extends Controller
         } elseif ($user && $user->user_type_id == 20) {
             Auth::guard('mst_users_guard')->logout();
             return redirect('/doctor-login');
+        } elseif ($user && $user->user_type_id == 21) {
+            Auth::guard('mst_users_guard')->logout();
+            return redirect('/accountant-login');
         } else {
             return redirect('/login');
         }
