@@ -388,6 +388,8 @@
                         class="angle fa fa-angle-right"></i>
                 </a>
                 <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/application-settings') }}">{{ __('Application Settings') }}</a>
+                    </li>
                     <li><a class="slide-item" href="{{ url('/profile') }}">{{ __('Profile') }}</a>
                     </li>
                     <li><a class="slide-item" href="{{ url('/change-password') }}">{{ __('Change Password') }}</a>

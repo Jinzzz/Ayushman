@@ -736,6 +736,10 @@ Route::get('/get-salary-heads/{staff_id}', [SalaryProcessingController::class, '
 Route::get('/profile', [SettingsController::class, 'ProfileIndex'])->name('profile');
 Route::get('/change-password', [SettingsController::class, 'ChangePassword'])->name('change.password');
 Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->name('profile.update_password');
+Route::get('/application-settings', [SettingsController::class, 'SettingsIndex'])->name('application.settings');
+Route::post('/settings/update/{id}', [SettingsController::class, 'UpdateSettings'])->name('settings.update');
+
+
 
 //Reports
 Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sales.report');
