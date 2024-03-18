@@ -280,6 +280,8 @@
                             href="{{ url('/journel-entry') }}">{{ __('Journel Entry') }}</a></li>
                     <li><a class="slide-item"
                             href="{{ url('/income-expense/index') }}">{{ __('Income/Expense') }}</a></li>
+                    <li><a class="slide-item"
+                                href="{{ url('/staff-cash-deposit/index') }}">{{ __('Staff Cash Deposit') }}</a></li>
             </li>
             </ul>
 

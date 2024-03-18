@@ -9,6 +9,7 @@ use App\Models\Trn_Journel_Entry_Details;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Account_Ledger;
 use App\Models\Mst_Branch;
+use App\Models\Trn_staff_cash_deposit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
@@ -315,4 +316,24 @@ class TrnJournelEntryController extends Controller
             return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
     }
+
+
+    
+    public function CashDepositIndex(Request $request)
+    {
+        return view('staff-cash-deposit.index', [
+            'processDatas' => Trn_staff_cash_deposit::orderBy('created_at','DESC')->get(),
+            'pageTitle' => 'Staff Cash Deposit Transfers'
+        ]);
+    }
+
+    public function CashDepositCreate(Request $request)
+    {
+        return view('staff-cash-deposit.create', [
+            'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
+            'ledgerAccounts' => Mst_Account_Ledger::whereIn('account_sub_group_id', [4, 5])->get(),
+            'pageTitle' => 'Add Cash Deposit Transfer'
+        ]);
+    }
+
 }

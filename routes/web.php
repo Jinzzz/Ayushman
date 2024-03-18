@@ -797,6 +797,11 @@ Route::get('/doctor/consultation/index', [ConsultationController::class, 'Consul
 Route::get('/doctor/consultation/precription/add/{id}', [ConsultationController::class, 'PrescriptionAdd'])->name('doctor.precription.add');
 Route::get('/doctor/patient/history/{id}', [ConsultationController::class, 'PatientHistory'])->name('doctor.patient.history');
 
+//Accountant - Staff cash deposit
+Route::get('/staff-cash-deposit/index', [TrnJournelEntryController::class, 'CashDepositIndex'])->name('staff.cash.deposit.index');
+Route::get('/staff-cash-deposit/create', [TrnJournelEntryController::class, 'CashDepositCreate'])->name('create.cash.deposit');
+
+
 
 
 
