@@ -16,6 +16,8 @@ use App\Models\Mst_Salary;
 use App\Models\Staff_Leave;
 use App\Models\Mst_Leave_Type;
 use App\Models\Salary_Head_Master;
+use App\Models\Trn_Staff_Advance_Salary;
+use App\Models\Mst_Master_Value;
 
 class SalaryProcessingController extends Controller
 {
@@ -137,5 +139,25 @@ class SalaryProcessingController extends Controller
             'deductions' => $deductions
         ]);
     }
+
+    
+    public function AdvanceSalaryIndex(Request $request)
+    {
+        return view('advance-salary.index', [
+            'processDatas' => Trn_Staff_Advance_Salary::orderBy('created_at','DESC')->get(),
+            'pageTitle' => 'Advance Salary'
+        ]);
+    }
+    
+    public function AdvanceSalaryCreate(Request $request)
+    {
+        return view('advance-salary.create', [
+            'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
+            'paymentType' => Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id'),
+            'pageTitle' => 'Add Advance Salary'
+        ]);
+    }
+
+
 
 }

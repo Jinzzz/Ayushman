@@ -261,6 +261,9 @@
                     <li><a class="slide-item"
                             href="{{ route('salary-processing.index') }}">{{ __('Salary Processing') }}</a>
                     </li>
+                    <li><a class="slide-item"
+                        href="{{ route('advance-salary.index') }}">{{ __('Advance Salary') }}</a>
+                </li>
             </li>
             </ul>
             <!-- Accounts  -->

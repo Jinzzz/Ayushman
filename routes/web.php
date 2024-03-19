@@ -801,6 +801,11 @@ Route::get('/doctor/patient/history/{id}', [ConsultationController::class, 'Pati
 Route::get('/staff-cash-deposit/index', [TrnJournelEntryController::class, 'CashDepositIndex'])->name('staff.cash.deposit.index');
 Route::get('/staff-cash-deposit/create', [TrnJournelEntryController::class, 'CashDepositCreate'])->name('create.cash.deposit');
 
+//HRMS - Advance Salary
+Route::get('/advance-salary/index', [SalaryProcessingController::class, 'AdvanceSalaryIndex'])->name('advance-salary.index');
+Route::get('/advance-salary/create', [SalaryProcessingController::class, 'AdvanceSalaryCreate'])->name('staff.advance-salary.create');
+
+
 
 
 
