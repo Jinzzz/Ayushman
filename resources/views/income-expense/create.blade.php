@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .disabledC {
+    pointer-events: none;
+}
+</style>
 <div class="container">
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
@@ -53,7 +58,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Amount*</label>
-                           <input type="text" required class="form-control"  name="income_expense_amount"  id="numericInput" value="{{old('income_expense_amount')}}" placeholder="Amount" pattern="\d+(\.\d{0,2})?">
+                           <input type="text" required class="form-control"  name="income_expense_amount" id="numericInput"   value="{{old('income_expense_amount')}}" placeholder="Amount" pattern="\d+(\.\d{0,2})?">
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -92,17 +97,29 @@
                            <input type="text" class="form-control"  name="reference"  id="reference" value="{{old('reference')}}" placeholder="Reference">
                         </div>
                      
-                     <div class="col-md-12">
+                     <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Notes</label>
                            <input type="text" class="form-control"  name="notes"  id="notes" value="{{old('notes')}}" placeholder="Notes">
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-group errorFm">
+                           <label class="form-label">Reference File (Supported Formats: .pdf, .doc, .docx. Max size: 2 MB)</label>
+                            <input type="file" class="form-control" accept=".pdf, .doc, .docx" name="reference_file" >
+                            
+                            <div class="name">
+                                @if ($errors->has('reference_file'))
+                                    <span class="text-danger errbk">{{ $errors->first('reference_file') }}</span>
+                                @endif
+                             </div>
                         </div>
                      </div>
                   </div>
                   <!-- ... -->
                   <div class="form-group">
                      <center>
-                        <button type="submit" class="btn btn-raised btn-primary">
+                        <button type="submit" class="btn btn-raised btn-primary" id="submitFm" >
                         <i class="fa fa-check-square-o"></i> Add</button>
                         <button type="reset" class="btn btn-raised btn-success">
                         <i class="fa fa-refresh"></i> Reset</button>
@@ -158,6 +175,32 @@
             }
          });
       });
+      
+      $(document).ready(function() {
+          $('input[name="reference_file"]').on('change', function() {
+            if($(this).val()){
+                var fileSize = this.files[0].size;
+            var maxSize = 2 * 1024 * 1024; 
+        
+            if (fileSize > maxSize) {
+            //   $('#submitFm').prop('disabled', true);
+            $('#submitFm').addClass("disabledC");
+              if (!$('#error_message').length) {
+                $('<div id="error_message" style="color: red;">File size exceeds 2 MB</div>').appendTo('.errorFm');
+              }
+            } else {
+             $('#submitFm').removeClass("disabledC");
+              $('#error_message').remove();
+            }
+            }
+            else {
+                $('#submitFm').removeClass("disabledC");
+              $('#error_message').remove();
+            }
+            
+          });
+        });
+
 </script>
 
 <script>

@@ -8,7 +8,9 @@
     </style>
     <div class="row">
         <div class="col-md-12 col-lg-12">
-            <div class="card">
+            <button class="btn btn-blue displayfilter"><i class="fa fa-filter" aria-hidden="true"></i>
+                <span>Show Filters</span></button>
+            <div class="card displaycard ShowFilterBox">
                 <div class="card-header">
                     <h3 class="card-title">Search Medicine</h3>
                 </div>
@@ -81,7 +83,8 @@
                     <thead>
                         <tr>
                             <th>SL.NO</th>
-                            <th>Medicine Name</th>
+                            <th>Medicine Name</th> 
+                            <th>Code</th>
                             <th>Generic Name</th>
                             <th>Medicine Type</th>
                             <th>Status</th>
@@ -95,32 +98,26 @@
                         @foreach ($medicines as $medicine)
                             <tr id="dataRow_{{ $medicine->id }}">
                                 <td>{{ ++$i }}</td>
-                                <td>{!! wordwrap($medicine->medicine_name, 25, '<br>') !!}
-                                    <br>
-                                    <span style="font-weight: bold;">Code:</span> {!! wordwrap($medicine->medicine_code, 25, '<br>') !!}
-                                </td>
+                                <td>{!! wordwrap($medicine->medicine_name, 25, '<br>') !!} </td>    
+                                <td>{!! wordwrap($medicine->medicine_code, 25, '<br>') !!}</td>
                                 <td>{!! wordwrap($medicine->generic_name, 25, '<br>') !!}</td>
                                 <td>{{ $medicine->medicineType->master_value }}</td>
 
-                                <td>
-                                    <button type="button" style="width: 70px;" onclick="changeStatus({{ $medicine->id }})"
-                                        class="btn btn-sm @if ($medicine->is_active == 0) btn-danger @else btn-success @endif">
-                                        @if ($medicine->is_active == 0)
-                                            Inactive
-                                        @else
-                                            Active
-                                        @endif
-                                    </button>
-                                </td>
+                                       <td>
+                        <button onclick="changeStatus({{ $medicine->id }})" type="button" style="width: 70px;" class="btn btn-sm @if($medicine->is_active == 0) btn-danger @else btn-success @endif" data-staff_id="{{ $medicine->id }}">
+                @if($medicine->is_active == 0)
+                    Inactive
+                @else
+                    Active
+                @endif
+            </button>
+                        </td>
                                 <td>
                                     <a class="btn btn-secondary btn-sm"
                                         href="{{ route('medicine.edit', $medicine->id) }}"><i class="fa fa-pencil-square-o"
                                             aria-hidden="true"></i> Edit </a>
                                     <a class="btn btn-secondary btn-sm" href="{{ route('medicine.show', $medicine->id) }}">
                                         <i class="fa fa-eye" aria-hidden="true"></i> View </a><br><br>
-                                    <a class="btn btn-secondary btn-sm"
-                                        href="{{ route('viewMedicineStockUpdation.view', $medicine->id) }}">
-                                        <i class="fa fa-eye" aria-hidden="true"></i> Stock </a>
                                     <form style="display: inline-block"
                                         action="{{ route('medicine.destroy', $medicine->id) }}" method="post">
                                         @csrf
@@ -141,6 +138,10 @@
     {{-- </div> --}}
     </div>
 @endsection
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function deleteData(dataId) {
         swal({
@@ -187,51 +188,47 @@
     }
     // Change status 
     function changeStatus(dataId) {
-        swal({
-                title: "Change Status?",
-                text: "Are you sure you want to change the status?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-                closeOnConfirm: true,
-                closeOnCancel: true
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                        url: "{{ route('medicine.changeStatus', '') }}/" + dataId,
-                        type: "patch",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                        },
-                        success: function(response) {
-                            if (response == '1') {
-                                var cell = $('#dataRow_' + dataId).find('td:eq(4)');
+    Swal.fire({
+        title: "Change Status?",
+        text: "Are you sure you want to change the status of this data?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/medicine-update-status/' + dataId,
 
-                                if (cell.find('.btn-success').length) {
-                                    cell.html(
-                                        '<button type="button" style="width: 70px;"  onclick="changeStatus(' +
-                                        dataId +
-                                        ')" class="btn btn-sm btn-danger">Inactive</button>');
-                                } else {
-                                    cell.html(
-                                        '<button type="button" style="width: 70px;"  onclick="changeStatus(' +
-                                        dataId + ')" class="btn btn-sm btn-success">Active</button>'
-                                    );
-                                }
+                type: 'PATCH',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var cell = $('#dataRow_' + dataId).find('td:eq(5)');
+                        var buttonClass = response.status == 1 ? 'btn-success' : 'btn-danger';
+                        var buttonText = response.status == 1 ? 'Active' : 'Inactive';
 
-                                flashMessage('s', 'Status changed successfully');
-                            } else {
-                                flashMessage('e', 'An error occurred! Please try again later.');
-                            }
-                        },
-                        error: function() {
-                            alert('An error occurred while changing the medicine status.');
-                        },
+                         cell.html('<button type="button" style="width: 70px;" onclick="changeStatus(' + dataId + ')" class="btn btn-sm ' + buttonClass + '">' + buttonText + '</button>');
+
+                        flashMessage('s', 'Status changed successfully');
+                    } else {
+                        flashMessage('e', 'An error occurred! Please try again later.');
+                    }
+                    },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while changing the status.',
                     });
-                }
+                },
             });
-    }
+        }
+    });
+}
 </script>

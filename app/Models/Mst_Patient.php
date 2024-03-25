@@ -30,6 +30,7 @@ class Mst_Patient extends Model
         'password',
         'whatsapp_number',
         'is_active',
+        'has_credit',
         'deleted_at',
 
     ];
@@ -58,6 +59,11 @@ class Mst_Patient extends Model
     {
       return $this->belongsTo(Mst_Master_Value::class,'patient_registration_type','id');
     }
+     public function familyMembers()
+    {
+      return $this->hasMany(Trn_Patient_Family_Member::class,'patient_id','id');
+    }
+   
 
 
 

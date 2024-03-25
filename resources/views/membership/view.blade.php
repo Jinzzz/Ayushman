@@ -107,7 +107,7 @@
 													<p class="card-text">
 														<strong>Duration:</strong> {{ $wellness->wellness_duration }}<br>
 														<strong>Maximum Usage Limit:</strong> {{ $wellness->maximum_usage_limit }}<br>
-														<strong>Wellness Inclusions:</strong> {{ $wellness->wellness_inclusions }}<br>
+														<strong>Wellness Inclusions:</strong> {!! $wellness->wellness_inclusions !!}<br>
 														<!-- <strong>Wellness staus:</strong> {{ isset($wellness->is_active) && $wellness->is_active == 1 ? 'Active' : 'Inactive' }} -->
 													</p>
 												</div>

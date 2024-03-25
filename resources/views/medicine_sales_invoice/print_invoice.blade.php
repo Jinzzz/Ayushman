@@ -74,6 +74,7 @@
 			</colgroup>
 			<tr style="text-align: left;">
 				<th colspan="6" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Medicine Name</th>
+				<th colspan="6" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Unit</th>
 				<th colspan="1" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Qty</th>
 				<th colspan="1" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Amt</th>
 				<th colspan="1" style="padding: 10px; border: 1px solid #999; background: #f1f2f2;">Mfd</th>
@@ -82,6 +83,7 @@
 			@foreach($medicine_sale_details as $invoice)
 			<tr>
 				<td colspan="6" style="padding: 10px; border: 1px solid #999;">{{$invoice->medicine->medicine_name}}</td>
+				<td colspan="6" style="padding: 10px; border: 1px solid #999;">{{$invoice->unit->unit_name}}</td>
 				<td colspan="1" style="padding: 10px; border: 1px solid #999;">{{intval($invoice->quantity)}}</td>
 				<td colspan="1" style="padding: 10px; border: 1px solid #999;">{{ number_format($invoice->amount, 2) }}</td>
 				<td colspan="1" style="padding: 10px; border: 1px solid #999;">{{ date('d-m-Y', strtotime($invoice->manufactured_date)) }}</td>
@@ -108,7 +110,8 @@
 					<p style="margin: 15px 0 0;">Subtotal : {{$data['sub_total']}} /-</p>
 					<p style="margin: 15px 0 0;">Tax Amount : {{$data['tax_amount']}} /-</p>
 					<p style="margin: 15px 0 0;"><b>Total Amount : {{$data['total_amount']}} /-</b></p>
-					<p style="margin: 15px 0 0;">Discount Amount : {{$data['discount_amount']}} /-</p>
+					<p style="margin: 15px 0 0;">Discount Amount: {{ $data['discount_amount'] ?? '0' }} /-</p>
+
 					<h3 style="margin: 15px 0 0;"><b>Payable Amount : {{$data['payable_amount']}} /-</b></h3>
 				</td>
 			</tr>

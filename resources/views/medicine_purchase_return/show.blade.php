@@ -43,6 +43,7 @@
                                         <th class="wd-15p">Product Name</th>
                                         <th class="wd-15p">Quantity</th>
                                         <th class="wd-15p">Product Unit</th>
+                                        <th class="wd-15p">Product Tax</th>
                                         <th class="wd-15p">Return Quantity</th>
                                
                                     </tr>
@@ -58,6 +59,7 @@
                                                 <input type="text" class="form-control" readonly name="unit_id[]" value="{{ $unit[$detail->unit_id] }}" />
                                                
                                             </td>
+                                            <td><input type="text" class="form-control" readonly name="free_quantity[]" value="{{ $detail->tax_rate }}"></td>
                                             <td><input type="text" class="form-control" readonly name="free_quantity[]" value="{{ $detail->return_quantity }}"></td>
 
                                         </tr>

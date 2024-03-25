@@ -92,8 +92,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Pincode*</label>
-                                    <input type="number" class="form-control" required name="pincode" max="999999" min="100000" value="{{$supplier->pincode}}" placeholder="Pincode">
+                                    <label class="form-label">Pincode</label>
+                                    <input type="number" class="form-control" name="pincode" max="999999" min="100000" value="{{$supplier->pincode}}" placeholder="Pincode">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -120,8 +120,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Email*</label>
-                                    <input type="email" class="form-control" required name="email" value="{{$supplier->email}}" placeholder="Email">
+                                     <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" value="{{$supplier->email}}" placeholder="Email">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -134,7 +134,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Credit Period</label>
+                                    <label class="form-label">Credit Period (Days)</label>
                                     <input type="number" max="99" class="form-control" min="0" pattern="\d*" name="credit_period" value="{{$supplier->credit_period}}" placeholder="Credit Period">
                                 </div>
                             </div>

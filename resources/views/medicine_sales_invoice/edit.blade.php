@@ -135,8 +135,7 @@ use App\Helpers\AdminHelper;
                                           </select>
                                        </td>
                                        <td><textarea class="form-control" name="description[]" placeholder="Description"></textarea></td>
-                                       <td><input type="number" min="0" class="form-control" value="{{ $ledgerPosting ? $ledgerPosting->debit : 0 }}" name="debit[]"></td>
-                                       <td><input type="number" readonly class="form-control" value="{{$ledgerPosting->credit}}" name="credit[]"></td>
+
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                     </tr>
                                     @foreach ($all_medicine_sale_details as $sale_details)

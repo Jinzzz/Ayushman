@@ -36,15 +36,15 @@ class MstMembershipController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'membership_package_name' => ['required'],
+                'membership_package_name' => 'required|unique:mst__membership__packages,package_title',
                 'membership_package_duration' => ['required'],
                 'membership_package_price' => ['required'],
                 // 'discount_price' => ['required'],
-                // 'membership_package_description' => ['required'],
+                'membership_package_description' => 'max:200',
                 'membership_package_active' => ['required'],
                 'wellness_id' => ['required'],
                 'max_limit' => ['required'],
-                'benefits' => ['required'],
+                'benefits' => 'required||max:200',
             ],
             [
                 'membership_package_name.required' => 'Membership package name is required',
@@ -126,10 +126,12 @@ class MstMembershipController extends Controller
 
     public function update(Request $request, $id)
     {
+       
         $validator = Validator::make(
             $request->all(),
             [
                 'update_type' => 'required',
+                //  'membership_package_name' => 'required|unique:mst__membership__packages,package_title,' . $membershipPackage,
             ],
             [
                 'update_type.required' => 'Update type is required',
@@ -140,6 +142,13 @@ class MstMembershipController extends Controller
             if (!empty($request->update_type)) {
                 if ($request->update_type == 1) {
                     $membershipPackage = Mst_Membership_Package::find($id);
+                    $existingPackage = Mst_Membership_Package::where('package_title', $request->membership_package_name)
+                                        ->where('membership_package_id', '!=', $id)
+                                        ->exists();
+                    if ($existingPackage) {
+                         return redirect()->route('membership.edit', ['id' => $id, 'active_tab' => 1])->with('success', 'Package name already exists.');
+                    }
+                    
                     if ($membershipPackage) {
                         $membershipPackage->update([
                             'package_title'      => $request->membership_package_name,
@@ -211,7 +220,7 @@ class MstMembershipController extends Controller
                             $message = "Benefits updated successfully";
                             $status = 'success';
                         } else {
-                            $message = "Someting went wrong";
+                            $message = "Something went wrong";
                             $status = 'error';
                         }
                     }else{

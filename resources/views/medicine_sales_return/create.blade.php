@@ -2,6 +2,7 @@
 @section('content')
 @php
 use App\Helpers\AdminHelper;
+use App\Models\Mst_Staff;
 // dd(AdminHelper::getProductId($value->medicine_code));
 @endphp
 <div class="container">
@@ -45,7 +46,8 @@ use App\Helpers\AdminHelper;
                @endif
                @if ($errors->any())
                <div class="alert alert-danger">
-                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->                  <ul>
+                  <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                  <ul>
                      @foreach ($errors->all() as $error)
                      <li>{{ $error }}</li>
                      @endforeach
@@ -56,35 +58,68 @@ use App\Helpers\AdminHelper;
                   @csrf
                   <input type="hidden" name="discount_percentage" value="3" id="discount_percentage">
                   <div class="row">
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
-                           <label class="form-label">Select Patient*</label>
-                           <select class="form-control" name="patient_id" id="patient_id" required>
-                              <option value="">Select Patient</option>
-                              <option value="0">Guest Patient</option>
-                              @foreach ($patients as $patient)
-                              <option value="{{ $patient->id }}">
-                                 {{ $patient->patient_name }} ({{ $patient->patient_code }})
-                              </option>
+                           <label class="form-label">Select Invoice ID*</label>
+                           <select class="form-control" name="patient_invoice_id" id="patient_invoice_id" required="">
+                              <option value="">Choose Invoice ID</option>
+                              @foreach ($invoices as $invoice)
+                              <option value="{{ $invoice->sales_invoice_id }}">{{ $invoice->sales_invoice_number }}</option>
                               @endforeach
                            </select>
+
                         </div>
                      </div>
 
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
-                           <label class="form-label">Select Invoice ID</label>
-                           <select class="form-control" name="patient_invoice_id" id="patient_invoice_id">
-                              <option value="">Choose Invoice ID</option>
-                           </select>
+
+                           <label class="form-label">Patient*</label>
+                           <input type="text" class="form-control" name="patient_id" id="patient_id" required readonly placeholder="Patient">
+                           <input type="hidden" id="patient_id_hidden" name="patient_id_hidden" />
                         </div>
                      </div>
 
 
-                     <div class="col-md-4">
+                     <div class="col-md-3">
                         <div class="form-group">
                            <label class="form-label">Return Date</label>
                            <input type="date" class="form-control" readonly name="due_date" id="date" placeholder="Date">
+                        </div>
+                     </div>
+                     <div class="col-md-3">
+                        <div class="form-group">
+                           <label class="form-label">Pharmacy*</label>
+                           @if(Auth::check() && Auth::user()->user_type_id == 96)
+                               @php
+                                $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                                $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                               @endphp
+                               
+                                   <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                                       <option value="">Select Pharmacy</option>
+                                       @foreach ($pharmacies as $pharmacy)
+                                           @if(in_array($pharmacy->id, $mappedpharma))
+                                               <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                                           @endif
+                                       @endforeach
+                                </select>
+                          
+                       @else
+                            @if(session()->has('pharmacy_id') && session()->has('pharmacy_name') && session('pharmacy_id') != "all")
+                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required readonly>
+                                   <option value="{{ session('pharmacy_id') }}">{{ session('pharmacy_name') }}</option>
+                               </select>
+                           @else
+                               <select class="form-control" name="pharmacy_id" id="pharmacy_id" required>
+                                   <option value="">Select Pharmacy</option>
+                                   @foreach ($pharmacies as $pharmacy)
+                                       <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                                   @endforeach
+                               </select>
+                            @endif
+                       @endif
+                         
                         </div>
                      </div>
 
@@ -109,8 +144,9 @@ use App\Helpers\AdminHelper;
                               <table class="table card-table table-vcenter text-nowrap" id="productTable">
                                  <thead>
                                     <tr>
-                                    <th>Medicine Name</th>
+                                       <th>Medicine Name</th>
                                        <th>Batch No</th>
+                                       <th>Quantity</th>
                                        <th>Return Quantity</th>
                                        <th>Unit</th>
                                        <th>Rate</th>
@@ -124,22 +160,20 @@ use App\Helpers\AdminHelper;
                                        <th>Manufacture Date</th>
                                        <th>Expiry Date</th> -->
                                     </tr>
-                                 </thead>
-                                 <tbody>
                                     <tr id="productRowTemplate" style="display: none">
                                        <td>
-                                          <select class="form-control " name="medicine_id[]" dis>
-                                             <option value="">Please select medicine</option>
-                                             @foreach($medicines as $medicine)
-                                             <option value="{{ $medicine->id }}">{{ $medicine->medicine_name}}</option>
-                                             @endforeach
-                                          </select>
+                                          <input type="text" class="form-control medicine-select" name="medicine_id[]" readonly>
+                                          <input type="hidden" id="medicine_id_hidden" name="medicine_id_hidden[]" />
                                        </td>
                                        <td class="medicine-batch-no"><input type="text" class="form-control" name="batch_no[]" readonly></td>
+                                       <td class="medicine-qty"><input type="text" class="form-control" name="qty[]" readonly></td>
                                        <td class="medicine-quantity"><input type="number" min="1" class="form-control" name="quantity[]" oninput="calculateAmount(this)"></td>
-                                       <td class="medicine-unit-id"><input type="text" class="form-control" name="unit_id[]" readonly></td>
-                                       <td class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
-                                       <td class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
+                                       <td style="width: 15%;" class="medicine-unit-id">
+                                           <input type="text" class="form-control" name="unit_id[]" readonly>
+                                           <input type="hidden" id="unit_id_hidden" name="unit_id_hidden[]" />
+                                        </td>
+                                       <td style="width: 15%;" class="medicine-rate"><input type="text" class="form-control" name="rate[]" readonly></td>
+                                       <td style="width: 15%;" class="medicine-amount"><input type="text" class="form-control" name="amount[]" readonly></td>
                                        <td><button type="button" onclick="myClickFunction(this)" style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
                                        <td class="display-med-row medicine-stock-id"><input type="hidden" class="form-control" name="med_stock_id[]" readonly></td>
 
@@ -152,6 +186,9 @@ use App\Helpers\AdminHelper;
                                        <td class="display-med-row medicine-mfd"><input type="hidden" class="form-control" name="mfd[]" readonly></td>
                                        <td class="display-med-row medicine-expd"><input type="hidden" class="form-control" name="expd[]" readonly></td>
                                     </tr>
+                                 </thead>
+                                 <tbody>
+
                                  </tbody>
                               </table>
                            </div>
@@ -194,7 +231,7 @@ use App\Helpers\AdminHelper;
                               </table>
                            </div>
                            <div class="modal-footer">
-                           <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal" data-dismiss="modal">Select</button>
                            </div>
                         </div>
                      </div>
@@ -204,8 +241,8 @@ use App\Helpers\AdminHelper;
                         <!-- Left Div - terms_condition -->
                         <div id="terms_condition" class="custom-margin">
                            <div class="form-group">
-                              <label class="form-label">Notes:</label>
-                              <textarea class="form-control" name="notes" placeholder="Notes"></textarea>
+                              <label class="form-label">Notes:*</label>
+                              <textarea class="form-control" name="notes" placeholder="Notes" required=""></textarea>
                            </div>
                         </div>
                      </div>
@@ -221,16 +258,16 @@ use App\Helpers\AdminHelper;
                                     </tr>
                                     <tr>
                                        <td><strong>Tax Amount</strong></td>
-                                       <td style="text-align: right;"><strong class="tax-amount">0</strong><input type="hidden" id="tax-amount-input" name="total_tax_amount" value="0"></td>
+                                       <td style="text-align: right;"><strong class="tax-amount">0</strong><input type="hidden" id="tax-amount-input-1" name="total_tax_amount" value="0"></td>
                                     </tr>
                                     <tr>
                                        <td><strong>Total Amount</strong></td>
                                        <td style="text-align: right;"><strong class="total-amount">0</strong><input type="hidden" id="total-amount-input" name="total_amount" value="0"></td>
                                     </tr>
-                                    <tr>
+                                    <!-- <tr>
                                        <td><strong>Discount Amount</strong></td>
                                        <td style="text-align: right;"><strong class="discount-amount">0</strong><input type="hidden" id="discount-amount-input" name="discount_amount" value="0"></td>
-                                    </tr>
+                                    </tr> -->
                                  </table>
                                  <hr>
                                  <div class="form-group mb-2"> <!-- Decreased margin height -->
@@ -399,7 +436,6 @@ use App\Helpers\AdminHelper;
          // Get the values from the input fields in the current row
          var calculatedAmount = parseFloat($(this).find('input[name="quantity[]"]').val() * $(this).find('input[name="rate[]"]').val()) - (parseFloat($(this).find('input[name="discount[]"]').val()) + parseFloat($(this).find('input[name="tax[]"]').val()));
          var amount = parseFloat($(this).find('input[name="amount[]"]').val()) || 0;
-
          // Compare the calculated amount with the entered amount
          var epsilon = 0.0001; // A small positive number to account for floating-point precision
          if (Math.abs(calculatedAmount - amount) > epsilon) {
@@ -454,29 +490,32 @@ use App\Helpers\AdminHelper;
    }
 
 
-   $('#patient_id').on('change', function() {
-      var selected_patient_id = $(this).val();
+   $('#patient_invoice_id').on('change', function() {
+      var selected_patient_invoice_id = $(this).val();
+
 
       $.ajax({
-         url: "{{ route('get.patient.invoice.ids', '') }}/" + selected_patient_id,
+         url: "{{ route('get.patient.invoice.ids', '') }}/" + selected_patient_invoice_id,
          method: "patch",
          data: {
             _token: "{{ csrf_token() }}",
+            selected_patient_invoice_id: selected_patient_invoice_id // Include selected_patient_invoice_id in the data
          },
          success: function(data) {
-            // alert(1);
-            $('#patient_invoice_id').empty().append('<option value="">Choose Invoice ID</option>');
-            $.each(data, function(key, value) {
 
-               $('#patient_invoice_id').append('<option value="' + key + '">' + value + '</option>');
+            $('#patient_id').empty();
+            $.each(data, function(key, value) {
+               $('#patient_id').val(`${value.patient_name}`);
+               $('#patient_id_hidden').val(value.patient_id);
             });
          },
          error: function() {
-            console.log('Error fetching account sub groups.');
+            console.log('Error fetching patient IDs.');
          }
       });
 
    });
+
 
    function toggleStatus(checkbox) {
       if (checkbox.checked) {
@@ -751,6 +790,20 @@ use App\Helpers\AdminHelper;
    });
    // calculate amount 
    function calculateAmount(input) {
+       
+             if (input.value < 1) {
+            input.value = 1;
+        }
+
+      var quantityInput = input.value;
+      var qty = parseInt($(input).closest('tr').find('.medicine-qty input').val());
+      if (quantityInput > qty) {
+         swal("Error", "Quantity cannot be greater than available quantity", "error");
+         input.value = qty;
+      } else {
+         // Your existing calculation logic here
+         // For example, updating the total amount based on the quantity
+      }
       // Get the parent row
       var row = input.closest('tr');
       var inputElements = $('input[name="amount[]"]');
@@ -783,19 +836,17 @@ use App\Helpers\AdminHelper;
          var totalTax = 0
          amount.each(function() {
             sum1 = parseFloat($(this).val()) || 0;
-            var x = $(this).parent("td").siblings(".medicine-tax-rate").find('input').val();
-            // alert(x)
+            var x = $(this).closest("tr").find('.medicine-tax-rate input').val();
             x = parseFloat(x) || 0;
             var tax = (sum1 * x) / 100;
-            var y = $(this).parent("td").siblings(".medicine-tax-amount").find('input');
-            y.val(tax)
-            // alert(rate)
-            totalTax += tax
+            var taxField = $(this).closest("tr").find('.medicine-tax-amount input');
+            taxField.val(tax.toFixed(2)); // Update tax input field
+            totalTax += tax;
          });
 
 
-         $(".tax-amount").text(totalTax);
-         $('#tax-amount-input').val(totalTax);
+         $(".tax-amount").text(totalTax.toFixed(2));
+         $('#tax-amount-input-1').val(totalTax.toFixed(2));
          $(".total-amount").text(sum + totalTax);
          $('#total-amount-input').val(sum + totalTax);
 
@@ -804,19 +855,23 @@ use App\Helpers\AdminHelper;
          var discount = $("#discount_percentage").val()
          var discountT = (totalA * discount) / 100
          //alert(discountT)
-         $("#discount-amount-input").val(discountT)
-         $(".discount-amount").text('' + discountT)
-         var payable = totalA - discountT
+         //$("#discount-amount-input").val(discountT)
+         $(".tax-amount").text('' + discountT)
+         $("#tax-amount-input-1").val(discountT)
+         var payable = totalA + discountT
 
+         //alert(payable)
          $(".payable-amount b").text('' + payable)
          $(".paid-amount").val(payable)
+
+         $(".total-amount").text(payable)
+         $("#total-amount-input").val(payable)
 
 
 
       } else {
-         amountInput.value = ''; // Clear the amount if either quantity or rate is not a number
+         amountInput.value = '';
       }
-
 
    }
    $(document).on('click', '.no-selected-item', function() {
@@ -839,10 +894,6 @@ use App\Helpers\AdminHelper;
       var stck = parseFloat($(this).closest('tr').find('.medicine-current-stock input').val());
       var lmt = parseFloat($(this).closest('tr').find('.medicine-reorder-limit input').val());
       var quantity = parseFloat($(this).val());
-      // $(".selectedCls").find(".medicine-quantity").append('<span>Limited Stock</span>')
-      // alert(lmt)
-      // alert(quantity)
-
 
       var checkVal = 0
       if (stck > lmt) {
@@ -850,10 +901,10 @@ use App\Helpers\AdminHelper;
          //alert(checkVal)
          $(this).closest('tr').find(".medicine-quantity span").remove()
       } else {
-         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+         $(this).closest('tr').find(".medicine-quantity");
       }
       if (checkVal != 0 && checkVal <= quantity) {
-         $(this).closest('tr').find(".medicine-quantity").append('<span>Limited Stock</span>')
+         $(this).closest('tr').find(".medicine-quantity");
       }
       if (checkVal > quantity) {
          $(this).closest('tr').find(".medicine-quantity span").remove()
@@ -862,34 +913,40 @@ use App\Helpers\AdminHelper;
 
 
    $(document).ready(function() {
-        $('#patient_invoice_id').change(function() {
-            var purchaseInvoiceId = $(this).val();
-            $.ajax({
-               url: '/get-sale-invoice-details',
-                method: 'GET',
-                data: {
-                  patient_invoice_id: purchaseInvoiceId
-                },
-                success: function(response) {
-                    if (response.length > 0) {
-                        for (var i = 0; i < response.length; i++) {
-                            var newRow = $("#productRowTemplate").clone();
-                            newRow.removeAttr("style");
-
-                            newRow.find('select[name="product_id[]"]').val(response[i].product_id);
-                            newRow.find('input[name="quantity[]"]').val(response[i].quantity);
-                            newRow.find('select[name="unit_id[]"]').val(response[i].unit_id);
-                            newRow.find('input[name="rate[]"]').val(response[i].rate);
-                            newRow.find('input[name="free_quantity[]"]').val(response[i].free_quantity);
-                            $('#productTable tbody').append(newRow);
-                        }
-                    } else {}
-                },
-                error: function() {
-                    alert('Error fetching purchase invoice details.');
-                }
-            });
-        });
-    });
+      $('#patient_invoice_id').change(function() {
+         var purchaseInvoiceId = $(this).val();
+         $.ajax({
+            url: '/get-sale-invoice-details',
+            method: 'GET',
+            data: {
+               patient_invoice_id: purchaseInvoiceId
+            },
+            success: function(response) {
+               console.log(response);
+               if (response.length > 0) {
+                  $('#productTable tbody').empty()
+                  for (var i = 0; i < response.length; i++) {
+                     var newRow = $("#productRowTemplate").clone();
+                     newRow.removeAttr("style");
+                     newRow.find('input[name="medicine_id[]"]').val(response[i].medicine_name);
+                     newRow.find('input[name="medicine_id_hidden[]"]').val(response[i].medicine_id);
+                     newRow.find('input[name="quantity[]"]').val('0');
+                     newRow.find('input[name="amount[]"]').val(response[i].amount * response[i].quantity);
+                     newRow.find('input[name="batch_no[]"]').val(response[i].batch_id);
+                     newRow.find('input[name="qty[]"]').val(response[i].quantity);
+                     newRow.find('input[name="unit_id[]"]').val(response[i].unit_name);
+                     newRow.find('input[name="unit_id_hidden[]"]').val(response[i].medicine_unit_id);
+                     newRow.find('input[name="rate[]"]').val(response[i].rate);
+                     newRow.find('input[name="free_quantity[]"]').val(response[i].free_quantity);
+                     $('#productTable tbody').append(newRow);
+                  }
+               } else {}
+            },
+            error: function() {
+               alert('Error fetching purchase invoice details.');
+            }
+         });
+      });
+   });
 </script>
 @endsection

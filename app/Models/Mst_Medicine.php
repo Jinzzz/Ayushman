@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mst_Medicine extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $table = 'mst_medicines';
 
 
@@ -39,7 +40,7 @@ class Mst_Medicine extends Model
     
     public function tax()
     {
-        return $this->belongsTo(Mst_Tax::class, 'tax_id', 'id');
+        return $this->belongsTo(Mst_Tax_Group::class, 'tax_id', 'id');
     }
     public function unit()
     {

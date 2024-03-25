@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
+use App\Models\Mst_User;
 
 class ForgotPasswordController extends Controller
 {
@@ -19,18 +20,19 @@ class ForgotPasswordController extends Controller
     public function submitForgetPasswordForm(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:mst_users'
-        ],[
-            'email.exists' => 'Email does not exist !!'
+            'email' => 'required|email'
         ]);
-
-        $status = Password::sendResetLink($request->only('email'));
-        if ($status === Password::RESET_LINK_SENT) {
-            return redirect()->route('mst_login');
-        } else {
-            dd( __($status));
-            return back()->withErrors(['error' =>  __($status),]);
-        }
+            
+            $userExists = Mst_User::where('email', $request->email)->exists();
+            if (!$userExists) {
+                return redirect()->route('verification.request')->with('verification', 'User does not exist.');
+            }
+            $status = Password::sendResetLink($request->only('email'));
+            if ($status === Password::RESET_LINK_SENT) {
+                return redirect()->route('mst_login')->with('success', 'Password reset link has been sent to your email.');
+            } else {
+                return back()->withErrors(['error' =>  __($status),]);
+            }
     }
 
     public function showResetPasswordForm(Request $request)
@@ -61,7 +63,7 @@ class ForgotPasswordController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return redirect()->route('mst_login');
+            return redirect()->route('mst_login')->with('success', 'Password reset Successfull.');;
         } else {
             return back()->withErrors([
                 'error' => 'Something went wrong, Please try again later',

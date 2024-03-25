@@ -15,13 +15,16 @@ class Trn_Consultation_Booking extends Model
         'booking_type_id',
         'patient_id',
         'doctor_id',
+        'is_billable',
+        'is_paid',
 
     ];
 
 
     public function bookingType()
     {
-        return $this->belongsTo(Sys_Booking_Type::class, 'booking_type_id', 'booking_type_id');
+        // return $this->belongsTo(Sys_Booking_Type::class, 'booking_type_id', 'booking_type_id');
+        return $this->belongsTo(Mst_Master_Value::class,'booking_type_id','id');
     }
 
     public function patient()
@@ -46,7 +49,8 @@ class Trn_Consultation_Booking extends Model
 
     public function bookingStatus()
     {
-        return $this->belongsTo(Sys_Booking_Status::class, 'booking_status_id', 'id');
+        // return $this->belongsTo(Mst_Master_Value::class, 'booking_status_id', 'id');
+        return $this->belongsTo(Mst_Master_Value::class,'booking_status_id','id');
     }
 
     public function availability()
@@ -72,5 +76,15 @@ class Trn_Consultation_Booking extends Model
     public function familyMember()
     {
         return $this->belongsTo(Trn_Patient_Family_Member::class, 'family_member_id', 'id');
+    }
+    
+    public function therapyBookings()
+    {
+        return $this->hasMany(Trn_Booking_Therapy_detail::class, 'booking_id','id');
+    }
+    
+    public function precriptions()
+    {
+        return $this->hasMany(Trn_Prescription::class, 'booking_id','Booking_Id');
     }
 }

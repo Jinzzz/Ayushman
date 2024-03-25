@@ -50,7 +50,7 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $leave_type->name}}</td>
                             <td>
-                                <button type="button" style="width: 70px;"  onclick="changeStatus({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
+                                <button type="button" style="width: 70px;" @if($leave_type->is_system==0) onclick="changeStatus({{ $leave_type->leave_type_id }})" @endif class="btn btn-sm @if($leave_type->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($leave_type->is_active == 0)
                                     Inactive
                                     @else
@@ -59,7 +59,7 @@
                                 </button>
                             </td>
                             <td>
-                                <button type="button" style="width: 115px;" onclick="changeDeductible({{ $leave_type->leave_type_id }})" class="btn btn-sm @if($leave_type->is_dedactable == 0) btn-danger @else btn-success @endif">
+                                <button type="button" style="width: 115px;" @if($leave_type->is_system==0) onclick="changeDeductible({{ $leave_type->leave_type_id }})" @endif class="btn btn-sm @if($leave_type->is_dedactable == 0) btn-danger @else btn-success @endif">
                                     @if($leave_type->is_dedactable == 0)
                                     Non-Deductible
                                     @else
@@ -68,6 +68,7 @@
                                 </button>
                             </td>
                             <td>
+                            @if($leave_type->is_system==0)
                                 <a class="btn btn-primary" href="{{ route('leave.type.edit', $leave_type->leave_type_id) }}">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
                                 </a>
@@ -75,6 +76,9 @@
                                     <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                 </button>
                             </td>
+                            @else
+                            --
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>

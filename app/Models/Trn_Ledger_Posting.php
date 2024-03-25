@@ -11,16 +11,16 @@ class Trn_Ledger_Posting extends Model
     protected $table = 'trn_ledger_postings';
 
     protected $fillable = [
-        'ledger_posting_id',
         'posting_date',
+        'voucher_type_id',
         'master_id',
         'account_ledger_id',
         'debit',
         'credit',
         'branch_id',
-        'transaction_amount',
-        'reference_no',
-        'narration'
-
+        'narration',
+        'reference_number',
+        'entity_id',
+        'transaction_id'
     ];
 }

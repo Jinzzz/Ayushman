@@ -29,9 +29,12 @@ class AttendanceController extends Controller
         $firstDayOfMonth = Carbon::parse($selectedMonthYear . '-01');
         $lastDayOfMonth = $firstDayOfMonth->copy()->endOfMonth();
         $daysInMonth = $firstDayOfMonth->daysInMonth;
-        $staffLeaves = Staff_Leave::whereYear('from_date', '=', now()->year)
-        ->whereMonth('from_date', '=', now()->month)
-        ->get();
+        
+        // Fetch staff leaves for the selected month and year
+        $staffLeaves = Staff_Leave::whereYear('from_date', '=', $firstDayOfMonth->year)
+            ->whereMonth('from_date', '=', $firstDayOfMonth->month)
+            ->get();
+    
         // Fetch absent staff IDs during the specified time period
         $absentStaffIds = Staff_Leave::where('from_date', '<=', $lastDayOfMonth)
             ->where('to_date', '>=', $firstDayOfMonth)
@@ -41,8 +44,9 @@ class AttendanceController extends Controller
         // Assuming you have a Staff model and you want to retrieve all staff
         $allStaff = Mst_Staff::all();
     
-        return view('attendance.view', compact('allStaff', 'absentStaffIds', 'selectedMonthYear', 'daysInMonth','firstDayOfMonth','staffLeaves'));
+        return view('attendance.view', compact('allStaff', 'absentStaffIds', 'selectedMonthYear', 'daysInMonth', 'firstDayOfMonth', 'staffLeaves'));
     }
+    
     
     
     

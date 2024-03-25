@@ -23,22 +23,28 @@
                   @csrf
                   @method('PUT')
                   <div class="row">
-                     <div class="col-md-6">
+                     <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Medicine Name</label>
+                           <label class="form-label">Medicine Name*</label>
                            <input type="text" class="form-control" required name="medicine_name" maxlength="100" value="{{$medicine->medicine_name}}" placeholder="Medicine Name">
                         </div>
                      </div>
-                     <div class="col-md-6">
+                     <div class="col-md-4">
                         <div class="form-group">
-                           <label class="form-label">Generic Name</label>
+                           <label class="form-label">Medicine Code*</label>
+                           <input type="text" class="form-control" required name="medicine_code" value="{{$medicine->medicine_code}}" placeholder="Medicine Code">
+                        </div>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="form-label">Generic Name*</label>
                            <input type="text" class="form-control" required name="generic_name" maxlength="100" value="{{$medicine->generic_name}}" placeholder="Generic Name">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Item Type</label>
-                           <select class="form-control" name="item_type" id="item_type">
+                           <label class="form-label">Item Type*</label>
+                           <select class="form-control" name="item_type" id="item_type" required>
                               <option value="">Select Medicine Item Type</option>
                               @foreach($itemType as $masterId => $masterValue)
                               <option value="{{ $masterId }}" {{ $masterId == $medicine->item_type ? ' selected' : '' }}>{{ $masterValue }}</option>
@@ -48,8 +54,8 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Medicine Type</label>
-                           <select class="form-control" name="medicine_type" id="medicine_type">
+                           <label class="form-label">Medicine Type*</label>
+                           <select class="form-control" name="medicine_type" id="medicine_type" required="">
                               <option value="">Select Medicine Type</option>
                               @foreach($medicineType as $masterId => $masterValue)
                               <option value="{{ $masterId }}" {{ $masterId == $medicine->medicine_type ? ' selected' : '' }}>{{ $masterValue }}</option>
@@ -65,8 +71,8 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Tax</label>
-                           <select class="form-control" name="tax_id" id="tax_id">
+                           <label class="form-label">Tax*</label>
+                           <select class="form-control" name="tax_id" id="tax_id" required="">
                               <option value="">Choose Tax</option>
                               @foreach($taxes as $id => $tax)
                               <option value="{{ $id }}" {{$id == $medicine->tax_id ?' selected' : ''}}>{{ $tax }}</option>
@@ -76,7 +82,7 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Manufacturer</label>
+                           <label class="form-label">Manufacturer*</label>
                            <select class="form-control" name="manufacturer" id="manufacturer">
                            <option value="">Select Manufacturer</option>
                            @foreach($Manufacturer as $masterValue)
@@ -90,20 +96,20 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Unit Price</label>
-                           <input type="text" class="form-control" required name="unit_price" maxlength="14" value="{{$medicine->unit_price}}" placeholder="Unit Price" oninput="validateNumericValue(this);">
+                           <label class="form-label">Unit Price* (Excluding GST)</label>
+                           <input type="text" class="form-control" required name="unit_price" value="{{$medicine->unit_price}}" placeholder="Unit Price" oninput="validateNumericValuedec(this);">
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Description</label>
-                           <textarea class="form-control" required name="description" placeholder="Description">{{ $medicine->description}}</textarea>
+                           <textarea class="form-control" name="description" placeholder="Description">{{ $medicine->description}}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Unit*</label>
-                           <select class="form-control" name="unit_id" id="unit_id">
+                           <select class="form-control" name="unit_id" id="unit_id" required="">
                               <option value="">Choose Unit</option>
                               @foreach($units as $unit_id => $unit)
                               <option value="{{ $unit_id }}" {{ $unit_id == $medicine->unit_id ? 'selected' : '' }}>{{ $unit }}</option>
@@ -165,20 +171,12 @@
                      required: true,
                      maxlength: 100
                   },
-                  Hsn_code: {
-                     number: true,
-                     maxlength: 8
-                  },
+
                   unit_price: {
                      required: true,
                      number: true,
                      maxlength: 10
                   },
-                  reorder_limit: {
-                     number: true,
-                     maxlength: 10
-                  },
-                  description: "required",
                },
                messages: {
                   medicine_name: {
@@ -195,13 +193,7 @@
                      number: 'Please enter a valid integer.',
                      maxlength: 'Unit price must not exceed 10 characters.'
                   },
-                  reorder_limit: {
-                     number: 'Please enter a valid integer.',
-                     maxlength: 'Reorder limit must not exceed 10 characters.'
-                  },
-                  description: {
-                     required: 'Please enter description.',
-                  },
+
                },
                errorPlacement: function(label, element) {
                   label.addClass('text-danger');
@@ -244,6 +236,12 @@
       <script>
          function validateNumericValue(input) {
             input.value = input.value.replace(/[^0-9.]/g, '');
+         }
+      </script>
+       <script>
+         function validateNumericValuedec(input) {
+            input.value = input.value.replace(/[^0-9.]/g, ''); 
+            input.value = input.value.replace(/^(\d*\.\d{0,2})\d*$/, '$1');
          }
       </script>
       @endsection

@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Leave_Type;
+use App\Models\Trn_Consultation_Booking;
 use App\Models\EmployeeAvailableLeave;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class StaffLeaveController extends Controller
 {
     /**
@@ -57,7 +60,7 @@ class StaffLeaveController extends Controller
     public function create()
     {
         $pageTitle = "Create Leave Request";
-        $branches = Mst_Branch::get();
+        $branches = DB::table('mst_branches')->where('is_active', 1)->get();
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
         return view('staffleave.create', compact('pageTitle','branches','leave_types'));
     }
@@ -101,10 +104,14 @@ class StaffLeaveController extends Controller
             return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
         }
         $updatedTotalLeaves = $totalLeaves -  $requestedDays;
-   
-        EmployeeAvailableLeave::where('staff_id', $staffId)
+       if($request->leave_type!=5)
+       {
+           EmployeeAvailableLeave::where('staff_id', $staffId)
                                ->update(['total_leaves' => $updatedTotalLeaves,
                             ]);
+           
+       }
+        
 
         $lastInsertedId = Staff_Leave::create([
             'branch_id' => $request->branch_id,
@@ -265,9 +272,49 @@ class StaffLeaveController extends Controller
     public function getTotalLeaves(Request $request, $staffId)
     {
         // Fetch the total leaves for the given staffId from the database
-        $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
-
-        // You can return the total leaves in JSON format
-        return response()->json(['total_leaves' => $totalLeaves]);
+        
+        return EmployeeAvailableLeave::where('staff_id', $staffId)->first();
     }
+
+    public function checkDoctor($staffId)
+    {
+        $staff = Mst_Staff::find($staffId);   
+        if ($staff) {
+            $isDoctor = $staff->staff_type === 20;
+            return response()->json(['isDoctor' => $isDoctor]);
+        } else {
+            return response()->json(['error' => 'Staff member not found'], 404);
+        }
+    }
+
+    public function bookingCount(Request $request)
+    {
+        
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
+        $staffId = $request->input('staff_id');
+    
+        $bookingCount = Trn_Consultation_Booking::where('doctor_id', $staffId)->whereBetween('booking_date', [$fromDate, $toDate])->count();
+
+        return response()->json(['booking_count' => $bookingCount]);
+    }
+     public function getEmployeeAvaialbleLeaves(Request $request)
+    {
+            $staff_id = $request->input('staff_id');
+            $available_leave =EmployeeAvailableLeave::where('staff_id',$staff_id)->first();
+            $data=array();
+            if($available_leave)
+            {
+                
+             $datat['leave_count']=$available_leave->total_leaves;
+            }
+            else
+            {
+    
+             $datat['leave_count']=0.0;
+            }
+            return response()->json($data);
+
+    }
+    
 }

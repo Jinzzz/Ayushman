@@ -32,4 +32,19 @@ class Trn_Medicine_Purchase_Invoice_Detail extends Model
         'updated_by',
         
     ];
+    
+    public function invoice()
+    {
+        return $this->belongsTo(Trn_Medicine_Purchase_Invoice::class, 'invoice_id', 'purchase_invoice_id');
+    }
+
+    public function Medicine()
+    {
+        return $this->belongsTo(Mst_Medicine::class, 'product_id','id');
+    }
+
+    public function Unit()
+    {
+        return $this->belongsTo(Mst_Unit::class, 'unit_id');
+    }
 }

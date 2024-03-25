@@ -21,13 +21,19 @@
                <form id="addFm" action="{{ route('medicine.store') }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="row">
-                     <div class="col-md-6">
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Medicine Name*</label>
                            <input type="text" class="form-control" required name="medicine_name" value="{{ old('medicine_name') }}" placeholder="Medicine Name">
                         </div>
                      </div>
-                     <div class="col-md-6">
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="form-label">Medicine Code*</label>
+                           <input type="text" class="form-control" required name="medicine_code" value="{{ old('medicine_code') }}" placeholder="Medicine Code">
+                        </div>
+                     </div>
+                     <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Generic Name*</label>
                            <input type="text" class="form-control" required name="generic_name" value="{{ old('generic_name') }}" placeholder="Generic Name">
@@ -36,7 +42,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Item Type*</label>
-                           <select class="form-control" name="item_type" id="item_type">
+                           <select class="form-control" name="item_type" id="item_type" required>
                               <option value="">Select Item Type</option>
                               @foreach($itemType as $masterId => $masterValue)
                               <option value="{{ $masterId }}" {{ old('item_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
@@ -47,7 +53,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Medicine Type*</label>
-                           <select class="form-control" name="medicine_type" id="medicine_type">
+                           <select class="form-control" name="medicine_type" id="medicine_type" required>
                               <option value="">Select Medicine Type</option>
                               @foreach($medicineType as $masterId => $masterValue)
                               <option value="{{ $masterId }}" {{ old('medicine_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
@@ -64,7 +70,7 @@
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Tax*</label>
-                           <select class="form-control" name="tax_id" id="tax_id">
+                           <select class="form-control" name="tax_id" id="tax_id" required>
                               <option value="">Choose Tax</option>
                               @foreach($taxes as $tax_id => $tax)
                               <option value="{{ $tax_id }}" {{ old('tax_id') == $tax_id ? 'selected' : '' }}>{{ $tax }}</option>
@@ -74,8 +80,8 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Manufacturer</label>
-                           <select class="form-control" name="manufacturer" id="manufacturer">
+                           <label class="form-label">Manufacturer*</label>
+                           <select class="form-control" name="manufacturer" id="manufacturer" required>
                               <option value="">Select Manufacturer</option>
                               @foreach($Manufacturer as $masterValue)
                               <option value="{{ $masterValue->manufacturer_id }}" {{ old('manufacturer') == $masterValue->manufacturer_id ? 'selected' : '' }}>{{ $masterValue->name }}</option>
@@ -85,21 +91,21 @@
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Unit Price*</label>
-                           <input type="number" class="form-control" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="10" required name="unit_price" value="{{ old('unit_price') }}" placeholder="Unit Price">
+                           <label class="form-label">Unit Price* (Excluding GST)</label>
+                           <input type="text" class="form-control" oninput="validateNumericValuedec(this);" required name="unit_price" value="{{ old('unit_price') }}" placeholder="Unit Price">
 
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
-                           <label class="form-label">Description*</label>
-                           <textarea class="form-control" required name="description" placeholder="Description">{{ old('description') }}</textarea>
+                           <label class="form-label">Description</label>
+                           <textarea class="form-control" name="description" placeholder="Description">{{ old('description') }}</textarea>
                         </div>
                      </div>
                      <div class="col-md-6">
                         <div class="form-group">
                            <label class="form-label">Unit*</label>
-                           <select class="form-control" name="unit_id" id="unit_id">
+                           <select class="form-control" name="unit_id" id="unit_id" required>
                               <option value="">Choose Unit</option>
                               @foreach($units as $unit_id => $unit)
                               <option value="{{ $unit_id }}" {{ old('unit_id') == $unit_id ? 'selected' : '' }}>{{ $unit }}</option>
@@ -113,8 +119,6 @@
                            <input type="number" class="form-control" name="reorder_limit" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"  maxlength="10" value="{{ old('reorder_limit') }}" placeholder="Reorder Limit">
                         </div>
                      </div>
-   
-                           <input type="hidden" class="form-control" name="medicine_code" value="{{ old('medicine_code', $randomMedicineCode) }}" readonly>
                    
                      <div class="col-md-6">
                         <div class="form-group">
@@ -165,11 +169,11 @@
                number: true,
                maxlength: 10
             },
-            reorder_limit: {
+              unit_id: {
+               required: true,
                number: true,
                maxlength: 10
             },
-            description: "required",
          },
          messages: {
             medicine_name: {
@@ -184,13 +188,9 @@
                required: 'Please enter unit price.',
                number: 'Please enter a valid integer.',
                maxlength: 'Unit price must not exceed 10 characters.'
-            },
-            reorder_limit: {
-               number: 'Please enter a valid integer.',
-               maxlength: 'Reorder limit must not exceed 10 characters.'
-            },
-            description: {
-               required: 'Please enter description.',
+            }, 
+               unit_id: {
+               required: 'Please select unit .',
             },
          },
          errorPlacement: function(label, element) {
@@ -234,6 +234,12 @@
 <script>
    function validateNumericValue(input) {
       input.value = input.value.replace(/[^0-9.]/g, '');
+   }
+</script>
+<script>
+   function validateNumericValuedec(input) {
+      input.value = input.value.replace(/[^0-9.]/g, ''); 
+      input.value = input.value.replace(/^(\d*\.\d{0,2})\d*$/, '$1');
    }
 </script>
 

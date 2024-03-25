@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use App\Models\Trn_Feedback;
+use App\Models\Trn_Consultation_Booking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +50,78 @@ class FeedbackController extends Controller
         return redirect()->route('customer.feedback.index')->with('error', 'Something went wrong.');
       }
     }
+
+    
+    public function create(Request $request)
+    {
+      $booking = Trn_Consultation_Booking::where('booking_reference_number',$request->id)->first();
+        return view('feedback.create', [
+            'pageTitle' => 'New Feedback',
+            'booking' => $booking
+        ]);
+    }
+
+    
+    public function saveFeedback(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required',
+            'consultancy_rating' => 'required',
+            'visit_rating' => 'required',
+            'service_rating' => 'required',
+            'appointment_rating' => 'required',
+            'pharmacy_rating' =>'required',
+        ], [
+            'booking_id.required' => 'Booking ID is required',
+            'consultancy_rating.required' => 'Please Choose a rating',
+            'visit_rating.required' => 'Please Choose a rating',
+            'service_rating.required' => 'Please Choose a rating',
+            'appointment_rating.required' => 'Please Choose a rating',
+            'pharmacy_rating.required' => 'Please Choose a rating',
+            
+        ]);
+
+        DB::beginTransaction();
+        try {
+          $consultancy_rating = $request->consultancy_rating;
+          $visit_rating = $request->visit_rating;
+          $service_rating = $request->service_rating;
+          $appointment_rating = $request->appointment_rating;
+          $pharmacy_rating = $request->pharmacy_rating;
+          $total_ratings = 5; 
+          $total_sum = $consultancy_rating + $visit_rating + $service_rating + $appointment_rating+$pharmacy_rating;
+          $average_rating = ($total_sum/($total_ratings * 5)) * 5;
+
+            $booking = Trn_Feedback::create([
+                'booking_id' => $request->booking_id,
+                'consultancy_rating' =>  $request->consultancy_rating,
+                'visit_rating'    =>  $request->visit_rating,
+                'service_rating'    =>  $request->service_rating,
+                'pharmacy_rating'   => $request->pharmacy_rating,
+                'appointment_rating'    =>  $request->appointment_rating,
+                'average_rating'    =>  $average_rating,
+                'feedback'          => $request->feedback,
+                'is_active'         => 1,
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            $request->session()->flash('error', 'Something Went Wrong');
+            return redirect()->back();
+        }
+        DB::commit();
+        return redirect()->route('feedback.success')->with('success-message', 'Feedback Submitted successfully.');
+    }
+
+    
+    public function successPage()
+    {
+        return view('feedback.success', [
+            'pageTitle' => 'Feedback'
+        ]);
+    }
+
+
 
 
 }

@@ -68,7 +68,7 @@ class MstTherapyRoomSlotController extends Controller
             $therapy_room_slot->delete();
             return 1;
         } catch (QueryException $e) {
-            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
+           return redirect()->route('slot_assigning.index')->with('error', 'Something went wrong');
         }
     }
 
@@ -82,7 +82,7 @@ class MstTherapyRoomSlotController extends Controller
             return 1;
             return redirect()->back()->with('success', 'Status changed successfully');
         } catch (QueryException $e) {
-            return redirect()->route('medicine.dosage.index')->with('error', 'Something went wrong');
+            return redirect()->route('slot_assigning.index')->with('error', 'Something went wrong');
         }
     }
 }

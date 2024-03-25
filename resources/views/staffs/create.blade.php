@@ -82,6 +82,10 @@
     font-size: 12px;
   }
 
+
+  .swal-overlay {
+    z-index: 9999 !important;
+  }
 </style>
 <div class="container">
   @if ($errors->any())
@@ -129,17 +133,25 @@
                   </select>
                 </div>
               </div>
-              <div class="col-md-6" id="pharmacySelectBox" style="display: none;">
-              <div class="form-group">
-              <label class="form-label">Pharmacy*</label>
-                           <select class="form-control" name="pharmacy[]" multiple id="pharmacy_id" required>
-                              <option value=""selected disabled>Select Pharmacy</option>
-                              @foreach ($pharmacies as $pharmacy)
-                              <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
-                              @endforeach
-                           </select>
+              <div class="col-md-6" id="consultation_fees_field" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Consultation Fees*</label>
+                  <input type="text" class="form-control" name="consultation_fees" id="consultation_fees" placeholder="Consultation Fees">
+                  <span class="required-message" style="display: none; color: red;">Consultation Fees is required</span>
+                </div>
               </div>
-          </div>
+
+              <div class="col-md-6" id="pharmacySelectBox" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Pharmacy*</label>
+                  <select class="form-control" name="pharmacy[]" multiple id="pharmacy_id" required>
+                    <option value="" selected disabled>Select Pharmacy</option>
+                    @foreach ($pharmacies as $pharmacy)
+                    <option value="{{ $pharmacy->id }}">{{ $pharmacy->pharmacy_name }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Employment Type*</label>
@@ -186,7 +198,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Date Of Birth*</label>
-                  <input type="date" class="form-control" name="date_of_birth" value="{{ old('date_of_birth') }}" placeholder="Date Of Birth">
+                  <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" value="{{ old('date_of_birth') }}" placeholder="Date Of Birth">
                 </div>
               </div>
             </div>
@@ -195,12 +207,14 @@
                 <div class="form-group">
                   <label class="form-label">Email*</label>
                   <input type="email" class="form-control" name="staff_email" onblur="checkemail()" id="staff_email_id" value="{{ old('staff_email') }}" placeholder="Staff Email">
+
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Contact Number*</label>
-                  <input type="text" class="form-control" name="staff_contact_number" value="{{old('staff_contact_number')}}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateContact(this)">
+                  <input type="number"  class="form-control" name="staff_contact_number" id="numericInput"  value="{{ old('staff_contact_number') }}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" inputmode="numeric">
+
                   <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
                 </div>
               </div>
@@ -235,24 +249,25 @@
               </div>
             </div>
             <div class="row">
-            <div class="col-md-6">
+              <div class="col-md-6">
                 <div class="form-group">
-                    <label class="form-label">Commission Type*</label>
-                    <select class="form-control" name="staff_commission_type" id="staff_commission_type" onchange="updateCommissionPlaceholder()">
-                        <option value="">Select Commission Type</option>
-                        <option value="percentage">Percentage</option>
-                        <option value="fixed">Fixed</option>
-                    </select>
+                  <label class="form-label">Commission Type*</label>
+                  <select class="form-control" name="staff_commission_type" id="staff_commission_type" onchange="updateCommissionPlaceholder()">
+                    <option value="">Select Commission Type</option>
+                    <option value="percentage" {{ old('staff_commission_type') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                    <option value="fixed" {{ old('staff_commission_type') == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                  </select>
+
                 </div>
-            </div>
-            <div class="col-md-6">
+              </div>
+              <div class="col-md-6">
                 <div class="form-group">
-                    <label class="form-label">Staff Commission*</label>
-                    <input type="text" class="form-control" name="staff_commission" id="staff_commission" value="{{ old('staff_commission') }}" placeholder="Staff Commission" oninput="validateCommission(this);">
-                    <span id="commission-error" style="color: red;"></span>
+                  <label class="form-label">Staff Commission*</label>
+                  <input type="text" class="form-control" name="staff_commission"  id="numericInput1" id="staff_commission" value="{{ old('staff_commission') }}" placeholder="Staff Commission" oninput="validateCommission(this);">
+                  <span id="commission-error" style="color: red;"></span>
                 </div>
+              </div>
             </div>
-        </div>
             <div class="row">
 
               <div class="col-md-6">
@@ -302,16 +317,16 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Staff Username*</label>
-                  <input type="text" class="form-control" name="staff_username" onkeyup="checkusername()" id="staff_username_id" value="{{ old('staff_username') }}" placeholder="Staff Username">
+                  <input type="text" class="form-control" name="staff_username" onblur="checkusername()" id="staff_username_id" value="{{ old('staff_username') }}" placeholder="Staff Username">
                 </div>
-                <label class="form-label" style="color:#0d97c6;">Note: Password will be generated and shared to registerd E-mail.</label>
+                <label class="form-label" style="color:#0d97c6;">Note: Password will be generated and shared to registered E-mail.</label>
               </div>
               <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-label">Staff Discount Percentage</label>
-                <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{ old('discount_percentage') }}" placeholder="Staff Discount Percentage">
+                <div class="form-group">
+                  <label class="form-label">Staff Discount Percentage</label>
+                  <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{ old('discount_percentage') }}" placeholder="Staff Discount Percentage">
+                </div>
               </div>
-            </div>
               <!-- Add other login fields here -->
             </div>
           </div>
@@ -407,7 +422,7 @@
             </td>
             <td>
               <div class="form-group">
-                <input class="form-control"  type="number" id="credit_limit_0" name="credit_limit[]" placeholder="Enter Credit Limit" disabled>
+                <input class="form-control" type="number" id="credit_limit_0" name="credit_limit[]" placeholder="Enter Credit Limit" disabled>
               </div>
             </td>
             </tr>
@@ -429,10 +444,10 @@
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <link rel="stylesheet" type="text/css" href="path/to/sweetalert.css">
 <script src="path/to/sweetalert.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
 
 
 
@@ -558,9 +573,34 @@
         // Add more fields as needed
       }
 
+      //validation
+      const validationErr = validateLeaves()
+      if(validationErr){
+        // alert("Please fill all checked fields");
+        return;
+      }
+      
       // Submit the form
       $('#addFm').submit();
     });
+
+    function validateLeaves(params) {
+      let err = false
+      const checkboxes = document.querySelectorAll('input[name="leave_type[]"]');
+      checkboxes.forEach(function(checkbox, index) {
+        console.log(checkbox,"checkboxcheckboxcheckbox");
+        if(checkbox.checked){
+          var row = checkbox.closest('tr');
+          // Find credit period and credit limit fields in the same row
+          var creditPeriodField = row.querySelector('select[name="credit_period[]"]');
+          var creditLimitField = row.querySelector('input[name="credit_limit[]"]');
+          if(!creditPeriodField.value || !creditLimitField.value){
+            err = true
+          }
+        }
+      })
+      return err
+    }
 
 
 
@@ -585,7 +625,7 @@
         '<div class="col-md-3">' +
         '<div class="form-group">' +
         '<label class="form-label">Salary Head Type*</label>' +
-        '<input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type">' +
+        '<input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type" readonly>' +
         '</div>' +
         '</div>' +
         '<div class="col-md-3">' +
@@ -648,23 +688,18 @@
     var emailValue = $('#staff_email_id').val();
     // alert(emailValue);
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    console.log('Email Value:', emailValue);
+
     $.ajax({
       type: 'POST',
       url: '/checkUniqueEmail',
       headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        'X-CSRF-TOKEN': csrfToken
       },
       data: {
-
         email: emailValue
       },
       success: function(response) {
         if (response) {
-
-
-
-          // Assuming response is a boolean indicating existence
           if (!response.status) {
             Swal.fire({
               icon: 'warning',
@@ -672,8 +707,6 @@
               text: 'The email address already exists.'
             });
             $('#staff_email_id').val("");
-
-
           } else {
             Swal.fire({
               icon: 'success',
@@ -690,17 +723,36 @@
           });
         }
       },
-
     });
-
   }
 </script>
 
 <script>
+  $(document).ready(function() {
+    $('#staff_username_id').on('keydown', function(e) {
+      // Prevent the entry of spaces
+      if (e.key === ' ') {
+        e.preventDefault();
+      }
+    });
+    $('#staff_username_id').on('input', function() {
+      var usernameValue = $(this).val();
+      $(this).val(usernameValue.toLowerCase());
+    });
+  });
+
   function checkusername() {
-    var usernameValue = $('#staff_username_id').val();
+    var usernameValue = $('#staff_username_id').val().trim(); // Trim leading and trailing spaces
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    console.log('Username Value:', usernameValue);
+    usernameValue = usernameValue.toLowerCase(); // Convert to lowercase
+
+    // Update the input field with the trimmed and lowercase username
+    $('#staff_username_id').val(usernameValue);
+
+    if (usernameValue === "") {
+      return;
+    }
+
     $.ajax({
       type: 'POST',
       url: '/checkUniqueUsername',
@@ -712,7 +764,6 @@
       },
       success: function(response) {
         if (response) {
-          // Assuming response is a boolean indicating existence
           if (!response.status) {
             Swal.fire({
               icon: 'warning',
@@ -739,6 +790,7 @@
     });
   }
 </script>
+
 <script>
   function checkaccesscardnumber() {
     var accesscardnumberValue = $('#access_card_number_id').val();
@@ -783,57 +835,57 @@
   }
 </script>
 <script>
-function updateCommissionPlaceholder() {
+  function updateCommissionPlaceholder() {
     var commissionType = document.getElementById('staff_commission_type').value;
     var placeholderText = '';
     var commissionInput = document.getElementById('staff_commission');
 
     if (commissionType === 'percentage') {
-        placeholderText = 'Enter Percentage';
-        // Additional validation for percentage not greater than 100
-        validatePercentage(commissionInput.value);
+      placeholderText = 'Enter Percentage';
+      // Additional validation for percentage not greater than 100
+      validatePercentage(commissionInput.value);
     } else if (commissionType === 'fixed') {
-        placeholderText = 'Enter Fixed Amount';
-        // Clear previous error message
-        document.getElementById('commission-error').innerHTML = '';
+      placeholderText = 'Enter Fixed Amount';
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
     } else {
-        placeholderText = 'Staff Commission';
-        // Clear previous error message
-        document.getElementById('commission-error').innerHTML = '';
+      placeholderText = 'Staff Commission';
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
     }
 
     commissionInput.setAttribute('placeholder', placeholderText);
-}
+  }
 
-function validatePercentage(value) {
+  function validatePercentage(value) {
     var errorMessage = '';
     if (value && (isNaN(value) || parseFloat(value) > 100)) {
       Swal.fire({
-            icon: 'error',
-            title: 'Invalid Percentage',
-            text: 'Percentage should be between 0 and 100.'
-        });
-        $('#staff_commission').val("");
+        icon: 'error',
+        title: 'Invalid Percentage',
+        text: 'Percentage should be between 0 and 100.'
+      });
+      $('#staff_commission').val("");
     }
 
     document.getElementById('commission-error').innerHTML = errorMessage;
-}
+  }
 
-// Call the function on page load
-document.addEventListener('DOMContentLoaded', function() {
+  // Call the function on page load
+  document.addEventListener('DOMContentLoaded', function() {
     updateCommissionPlaceholder();
-});
+  });
 
-function validateCommission(input) {
+  function validateCommission(input) {
     var commissionType = document.getElementById('staff_commission_type').value;
 
     if (commissionType === 'percentage') {
-        validatePercentage(input.value);
+      validatePercentage(input.value);
     } else {
-        // Clear previous error message
-        document.getElementById('commission-error').innerHTML = '';
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
     }
-}
+  }
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -841,6 +893,7 @@ function validateCommission(input) {
 
     checkboxes.forEach(function(checkbox, index) {
       checkbox.addEventListener('change', function() {
+      
         // Find the closest row to the checkbox
         var row = this.closest('tr');
 
@@ -848,6 +901,18 @@ function validateCommission(input) {
         var creditPeriodField = row.querySelector('select[name="credit_period[]"]');
         var creditLimitField = row.querySelector('input[name="credit_limit[]"]');
         var requiredMessage = row.querySelector('.required-message');
+
+        creditPeriodField.addEventListener('change', function() {
+          creditPeriodField.classList.remove('error-border');
+        })
+
+        creditLimitField.addEventListener('input', function() {
+          creditLimitField.classList.remove('error-border');
+          if (requiredMessage && creditPeriodField.value && creditLimitField.value) {
+            row.removeChild(requiredMessage);
+          }
+
+        })
 
         if (creditPeriodField && creditLimitField) {
           if (this.checked) {
@@ -889,44 +954,108 @@ function validateCommission(input) {
   });
 
   function checkDiscountPercentage() {
-  var discountInput = document.getElementById('discount_percentage');
-  var enteredValue = parseFloat(discountInput.value);
+    var discountInput = document.getElementById('discount_percentage');
+    var enteredValue = parseFloat(discountInput.value);
 
-  if (isNaN(enteredValue) || enteredValue < 0 || enteredValue > 100) {
-    swal({
-      title: 'Invalid Percentage',
-      text: 'Please enter a valid discount percentage between 0 and 100.',
-      icon: 'error',
-      button: 'OK',
-    });
+    if (isNaN(enteredValue) || enteredValue < 0 || enteredValue > 100) {
+      swal({
+        title: 'Invalid Percentage',
+        text: 'Please enter a valid discount percentage between 0 and 100.',
+        icon: 'error',
+        button: 'OK',
+      });
 
-    discountInput.value = '';
+      discountInput.value = '';
+    }
   }
-}
 
-$(document).ready(function () {
-        // Event handler for staff_type change
-        $('#staff_type').change(function () {
-            // Get the selected staff_type value
-            var selectedStaffType = $(this).val();
-
-            // Check if the selected staff_type is 96
-            if (selectedStaffType == 96) {
-                // Show the pharmacySelectBox div
-                $('#pharmacySelectBox').show();
-            } else {
-                // Hide the pharmacySelectBox div
-                $('#pharmacySelectBox').hide();
-            }
-        });
+  $(document).ready(function() {
+    $('#staff_type').change(function() {
+      var selectedStaffType = $(this).val();
+      if (selectedStaffType == 96) {
+        $('#pharmacySelectBox').show();
+      } else {
+        $('#pharmacySelectBox').hide();
+      }
     });
 
+
+    $('#staff_type').change(function() {
+      var selectedStaffType = $(this).val();
+      if (selectedStaffType == 20) {
+        $('#consultation_fees_field').show();
+      } else {
+        $('#consultation_fees_field').hide();
+      }
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function() {
+    var staffTypeSelect = document.getElementById("staff_type");
+    var consultationFeesField = document.getElementById("consultation_fees_field");
+    var consultationFeesInput = document.getElementById("consultation_fees");
+    var requiredMessage = document.querySelector(".required-message");
+
+    staffTypeSelect.addEventListener("change", function() {
+      var selectedOption = staffTypeSelect.options[staffTypeSelect.selectedIndex].value;
+
+      if (selectedOption === "20") {
+        consultationFeesField.style.display = "block";
+        consultationFeesInput.setAttribute("required", true);
+      } else {
+        consultationFeesField.style.display = "none";
+        consultationFeesInput.removeAttribute("required");
+        requiredMessage.style.display = "none";
+      }
+
+      if (consultationFeesInput.validity.valueMissing) {
+        requiredMessage.style.display = "block";
+      } else {
+        requiredMessage.style.display = "none";
+      }
+    });
+
+    consultationFeesInput.addEventListener("input", function() {
+      if (consultationFeesInput.validity.valueMissing) {
+        requiredMessage.style.display = "block";
+      } else {
+        requiredMessage.style.display = "none";
+      }
+    });
+
+  });
+
+  $(document).ready(function() {
+
+    var today = new Date().toISOString().split('T')[0];
+
+    // Set the max attribute of the date input to today
+    document.getElementById("date_of_birth").setAttribute("max", today);
+
+  });
+
+  function toggleStatus(checkbox) {
+    var statusText = document.getElementById('statusText');
+    if (checkbox.checked) {
+      statusText.textContent = 'Active';
+    } else {
+      statusText.textContent = 'Inactive';
+    }
+  }
+  $(document).ready(function(){
+    document.getElementById('numericInput').addEventListener('input', function(event) {
+        let inputValue = event.target.value;
+        inputValue = inputValue.replace(/[^0-9.]/g, '');
+        inputValue = inputValue.replace(/(\..*)\./g, '$1');
+        event.target.value = inputValue;
+    });
+})
+
+$(document).ready(function(){
+    document.getElementById('numericInput1').addEventListener('input', function(event) {
+        let inputValue = event.target.value;
+        inputValue = inputValue.replace(/[^0-9.]/g, '');
+        inputValue = inputValue.replace(/(\..*)\./g, '$1');
+        event.target.value = inputValue;
+    });
+})
 </script>
-
-
-
-
-
-
-
-

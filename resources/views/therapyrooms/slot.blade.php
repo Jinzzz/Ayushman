@@ -91,8 +91,12 @@
                         @foreach($timeslots as $slot)
                         <tr id="dataRow_{{ $slot->id }}">
                             <td>{{ ++$i }}</td>
-                            <td>{{ $slot->weekDay->master_value}}</td>
-                            <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_from)->format('g:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $slot->slot->time_to)->format('g:i A') }}</td>
+                             <td>{{ @$slot->weekDay['master_value']}}</td>
+                            <td> @if(isset($slot->slot['time_from'])&& !empty($slot->slot['time_from']))
+                                {{ \Carbon\Carbon::createFromFormat('H:i:s', @$slot->slot['time_from'])->format('g:i A') }} @endif -
+                                @if(isset($slot->slot['time_to']) && !empty($slot->slot['time_to']))
+                                 {{ \Carbon\Carbon::createFromFormat('H:i:s', @$slot->slot['time_to'])->format('g:i A') }}
+                                 @endif</td>
                             <td>
                                 <button type="button" style="width: 70px;"  onclick="changeStatus({{ $slot->id }})" class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($slot->is_active == 0)

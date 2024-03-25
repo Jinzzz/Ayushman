@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+@php
+use App\Models\Mst_Staff;
+@endphp
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
@@ -19,12 +22,38 @@
                         </div>
                         <div class="col-md-3">
                         <label for="contact-number">Pharmacy</label>
+                         @if(Auth::check() && Auth::user()->user_type_id == 96)
+                           @php
+                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                           @endphp
                             <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach ($pharmacies as $pharmacy)
+                                       @if(in_array($pharmacy->id, $mappedpharma))
+                                           <option value="{{ $pharmacy->id }}" {{request()->input('pharmacy_id') == $pharmacy->id ? 'selected':''}}>{{ $pharmacy->pharmacy_name }}</option>
+                                       @endif
+                                @endforeach
+                            </select>
+                        @else
+                        <select class="form-control" name="pharmacy_id" id="pharmacy_id">
                                 <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
                                 @foreach($pharmacies as  $data)
                                     <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
                                         {{ $data->pharmacy_name }}
                                     </option>
+                                @endforeach
+                            </select>
+                        @endif
+                        </div>
+                        
+                         <div class="col-md-3">
+                            <label for="contact-number">Select Patient</label>
+                            <select class="form-control" name="patient_id" id="patient_id">
+                                 <option value=""> Select Patient </option> 
+                                 <option value="0" {{ request('patient_id') == '0' ? 'selected' : '' }}> Guest Patient </option> 
+                                @foreach($patients as  $data)
+                                    <option value="{{ $data->id  }}" {{ request('patient_id') == $data->id ? 'selected' : '' }}>{{ $data->patient_name }} </option>
                                 @endforeach
                             </select>
                         </div>
@@ -71,7 +100,7 @@
                         <th class="wd-15p">Invoice No</th>
                         <th class="wd-15p">Invoice Date</th>
                         <th class="wd-15p">Pharmacy</th>
-                        <!-- <th class="wd-15p">Discount Amount</th> -->
+                         <th class="wd-15p">Patient</th> 
                         <th class="wd-15p">Paid Amount</th>
                         <th class="wd-15p">Sales person</th>
                         <th class="wd-15p">Action</th>
@@ -88,11 +117,20 @@
                         <td>{{ $invoice->sales_invoice_number }}</td>
                         <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y') }}</td>
                         <td>{{ $invoice->pharmacy_name }}</td>
-                        <td>{{ $invoice->payable_amount }}</td>
-                        <td>{{ $invoice->staff->staff_name }}</td>
                         <td>
-                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.invoices.edit', $invoice->sales_invoice_id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.invoices.print', $invoice->sales_invoice_id) }}"><i class="fa fa-print" aria-hidden="true"></i>
+                            @if($invoice->patient_id != 0)
+                             {{ @$invoice->patient['patient_name'] }}
+                             @else
+                             Guest Patient
+                             @endif
+                        </td>
+                        <td>{{ $invoice->total_amount }}</td>
+                       
+                        <td>{{ @$invoice->Staff['staff_username'] }}</td>
+                       
+                        
+                        <td>
+                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.invoices.print', $invoice->sales_invoice_id) }}" target="_blank"><i class="fa fa-print" aria-hidden="true"></i>
                             Print </a>
 
                             <a class="btn btn-secondary btn-sm" href="{{ route('medicine.sales.invoices.show', $invoice->sales_invoice_id) }}">

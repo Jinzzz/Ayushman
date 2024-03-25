@@ -55,19 +55,17 @@ use App\Helpers\AdminHelper;
                         </div>
                      </div>
 
-                     <div class="col-md-4">
-                        <div class="form-group">
-                           <label class="form-label" disabled>Select Invoice ID</label>
-                           <select class="form-control" name="patient_invoice_id" id="patient_invoice_id">
-                              <option value="" selected>{{ $sales_invoice_number->sales_invoice_number }}</option>
-                           </select>
-                        </div>
-                     </div>
+    
 
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Date</label>
                            <input type="text" class="form-control" value="{{ date('d-m-y', strtotime($medicine_sale_invoices->return_date)) }}" readonly name="due_date" placeholder="Date">                        </div>
+                     </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="form-label">Pharmacy</label>
+                           <input type="text" class="form-control" value="{{$pharmacy}}" readonly name="due_date" placeholder="Date">                        </div>
                      </div>
 
                   </div>
@@ -87,7 +85,6 @@ use App\Helpers\AdminHelper;
                                        <!-- <th>Tax Rate</th> -->
                                        <!-- <th>Tax Amount</th> -->
                                        <th>Amount</th>
-                                       <th>Actions</th>
                                     </tr>
                                  </thead>
                                  <tbody>
@@ -95,21 +92,13 @@ use App\Helpers\AdminHelper;
                                     <tr id="productRowTemplate">
                                        <!-- <td class="medicine-stock-id"><input type="text" class="form-control" name="med_stock_id[]" readonly></td> -->
 
-                                       <td>
-                                          <select class="form-control " name="medicine_id[]" disabled>
-                                             <option value="">Please select medicine</option>
-                                             @foreach($medicines as $medicine)
-                                             <option value="{{ $medicine->id }}" {{ $medicine->id == $sale_details->medicine_id ? ' selected' : '' }}>{{ $medicine->medicine_name}}</option>
-                                             @endforeach
-                                          </select>
-                                       </td>
+                                       <td class="medicine_name"><input type="text" value="{{$sale_details->Medicine->medicine_name}}" class="form-control" name="batch_no[]" readonly></td>
                                        <td class="medicine-batch-no"><input type="text" value="{{$sale_details->batch_id}}" class="form-control" name="batch_no[]" readonly></td>
                                        <td class="medicine-quantity"><input type="number" value="{{intval($sale_details->quantity)}}" class="form-control" name="quantity[]" readonly oninput="calculateAmount(this)"></td>
-                                       <td class="medicine-unit-id"><input type="text" value="{{$sale_details->quantity_unit_id}}" class="form-control" name="unit_id[]" readonly></td>
+                                       <td class="medicine-unit-id"><input type="text" value="{{$sale_details->Unit->unit_name}}" class="form-control" name="unit_id[]" readonly></td>
                                        <td class="medicine-rate"><input type="text" value="{{$sale_details->rate}}" class="form-control" name="rate[]" readonly></td>
                                        <td class="medicine-amount"><input type="text" value="{{$sale_details->amount}}" class="form-control" name="amount[]" readonly></td>
-                                       <td><button type="button" onclick="myClickFunction(this)" disabled style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button></td>
-                                       
+                              
                                        <td class="medicine-tax-rate"><input type="hidden" value="{{$sale_details->quantity_unit_id}}" class="form-control" name="tax_rate[]"></td>
                                        <td class="medicine-tax-amount"><input type="hidden" value="{{$sale_details->tax_amount}}" class="form-control" name="single_tax_amount[]" readonly></td>
                                        
@@ -202,7 +191,7 @@ use App\Helpers\AdminHelper;
                                  </table>
                                  <hr>
                                  <div class="form-group mb-2"> <!-- Decreased margin height -->
-                                    <label class="form-label payable-amount">Payable Amount : <b>{{$medicine_sale_invoices->total_discount}}</b></label>
+                                    <label class="form-label payable-amount">Payable Amount : <b>{{$medicine_sale_invoices->total_amount - $medicine_sale_invoices->total_discount}}</b></label>
                                  </div>
                               </div>
                            </div>

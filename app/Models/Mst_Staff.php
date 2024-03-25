@@ -40,6 +40,7 @@ class Mst_Staff extends Model
         'access_card_number',
         'is_resigned',
         'deleted_at',
+        'date_of_join'
     ];
 
 
@@ -95,6 +96,11 @@ class Mst_Staff extends Model
     public function leaveConfig()
     {
         return $this->hasOne(Mst_Leave_Config::class, 'staff_id', 'staff_id');
+    }
+    
+    public function pharmacies()
+    {
+        return $this->belongsToMany('App\Models\Mst_Pharmacy', 'staff_pharmacy_mapping', 'staff_id', 'pharmacy');
     }
 
 }

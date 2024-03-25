@@ -55,10 +55,10 @@
                 <p>{{$message}}</p>
             </div>
             @endif
-            <!-- <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title mb-0">{{$pageTitle}}</h3>
                 <a class="btn btn-success" href="{{ route('wellness.room.assign') }}">Assign Therapy Rooms</a>
-            </div> -->
+            </div>
 
             <div class="card-body">
                 <a href="{{ route('wellness.create') }}" class="btn btn-block btn-info">
@@ -73,7 +73,7 @@
                                 <th class="wd-15p">Branch Name</th>
                                 <th class="wd-15p">Wellness Name</th>
                                 <th class="wd-15p">Wellness Cost</th>
-                                <th class="wd-20p">Status</th>
+                                <!--<th class="wd-20p">Status</th>-->
                                 <th class="wd-15p">Action</th>
                             </tr>
                         </thead>
@@ -87,14 +87,14 @@
                                 <td>{{ $wellnes->branch_name }}</td>
                                 <td>{{ $wellnes->wellness_name }}</td>
                                 <td>{{ $wellnes->wellness_cost }}</td>
-                                <td>
-                                <button type="button" style="width: 70px;" onclick="changeStatus({{$wellnes->wellness_id}})" class="btn btn-sm @if($wellnes->is_active == 0) btn-danger @else btn-success @endif">
-                                @if($wellnes->is_active == 0)
-                                    Inactive
-                                @else
-                                    Active
-                                @endif
-                            </button> </td>
+                            <!--    <td>-->
+                            <!--    <button type="button" style="width: 70px;" onclick="changeStatus({{$wellnes->wellness_id}})" class="btn btn-sm @if($wellnes->is_active == 0) btn-danger @else btn-success @endif">-->
+                            <!--    @if($wellnes->is_active == 0)-->
+                            <!--        Inactive-->
+                            <!--    @else-->
+                            <!--        Active-->
+                            <!--    @endif-->
+                            <!--</button> </td>-->
 
                                 <td>
                                     <a class="btn btn-primary btn-sm edit-custom" href="{{ route('wellness.edit', $wellnes->wellness_id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>

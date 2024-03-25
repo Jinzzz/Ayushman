@@ -38,11 +38,31 @@ class Trn_Medicine_Sales_Invoice extends Model
 
     public function Staff()
     {
-        return $this->belongsTo(Mst_Staff::class, 'sales_person_id');
+        return $this->belongsTo(Mst_Staff::class, 'sales_person_id','staff_id');
+    }
+    
+    public function patient()
+    {
+        return $this->belongsTo(Mst_Patient::class, 'patient_id','id');
     }
     
     public function Branch()
     {
         return $this->belongsTo(Mst_Branch::class, 'branch_id');
     }
+    public function salesInvoiceDetails()
+    {
+        return $this->hasMany(Trn_Medicine_Sales_Invoice_Details::class, 'sales_invoice_id', 'sales_invoice_id');
+    }
+
+    public function pharmacy()
+    {
+        return $this->belongsTo(Mst_Pharmacy::class, 'pharmacy_id','id');
+    }
+    
+    public function salesInvoicePayments()
+    {
+        return $this->hasMany(Trn_Sales_Invoice_Payment::class, 'sales_invoice_id', 'sales_invoice_id');
+    }
+
 }

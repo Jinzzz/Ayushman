@@ -9,10 +9,13 @@ use App\Models\Trn_Journel_Entry_Details;
 use App\Models\Mst_Staff;
 use App\Models\Mst_Account_Ledger;
 use App\Models\Mst_Branch;
+use App\Models\Trn_staff_cash_deposit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use Carbon\Carbon;
+use App\Models\Trn_Ledger_Posting;
+
 
 class TrnJournelEntryController extends Controller
 {
@@ -315,4 +318,121 @@ class TrnJournelEntryController extends Controller
             return redirect()->route('journel.entry.index')->with('error', 'Something went wrong');
         }
     }
+    
+    
+
+    
+    public function CashDepositIndex(Request $request)
+    {
+        $processDatas = Trn_staff_cash_deposit::orderBy('created_at', 'DESC')
+                        ->join('mst_branches', 'trn_staff_cash_deposits.branch_id', '=', 'mst_branches.branch_id')
+                        ->join('mst__account__ledgers as from_ledger', 'trn_staff_cash_deposits.transfer_from_account', '=', 'from_ledger.id')
+                        ->join('mst__account__ledgers as to_ledger', 'trn_staff_cash_deposits.transfer_to_account', '=', 'to_ledger.id')
+                        ->get(['trn_staff_cash_deposits.*', 'mst_branches.branch_name', 'from_ledger.ledger_name as from_account', 'to_ledger.ledger_name as to_account']);
+    
+        return view('staff-cash-deposit.index', [
+            'processDatas' => $processDatas,
+            'pageTitle' => 'Staff Cash Deposit Transfers'
+        ]);
+    }
+
+
+    public function CashDepositCreate(Request $request)
+    {
+        return view('staff-cash-deposit.create', [
+            'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
+            'ledgerAccounts' => Mst_Account_Ledger::whereIn('account_sub_group_id', [4, 5])->get(),
+            'pageTitle' => 'Add Cash Deposit Transfer'
+        ]);
+    }
+    
+    public function CashDepositStore(Request $request)
+    {
+         $validatedData = $request->validate([
+        'transfer_date' => 'required|date',
+        'branch_id' => 'required',
+        'reference_number' => 'nullable',
+        'transfer_from_account' => 'required',
+        'transfer_to_account' => 'required',
+        'transfer_amount' => 'required|numeric',
+        'remarks' => 'nullable',
+    ]);
+
+    // Create a new CashDeposit instance
+    $cashDeposit = new Trn_staff_cash_deposit();
+    $cashDeposit->transfer_date = $validatedData['transfer_date'];
+    $cashDeposit->branch_id = $validatedData['branch_id'];
+    $cashDeposit->reference_number = $validatedData['reference_number'];
+    $cashDeposit->transfer_from_account = $validatedData['transfer_from_account'];
+    $cashDeposit->transfer_to_account = $validatedData['transfer_to_account'];
+    $cashDeposit->transfer_amount = $validatedData['transfer_amount'];
+    $cashDeposit->remarks = $validatedData['remarks'];
+    $cashDeposit->save();
+    
+    // Petty Cash to Bank Account
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SCD' . $cashDeposit->id,
+            'account_ledger_id' => $validatedData['transfer_from_account'],
+            'entity_id' => 0,
+            'debit' =>  $validatedData['transfer_amount'],
+            'credit' =>0,
+            'branch_id' => $validatedData['branch_id'],
+            'transaction_id' => $cashDeposit->id,
+            'narration' => 'Staff Cash Deposit Payment'
+        ]);
+        
+          Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SCD' . $cashDeposit->id,
+            'account_ledger_id' => $validatedData['transfer_to_account'],
+            'entity_id' => 0,
+            'debit' =>  0,
+            'credit' => $validatedData['transfer_amount'],
+            'branch_id' => $validatedData['branch_id'],
+            'transaction_id' => $cashDeposit->id,
+            'narration' => 'Staff Cash Deposit Payment'
+        ]);
+    // Bank Account to Cash Account.
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SCD' . $cashDeposit->id,
+            'account_ledger_id' => $validatedData['transfer_to_account'],
+            'entity_id' => 0,
+            'debit' =>  $validatedData['transfer_amount'],
+            'credit' =>0,
+            'branch_id' => $validatedData['branch_id'],
+            'transaction_id' => $cashDeposit->id,
+            'narration' => 'Staff Cash Deposit Payment'
+        ]);
+        
+          Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SCD' . $cashDeposit->id,
+            'account_ledger_id' => $validatedData['transfer_from_account'],
+            'entity_id' => 0,
+            'debit' =>  0,
+            'credit' => $validatedData['transfer_amount'],
+            'branch_id' => $validatedData['branch_id'],
+            'transaction_id' => $cashDeposit->id,
+            'narration' => 'Staff Cash Deposit Payment'
+        ]);
+    return redirect()->route('staff.cash.deposit.index')->with('success', 'Cash Deposited Successfully.');
+    }
+    
+    public function CashDepositShow($id)
+    {
+        $processDatas = Trn_staff_cash_deposit::join('mst_branches', 'trn_staff_cash_deposits.branch_id', '=', 'mst_branches.branch_id')
+                        ->join('mst__account__ledgers as from_ledger', 'trn_staff_cash_deposits.transfer_from_account', '=', 'from_ledger.id')
+                        ->join('mst__account__ledgers as to_ledger', 'trn_staff_cash_deposits.transfer_to_account', '=', 'to_ledger.id')
+                        ->where('trn_staff_cash_deposits.id', $id)
+                        ->first(['trn_staff_cash_deposits.*', 'mst_branches.branch_name', 'from_ledger.ledger_name as from_account', 'to_ledger.ledger_name as to_account']);
+    
+        return view('staff-cash-deposit.show', [
+            'processDatas' => $processDatas,
+            'pageTitle' => 'Staff Cash Deposit Transfers'
+        ]);
+    }
+
+
 }

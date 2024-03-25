@@ -9,6 +9,8 @@ use App\Models\Mst_Membership_Package;
 use App\Models\Mst_Membership_Package_Wellness;
 use App\Models\Mst_Patient_Membership_Booking;
 use App\Models\Mst_Membership_Benefit;
+use App\Models\Trn_Consultation_Booking;
+use App\Models\Trn_Consultation_Booking_Invoice;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -63,27 +65,16 @@ class MstPatientController extends Controller
         $request->validate([
 
             'patient_name' => 'required',
-            // 'patient_email' => 'required',
             'patient_mobile' => 'required|digits:10|numeric',
-            // 'patient_address' => 'required',
-            // 'patient_gender' => 'required',
-            // 'patient_dob' => 'required', 
-            // 'patient_blood_group_id' => 'required',
-            // 'emergency_contact_person' => 'required',
-            // 'emergency_contact' => 'required',
-            'marital_status' => 'required',
-            'patient_medical_history' => 'required',
-            'patient_current_medications' => 'required',
+            // 'marital_status' => 'required',
+            // 'patient_medical_history' => 'required',
+            // 'patient_current_medications' => 'required',
             'patient_registration_type' => 'required',
-            // 'is_otp_verified' => 'required',
-            // 'is_approved' => 'required',
-            // 'password' => 'required',
-            // 'confirm_password' => 'required|same:password',
-            // 'whatsapp_number' => 'required',
-            // 'available_membership' => 'required',
             'is_active' => 'required',
+            'patient_dob' => 'nullable|date|before_or_equal:' . now()->format('Y-m-d'),
         ]);
         $is_active = $request->input('is_active') ? 1 : 0;
+        $has_credit = $request->input('has_credit') ? 1 : 0;
         $available_membership = $request->has('available_membership') ? 1 : 0;
         $generatedPassword = Str::random(8);
 
@@ -109,6 +100,7 @@ class MstPatientController extends Controller
             'whatsapp_number' => $request->whatsapp_number,
             'available_membership' =>  $available_membership,
             'is_active' =>  $is_active,
+            'has_credit' =>  $has_credit,
             'created_by' => Auth::id(),
         ]);
 
@@ -140,6 +132,7 @@ class MstPatientController extends Controller
     {
 
         $is_active = $request->input('is_active') ? 1 : 0;
+        $has_credit = $request->input('has_credit') ? 1 : 0;
         // print_r($request->emergency_contact_person);die();
         $update = Mst_Patient::find($id);
         $update->update([
@@ -161,6 +154,7 @@ class MstPatientController extends Controller
             'whatsapp_number' => $request->whatsapp_number,
             'available_membership' => $request->available_membership,
             'is_active' =>  $is_active,
+            'has_credit' =>  $has_credit,
         ]);
 
         return redirect()->route('patients.index')->with('success', 'Patient updated successfully');
@@ -169,8 +163,24 @@ class MstPatientController extends Controller
     public function show($id)
     {
         $pageTitle = "View patient details";
-        $show = Mst_Patient::findOrFail($id);
-        return view('patients.show', compact('pageTitle', 'show'));
+        $show = Mst_Patient::with('familyMembers')->findOrFail($id);
+        //dd($show);
+        $consultationDetails = Mst_Patient::join('trn_consultation_bookings', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+                            ->join('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
+                            ->join('mst_master_values as booking_type', 'booking_type.id', '=', 'trn_consultation_bookings.booking_type_id')
+                            ->join('mst_master_values as booking_status', 'booking_status.id', '=', 'trn_consultation_bookings.booking_status_id')
+                            ->where('trn_consultation_bookings.patient_id', $id)
+                            ->select('trn_consultation_bookings.*',
+                            'mst_staffs.staff_name',
+                            'booking_type.master_value as booking_type_value',
+                            'booking_status.master_value as booking_status_value',)
+                            ->get();
+    
+        $invoices =  Trn_Consultation_Booking_Invoice::join('trn_consultation_bookings', 'trn_consultation_booking_invoices.booking_id', '=', 'trn_consultation_bookings.id')  
+                      ->where('trn_consultation_bookings.patient_id',$id)->get();
+         
+
+        return view('patients.show', compact('pageTitle', 'show','consultationDetails','invoices'));
     }
 
     public function destroy($id)
@@ -219,7 +229,7 @@ class MstPatientController extends Controller
     {
         $pageTitle = "Membership details";
         $paymentType = Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id');
-        $memberships = Mst_Membership_Package::pluck('package_title', 'membership_package_id', 'package_duration', 'package_description', 'package_price', 'is_active');
+        $memberships = Mst_Membership_Package::where('is_active',1)->pluck('package_title', 'membership_package_id', 'package_duration', 'package_description', 'package_price', 'is_active');
         $patientMemberships = Mst_Patient_Membership_Booking::with('membershipPackage')->where('patient_id', $id)->orderBy('created_at', 'desc')->get();
         return view('patients.membership_details', compact('pageTitle', 'memberships', 'id', 'patientMemberships', 'paymentType'));
     }
@@ -407,44 +417,62 @@ class MstPatientController extends Controller
                         ]);
                     }
                 }
+                        //Accounts Payable
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'PAT_MP' . $lastInsertedId,
+            'account_ledger_id' => 1,
+            'entity_id' => $request->patient_id,
+            'debit' => $selectedMembership->package_price,
+            'credit' => 0,
+            'branch_id' => 1,
+            'transaction_id' =>  $booking->id,
+            'narration' => 'Patient Membership Payment'
+        ]);
 
-                // Ledger posting happening between payment mode ledger and membership purchase ledger(21), There should add two rows one for debit and another for credit.
-                TrnLedgerPosting::insertGetId([
-                    'posting_date' => Carbon::now()->toDateString(),
-                    'voucher_type_id' => 5,
-                    'master_id' => 1,
-                    'account_ledger_id' => $request->deposit_to,
-                    'debit' => $selectedMembership->package_price,
-                    'credit' => 0,
-                    'branch_id' => 1,
-                    'reference_no' => $request->input('reference_number'),
-                    'transaction_amount' => $selectedMembership->package_price,
-                    'narration' => "test",
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-
-                TrnLedgerPosting::insertGetId([
-                    'posting_date' => Carbon::now()->toDateString(),
-                    'voucher_type_id' => 5,
-                    'master_id' => 1,
-                    'account_ledger_id' => 21,
-                    'debit' => 0,
-                    'credit' => $selectedMembership->package_price,
-                    'branch_id' => 1,
-                    'reference_no' => $request->input('reference_number'),
-                    'transaction_amount' => $selectedMembership->package_price,
-                    'narration' => "test",
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
+                // Consulting Revenue
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'PAT_MP' . $lastInsertedId,
+            'account_ledger_id' => 89,
+            'entity_id' => 0,
+            'debit' => 0,
+            'credit' => $selectedMembership->package_price,
+            'branch_id' => 1,
+            'transaction_id' =>  $invoice->id,
+            'narration' => 'Patient Membership Payment'
+        ]);
+        //Accounts Receivable
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'PAT_MP' . $lastInsertedId,
+            'account_ledger_id' => 1,
+            'entity_id' => $request->patient_id,
+            'debit' => 0,
+            'credit' => $selectedMembership->package_price,
+            'branch_id' => 1,
+            'transaction_id' =>  $invoice->id,
+            'narration' => 'Patient Membership Payment'
+        ]);
+        //Cash or Bank Account
+        Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'PAT_MP' . $lastInsertedId,
+            'account_ledger_id' => 4,
+            'entity_id' => $request->patient_id,
+            'debit' => $selectedMembership->package_price,
+            'credit' => 0,
+            'branch_id' => 1,
+            'transaction_id' =>  $invoice->id,
+            'narration' => 'Patient Membership Payment'
+        ]);
                 return redirect()->route('patients.index')->with('success', 'Membership assigned successfully');
             } else {
                 $messages = $validator->errors();
                 return redirect()->to('patients/membership/' . $id)->with('errors',  $messages);
             }
         } catch (QueryException $e) {
-            dd($e->getMessage());
+           // dd($e->getMessage());
             return redirect()->route('home')->with('error', 'Something went wrong');
         }
     }

@@ -1,58 +1,104 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
-    
-    <div class="card-body">
-    <h1>Patient Details</h1>
-    <div class="show-container">
 
-    <div class="text-right">
-        <a class="btn btn-secondary ml-2" href="{{ route('patient_search.index') }}">
-            <i class="fa fa-times" aria-hidden="true"></i> Back
-        </a>
-    </div>
-        <p><strong>Patient Code:</strong> {{ $patient->patient_code }}</p> <br>
-        <p><strong>Patient Name:</strong> {{ $patient->patient_name }}</p> <br>
-        <p><strong>Patient Mobile:</strong> {{ $patient->patient_mobile }}</p> <br>
-        </div>
-     
-        <h1> Booking Details</h1>
+    <style>
+        .form-control[readonly] {
+            background-color: #c7c7c7 !important;
+        }
 
-            <div class="table-responsive">
-                <table id="example" class="table table-striped table-bordered text-nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th class="wd-20p">SL.NO</th>
-                            <th class="wd-20p">Doctor Name</th>
-                            <th class="wd-20p">Branch</th>
-                            <th class="wd-20p">Booking Date</th>
-                            <th class="wd-20p">Slot Time</th>
-                            <th class="wd-20p">Booking Status</th>
-                            <th class="wd-20p">Booking Fee</th>
-                    
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                        $i = 0;
-                        @endphp
-                        @foreach($patient_bookings as $patient_booking)
-                        <tr id="dataRow_{{$patient_booking->id }}">
-                            <td>{{ ++$i }}</td>
-                            <td>{{ $patient_booking->staff_username }}</td>
-                            <td>{{ $patient_booking->branch_name}}</td>
-                            <td>{{ $patient_booking->booking_date }}</td>
-                            <td>{{ $patient_booking->time_from }} - {{ $patient->time_to }}</td>
-                            <td>{{ $patient_booking->master_value }}</td>
-                            <td>{{ $patient_booking->booking_fee}}</td>
+        .page input[type=text][readonly] {
+            background-color: #c7c7c7 !important;
+        }
 
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        .form-group .last-row {
+            border-top: 1px solid #0d97c6;
+            padding-top: 15px;
+        }
+       
+
+    </style>
+    <div class="container">
+        <div class="row" style="min-height: 70vh;">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0 card-title"> Booking  Details</h3>
+                    </div>
+                    <!-- Success message -->
+                    <div class="col-lg-12 card-background" style="background-color:#fff; padding: 10px;">
+                        <form action="" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            
+                                <div class="card">
+									<div class="card-header">
+										<h3 class="card-title">BOOKING ID: {{ $patient->booking_reference_number }}</h3>
+										<div class="card-options">
+											<a href="#" class="btn btn-primary btn-sm">Status:  {{ $patient->master_value }}</a>
+										</div>
+									</div>
+									<div class="card-body">
+										<div class="row">
+                                            @if($patient->booking_type_id==84)
+                                            <div class="col-md-4">
+                                                <span class="form-label">Doctor: {{ $patient->staff_username }}</span>
+                                            </div>
+                                            @endif
+                                            <div class="col-md-4">
+                                                <span class="form-label">Patient: {{ $patient->patient_name }}</span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span class="form-label">Patient Code: {{ $patient->patient_code }}</span>
+                                            </div>
+                                              <div class="col-md-4">
+                                                <span class="form-label">Patient Mobile: {{ $patient->patient_mobile }}</span>
+                                            </div>
+                                             <div class="col-md-4">
+                                                <span class="form-label">Booking Reference Number: {{ $patient->booking_reference_number }}</span>
+                                            </div>
+                                            
+                                            <div class="col-md-4">
+                                                <span class="form-label">Booking Date: {{ $patient->created_at->format('Y-m-d') }}</span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span class="form-label">Appointment Date: {{ $patient->booking_date }}</span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span class="form-label">Timeslot:  {{ $patient->time_slot_id }} </span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span class="form-label">Branch: {{ $patient->branch_name }}</span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span class="form-label">Appointment Date & Time : {{ $patient->created_at->format('Y-m-d') }} | {{ $patient->time_slot_id }} </span>
+                                            </div>
+                                            
+                                        </div>
+                                        
+                                        	<div class="row">
+                                        	    <div class="col-md-12">
+                                        	  
+                                        	    
+                                        	</div>
+									</div>
+                                </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <center>
+                                            <a class="btn btn-danger" href="{{ route('booking_search.index') }}"> <i class="fa fa-times"></i>
+                                                Back</a>
+                                        </center>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                </form>
             </div>
-            <!-- TABLE WRAPPER -->
- 
+        </div>
     </div>
-    </div>
+
+
+        </div>
+
 @endsection

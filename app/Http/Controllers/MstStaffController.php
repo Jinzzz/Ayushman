@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\DB;
 use App\Mail\PasswordEmail;
 use App\Models\Mst_Pharmacy;
 use App\Models\StaffPharmacyMapping;
+use App\Models\MstDoctor;
+use App\Models\EmployeeAvailableLeave;
 
 class MstStaffController extends Controller
 {
@@ -52,7 +54,7 @@ class MstStaffController extends Controller
             $query->where('staff_contact_number','LIKE',"%{$request->contact_number}%");
         }
       
-        $staffs = $query->orderBy('updated_at', 'desc')->get();
+        $staffs = $query->orderBy('created_at', 'desc')->get();
         return view('staffs.index',compact('pageTitle','staffs','branch','stafftype'));
     }
 
@@ -65,7 +67,7 @@ class MstStaffController extends Controller
         $branchs = Mst_Branch::get();
         $salaryType = Sys_Salary_Type::pluck('salary_type','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
-        $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
+        $leave_types = Mst_Leave_Type::where('is_active', 1)->whereNotIn('leave_type_id',[5])->get();
         $branch = Salary_Head_Type::get();
         $heads = Salary_Head_Master::where('status', 1)->get();
         $pharmacies = Mst_Pharmacy::get();
@@ -74,15 +76,15 @@ class MstStaffController extends Controller
 
     public function store(Request $request)
     {
- 
+
         $request->validate([
-            'staff_type' => 'required',
+                'staff_type' => 'required',
                 'employment_type' => 'required',
                 'staff_name' => 'required|max:100',
                 'gender' => 'required',
                 'branch_id' => 'required',
                 'date_of_birth' => 'required|date',
-                'staff_email' => 'required',
+                'staff_email' => 'required|unique:mst_staffs,staff_email',
                 'staff_contact_number' => 'required',
                 'staff_address' => 'required',
                 'staff_qualification' => 'required|max:100',
@@ -93,12 +95,6 @@ class MstStaffController extends Controller
                 'access_card_number' => 'required',
                 'date_of_join' => 'required',
                 'is_active' => 'required',
-            'salary_head_id' => 'required',
-            'salary_head_type_id' => 'required',
-            'amount' => 'required',
-            'leave_type' => 'required',
-            'credit_period' => 'required',
-            'credit_limit' => 'required', 
         ]);
     
         // Process personal info
@@ -126,7 +122,9 @@ class MstStaffController extends Controller
             'is_active' => $is_active,
             'is_login' => $is_login,
             'created_by' => Auth::id(),
+            'max_discount_value' =>$request->input('consultation_fees'),
             'staff_username' =>$request->input('staff_username'),
+            'staff_booking_fee' =>$request->input('consultation_fees'),
         
         ]);
         
@@ -148,19 +146,19 @@ class MstStaffController extends Controller
                 }
             }
         }
-
+    
         if ($request->has('staff_username')) {
             // Create a user entry
             $user = Mst_User::create([
                 'username' => $request->input('staff_username'),
                 'email' => $request->input('staff_email'),
-                'password' => bcrypt($generatedPassword),
+                'password' => Hash::make($generatedPassword),
                 'staff_id' => $staff->staff_id,
                 'date_of_birth' => $request->input('date_of_birth'),
                 'address' => $request->input('staff_address'),
                 'gender' => $request->input('gender'),
                 'user_type_id' => $request->input('staff_type'),
-                'discount_percentage' => $request->input('discount_percentage'),
+                'discount_percentage' => $request->input('discount_percentage'), // duplication of coolumn max_discount in mst_staff
                 'is_active' => $is_active,
                 'last_login_time' => now(),
                 'created_by' => Auth::id(),
@@ -179,19 +177,18 @@ class MstStaffController extends Controller
                });
         }
     
-        
-        
-        // Process salary info
-        $salaryHeadIds = $request->input('salary_head_id');
-        $salaryHeadTypeIds = $request->input('salary_head_type_id');
-        $amounts = $request->input('amount');
 
+        $salaryHeadIds = $request->input('salary_head_id') ?? [];
+        $salaryHeadTypeIds = $request->input('salary_head_type_id') ?? [];
+        $amounts = $request->input('amount') ?? [];
+        
         // Remove the last entry from the arrays
         array_pop($salaryHeadIds);
         array_pop($salaryHeadTypeIds);
         array_pop($amounts);
 
-        // Assuming the arrays have the same length, you can use a loop to iterate through them
+        if(isset($salaryHeadIds) && count($salaryHeadIds) > 0) 
+        {
         foreach ($salaryHeadIds as $index => $headId) {
             Mst_Salary::create([
                 'staff_id' => $staff->staff_id,
@@ -200,44 +197,54 @@ class MstStaffController extends Controller
                 'amount' => $amounts[$index],
             ]);
         }
-        // Process available leaves info
+    }
+
         $leaveTypes = $request->input('leave_type');
         $creditPeriods = $request->input('credit_period');
         $creditLimits = $request->input('credit_limit');
-    
+        $creditSum=0;
         // Assuming the arrays have the same length, you can use a loop to iterate through them
-        foreach ($leaveTypes as $index => $leaveType) {
-            Mst_Leave_Config::create([
-                'staff_id' => $staff->staff_id,
-                'leave_type' => $leaveType,
-                'credit_period' => $creditPeriods[$index],
-                'credit_limit' => $creditLimits[$index],
-            ]);
-
-    }
+        if(isset($leaveTypes) && count($leaveTypes) > 0) 
+        {
+            foreach ($leaveTypes as $index => $leaveType) 
+            {
+                Mst_Leave_Config::create([
+                    'staff_id' => $staff->staff_id,
+                    'leave_type' => $leaveType,
+                    'credit_period' => $creditPeriods[$index],
+                    'credit_limit' => $creditLimits[$index],
+                ]);
+                $lType=Mst_Leave_Type::find($leaveType);
+                if($lType)
+                {
+                    if($lType->is_dedactable==0)
+                    {
+                        $creditSum+=$creditLimits[$index];
+                    }
+                    
+                }
+            }
+        
+        }
+        EmployeeAvailableLeave::create([
+                    'staff_id' => $staff->staff_id,
+                    'remark' => '',
+                    'total_leaves' => $creditSum,
+                ]);
     return redirect()->route('staffs.index')->with('success', 'Staff added successfully');
 }
-    
- 
+
 
     public function edit($staff_id)
     {
         
         $pageTitle = "Edit Staff";
-        // $staffs = Mst_Staff::findOrFail($staff_id)
-        // ->join('mst_salary', 'mst_staffs.staff_id', '=', 'mst_salary.staff_id')
-        // ->join('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
-        // ->select(
-        //     'mst_staffs.*','mst_salary.*','mst_leave_config.*'
-        // )
-        // ->first();
-        $staffs = Mst_Staff::where('mst_staffs.staff_id','=',$staff_id)
-                ->join('mst_salary', 'mst_salary.staff_id',  '=',  'mst_staffs.staff_id')
-                ->join('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
-                 ->select('mst_staffs.*','mst_salary.*','mst_leave_config.*')
+        $staffs = Mst_Staff::where('mst_staffs.staff_id', '=', $staff_id)
+        ->leftJoin('mst_salary', 'mst_salary.staff_id', '=', 'mst_staffs.staff_id')
+        ->leftJoin('mst_leave_config', 'mst_staffs.staff_id', '=', 'mst_leave_config.staff_id')
+        ->select('mst_staffs.*', 'mst_salary.*', 'mst_leave_config.*','mst_staffs.staff_id')
         ->first();
-   
-       
+  
         $stafftype = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
         $selectedLeaveTypes = DB::table('mst_leave_config')
         ->where('staff_id', $staff_id)
@@ -249,16 +256,17 @@ class MstStaffController extends Controller
         $salaryType = Sys_Salary_Type::pluck('salary_type','id');
         $commissiontype = Mst_Master_Value::where('master_id',8)->pluck('master_value','id');
         $heads = Salary_Head_Master::where('status', 1)->get();
-        $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
+        $leave_types = Mst_Leave_Type::where('is_active', 1)->whereNotIn('leave_type_id',[5])->get();
         $salaryData = DB::table('mst_salary')->where('staff_id', $staff_id)->get();
         $staff_id = $staff_id;
-        
+
         return view('staffs.edit',compact('pageTitle','staffs','stafftype','employmentType','gender','branchs','salaryType','commissiontype','heads','leave_types','salaryData','selectedLeaveTypes','staff_id'));
 
     }
 
     public function update(Request $request, $staff_id)
     {
+
         $request->validate([
             'staff_type' => 'required',
             'employment_type' => 'required',
@@ -268,6 +276,7 @@ class MstStaffController extends Controller
             'date_of_birth' => 'required',
             'staff_contact_number' =>'required',
             'staff_address' => 'required',
+            'staff_email' => 'required|email|unique:mst_staffs,staff_email,'.$staff_id.',staff_id',
             'staff_qualification' =>'required',
             'staff_specialization' => 'required',
             'staff_work_experience' => 'required',
@@ -276,12 +285,6 @@ class MstStaffController extends Controller
             'access_card_number' =>'required',
             'date_of_join' => 'required',
             'is_active' => 'required',
-        'salary_head_id' => 'required',
-        'salary_head_type_id' => 'required',
-        'amount' => 'required',
-        'leave_type' => 'required',
-        'credit_period' => 'required',
-        'credit_limit' => 'required', 
                                            
         ]);
         $is_active = $request->input('is_active') ? 1 : 0;
@@ -305,7 +308,82 @@ class MstStaffController extends Controller
         $staff->staff_commission_type = $request->input('staff_commission_type');
         $staff->staff_commission = $request->input('staff_commission');
         $staff->access_card_number = $request->input('access_card_number');
+        $staff->max_discount_value = $request->input('discount_percentage');
+        $staff->date_of_join = $request->input('date_of_join');
         $staff->save();
+
+        $salaryHeadIds = $request->input('salary_head_id');
+        $salaryHeadTypeIds = $request->input('salary_head_type_id');
+        $amounts = $request->input('amount');
+        if(isset($salaryHeadIds) && count($salaryHeadIds) > 0) {
+            foreach ($salaryHeadIds as $index => $headId) {
+                $salary = Mst_Salary::where('staff_id', $staff->staff_id)
+                                    ->where('salary_head', $headId)
+                                    ->first();
+        
+                if ($salary) {
+                    $salary->update([
+                        'salary_head_type' => $salaryHeadTypeIds[$index],
+                        'amount' => $amounts[$index],
+                    ]);
+                } else {
+                    Mst_Salary::create([
+                        'staff_id' => $staff->staff_id,
+                        'salary_head' => $headId,
+                        'salary_head_type' => $salaryHeadTypeIds[$index],
+                        'amount' => $amounts[$index],
+                    ]);
+                }
+                
+            }
+        }
+
+        $leaveTypes = $request->input('leave_type');
+        $creditPeriods = $request->input('credit_period');
+        $creditLimits = $request->input('credit_limit');
+        //dd($creditLimits);
+        $creditSum=0;
+        if(isset($leaveTypes) && count($leaveTypes) > 0) {
+            foreach ($leaveTypes as $index => $leaveType) {
+                if($creditLimits[$index]!=NULL)
+                {
+                $leaveConfig = Mst_Leave_Config::where('staff_id', $staff->staff_id)
+                                                ->where('leave_type', $leaveType)
+                                                ->first();
+        
+                if ($leaveConfig) {
+                    $leaveConfig->update([
+                        'credit_period' => $creditPeriods[$index],
+                        'credit_limit' => $creditLimits[$index],
+                    ]);
+                } else {
+                    Mst_Leave_Config::create([
+                        'staff_id' => $staff->staff_id,
+                        'leave_type' => $leaveType,
+                        'credit_period' => $creditPeriods[$index],
+                        'credit_limit' => $creditLimits[$index],
+                    ]);
+                }
+                 $lType=Mst_Leave_Type::find($leaveType);
+                if($lType)
+                {
+                    if($lType->is_dedactable==0)
+                    {
+                        $creditSum+=$creditLimits[$index];
+                    }
+                    
+                }
+                
+            }
+            }
+        }
+       EmployeeAvailableLeave::where('staff_id',$staff->staff_id)->update([
+                    'staff_id' => $staff->staff_id,
+                    'remark' => '',
+                    'total_leaves' => $creditSum,
+                ]);
+        
+        
 
 
         return redirect()->route('staffs.index')->with('success', 'Staff record updated successfully.');
@@ -314,23 +392,37 @@ class MstStaffController extends Controller
 
     public function show($id)
     {
-
-            $pageTitle = "View staff details";
-            $show = Mst_Staff::join('mst_salary', 'mst_salary.staff_id', '=', 'mst_staffs.staff_id')
-                                ->join('mst_leave_config', 'mst_leave_config.staff_id', '=', 'mst_staffs.staff_id')
-                                ->select('mst_staffs.*', 'mst_leave_config.*', 'mst_salary.*',)
-                                ->findOrFail($id); 
-            $leave_type = Mst_Leave_Type::where('leave_type_id', $show->leave_type)->pluck('name'); 
-            $salary = Salary_Head_Master::where('id', $show->salary_head)->pluck('salary_head_name');                  
-            return view('staffs.show',compact('pageTitle','show','leave_type','salary'));
-      
+        $pageTitle = "View staff details";
+        $show = Mst_Staff::leftJoin('mst_salary', function($join) {
+                $join->on('mst_salary.staff_id', '=', 'mst_staffs.staff_id');
+            })
+            ->leftJoin('mst_leave_config', function($join) {
+                $join->on('mst_leave_config.staff_id', '=', 'mst_staffs.staff_id');
+            })
+            ->select(
+                'mst_staffs.*',
+                'mst_leave_config.*',
+                'mst_salary.*',
+                'mst_staffs.created_at',
+            )
+            ->where('mst_staffs.staff_id', $id)
+            ->firstOrFail();
+    
+    
+        $leaveType = $show->leave_type ? Mst_Leave_Type::where('leave_type_id', $show->leave_type)->value('name') : null;
+    
+        $salaryHead = $show->salary_head ? Salary_Head_Master::where('id', $show->salary_head)->value('salary_head_name') : null;
+    
+        return view('staffs.show', compact('pageTitle', 'show', 'leaveType', 'salaryHead'));
     }
+
     
     public function destroy($staff_id)
     {
+        Mst_Salary::where('staff_id', $staff_id)->delete();
+        Mst_Leave_Config::where('staff_id', $staff_id)->delete();
         $staff = Mst_Staff::findOrFail($staff_id);
         $staff->delete();
-    
         return 1;
     }
     
@@ -361,31 +453,29 @@ class MstStaffController extends Controller
         ]);
     }
 
-    public function changeStatus(Request $request, $staff_id)
+    public function updateStatus($staffId)
     {
-       
-        $staff = Mst_Staff::findOrFail($staff_id);
-        
-            $staff->is_active = !$staff->is_active;
-            $staff->save();
-            return 1;
-    }
-
-        public function checkUniqueEmail(Request $request)
-        {
-            $email = $request->input('email');
-            $isUnique = Mst_Staff::where('staff_email', $email)->count();
-            $data=array();
-            if($isUnique>0)
-                {
-                $data['status']=false;
-                }
-            else
-                {
-                $data['status']=true;
-                }
-            return response()->json($data);
+        $staff = Mst_Staff::find($staffId);
+        if (!$staff) {
+            return response()->json(['success' => false]);
         }
+    
+        // Toggle the is_active value
+        $staff->is_active = !$staff->is_active;
+        $staff->save();
+    
+        return response()->json(['success' => true, 'status' => $staff->is_active]);
+    }
+    
+    
+
+    public function checkUniqueEmail(Request $request)
+    {
+        $email = $request->input('email');
+        $isUnique = !Mst_Staff::where('staff_email', $email)->exists();
+        $data = ['status' => $isUnique];
+        return response()->json($data);
+    }
 
         public function checkUniqueUsername(Request $request)
         {
@@ -416,6 +506,24 @@ class MstStaffController extends Controller
                 {
                 $data['status']=true;
                 }
+            return response()->json($data);
+
+        }
+        public function getEmployeeAvaialbleLeaves(Request $request)
+        {
+            $staff_id = $request->input('staff_id');
+            $available_leave =EmployeeAvailableLeave::where('staff_id',$staff_id)->first();
+            $data=array();
+            if($available_leave)
+            {
+                
+             $datat['leave_count']=$available_leave->total_leaves;
+            }
+            else
+            {
+    
+             $datat['leave_count']=0.0;
+            }
             return response()->json($data);
 
         }

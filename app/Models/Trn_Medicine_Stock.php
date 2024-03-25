@@ -25,6 +25,7 @@ class Trn_Medicine_Stock extends Model
         'purchase_unit_id',
         'opening_stock',
         'current_stock',
+        'invoive_id',
         'remarks',
         'created_at',
         'updated_at',

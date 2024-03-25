@@ -53,10 +53,16 @@
                                         @endif
                                         </td>
                                         <td>{{$rawdata->income_expense_date}}</td>
-                                        <td>{{$rawdata->income_expense_ledger_id}}</td>
+                                        <td>{{$rawdata->income_expense_ledger_id}} <br>
+                                        
+                                        @if($rawdata->reference_file != NULL)
+                                        File: <a href="{{asset('/assets/uploads/miscelleneous/documents/'.$rawdata->reference_file)}}">View File</a>
+                                        @endif
+                                        
+                                        </td>
                                         <td>{{$rawdata->income_expense_amount}}</td>
                                         <td>
-                                            <a class="btn btn-danger btn-sm edit-custom"
+                                            <a class="btn btn-danger"
                                                href="{{ route('income-expense.destroy', ['id' => $rawdata->id]) }}"
                                                onclick="event.preventDefault(); document.getElementById('delete-form-{{ $rawdata->id }}').submit();">
                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete

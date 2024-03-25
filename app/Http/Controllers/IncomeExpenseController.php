@@ -49,6 +49,7 @@ class IncomeExpenseController extends Controller
             'transaction_mode_id' => 'required',
             'transaction_account_id' => 'required',
             'branch' => 'required',
+            'reference_file' => 'nullable|mimes:pdf,doc|max:2048' //2mb
     
         ]);
             $incomeExpense = new Trn_income_expense;
@@ -60,6 +61,20 @@ class IncomeExpenseController extends Controller
             $incomeExpense->transaction_account_id = $request->input('transaction_account_id');
             $incomeExpense->reference = $request->input('reference');
             $incomeExpense->notes = $request->input('notes');
+            $refFile = $request->file('reference_file');
+            
+            if (!empty($refFile)) {
+                if (isset($refFile)) {
+                    $filename = uniqid('income_expense_') . '.' . $refFile->getClientOriginalExtension();
+                    if(isset($refFile) && $refFile->isValid() ) 
+                    {
+                       $path2 = $refFile->move(public_path('assets/uploads/miscelleneous/documents'), $filename);
+                    }
+            }
+            } else {
+                $filename =null;
+            }
+            $incomeExpense->reference_file = $filename;
         
             $incomeExpense->save();
             

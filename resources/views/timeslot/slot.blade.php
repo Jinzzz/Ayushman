@@ -4,7 +4,7 @@
    <div class="col-md-12 col-lg-12">
       <div class="card">
          <div class="card-header">
-            <h3 class="card-title"><strong>Add New Slots</strong></h3>
+            <h3 class="card-title"><strong>Add Slots to {{@$staff->staff_name}}</strong></h3>
          </div>
          <form action="{{ route('timeslotStaff.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -26,8 +26,8 @@
                         <label class="form-label">Slot *</label>
                         <select class="form-control" required name="slot" id="slot">
                            <option value="">Select Slot</option>
-                           @foreach( $slot as $masterId => $masterValue)
-                           <option value="{{ $masterId }}">{{ $masterValue }}</option>
+                           @foreach( $slot as $key => $slots)
+                           <option value="{{ $slots->id }}">{{ $slots->slot_name }} : {{$slots->time_from}} - {{$slots->time_to}}</option>
                            @endforeach
                         </select>
                      </div>
@@ -79,7 +79,6 @@
                      <th class="wd-15p">Day</th>
                      <th class="wd-15p">Slot</th>
                      <th class="wd-15p">Max Tokens</th>
-                     <th class="wd-15p">Status</th>
                      <th class="wd-15p">Action</th>
                   </tr>
                </thead>
@@ -90,28 +89,13 @@
                   @foreach($timeslot as $slot)
                   <tr>
                      <td>{{ ++$i }}</td>
-                     <td>{{ $slot->weekDay->master_value}}</td>
-                     <td>{{ $slot->timeSlot->master_value}}</td>
-                     <td>{{ $slot->max_tokens}}</td>
-                     <td>
-                        <form action="{{ route('timeslot.changeStatus', $slot->id) }}" method="POST">
-                           @csrf
-                           @method('PATCH')
-                           <button type="submit"
-                              onclick="return confirm('Do you want to Change status?');"
-                              class="btn btn-sm @if($slot->is_active == 0) btn-danger @else btn-success @endif">
-                           @if($slot->is_active == 0)
-                           Inactive
-                           @else
-                           Active
-                           @endif
-                           </button>
-                        </form>
-                     </td>
+                     <td>{{ $slot->weekDay['master_value']}}</td>
+                     <td>{{ $slot->timeSlot['slot_name']}}</td>
+                     <td>{{ $slot->no_tokens}}</td>
                      <td>
                        
                         <form style="display: inline-block"
-                           action="{{ route('timeslotStaff.destroy', $slot->id) }}" method="post">
+                           action="{{ route('timeslotStaff.destroy', $slot->id) }}" method="get">
                            @csrf
                            @method('delete')
                            <button type="submit" onclick="return confirm('Do you want to delete it?');"

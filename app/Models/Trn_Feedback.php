@@ -10,7 +10,7 @@ class Trn_Feedback extends Model
     use HasFactory;
     protected $table ='trn__feedback';
     protected $fillable = [
-        'patient_id',
+        'booking_id',
         'consultancy_rating',
         'visit_rating',
         'service_rating',
@@ -24,9 +24,9 @@ class Trn_Feedback extends Model
     ];
 
 
-    public function patient()
+    public function booking()
     {
-        return $this->belongsTo(Mst_Patient::class, 'patient_id','id');
+        return $this->belongsTo(Trn_Consultation_Booking::class, 'booking_id','id');
     }
 
 }

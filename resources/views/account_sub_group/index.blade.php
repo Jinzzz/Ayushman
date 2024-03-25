@@ -27,6 +27,7 @@
                         <th class="wd-15p">SL.NO</th>
                         <th class="wd-15p">Account Sub Group Name</th>
                         <th class="wd-15p">Status</th>
+                        <th class="wd-15p">Is System</th>
                         <th class="wd-15p">Action</th>
                     </tr>
                 </thead>
@@ -48,10 +49,23 @@
                             </button>
                         </td>
                         <td>
+                            <button type="button" style="width: 70px;">
+                                @if($account_sub_group->is_system == 0)
+                                No
+                                @else
+                                Yes
+                                @endif
+                            </button>
+                        </td>
+                        <td>
+                             @if($account_sub_group->is_system == 0)
                             <a class="btn btn-secondary" href="{{ route('account.sub.group.edit', $account_sub_group->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
                             <button type="button" onclick="deleteData({{ $account_sub_group->id }})" class="btn btn-danger">
                                 <i class="fa fa-trash" aria-hidden="true"></i> Delete
                             </button>
+                            @else
+                            System Defined
+                            @endif
                         </td>
                     </tr>
                     @endforeach

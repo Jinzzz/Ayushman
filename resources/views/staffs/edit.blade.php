@@ -71,6 +71,15 @@
   .custom-control-label::after {
     top: 0;
   }
+
+  .error-border {
+    border: 2px solid red;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 12px;
+  }
 </style>
 <div class="container">
 @if ($errors->any())
@@ -99,7 +108,7 @@
       </div>
     </div>
   </div>
-  <form action="{{ route('staffs.update', ['staff_id' => $staffs->staff_id]) }}" method="POST" enctype="multipart/form-data"> 
+  <form action="{{ route('staffs.update', ['staff_id' => $staffs->staff_id]) }}" method="POST" enctype="multipart/form-data" id="addFm"> 
     @csrf 
     @method('PUT')
     <div class="row setup-content" id="step-1">
@@ -112,13 +121,13 @@
                 <div class="form-group">
                   <label class="form-label">Staff Type*</label>
                   <select class="form-control" name="staff_type" id="staff_type">
-    <option value="">Select Staff Type</option>
-    @foreach($stafftype as $masterId => $masterValue)
-        <option value="{{ $masterId }}" {{ optional($staffs)->staff_type == $masterId ? 'selected' : '' }}>
-            {{ $masterValue }}
-        </option>
-    @endforeach
-</select>
+                    <option value="">Select Staff Type</option>
+                    @foreach($stafftype as $masterId => $masterValue)
+                        <option value="{{ $masterId }}" {{ optional($staffs)->staff_type == $masterId ? 'selected' : '' }}>
+                            {{ $masterValue }}
+                        </option>
+                    @endforeach
+                 </select>
 
                 </div>
               </div>
@@ -165,7 +174,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Date Of Birth*</label>
-                  <input type="date" class="form-control" name="date_of_birth" value="{{ $staffs->date_of_birth }}" placeholder="Date Of Birth">
+                  <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ $staffs->date_of_birth }}" placeholder="Date Of Birth">
                 </div>
               </div>
             </div>
@@ -179,7 +188,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Contact Number*</label>
-                  <input type="text" class="form-control" name="staff_contact_number" value="{{ $staffs->staff_contact_number }}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateContact(this)">
+                  <input type="text" class="form-control numericInput" name="staff_contact_number"  value="{{ $staffs->staff_contact_number }}" placeholder="Contact Number" pattern="[0-9]+" title="Please enter digits only" oninput="validateContact(this)">
                   <p class="error-message" style="color: green; display: none;">Please enter digits only.</p>
                 </div>
               </div>
@@ -217,7 +226,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Commission Type*</label>
-                  <select class="form-control" name="staff_commission_type" id="staff_commission_type">
+                  <select class="form-control" name="staff_commission_type" id="staff_commission_type"  onchange="updateCommissionPlaceholder()">
                       <option value="">Select Commission Type</option>
                       <option value="percentage" {{ $staffs->staff_commission_type == 'percentage' ? 'selected' : '' }}>Percentage</option>
                       <option value="fixed" {{ $staffs->staff_commission_type == 'fixed' ? 'selected' : '' }}>Fixed</option>
@@ -227,7 +236,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-label">Staff Commission*</label>
-                  <input type="text" class="form-control" name="staff_commission" id="staff_commission" value="{{ $staffs->staff_commission }}"  placeholder="Staff Commission" oninput="validateCommission(this);" >
+                  <input type="number" class="form-control numericInput" name="staff_commission" oninput="updateCommissionPlaceholder()"  id="staff_commission" value="{{ $staffs->staff_commission }}"  placeholder="Staff Commission" >
                 </div>
               </div>
             </div>
@@ -244,7 +253,8 @@
                 <div class="form-group">
                   <div class="form-label"></div>
                   <label class="form-label">Date Of Join*</label>
-                  <input type="date" class="form-control" name="date_of_join" value="{{ $staffs->date_of_join }}" placeholder="Date Of Join" >
+                  <input type="date" class="form-control" name="date_of_join" value="{{ $staffs->date_of_join ? $staffs->date_of_join : date('Y-m-d') }}" placeholder="Date Of Join">
+
                 </div>
               </div>
             </div>
@@ -274,15 +284,17 @@
         </div>
           </div>
           <button class="btn btn-primary nextBtn btn-lg pull-right" type="button">Next</button>
+          <div class="row">
           <div class="col-md-6" id="usernameField" style="{{ $staffs->is_login == 1 ? '' : 'display: none;' }}">
           <div class="form-group">
               <label class="form-label">Username</label>
-              <input type="text" class="form-control" name="staff_username" id="staff_username" value="{{ old('staff_username', $staffs->staff_username) }}">
+              <input type="text" class="form-control" name="staff_username" onblur="checkusername()"  id="staff_username" value="{{ old('staff_username', $staffs->staff_username) }}">
           </div>
           <div class="form-group">
           <label class="form-label">Staff Discount Percentage</label>
-                <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{  $staffs->discount_percentage }}" placeholder="Staff Discount Percentage">
+                <input type="text" class="form-control" name="discount_percentage" onkeyup="checkDiscountPercentage()" id="discount_percentage" value="{{  $staffs->max_discount_value }}" placeholder="Staff Discount Percentage">
           </div>
+      </div>
       </div>
         </div>
       </div>
@@ -302,7 +314,7 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label class="form-label">Salary Head*</label>
-                <select class="form-control salary_head" name="salary_head_id[]" id="salary_head_id{{ $index }}" required>
+                <select class="form-control salary_head" name="salary_head_id[]" id="salary_head_id{{ $index }}">
                 <option value="" disabled selected>Choose Salary Head</option>
                 @foreach($heads as $head)
                   <option value="{{ $head->id }}" {{ $head->id == $salary->salary_head ? 'selected' : '' }}>
@@ -315,13 +327,13 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label class="form-label">Salary Head Type*</label>
-                <input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type{{ $index }}" value="{{ $salary->salary_head_type }}" required>
+                <input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type{{ $index }}" value="{{ $salary->salary_head_type }}" readonly>
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label class="form-label">Salary Amount*</label>
-                <input type="number" class="form-control" name="amount[]" value="{{ $salary->amount }}" placeholder="Salary Amount" required>
+                <input type="number" class="form-control" name="amount[]" value="{{ $salary->amount }}" placeholder="Salary Amount">
               </div>
             </div>
             <div class="col-md-3" data-initial-row id="salaryContainer{{ $index }}">
@@ -340,7 +352,7 @@
         </div>
         
         <div class="col-md-6" style="display: flex; justify-content:center;">
-          <button class="btn btn-primary nextBtn btn-lg pull-right" type="button">Next</button>
+          <button class="btn btn-primary nextBtn checkCls btn-lg pull-right" type="button">Next</button>
         </div>
       </div>
     </div>
@@ -383,7 +395,7 @@
             </td>
             <td>
                 <div class="form-group">
-                    <input type="number" id="credit_limit" name="credit_limit[]" placeholder="Enter Credit Limit" 
+                    <input type="number" id="credit_limit" class="form-control" name="credit_limit[]" placeholder="Enter Credit Limit" 
                     @if($selectedLeaveTypes->where('leave_type', $leave_types[$i]->leave_type_id)->isNotEmpty()) value="{{ $selectedLeaveTypes->where('leave_type', $leave_types[$i]->leave_type_id)->first()->credit_limit }}" @endif
                     >
                 </div>
@@ -395,7 +407,7 @@
       </table>
     </div>
     <div class="text-center">
-      <button class="btn btn-success btn-lg"  type="submit" id="finalSubmit">Update</button>
+      <button class="btn btn-success btn-lg"  type="button" id="finalSubmit">Update</button>
     </div>
     <br><br>
   </div>
@@ -412,6 +424,18 @@
 
 
 <script>
+$(document).on('change', 'select[name="salary_head_id[]"]', function() {
+    var selectedValue = $(this).val();
+    var row = $(this).closest(".row");
+    var amountInput = row.find('input[name="amount[]"]');
+    
+
+    if (selectedValue !== "") {
+        amountInput.addClass("checkF");
+    } else {
+        amountInput.removeClass("checkF");
+    }
+});
   $(document).ready(function() {
 
     var navListItems = $('div.setup-panel div a'),
@@ -433,6 +457,7 @@
         $target.find('input:eq(0)').focus();
       }
     });
+    
 
     allNextBtn.click(function() {
       var curStep = $(this).closest(".setup-content"),
@@ -440,16 +465,27 @@
         nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a"),
         curInputs = curStep.find("input[type='text'],input[type='url']"),
         isValid = true;
+        checkFInputs = curStep.find("input.checkF"),
+        allRequiredFilled = true;
 
       $(".form-group").removeClass("has-error");
+      if(curStepBtn == 'step-2') {
+        $(".checkF").each(function() {
+        if ($(this).val().trim() === '') {
+          allRequiredFilled = false;
+          $(this).closest(".form-group").addClass("has-error");
+        }
+      });
+    }
       for (var i = 0; i < curInputs.length; i++) {
         if (!curInputs[i].validity.valid) {
           isValid = false;
           $(curInputs[i]).closest(".form-group").addClass("has-error");
         }
       }
+     // console.log(requiredInputs)
 
-      if (isValid)
+      if (isValid && allRequiredFilled)
         nextStepWizard.removeAttr('disabled').trigger('click');
     });
 
@@ -484,9 +520,9 @@
 // });
 $("#finalSubmit").click(function() {
     // Remove existing hidden fields to avoid duplication
-    $('#addFm [name^="salary_head_id"]').remove();
-    $('#addFm [name^="salary_head_type_id"]').remove();
-    $('#addFm [name^="amount"]').remove();
+    // $('#addFm [name^="salary_head_id"]').remove();
+    // $('#addFm [name^="salary_head_type_id"]').remove();
+    // $('#addFm [name^="amount"]').remove();
 
     // Create an array to store data for dynamically added rows
     var dataArray = [];
@@ -499,7 +535,7 @@ $("#finalSubmit").click(function() {
         var salary_head_id = row.find('.salary_head').val();
         var salary_head_type_id = row.find('.salary_head_types').val();
         var amount = row.find('[name="amount[]"]').val();
-
+        //alert(salary_head_id)
         // Only append hidden fields when valid data is available
         if (salary_head_id && salary_head_type_id && amount) {
             dataArray.push({
@@ -508,10 +544,10 @@ $("#finalSubmit").click(function() {
                 'amount': amount,
             });
         }
-
+      
         // Add more fields as needed
     });
-
+    //console.log(dataArray)
     // Append the dataArray to the form using a traditional for loop
     for (var i = 0; i < dataArray.length; i++) {
         $('<input>').attr({
@@ -535,10 +571,35 @@ $("#finalSubmit").click(function() {
         // Add more fields as needed
     }
 
+          //validation
+          const validationErr = validateLeaves()
+      if(validationErr){
+        // alert("Please fill all checked fields");
+        return;
+      }
+
     // Submit the form
     $('#addFm').submit();
+    
 });
   });
+  function validateLeaves(params) {
+      let err = false
+      const checkboxes = document.querySelectorAll('input[name="leave_type[]"]');
+      checkboxes.forEach(function(checkbox, index) {
+        console.log(checkbox,"checkboxcheckboxcheckbox");
+        if(checkbox.checked){
+          var row = checkbox.closest('tr');
+          // Find credit period and credit limit fields in the same row
+          var creditPeriodField = row.querySelector('select[name="credit_period[]"]');
+          var creditLimitField = row.querySelector('input[name="credit_limit[]"]');
+          if(!creditPeriodField.value || !creditLimitField.value){
+            err = true
+          }
+        }
+      })
+      return err
+    }
 
   $(document).ready(function () {
     $("#addProductBtn").click(function (event) {
@@ -560,7 +621,7 @@ $("#finalSubmit").click(function() {
                 '<div class="col-md-3">' +
                 '<div class="form-group">' +
                 '<label class="form-label">Salary Head Type*</label>' +
-                '<input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type">' +
+                '<input type="text" class="form-control salary_head_types" name="salary_head_type_id[]" id="salary_head_type" readonly>' +
                 '</div>' +
                 '</div>' +
                 '<div class="col-md-3">' +
@@ -663,7 +724,156 @@ $("#finalSubmit").click(function() {
 
 
         });
+        $(document).ready(function() {
+    $('#staff_username').on('keydown', function(e) {
+      // Prevent the entry of spaces
+      if (e.key === ' ') {
+        e.preventDefault();
+      }
+    });
+    $('#staff_username').on('input', function() {
+      var usernameValue = $(this).val();
+      $(this).val(usernameValue.toLowerCase());
+    });
+  });
+  
 
-    </script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var checkboxes = document.querySelectorAll('input[name="leave_type[]"]');
+
+    checkboxes.forEach(function(checkbox, index) {
+      checkbox.addEventListener('change', function() {
+        // Find the closest row to the checkbox
+        var row = this.closest('tr');
+
+        // Find credit period and credit limit fields in the same row
+        var creditPeriodField = row.querySelector('select[name="credit_period[]"]');
+        var creditLimitField = row.querySelector('input[name="credit_limit[]"]');
+        var requiredMessage = row.querySelector('.required-message');
+        
+        creditPeriodField.addEventListener('change', function()
+        {
+          creditPeriodField.classList.remove('error-border');
+        })
+
+        creditLimitField.addEventListener('input', function()
+        {
+          creditLimitField.classList.remove('error-border');
+         if(requiredMessage && creditPeriodField.value && creditLimitField.value)
+         {
+          row.removeChild(requiredMessage);
+         }
+
+        })
+
+        if (creditPeriodField && creditLimitField) {
+          if (this.checked) {
+            // Checkbox is checked, remove red border
+            creditPeriodField.classList.add('error-border');
+            creditLimitField.classList.add('error-border');
+
+            if (!requiredMessage) {
+              requiredMessage = document.createElement('div');
+              requiredMessage.classList.add('required-message');
+              requiredMessage.textContent = 'Fields are required';
+              // Set the background color to red
+              requiredMessage.style.color = 'red';
+              row.appendChild(requiredMessage);
+            }
+
+            // Make other fields mandatory
+            creditPeriodField.removeAttribute('disabled');
+            creditLimitField.removeAttribute('disabled');
+          } else {
+            // Checkbox is unchecked, add red border and show required message
+            creditPeriodField.classList.remove('error-border');
+            creditLimitField.classList.remove('error-border');
+
+            // Remove required message
+            if (requiredMessage) {
+              requiredMessage.remove();
+            }
+
+            // Make other fields non-mandatory
+            creditPeriodField.setAttribute('disabled', 'true');
+            creditLimitField.setAttribute('disabled', 'true');
+          }
+        } else {
+          console.error('Elements not found for checkbox:', this);
+        }
+      });
+    });
+  });
+
+  $(document).ready(function() {
+    var today = new Date().toISOString().split('T')[0];
+  document.getElementById("date_of_birth").setAttribute("max", today);
+});
+
+$(document).ready(function(){
+    const numericInputs = document.querySelectorAll('.numericInput')
+    numericInputs.forEach((numericInput)=>{
+      numericInput.addEventListener('input', function(event) {
+        let inputValue = event.target.value;
+        inputValue = inputValue.replace(/[^0-9.]/g, '');
+        inputValue = inputValue.replace(/(\..*)\./g, '$1');
+        event.target.value = inputValue;
+      });
+    })
+})
+</script>
+<script>
+  function updateCommissionPlaceholder() {
+    var commissionType = document.getElementById('staff_commission_type').value;
+    var placeholderText = '';
+    var commissionInput = document.getElementById('staff_commission');
+
+    if (commissionType === 'percentage') {
+      placeholderText = 'Enter Percentage';
+      // Additional validation for percentage not greater than 100
+      validatePercentage(commissionInput.value);
+    } else if (commissionType === 'fixed') {
+      placeholderText = 'Enter Fixed Amount';
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
+    } else {
+      placeholderText = 'Staff Commission';
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
+    }
+
+    commissionInput.setAttribute('placeholder', placeholderText);
+  }
+
+  function validatePercentage(value) {
+    var errorMessage = '';
+    if (value && (isNaN(value) || parseFloat(value) > 100)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Percentage',
+        text: 'Percentage should be between 0 and 100.'
+      });
+      $('#staff_commission').val("");
+    }
+
+    document.getElementById('commission-error').innerHTML = errorMessage;
+  }
+
+  // Call the function on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    updateCommissionPlaceholder();
+  });
+
+  function validateCommission(input) {
+    var commissionType = document.getElementById('staff_commission_type').value;
+
+    if (commissionType === 'percentage') {
+      validatePercentage(input.value);
+    } else {
+      // Clear previous error message
+      document.getElementById('commission-error').innerHTML = '';
+    }
+  }
+</script>
     
 

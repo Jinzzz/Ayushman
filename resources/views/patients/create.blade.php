@@ -57,8 +57,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="patient_gender" class="form-label">Gender*</label>
-                                    <select class="form-control" name="patient_gender" id="patient_gender" required>
+                                    <label for="patient_gender" class="form-label">Gender</label>
+                                    <select class="form-control" name="patient_gender" id="patient_gender">
                                         <option value="">Choose Gender</option>
                                         @foreach($gender as $id => $gender)
                                         <option value="{{ $id }}">{{ $gender }}</option>
@@ -68,8 +68,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Date Of Birth*</label>
-                                    <input type="date" class="form-control" name="patient_dob" required
+                                    <label class="form-label">Date Of Birth</label>
+                                    <input type="date" class="form-control" name="patient_dob" id="patient_dob"
                                         placeholder="Patient Dob">
                                 </div>
                             </div>
@@ -139,32 +139,42 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Medical History</label>
-                                    <textarea class="form-control" required name="patient_medical_history" id="medicalHistory"
+                                    <textarea class="form-control" name="patient_medical_history" id="medicalHistory"
                                         placeholder="Medical History">{{ old('patient_medical_history') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Patient Current Medication</label>
-                                    <textarea class="form-control" required name="patient_current_medications" id="currentMedication"
+                                    <textarea class="form-control" name="patient_current_medications" id="currentMedication"
                                         placeholder="Patient Current Medication">{{ old('patient_current_medications') }}</textarea>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="form-group">
                                     <div class="form-label">Status</div>
                                     <label class="custom-switch">
-                                        <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" id="is_active" name="is_active"
-                                            onchange="toggleStatus(this)" class="custom-switch-input" checked>
-                                        <span id="statusLabel" class="custom-switch-indicator"></span>
-                                        <span id="statusText" class="custom-switch-description">Active</span>
+                                       <input type="hidden" name="is_active" value="0">
+                                       <input type="checkbox" id="is_active" name="is_active" onchange="toggleStatus(this)" class="custom-switch-input" checked>
+                                       <span id="statusLabel" class="custom-switch-indicator"></span>
+                                       <span id="statusText" class="custom-switch-description">Active</span>
                                     </label>
-                                </div>
-                            </div>
-                        </div>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="form-group">
+                                    <div class="form-label">Has Credit</div>
+                                    <label class="custom-switch">
+                                       <input type="hidden" name="has_credit" value="0">
+                                       <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input" checked>
+                                       <span id="statusLabel1" class="custom-switch-indicator"></span>
+                                       <span id="statusText1" class="custom-switch-description">Active</span>
+                                    </label>
+                                 </div>
+                              </div>
+                           </div>
                         <div class="form-group">
                             <center>
                                 <button type="submit" class="btn btn-raised btn-primary">
@@ -187,7 +197,22 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    
 <script type="text/javascript">
+ $(document).ready(function() {
+        var currentDate = new Date().toISOString().split('T')[0];
+        $('#patient_dob').attr('max', currentDate);
+    });
     $(document).ready(function() {
         CKEDITOR.replace('medicalHistory', {
             removePlugins: 'image',
@@ -201,19 +226,25 @@
         });
 
       });
-        function toggleStatus(checkbox) {
-            const statusLabel = document.getElementById("statusLabel");
-            const statusText = document.getElementById("statusText");
-
-            if (checkbox.checked) {
-                statusLabel.classList.remove("custom-switch-off");
-                statusText.textContent = "Active";
-            } else {
-                statusLabel.classList.add("custom-switch-off");
-                statusText.textContent = "Inactive";
-            }
-        }
+  
     });
+    
+     function toggleStatus(checkbox) {
+      if (checkbox.checked) {
+         $("#statusText").text('Active');
+         $("input[name=is_active]").val(1);
+      } else {
+         $("#statusText").text('Inactive');
+         $("input[name=is_active]").val(0);
+      }
+   }
+   function toggleStatus1(checkbox) {
+      if (checkbox.checked) {
+         $("#statusText1").text('Active');
+      } else {
+         $("#statusText1").text('Inactive');
+      }
+   }
 </script>
 <script>
     function validateInput(input) {

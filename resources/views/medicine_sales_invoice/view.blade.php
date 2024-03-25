@@ -161,35 +161,31 @@ use App\Helpers\AdminHelper;
                      </div>
                   </div>
                   <!-- payment   -->
-                  <div id="payment_fields">
-                     <div class="row">
-                        <div class="col-md-4">
-                           <div class="form-group">
-                              <label class="form-label">Paid Amount</label>
-                              <input type="text" class="form-control paid-amount" name="paid_amount" maxlength="16" readonly placeholder="Paid Amount" value="{{$medicine_sale_invoices->payable_amount}}">
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="form-group">
-                              <label for="payment-type" class="form-label">Payment Mode</label>
-                              <select disabled readonly class="form-control" required name="payment_mode" placeholder="Payment Mode" id="payment_mode" onchange="updateDepositTo()">
-                                 <option value="">--Select--</option>
-                                 @foreach($paymentType as $id => $value)
-                                 <option value="{{ $id }}" {{ $id == $medicine_sale_invoices->payment_mode ? ' selected' : '' }}>{{ $value }}</option>
-                                 @endforeach
-                              </select>
-                           </div>
-                        </div>
-                        <div class="col-md-4">
-                           <div class="form-group">
-                              <label class="form-label">Deposit To</label>
-                              <select class="form-control" readonly name="deposit_to" id="deposit_to" disabled>
-                                 <option value="" selected readonly>{{$deposit_to}}</option>
-                              </select>
-                           </div>
-                        </div>
-                     </div>
+                  @foreach($patymentDetails as $patymentDetail)
+         <div id="payment_fields">
+            <div class="row">
+               <div class="col-md-4">
+                  <div class="form-group">
+                     <label for="paid_amount_{{$patymentDetail->id}}" class="form-label">Paid Amount</label>
+                     <input type="text" id="paid_amount_{{$patymentDetail->id}}" class="form-control paid-amount" name="paid_amount[]" readonly value="{{$patymentDetail->payable_amount}}">
                   </div>
+               </div>
+               <div class="col-md-4">
+                  <div class="form-group">
+                     <label for="payment-type_{{$patymentDetail->id}}" class="form-label">Payment Mode</label>
+                     <input type="text" id="payment-type_{{$patymentDetail->id}}" class="form-control payment-type" name="payment_type[]" readonly value="{{$patymentDetail->master_value}}">
+                  </div>
+               </div>
+               <div class="col-md-4">
+                  <div class="form-group">
+                     <label for="deposit_to_{{$patymentDetail->id}}" class="form-label">Deposit To</label>
+                     <input type="text" id="deposit_to_{{$patymentDetail->id}}" class="form-control deposit-to" name="deposit_to[]" maxlength="16" readonly placeholder="Deposit To" value="{{$patymentDetail->ledger_name}}">
+                  </div>
+               </div>
+            </div>
+         </div>
+         @endforeach
+
                   <div class="form-group">
                      <center>
                      <a class="btn btn-danger" href="{{ url('/medicine-sales-invoices') }}">Cancel</a>

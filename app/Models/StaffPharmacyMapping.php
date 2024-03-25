@@ -14,4 +14,9 @@ class StaffPharmacyMapping extends Model
         'staff_id',
         'pharmacy',
     ];
+    
+    public function pharmacies()
+    {
+        return $this->hasMany(Mst_Pharmacy::class, 'pharmacy','pharmacy_id');
+    }
 }

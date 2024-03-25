@@ -19,13 +19,15 @@ class PatientSearchController extends Controller
         }
     
         if ($request->filled('pat_name')) {
-            $patients->where('patient_name', $request->input('pat_name'));
+            $patName=$request->input('pat_name');
+            $patients->where('patient_name', 'like', "%$patName%");
         }
     
         if ($request->filled('pat_mobile')) {
-            $patients->where('patient_mobile', $request->input('pat_mobile'));
+            $patMobile=$request->input('pat_mobile');
+            $patients->where('patient_mobile','like', "%$patMobile%");
         }
-
+        
         if ($request->filled('from_date')) {
             $patients->where('booking_date', $request->input('from_date'));
         }
@@ -51,11 +53,13 @@ class PatientSearchController extends Controller
             ->leftJoin('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
             ->where('trn_consultation_bookings.patient_id', $patient->id)
             ->select('mst_patients.*', 'trn_consultation_bookings.*', 'mst_staffs.*', 'mst_branches.*', 'mst_timeslots.*', 'mst_master_values.*') // Adjust the columns you want to select
+            ->orderBy('trn_consultation_bookings.booking_date','DESC')
             ->get();
 
             $medicines = Mst_Medicine::get();
+            $pageTitle = "Booking Details";
       
-        return view('patient_search.show', compact('patient','patient_bookings','medicines'));
+        return view('patient_search.show_new', compact('patient','patient_bookings','medicines','pageTitle'));
     }
 
     public function storePrescription(Request $request)

@@ -1,10 +1,13 @@
 @extends('layouts.app')
 @section('content')
+@php
+use App\Models\Mst_Staff;
+@endphp
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Search Purchae Invoice</h3>
+                <h3 class="card-title">Search Sales Return</h3>
             </div>
             <div class="card-body">
                 <form action="{{ route('medicine.sales.return.index') }}" method="GET">
@@ -20,12 +23,37 @@
 
                         <div class="col-md-3">
                         <label for="contact-number">Pharmacy</label>
+                         @if(Auth::check() && Auth::user()->user_type_id == 96)
+                           @php
+                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                           @endphp
                             <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach ($pharmacies as $pharmacy)
+                                       @if(in_array($pharmacy->id, $mappedpharma))
+                                           <option value="{{ $pharmacy->id }}"  {{request()->input('pharmacy_id') == $pharmacy->id ? 'selected':''}}>{{ $pharmacy->pharmacy_name }}</option>
+                                       @endif
+                                @endforeach
+                            </select>
+                        @else
+                         <select class="form-control" name="pharmacy_id" id="pharmacy_id">
                                 <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
                                 @foreach($pharmacies as  $data)
                                     <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
                                         {{ $data->pharmacy_name }}
                                     </option>
+                                @endforeach
+                            </select>
+                        @endif
+                        </div>
+                        <div class="col-md-3">
+                            <label for="contact-number">Select Patient</label>
+                            <select class="form-control" name="patient_id" id="patient_id">
+                                 <option value=""> Select Patient </option> 
+                                 <option value="0" {{ request('patient_id') == '0' ? 'selected' : '' }}> Guest Patient </option> 
+                                @foreach($patients as  $data)
+                                    <option value="{{ $data->id  }}" {{ request('patient_id') == $data->id ? 'selected' : '' }}>{{ $data->patient_name }} </option>
                                 @endforeach
                             </select>
                         </div>
@@ -69,9 +97,11 @@
                     <tr>
                         <th class="wd-15p">SL.NO</th>
                         <th class="wd-15p">Return No</th>
-                        <th class="wd-15p">Return Date</th>
+                        <th class="wd-15p">Invoice <br>ID</th>
+                        <th class="wd-15p">Return <br>Date</th>
                         <th class="wd-15p">Pharmacy</th>
-                        <th class="wd-15p">Sales person</th>
+                         <th class="wd-15p">Patient</th>
+                        <th class="wd-15p">Sales <br>person</th>
                         <th class="wd-15p">Action</th>
                     </tr>
                 </thead>
@@ -83,15 +113,30 @@
                     <tr id="dataRow_{{ $invoice->sales_return_id  }}">
                         <td>{{ ++$i }}</td>
                         <td>{{ $invoice->sales_return_no }}</td>
+                        <td>{{ $invoice->Invoice['sales_invoice_number'] }}</td>
                         <td>{{ \Carbon\Carbon::parse($invoice->return_date)->format('d-m-Y') }}</td>
                         <td>{{ $invoice->pharmacy_name }}</td>
-                        <td>{{ $invoice->staff->staff_name }}</td>
-                        
+                         <td>
+                            @if($invoice->patient_id != 0)
+                             {{ @$invoice->patient['patient_name'] }}
+                             @else
+                             Guest Patient
+                             @endif
+                        </td>
+                                              <td>
+                        @if($invoice->created_by == 1)
+                            Administrator
+                         
+                        @else
+                  
+                     {{ $invoice->staff->staff_name }}
+                     @endif
+                          </td>
                         <!-- <td>{{ $invoice->discount_amount }}</td> -->
                         <td>
                             <!-- <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.return.edit', $invoice->sales_return_id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a> -->
-                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.return.print', $invoice->sales_return_id) }}"><i class="fa fa-print" aria-hidden="true"></i>
-                                Print </a>
+                            <!--<a class="btn btn-primary btn-sm edit-custom" href="{{ route('medicine.sales.return.print', $invoice->sales_return_id) }}"><i class="fa fa-print" aria-hidden="true"></i>-->
+                            <!--    Print </a>-->
                             <a class="btn btn-secondary btn-sm" href="{{ route('medicine.sales.return.show', $invoice->sales_return_id) }}">
                                 <i class="fa fa-eye" aria-hidden="true"></i> View</a>
                             <form style="display: inline-block" action="" method="post">

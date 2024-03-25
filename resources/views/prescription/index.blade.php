@@ -52,7 +52,7 @@
                                     <select class="form-control" name="patient_id" id="patient_id" required>
                                         <option value="">Select Patient</option>
                                         @foreach ($patients as $patient)
-                                        <option value="{{ $patient->id }}">
+                                        <option value="{{ $patient->id }}" {{ isset($patient_id) && $patient->id == $patient_id ? 'selected' : '' }}>
                                             {{ $patient->patient_name }} ({{ $patient->patient_code }})
                                         </option>
                                         @endforeach
@@ -62,8 +62,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="form-label">Select Booking ID*</label>
-                                    <select class="form-control" name="patient_booking_id" id="patient_booking_id">
-                                        <option value="">Choose Booking ID</option>
+                                    <select class="form-control" name="patient_booking_id" id="patient_booking_id" required>
+                                        <option value="">--Select Booking ID--</option>
                                     </select>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                     </form>
-                    @if(isset($prescriptions))
+                    @if(isset($prescriptions) && count($prescriptions) > 0)
                     <div class="row">
                         <div class="col-md-12 col-lg-12">
                             <div class="card">
@@ -86,6 +86,7 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Booking ID</th>
                                                 <th>Doctor Name</th>
                                                 <th>Prescritpions</th>
                                                 <th>Actions</th>
@@ -98,11 +99,12 @@
                                             @foreach($prescriptions as $prescription)
                                             <tr id="dataRow_{{ $prescription->prescription_id }}">
                                                 <td>{{ ++$i }}</td>
+                                                <td>{{ $bookingInfo->booking_reference_number}}</td>
                                                 <td>{{ $prescription->staff->staff_name}}</td>
                                                 <td>{{ $prescription->staff->staff_code.'-'.$prescription->created_at->format('d-m-Y h:i A')}}</td>
                                                 <td>
-                                                    <a class="btn btn-primary btn-sm edit-custom" href="{{ route('prescriptions.print', $prescription->prescription_id) }}"><i class="fa fa-print" aria-hidden="true"></i>
-                                                        Print </a>
+                                                   <a class="btn btn-primary btn-sm edit-custom" href="{{ route('prescriptions.print', $prescription->prescription_id) }}" target="_blank"><i class="fa fa-print" aria-hidden="true"></i> Print</a>
+
                                                     <a class="btn btn-primary btn-sm" href="{{ route('prescriptions.show', $prescription->prescription_id) }}">
                                                         <i class="fa fa-eye" aria-hidden="true"></i> View
                                                     </a>
@@ -130,7 +132,7 @@
     $(document).ready(function() {
         // searchable dropdown
         $('#patient_id').select2();
-        $('#patient_booking_id').select2();
+     $('#patient_booking_id').select2();
     });
 
     $('#patient_id').on('change', function() {
@@ -142,16 +144,17 @@
             _token: "{{ csrf_token() }}",
         },
         success: function(data) {
-            console.log(data);
-            var booking_id = $('#booking_id').val();
-            if (typeof booking_id !== 'undefined') {
-                // Your logic here
-            }
-            $('#patient_booking_id').empty().append('<option value="">Choose Booking ID</option>');
-            $.each(data, function(key, value) {
-                $('#patient_booking_id').append('<option value="' + key + '">' + value + '</option>');
-            });
-        },
+    console.log(data);
+    var booking_id = '{{ $booking_id ?? '' }}'; 
+
+    $('#patient_booking_id').empty().append('<option value="">Choose Booking ID</option>');
+
+    $.each(data, function(key, value) {
+        $('#patient_booking_id').append('<option value="' + key + '">' + value + '</option>');
+    });
+
+    $('#patient_booking_id').val(booking_id).change();
+},
         error: function() {
             console.log('Error fetching account sub groups.');
         }

@@ -54,6 +54,20 @@ use App\Http\Controllers\IncomeExpenseController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\BookingSearchController;
+use App\Http\Controllers\GeneralController;
+use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SalaryProcessingController;
+use App\Http\Controllers\ConsultationBillController;
+use App\Http\Controllers\WellnessBillController;
+use App\Http\Controllers\TherapyBillController;
+use App\Http\Controllers\InvoiceSettlemntBillController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BranchStockTransferController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\DoctorLeaveRequestController;
+use App\Http\Controllers\DoctorAttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,16 +83,37 @@ use App\Http\Controllers\BookingSearchController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/clear-cache', function () {
+        $exitCode = Artisan::call('cache:clear');
+        $exitCode = Artisan::call('config:cache');
+        return 'DONE'; //Return anything
+    });
+//General - Public 
+Route::get('/general/index/{branch_code}', [GeneralController::class, 'generalIndex'])->name('general.index');
+Route::get('/patient/feedback/{id}/create', [FeedbackController::class, 'create'])->name('customer.feedback.create');
+Route::post('/patient/feedback/save', [FeedbackController::class, 'saveFeedback'])->name('customer.feedback.save');
+Route::get('/feedback/success', [FeedbackController::class, 'successPage'])->name('feedback.success');
+
 
 //Authentication:
 Route::get('/login', [MstAuthController::class, 'showLoginForm'])->name('mst_login');
-Route::get('/pharmacy-login', [MstAuthController::class, 'showPharmacyLoginForm'])->name('mst_login.pharmacy');
-Route::post('/pharmacy-login-post', [MstAuthController::class, 'Pharmacylogin'])->name('pharmacy.login.redirect');
 Route::post('/admin-login', [MstAuthController::class, 'login'])->name('mst_login_redirect');
 Route::match(['get', 'post'], '/logout', [MstAuthController::class, 'logout'])->name('logout');
 Route::get('/verification-request', [MstAuthController::class, 'verificationRequest'])->name('verification.request');
 // Route::post('/verify-email', [MstAuthController::class, 'verifyEmail'])->name('verify.email');
 Route::post('/reset-password', [MstAuthController::class, 'resetPassword'])->name('reset.password');
+//pharmacy id = 96
+Route::get('/pharmacy-login', [MstAuthController::class, 'showPharmacyLoginForm'])->name('mst_login.pharmacy');
+Route::post('/pharmacy-login-post', [MstAuthController::class, 'Pharmacylogin'])->name('pharmacy.login.redirect');
+//Receptionist id = 18
+Route::get('/receptionist-login', [MstAuthController::class, 'showReceptionistLoginForm'])->name('mst_login.receptionist');
+Route::post('/receptionist-login-post', [MstAuthController::class, 'Receptionistlogin'])->name('receptionist.login.redirect');
+//Doctor id = 20
+Route::get('/doctor-login', [MstAuthController::class, 'showDoctorLoginForm'])->name('mst_login.doctor');
+Route::post('/doctor-login-post', [MstAuthController::class, 'Doctorlogin'])->name('doctor.login.redirect');
+//Accountant id= 21
+Route::get('/accountant-login', [MstAuthController::class, 'showAccountantLoginForm'])->name('mst_login.accountant');
+Route::post('/accountant-login-post', [MstAuthController::class, 'Accountantlogin'])->name('accountant.login.redirect');
 
 // Auth::routes();
 
@@ -91,6 +126,47 @@ Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPass
 
 //Authentication:
 Route::middleware('auth')->group(function () {
+    Route::middleware(['role:96'])->group(function () {
+        Route::get('/pharmacy-home', [DashboardController::class, 'pharmaIndex'])->name('pharmacy.home');
+    });
+     Route::middleware(['role:18'])->group(function () {
+        Route::get('/reception-home', [DashboardController::class, 'receptionIndex'])->name('reception.home');
+    });
+    
+    Route::middleware(['role:20'])->group(function () {
+        Route::get('/doctor-home', [DashboardController::class, 'doctorIndex'])->name('doctor.home');
+    });
+    
+    Route::middleware(['role:21'])->group(function () {
+        Route::get('/accountant-home', [DashboardController::class, 'accountantIndex'])->name('accountant.home');
+    });
+
+    //Route access for admin-pharmacist
+    Route::middleware(['role:1|role:96'])->group(function () {
+
+    });
+    
+     //Route access for admin-receptionist
+     Route::middleware(['role:1|role:18'])->group(function () {
+
+     });
+     
+     //Route access for admin-doctor
+    Route::middleware(['role:1|role:20'])->group(function () {
+
+    });
+    
+     //Route access for admin-accountant
+     Route::middleware(['role:1|role:21'])->group(function () {
+
+     });
+     
+   
+
+    // Dashboard 
+    Route::middleware('role:1')->get('/home', [DashboardController::class, 'index'])->name('home');
+    Route::middleware('role:1')->post('/save-default-pharmacy', [DashboardController::class, 'savePharmacy'])->name('save-default-pharmacy');
+    
     // Medicine dosage - Screen for medicine dosges
     Route::get('/medicine-dosage', [MstMedicineDosageController::class, 'index'])->name('medicine.dosage.index');
     Route::get('/medicine-dosage/create', [MstMedicineDosageController::class, 'create'])->name('medicine.dosage.create');
@@ -99,8 +175,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/medicine-dosage/edit/{id}', [MstMedicineDosageController::class, 'edit'])->name('medicine.dosage.edit');
     Route::patch('medicine-dosage/change-status/{id}', [MstMedicineDosageController::class, 'changeStatus'])->name('medicine.dosage.changeStatus');
 
-    // Dashboard 
-    Route::get('/home', [DashboardController::class, 'index'])->name('home');
 
     //Manage-Branches:
     Route::get('/branches', [MstBranchController::class, 'index'])->name('branches');
@@ -137,6 +211,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/staffs/restore', [MstStaffController::class, 'restore'])->name('staffs.restore');
     Route::patch('staffs/change-status/{staff_id}', [MstStaffController::class, 'changeStatus'])->name('staffs.changeStatus');
     Route::get('/getSalaryHeadTypes/{id}', [MstStaffController::class, 'getSalaryHeadTypes']);
+    Route::post('/checkUniqueUsername', [MstStaffController::class, 'checkUniqueUsername']);
+    Route::patch('/update-status/{staffId}', [MstStaffController::class, 'updateStatus'])->name('update-status');
     //Manage-External-Doctors:
     Route::get('/externaldoctors/index', [MstExternalDoctorController::class, 'index'])->name('externaldoctors.index');
     Route::get('/externaldoctors/create', [MstExternalDoctorController::class, 'create'])->name('externaldoctors.create');
@@ -155,17 +231,43 @@ Route::middleware('auth')->group(function () {
     Route::put('/therapies/update/{id}', [MstTherapyController::class, 'update'])->name('therapy.update');
     Route::patch('therapies/change-status/{id}', [MstTherapyController::class, 'changeStatus'])->name('therapy.changeStatus');
 
+      //Billing
+      
+      //consultationbilling
+        Route::get('/consultation-bill/index', [ConsultationBillController::class, 'consultationBill'])->name('consultation-bill.index');
+        Route::post('/consultation-bill/saveinvoice/{id}', [ConsultationBillController::class, 'saveInvoice'])->name('consultation-bill.store');
+        Route::get('/consultation-bill/create/{id}', [ConsultationBillController::class, 'generateInvoice'])->name('consultation-bill.create');
+        
+        
+        //wellnessbilling
+        Route::get('/wellness-bill/index', [WellnessBillController::class, 'wellnessBill'])->name('wellness-bill.index');
+        Route::post('/wellness-bill/saveinvoice/{id}', [WellnessBillController::class, 'saveInvoice'])->name('wellness-bill.store');
+        Route::get('/wellness-bill/create/{id}', [WellnessBillController::class, 'generateInvoice'])->name('wellness-bill.create');
+        
+        //therapybilling
+        Route::get('/therapy-bill/index', [TherapyBillController::class, 'therapyBill'])->name('therapy-bill.index');
+        Route::post('/therapy-bill/saveinvoice/{id}', [TherapyBillController::class, 'saveInvoice'])->name('therapy-bill.store');
+        Route::get('/therapy-bill/create/{id}', [TherapyBillController::class, 'generateInvoice'])->name('therapy-bill.create');
+        
+        //invoicesettlemnt
+        Route::get('/invoice-settlemnt/index', [InvoiceSettlemntBillController::class, 'invoiceSettlemntBill'])->name('invoice-settlemnt.index');
+        Route::post('/invoice-settlemnt/saveinvoice/{id}', [InvoiceSettlemntBillController::class, 'saveInvoice'])->name('invoice-settlemnt.store');
+        Route::get('/invoice-settlemnt/create/{id}', [InvoiceSettlemntBillController::class, 'generateInvoice'])->name('invoice-settlemnt.create');
+        
+
 
     //Manage-TimeSlots:
     Route::post('/timeslot/store', [MstTimeSlotController::class, 'store'])->name('timeslot.store');
     Route::patch('timeslot/change-status/{id}', [MstTimeSlotController::class, 'changeStatus'])->name('timeslot.changeStatus');
     Route::resource('timeslot', MstTimeSlotController::class);
+    
 
 
 
     //Assigning timeslot for a particular staff:
     Route::get('/timeslot-staff/slot/{id}', [MstTimeSlotController::class, 'slotIndex'])->name('staff.slot');
     Route::post('/timeslot-staff/store', [MstTimeSlotController::class, 'slotStore'])->name('timeslotStaff.store');
+    Route::get('/timeslot-staff/destroy/{id}', [MstTimeSlotController::class, 'slotDelete'])->name('timeslotStaff.destroy');
 
     // Assigning timeslot for a particular therapy room
     Route::get('/therapyroom-slot-assigning/index/{id}', [MstTherapyRoomSlotController::class, 'index'])->name('slot_assigning.index');
@@ -256,10 +358,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/medicine/update/{id}', [MstMedicineController::class, 'update'])->name('medicine.update');
     Route::get('/medicine/show/{id}', [MstMedicineController::class, 'show'])->name('medicine.show');
     Route::delete('/medicine/destroy/{id}', [MstMedicineController::class, 'destroy'])->name('medicine.destroy');
-    Route::patch('medicine/{id}/change-status', [MstMedicineController::class, 'changeStatus'])->name('medicine.changeStatus');
+    Route::patch('/medicine-update-status/{medicineId}', [MstMedicineController::class,'updateStatus'])->name('medicine.update-status');
     Route::post('/validate-hsn-code', [MstMedicineController::class, 'validateHsnCode'])->name('validate.hsn_code');
-    Route::get('/medicine-stock-updations/{id}',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
+    // Route::get('/medicine-stock-updations/{id}',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
+    Route::get('/medicine-stock-updations',[MstMedicineController ::class,'viewStockUpdation'])->name('viewMedicineStockUpdation.view');
     Route::post('/getBatchNumbers', [MstMedicineController::class, 'getBatchNumbers'])->name('getBatchNumbers'); 
+    Route::get('/initialstock/getUnitPrice/{medicineId}', [MstMedicineController::class, 'getUnitPrice'])->name('getUnitPrice'); 
     Route::get('/get-current-stock/{medicineId}/{batchNo}', [MstMedicineController::class, 'getCurrentStock']);
     Route::put('/updatestockmedicine', [MstMedicineController::class, 'updateStockMedicine'])->name('updatestockmedicine'); 
 
@@ -284,17 +388,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking-type/therapyIndex', [BookingTypeController::class, 'therapyIndex'])->name('booking_type.therapyIndex');
     Route::get('/booking-type/therapyShow/{id}', [BookingTypeController::class, 'therapyShow'])->name('booking_type.therapyShow');
 
-    //patient-search:
+   //patient-search:
     Route::get('/patient-search/index', [PatientSearchController::class, 'index'])->name('patient_search.index');
     Route::get('/patient-search/show/{id}', [PatientSearchController::class, 'show'])->name('patient_search.show');
-    Route::post('/add-prescription/store', [MstSupplierController::class, 'storePrescription'])->name('storePrescription.store');
+    Route::post('/add-prescription/store', [PatientSearchController::class, 'storePrescription'])->name('storePrescription.store');
 
-    //booking-search:
+      //booking-search:
      Route::get('/booking-search/index', [BookingSearchController::class, 'index'])->name('booking_search.index');
     Route::get('/booking-search/show/{id}', [BookingSearchController::class, 'show'])->name('booking_search.show');
     
-
-
     //Manage-suppliers:
     Route::get('/supplier/index', [MstSupplierController::class, 'index'])->name('supplier.index');
     Route::get('/supplier/create', [MstSupplierController::class, 'create'])->name('supplier.create');
@@ -324,6 +426,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/therapyroom-assigning/destroy/{id}', [MstTherapyRoomAssigningController::class, 'destroy'])->name('therapyroomassigning.destroy');
     Route::patch('therapyroom-assigning/change-status/{id}', [MstTherapyRoomAssigningController::class, 'changeStatus'])->name('therapyroomassigning.changeStatus');
     Route::get('/get-therapy-rooms/{branchId}', [MstTherapyRoomAssigningController::class, 'getTherapyRooms']);
+    
+    Route::get('/therapyroom-therapymapping', [MstTherapyRoomAssigningController::class, 'roomMappingIndex'])->name('therapymapping.index');
+    Route::post('/therapymap-room/store', [MstTherapyRoomAssigningController::class, 'roomMappingStore'])->name('therapy-map.room.store');
+    Route::get('/check-therapyroom-availability', [MstTherapyRoomAssigningController::class, 'therapyRoomAvailability'])->name('therapyRoomAvailability');
+    Route::delete('/therapy/room/destroy/{therapy_id}', [MstTherapyRoomAssigningController::class, 'roomDestroy'])->name('therapy.room.destroy');
+
+    
 
 
 
@@ -417,6 +526,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/staffleave/update/{id}', [StaffLeaveController::class, 'update'])->name('staffleave.update');
     Route::delete('/staffleave/destroy/{id}', [StaffLeaveController::class, 'destroy'])->name('staffleave.destroy');
     Route::get('/get-total-leaves/{staffId}', [StaffLeaveController::class, 'getTotalLeaves'])->name('get-total-leaves');
+    Route::post('/bookingCount', [StaffLeaveController::class, 'bookingCount'])->name('bookingCount');
     
         //Holidays
     Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
@@ -498,6 +608,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/get-patient-booking-ids/{id}', [MedicineSalesController::class, 'getPatientBookingIds'])->name('get.patient.booking.ids');
     Route::patch('/get-medicine-batches/{id}', [MedicineSalesController::class, 'getMedicineBatches'])->name('get.medicine.batches');
     Route::get('/getLedgerNames1', [MedicineSalesController::class, 'getLedgerNames'])->name('getLedgerNames1');
+    Route::get('/check-has-credit', [MedicineSalesController::class, 'hasCreditPatent'])->name('hasCreditPatient');
     Route::post('/medicine-sales-invoices/patient-store', [MedicineSalesController::class, 'patientStore'])->name('medicine.sales.invoices.patient-store');
 
     // Medicine sales return 
@@ -536,14 +647,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/medicine-purchase-invoice/store', [TrnMedicinePurchaseInvoiceDetailsController::class, 'store'])->name('medicinePurchaseInvoice.store');
     Route::get('/medicine-purchase-invoice/edit/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'edit'])->name('medicinePurchaseInvoice.edit');
     Route::put('/medicine-purchase-invoice/update/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'update'])->name('medicinePurchaseInvoice.update');
-    Route::get('/medicine-purchase-invoice/show/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'show'])->name('medicinePurchaseInvoice.show');
+    Route::get('/medicine-purchase-invoice/view/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'view'])->name('medicinePurchaseInvoice.view');
     Route::delete('/medicine-purchase-invoice/destroy/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'destroy'])->name('medicinePurchaseInvoice.destroy');
-    Route::get('/medicine-purchase-invoice/products/sample', function () {
-
-        $filepath = public_path('assets/uploads/medicine_purchase_sample.xlsx');
-
-        return Response::download($filepath);
-    })->name('download.products.sample');
+    Route::get('/medicine-purchase-invoice/check-invoice',[TrnMedicinePurchaseInvoiceDetailsController ::class,'checkInvoice'])->name('purchase.checkInvoice'); 
+ 
     Route::match(['get', 'post'], '/import/excel', [TrnMedicinePurchaseInvoiceDetailsController::class, 'create'])->name('excel.import');
 
     Route::get('/get-product-id/{medicineCode}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'getProductId'])->name('getProductId');
@@ -564,6 +671,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getPurchaseInvoiceDetails', [TrnMedicinePurchaseReturnController::class, 'getPurchaseInvoiceDetails'])->name('getPurchaseInvoiceDetails');
     Route::get('/get-invoice-branch',[TrnMedicinePurchaseReturnController::class,'getInvoiceBranch'])->name('getInvoiceBranch');
 Route::delete('/medicine-purchase-return/destroy/{id}', [TrnMedicinePurchaseReturnController::class, 'destroy'])->name('medicinePurchaseReturn.destroy');
+Route::get('/getLedgerNames2', [TrnMedicinePurchaseReturnController::class, 'getLedgerNames'])->name('getLedgerNames2');
 
 
 
@@ -591,8 +699,7 @@ Route::get('/medicine-purchase-invoice/show/{id}', [TrnMedicinePurchaseInvoiceDe
 Route::delete('/medicine-purchase-invoice/destroy/{id}', [TrnMedicinePurchaseInvoiceDetailsController::class, 'destroy'])->name('medicinePurchaseInvoice.destroy');
 Route::get('/medicine-purchase-invoice/products/sample', function () {
     
-    $filepath = public_path('assets/uploads/medicine_purchase_sample.xlsx');
-
+    $filepath = public_path('assets/uploads/medicine_purchase_invoice_sample.xlsx');
     return Response::download($filepath); 
 
 })->name('download.products.sample');
@@ -644,6 +751,131 @@ Route::delete('/feedback/destroy/{feedback_id}', [FeedbackController::class, 'de
 
 //search
 Route::get('/consultation-search/index', [SearchController::class, 'consultationSearch'])->name('consultation-search.index');
+
+//Settings
+Route::get('/profile', [SettingsController::class, 'ProfileIndex'])->name('profile');
+Route::get('/change-password', [SettingsController::class, 'ChangePassword'])->name('change.password');
+Route::post('/update-password', [SettingsController::class, 'UpdatePassword'])->name('profile.update_password');
+Route::get('/application-settings', [SettingsController::class, 'SettingsIndex'])->name('application.settings');
+Route::post('/settings/update/{id}', [SettingsController::class, 'UpdateSettings'])->name('settings.update');
+
+//Salary Processing
+
+Route::get('/staff/salary-processing/index', [SalaryProcessingController::class, 'index'])->name('salary-processing.index');
+Route::get('/staff/salary-processing/create', [SalaryProcessingController::class, 'create'])->name('create.salary-processing');
+Route::post('/staff/salary-processing/store', [SalaryProcessingController::class, 'store'])->name('store.salary-processing');
+Route::get('/getWorkingDays', [SalaryProcessingController::class, 'getWorkingDays'])->name('getWorkingDays');
+Route::get('/getStaffs/{branch_id}', [SalaryProcessingController::class, 'getStaffs'])->name('getStaffs');
+Route::get('/getStaffSalary/{staff_id}', [SalaryProcessingController::class, 'getStaffSalary'])->name('getStaffSalary');
+Route::get('getStaffLeaves/{staff_id}/{month}', [SalaryProcessingController::class, 'getStaffLeaves'])->name('get.staff.leaves');
+Route::get('/getDeductibleLeaveCount/{staff_id}/{month}', [SalaryProcessingController::class, 'getDeductibleLeaveCount'])->name('getDeductibleLeaveCount');
+Route::get('/get-salary-heads/{staff_id}', [SalaryProcessingController::class, 'getSalaryHeads'])->name('get-salary-heads');
+
+
+//Reports
+Route::get('/sales-report', [ReportController::class, 'SalesReport'])->name('sales.report');
+Route::get('/sales/report/detail/{id}', [ReportController::class, 'SalaryReportDetail'])->name('sales.report.detail');
+Route::get('/purchase-report', [ReportController::class, 'PurchaseReport'])->name('purchase-report');
+Route::get('/purchase/report/detail/{id}', [ReportController::class, 'PurchaseReportDetail'])->name('purchase.report.detail');
+Route::get('/purchase-return-report', [ReportController::class, 'PurchaseReturnReport'])->name('purchase.return.report');
+Route::get('/purchase/return/report/detail/{id}', [ReportController::class, 'PurchaseReturnReportDetail'])->name('purchase.return.report.detail');
+Route::get('/sales-return-report', [ReportController::class, 'SalesReturnReport'])->name('sales.return.report');
+Route::get('/sales/return/report/detail/{id}', [ReportController::class, 'SalesReturnReportDetail'])->name('sales.return.report.detail');
+Route::get('/stock-transfer-report', [ReportController::class, 'StockTransferReport'])->name('stock.transfer.report');
+Route::get('/stock-transfer-report/detail/{id}', [ReportController::class, 'StockTransferReportDetail'])->name('stock-transfer.report.detail');
+Route::get('/current-stocks-report', [ReportController::class, 'CurrentStockReport'])->name('current.stock.report');
+Route::get('/payment-made-report', [ReportController::class, 'PaymentMadeReport'])->name('payment.made.report');
+Route::get('/payment-made-report/detail/{id}', [ReportController::class, 'PaymentMadeReportDetail'])->name('payment.made.report.detail');
+
+//stock transfer to branches
+Route::get('/branch/stock-transfer', [BranchStockTransferController::class, 'index'])->name('branch-transfer.index');
+Route::get('/branch/stock-transfer/create', [BranchStockTransferController::class, 'create'])->name('create.branch-stock-transfer');
+Route::get('/getBatchDetails', [BranchStockTransferController::class, 'getBatchDetails'])->name('getBatchDetails');
+Route::post('/stockTransfer', [BranchStockTransferController::class, 'stockTransfer'])->name('stockTransfer');
+Route::get('/stock-transfer-history/{id}', [BranchStockTransferController::class, 'show'])->name('stock-transfer-history.show');
+Route::delete('/stock-transfer/{id}', [BranchStockTransferController::class, 'destroy'])->name('stock-transfer.destroy');
+
+//Consultation Bookings
+
+Route::get('/booking/consultation-booking', [BookingController::class, 'ConsultationIndex'])->name('bookings.consultation.index');
+Route::get('/booking/consultation-booking/create', [BookingController::class, 'ConsultationCreate'])->name('create.consultation.booking');
+Route::get('/consultation/get-staffs', [BookingController::class, 'getDoctors'])->name('consultation.getStaffs');
+Route::get('/consultation/get-bookingfee', [BookingController::class, 'getBookingFee'])->name('getBookingFee');
+Route::get('/consultation/getMembershipDetails', [BookingController::class, 'getMembershipDetails'])->name('getMembershipDetails');
+Route::get('/consultation/getMembershipAndBookingFee', [BookingController::class, 'getMembershipAndBookingFee'])->name('getMembershipAndBookingFee');
+Route::post('/booking/consultation-booking/savepatient', [BookingController::class, 'storePatient'])->name('savepatient.consultation.booking');
+Route::post('/booking/consultation-booking/savemember', [BookingController::class, 'saveMember'])->name('savemember.consultation.booking');
+Route::post('/booking/consultation-booking/patientbooking', [BookingController::class, 'patientBooking'])->name('patientbooking.consultation.booking');
+Route::get('/booking/consultation-booking/show/{id}', [BookingController::class, 'showBooking'])->name('show.consultation.booking');
+Route::delete('/booking/consultation-booking/delete/{id}', [BookingController::class, 'deleteBooking'])->name('delete.consultation.booking');
+
+//wellness booking
+Route::get('/booking/wellness-booking', [BookingController::class, 'WellnessIndex'])->name('bookings.wellness.index');
+Route::get('/booking/wellness-booking/create', [BookingController::class, 'WellnessCreate'])->name('create.wellness.booking');
+Route::get('/booking/getWellness', [BookingController::class, 'getWellnessList'])->name('booking.getWellness');
+Route::get('/booking/wellness/bookingfee', [BookingController::class, 'wellnessFee'])->name('wellness.getBookingFee');
+Route::get('/wellness/getMembershipAndBookingFee', [BookingController::class, 'wellnessMembershipandFee'])->name('wellness.getMembershipAndBookingFee');
+Route::get('/wellness/getPatientMembershipDetails', [BookingController::class, 'getPatientMembershipDetails'])->name('wellness.getPatientMembershipDetails');
+Route::post('/booking/wellness-booking/patientbooking', [BookingController::class, 'patientWellnessBooking'])->name('patientbooking.wellness.booking');
+Route::get('/wellness-booking/view/{id}', [BookingController::class, 'viewWellnessBooking'])->name('view.wellness.booking');
+Route::delete('/booking/wellness-booking/delete/{id}', [BookingController::class, 'deleteWellnessBooking'])->name('delete.wellness.booking');
+
+
+//Therapy Booking
+Route::get('/booking/therapy-booking', [BookingController::class, 'TherapyBooking'])->name('bookings.therapy.index');
+Route::get('/booking/therapy-booking/create', [BookingController::class, 'TherapyCreate'])->name('create.therapy.booking');
+Route::get('/booking/getTherapy', [BookingController::class, 'getTherapyList'])->name('booking.getTherapy');
+Route::get('/booking/therapy/getTherapyBookingFee', [BookingController::class, 'getTherapyBookingFee'])->name('therapy.getTherapyBookingFee');
+Route::get('/getInternalDoctors', [BookingController::class, 'getInternalDoctors'])->name('getInternalDoctors');
+Route::get('/getExternalDoctors', [BookingController::class, 'getExternalDoctors'])->name('getExternalDoctors');
+Route::post('/booking/therapy-booking/patienttherapybooking', [BookingController::class, 'patientTherapyBooking'])->name('patientbooking.therapy.booking');
+Route::get('/therapy-booking/view/{id}', [BookingController::class, 'viewTherapyBooking'])->name('view.therapy.booking');
+Route::delete('/booking/therapy-booking/delete/{id}', [BookingController::class, 'deleteTherapyBooking'])->name('delete.therapy.booking');
+
+//Therapy Refund
+
+Route::get('/booking/therapy-refund', [BookingController::class, 'TherapyRefundindex'])->name('bookings.therapy-refund.index');
+Route::get('/booking/therapy-refund/create', [BookingController::class, 'TherapyRefundCreate'])->name('create.therapy-refund');
+Route::post('/booking/therapy-refund/store', [BookingController::class, 'TherapyRefundStore'])->name('store.therapy-refund');
+Route::get('/booking/therapy-refund/fetchRefundBookings', [BookingController::class, 'fetchRefundBookings'])->name('fetch.refund.bookings');
+Route::get('/booking/therapy-refund/fetchtherapyInfo', [BookingController::class, 'fetchtherapyInfo'])->name('fetch.refund.fetchtherapyInfo');
+
+//Doctor - Consultation 
+Route::get('/doctor/consultation/index', [ConsultationController::class, 'ConsultIndex'])->name('consultation.index');
+Route::get('/doctor/consultation/prescription/add/{id}', [ConsultationController::class, 'PrescriptionAdd'])->name('doctor.precription.add');
+Route::post('/doctor/consultation/prescription/store', [ConsultationController::class, 'PrescriptionStore'])->name('doctor.precription.store');
+Route::get('/doctor/patient/history/{id}', [ConsultationController::class, 'PatientHistory'])->name('doctor.patient.history');
+Route::get('/doctor/consultation/history', [ConsultationController::class, 'ConsultHistory'])->name('consultation.history');
+Route::get('/doctor/consultation/view/{id}', [ConsultationController::class, 'viewConsultation'])->name('doctor.consultation.view');
+
+//Accountant - Staff cash deposit
+Route::get('/staff-cash-deposit/index', [TrnJournelEntryController::class, 'CashDepositIndex'])->name('staff.cash.deposit.index');
+Route::get('/staff-cash-deposit/create', [TrnJournelEntryController::class, 'CashDepositCreate'])->name('create.cash.deposit');
+Route::post('/staff-cash-deposit/store', [TrnJournelEntryController::class, 'CashDepositStore'])->name('staff.cash.deposit.store');
+Route::get('/staff-cash-deposit/show/{id}', [TrnJournelEntryController::class, 'CashDepositShow'])->name('staff.cash.deposit.show');
+
+//doctor-leave
+Route::get('/doctor-leave/index', [DoctorLeaveRequestController::class, 'index'])->name('employee.index');
+Route::get('doctor-leave/create', [DoctorLeaveRequestController::class, 'create'])->name('employee.create');
+Route::post('/doctor-leave/store', [DoctorLeaveRequestController::class, 'store'])->name('employee.store');
+Route::get('/doctor-leave/{staffleave_id}', [DoctorLeaveRequestController::class, 'show'])->name('employee.show');
+Route::get('/doctor-leave/edit/{id}', [DoctorLeaveRequestController::class, 'edit'])->name('employee.edit');
+Route::put('/doctor-leave/update/{id}', [DoctorLeaveRequestController::class, 'update'])->name('employee.update');
+Route::delete('doctor-leave/destroy/{id}', [DoctorLeaveRequestController::class, 'destroy'])->name('employee.destroy');
+
+//doctor-attendance
+Route::get('/doctor-attendance', [DoctorAttendanceController::class, 'viewAttendance'])->name('doctor.attendance.view');
+Route::get('/doctor-attendance/monthly', [DoctorAttendanceController::class, 'monthlyAttendance'])->name('doctorattendance.monthly');
+    
+//Salary process new routes
+
+Route::patch('salary-processing/change-status/{id}', [SalaryProcessingController::class, 'changeStatus'])->name('salary_processing.changeStatus');
+Route::get('salary-processing/view/{id}', [SalaryProcessingController::class, 'salaryProcessingView'])->name('salary_processing.view');
+
+//HRMS - Advance Salary
+Route::get('/advance-salary/index', [SalaryProcessingController::class, 'AdvanceSalaryIndex'])->name('advance-salary.index');
+Route::get('/advance-salary/create', [SalaryProcessingController::class, 'AdvanceSalaryCreate'])->name('staff.advance-salary.create');
+
 });
 
 

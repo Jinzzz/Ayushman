@@ -13,6 +13,8 @@ use View;
 use Dompdf\Options;
 use Carbon\Carbon;
 use App\Models\Trn_Consultation_Booking;
+use App\Models\Mst_Branch;
+use App\Models\Mst_Setting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
@@ -34,15 +36,17 @@ class TrnPrescriptionController extends Controller
     public function list(Request $request)
     {
         try {
-            // dd(2);
-            // dd($request->all());
             $pageTitle = "Prescriptions";
             $patients = Mst_Patient::where('is_active', 1)->get();
-            $prescriptions = Trn_Prescription::where('booking_id', $request->patient_booking_id)->with('Staff')->orderBy('created_at', 'desc')->get();
+            $prescriptions = [];
+            $bookingInfo = null;
             $patient_id = $request->patient_id;
             $booking_id = $request->patient_booking_id;
-            // dd($prescriptions[0]->staff->staff_code.'-'.$prescriptions[0]->created_at);
-            return view('prescription.index', compact('pageTitle', 'prescriptions', 'patients', 'patient_id', 'booking_id'));
+            if ($request->has('patient_booking_id')) {
+                $prescriptions = Trn_Prescription::where('booking_id', $request->patient_booking_id)->with('Staff')->orderBy('created_at', 'desc')->get();
+                $bookingInfo = Trn_Consultation_Booking::where('id', $request->patient_booking_id)->first();
+            }
+            return view('prescription.index', compact('pageTitle', 'prescriptions', 'patients', 'patient_id', 'booking_id','bookingInfo'));
         } catch (QueryException $e) {
             dd('Something went wrong.');
         }
@@ -120,7 +124,14 @@ class TrnPrescriptionController extends Controller
                 ];
             }
             $getDoctorDetails = Mst_Staff::where('staff_id', $basic_details->doctor_id)->first();
-            // dd($basic_details);
+            $getBranchID = Trn_Consultation_Booking::where('id', $basic_details->Booking_Id)->first();
+            if ($getBranchID && $getBranchID->branch_id) {
+                $branch_details = Mst_Branch::where('branch_id', $getBranchID->branch_id)->select('branch_name','branch_address','branch_contact_number','branch_email')->first();
+            }else{
+                $branch_details = NULL;
+            }
+            $AppkicationSettings = Mst_Setting::where('id',1)->first();
+            
             $medicine_details = Trn_Prescription_Details::where('trn__prescription__details.priscription_id', $id)
                 ->join('mst_medicines', 'trn__prescription__details.medicine_id', '=', 'mst_medicines.id')
                 ->join('mst_master_values as med_type_medicine', 'mst_medicines.medicine_type', '=', 'med_type_medicine.id')
@@ -137,7 +148,7 @@ class TrnPrescriptionController extends Controller
                 )
                 ->get();
             $dompdf = new Dompdf();
-            $view = View::make('prescription.print_prescription', ['doctorDetails' => $getDoctorDetails, 'pageTitle' => $pageTitle, 'basic_details' => $basic_details, 'patient_personal_details' => $patient_personal_details, 'medicine_details' => $medicine_details]);
+            $view = View::make('prescription.print_prescription', ['doctorDetails' => $getDoctorDetails, 'pageTitle' => $pageTitle,'branch_details' => $branch_details, 'settings' =>$AppkicationSettings, 'basic_details' => $basic_details, 'patient_personal_details' => $patient_personal_details, 'medicine_details' => $medicine_details]);
             $html = $view->render();
             // Load HTML content from a template or dynamically generate it based on $data
             // $html = '<html>HIKSLQW OIDJQ WOIJ D UHWEN</html>'; // You can generate HTML content here based on $data
@@ -179,7 +190,10 @@ class TrnPrescriptionController extends Controller
     public function getPatientBookingIds($id)
     {
         try {
-            $allBookings = Trn_Consultation_Booking::where('patient_id', $id)->select('booking_reference_number', 'id')->get();
+            $allBookings = Trn_Consultation_Booking::where('patient_id', $id)
+            ->where('booking_type_id','=',84)  // consultation bookingonly
+            ->where('booking_status_id','89')  //completed bookings only . a booking will be marked as completed once the doctor enters prescription and mark consultation done.
+            ->select('booking_reference_number', 'id')->get();
             $data = [];
             foreach ($allBookings as $bookings) {
                 $data[$bookings->id] = $bookings->booking_reference_number;

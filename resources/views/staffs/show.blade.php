@@ -15,7 +15,8 @@
                      </div>
                      <div class="user-wrap">
                         <h4><strong>{{ $show->staff_name}}</strong></h4>
-                        <h6 class="text-muted mb-3">Member Since: {{$show->last_login_time}}</h6>
+                        <h6 class="text-muted mb-3">Member Since: {{ $show->created_at->format('Y-m-d') }}</h6>
+
                         @if($show->is_active == 0)
                         <span class="badge badge-danger">Inactive</span>
                         @else
@@ -24,16 +25,7 @@
                      </div>
                   </div>
                </div>
-               <div class="col-lg-6 col-md-12">
-                  <div class="wideget-user-info">
-                     <div class="wideget-user-icons">
-                        <a href="#" class="bg-facebook text-white mt-0"><i class="fa fa-facebook"></i></a>
-                        <a href="#" class="bg-info text-white"><i class="fa fa-twitter"></i></a>
-                        <a href="#" class="bg-google text-white"><i class="fa fa-google"></i></a>
-                        <a href="#" class="bg-dribbble text-white"><i class="fa fa-dribbble"></i></a>
-                     </div>
-                  </div>
-               </div>
+       
             </div>
          </div>
       </div>
@@ -42,7 +34,7 @@
             <div class="tab-menu-heading">
                <div class="tabs-menu1">
                   <ul class="nav">
-                     <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Personale Details</a></li>
+                     <li class=""><a href="#tab-51" class="active show" data-toggle="tab">Personal Details</a></li>
                      <li><a href="#tab-61" data-toggle="tab" class="">Available Leaves</a></li>
                      <li><a href="#tab-71" data-toggle="tab" class="">Salary Details</a></li>
                   </ul>
@@ -98,14 +90,6 @@
                               <tr>
                                  <td><strong>Staff Address:</strong>{{ $show->staff_address ??''}}</td>
                               </tr>
-                          
-                              <tr>
-                                 <td><strong>Staff Salary Type:</strong> {{ $show->salaryType->salary_type ?? '' }}</td>
-                             </tr>
-                             
-                              <tr>
-                                 <td><strong>Salary Amount:</strong>{{ $show->salary_amount ??''}}</td>
-                              </tr>
                               <tr>
                                  <td><strong>Qualification :</strong>  {{ $show->staff_qualification ??''}}</td>
                               </tr>
@@ -148,13 +132,30 @@
                         <div class="card">
                            <div class="card-body">
                            <tr>
-                                 <td><strong>Leave Type:</strong>{{ str_replace(['[', ']', '"'], '', $leave_type) }}</td>
+                                 <td><strong>Leave Type:</strong>{{ str_replace(['[', ']', '"'], '', $leaveType) }}</td>
+
                               </tr> </br>
                               <tr>
-                                 <td><strong>Credit Period:</strong>{{ $show->credit_period}}</td>
+                                 <td>
+                                <strong>Credit Period:</strong>
+                                @if(isset($show->credit_period))
+                                    {{ $show->credit_period }}
+                                @else
+                                   
+                                @endif
+                            </td>
+
                               </tr></br>
                               <tr>
-                                 <td><strong>Credit Limit:</strong>{{ $show->credit_limit}}</td>
+                                 <td>
+                                <strong>Credit Limit:</strong>
+                                @if(isset($show->credit_limit))
+                                    {{ $show->credit_limit }}
+                                @else
+                                    
+                                @endif
+                            </td>
+
                               </tr>
                            </div>
                         </div>
@@ -170,13 +171,30 @@
                      <div class="card">
                      <div class="card-body">
                            <tr>
-                                 <td><strong>Salary Type :</strong>{{ str_replace(['[', ']','"'], '', $salary) }}</td>
+                               <td><strong>Salary:</strong>{{ str_replace(['[', ']','"'], '', $salaryHead) }}</td>
+
                               </tr> </br>
                               <tr>
-                                 <td><strong>Salary HeadType:</strong>{{ $show->salary_head_type}}</td>
+                                 <td>
+                                <strong>Salary Head :</strong>
+                                @if(isset($show->salary_head_type))
+                                    {{ $show->salary_head_type }}
+                                @else
+                                   
+                                @endif
+                            </td>
+
                               </tr></br>
                               <tr>
-                                 <td><strong>Amount:</strong>{{ $show->amount}}</td>
+                                <td>
+                                <strong>Amount:</strong>
+                                @if(isset($show->amount))
+                                    {{ $show->amount }}
+                                @else
+                                    
+                                @endif
+                            </td>
+
                               </tr>
                            </div>
                      </div>

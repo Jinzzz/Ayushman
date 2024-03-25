@@ -1,10 +1,13 @@
 @extends('layouts.app')
 @section('content')
+@php
+use App\Models\Mst_Staff;
+@endphp
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Search Purchae Invoice</h3>
+                <h3 class="card-title">Search Purchase Return</h3>
             </div>
             <div class="card-body">
                 <form action="{{ route('medicinePurchaseReturn.index') }}" method="GET">
@@ -20,15 +23,43 @@
                         </div>
                         <div class="col-md-3">
                             <label for="contact-number">Pharmacy</label>
+                            @if(Auth::check() && Auth::user()->user_type_id == 96)
+                               @php
+                                $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                                $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                               @endphp
                             <select class="form-control" name="pharmacy_id" id="pharmacy_id">
                                 <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
                                 @foreach($pharmacies as  $data)
-                                    <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
+                                    @if(in_array($data->id, $mappedpharma))
+                                    <option value="{{ $data->id }}" {{request()->input('pharmacy_id') == $data->id ? 'selected':''}}>
+                                        {{ $data->pharmacy_name }}
+                                    </option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            @else
+                            <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach($pharmacies as  $data)
+                                    <option value="{{ $data->id }}" {{ request()->input('pharmacy_id') == $data->id ? 'selected' : '' }}>
                                         {{ $data->pharmacy_name }}
                                     </option>
                                 @endforeach
                             </select>
+                            @endif
                         </div>
+                        <div class="col-md-3">
+                            <label for="contact-number">Supplier</label>
+                        <select class="form-control" name="supplier_id" id="supplier_id">
+                                <option value="">Choose Supplier</option>
+                                @foreach($suppliers as  $supplier)
+                                    <option value="{{ $supplier->supplier_id }}" {{ request()->input('supplier_id') == $supplier->supplier_id ? 'selected' : '' }}>
+                                        {{ $supplier->supplier_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            </div>
                    </div>
                    <div class="row mb-3">
                                  
@@ -68,7 +99,8 @@
             <thead>
                <tr>
                   <th class="wd-15p">SL.NO</th>
-                  <th class="wd-15p">Purchase Return No</th>
+                  <th class="wd-15p">Return No</th>
+                  <th class="wd-15p">Invoice ID</th>
                   <th class="wd-20p">Supplier</th>
                   <th class="wd-20p">Pharmacy</th>
                   <th class="wd-15p">Return Date</th>
@@ -84,6 +116,7 @@
                <tr id="dataRow_{{ $return->purchase_return_id  }}">
                   <td>{{ ++$i }}</td>
                   <td>{{ $return->purchase_return_no }}</td>
+                  <td>{{ @$return->PurchaseInvoice['purchase_invoice_no'] }}</td>
                   <td>{{ $return->supplier_name }}</td>
                   <td>{{ $return->pharmacy_name }}</td>
                   <td>{{ \Carbon\Carbon::parse($return->return_date)->format('d-m-Y') }}</td>
@@ -121,7 +154,7 @@
 function deleteData(dataId) {
     swal({
         title: "Delete selected data?",
-        text: "Are you sure you want to delete this data",
+        text: "The returned medicines will be restocked. Do you want to proceed?",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",

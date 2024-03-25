@@ -26,9 +26,7 @@
                                 <div class="col-md-4">Credit limit:{{$show->credit_limit}}</div> </br></br>
                             </div>
                             <div class="row justify-content-end" style="font-weight: bold; padding-left: 20px;">
-                                <div class="col-md-4">Outstanding amount: @foreach($outstanding as $amount)
-                <input type="text" class="form-control" readonly name="outstanding_amount[]" value="{{ $amount }}" placeholder="Outstanding Amount">
-            @endforeach</div></br></br>
+                                <div class="col-md-4">Outstanding amount: {{@$outstanding_sum}}</div>
                             </div>
                             <div class="row justify-content-end" style="font-weight: bold; padding-left: 20px;">
                                 <div class="col-md-4">Opening balance:{{$show->opening_balance}}</div></br></br>
@@ -59,14 +57,15 @@
                         <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Country</label>
-                            <select class="form-control" required name="country">
-                                @foreach ($countries as $id => $country)
-                                    @if ($show->country == $country->country_id)
-                                        <option value="{{ $country->country_id }}" selected>{{ $country->country_name }}</option>
-                                        @break
-                                    @endif
-                                @endforeach
-                            </select>
+                  <select class="form-control" required name="country" disabled>
+                    @foreach ($countries as $id => $country)
+                        @if ($show->country == $country->country_id)
+                            <option value="{{ $country->country_id }}" selected>{{ $country->country_name }}</option>
+                            @break
+                        @endif
+                    @endforeach
+                </select>
+
                         </div>
                     </div>
 
@@ -76,13 +75,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">State</label>
-                            <select class="form-control" required name="state">
+                            <select class="form-control" name="state" disabled>
                                 @foreach ($states as $state)
                                     <option value="{{ $state->state_id }}" {{ $show->state == $state->state_id ? 'selected' : '' }}>
                                         {{ $state->state_name }}
                                     </option>
                                 @endforeach
                             </select>
+                                                        
                         </div>
                     </div>
               
@@ -140,7 +140,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label">Credit Period</label>
+                                <label class="form-label">Credit Period (Days)</label>
                                 <input type="text" class="form-control" readonly name="credit_period" value="{{$show->credit_period}}" placeholder="Credit Period">
                             </div>
                         </div>

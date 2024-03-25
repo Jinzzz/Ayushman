@@ -61,6 +61,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <p id="leave_type_error" style="color: red;"></p>
 
                                 </div>
                                 </div>
@@ -243,5 +244,69 @@
 
 </script>
 
+<script>
+ $(document).ready(function() {
+    // Hide the error message initially
+    $('#leave_type_error').hide();
 
+    // Function to check and update submit button state and message
+    function checkLeaveTypeAndTotalDays() {
+        var leaveType = $('#leave_type').val();
+        var totalDays = parseFloat($('#total_days').val());
+        //alert(leaveType);
+        
+
+        if (leaveType != 5) {
+            if(totalDays === 0 || isNaN(totalDays))
+            {
+                 $('#leave_type_error').show(); // Show the error message
+                 $('#submitForm').prop('disabled', true); // Disable submit button
+                 $('#leave_type_error').text('Leave is not allowed for this type or total days is 0.'); // Display error message
+                 if(leaveType==null)
+                 {
+                     $('#leave_type_error').hide(); // Hide the error message
+                     
+                 }
+                
+            }
+            else
+            {
+                $('#leave_type_error').hide(); // Hide the error message
+                $('#submitForm').prop('disabled', false); // Enable submit button
+                $('#leave_type_error').text(''); // Display error message
+                
+            }
+           
+        } else {
+            $('#leave_type_error').hide(); // Hide the error message
+            $('#submitForm').prop('disabled', false); // Enable submit button
+        }
+    }
+
+    // Check initial state on document ready
+    checkLeaveTypeAndTotalDays();
+
+    // Check on change of leave type field
+    $('#leave_type').on('change', function() {
+        checkLeaveTypeAndTotalDays();
+    });
+
+    // Check on change of total days field
+    $('#total_days').on('change', function() {
+        checkLeaveTypeAndTotalDays();
+    });
+      $('#staff_id').on('change', function() {
+           $('#leave_type').val(''); // Unselect the leave type
+        checkLeaveTypeAndTotalDays();
+    });
+      $('#branch_id').on('change', function() {
+        $('#leave_type').val(''); // Unselect the leave type
+        checkLeaveTypeAndTotalDays(); // Check leave type and total days again
+    });
+});
+
+
+
+
+</script>
 

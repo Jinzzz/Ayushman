@@ -23,6 +23,7 @@
                     <thead>
                         <tr>
                             <th class="wd-20p">SL.NO</th>
+                            <th>Reference Number</th>
                             <th class="wd-20p">Doctor Name</th>
                             <th class="wd-20p">Branch</th>
                             <th class="wd-20p">Booking Date</th>
@@ -38,10 +39,12 @@
                         @foreach($patient_bookings as $patient_booking)
                         <tr id="dataRow_{{$patient_booking->id }}">
                             <td>{{ ++$i }}</td>
+                            <td>{{ $patient_booking->booking_reference_number}}</td>
                             <td>{{ $patient_booking->staff_username }}</td>
                             <td>{{ $patient_booking->branch_name}}</td>
                             <td>{{ $patient_booking->booking_date }}</td>
-                            <td>{{ $patient_booking->time_from }} - {{ $patient->time_to }}</td>
+                             <td>{{ $patient_booking->time_slot_id }}</td>
+                            <!--<td>{{ $patient_booking->time_from }} - {{ $patient->time_to }}</td>-->
                             <td>{{ $patient_booking->master_value }}</td>
                             <td>{{ $patient_booking->booking_fee}}</td>
                         </tr>

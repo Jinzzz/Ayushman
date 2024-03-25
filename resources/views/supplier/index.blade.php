@@ -28,7 +28,7 @@
                             <input type="text" id="supplier-name" name="supplier_name" class="form-control" value="{{ request('supplier_name') }}">
                         </div>
                         <div class="col-md-3">
-                            <label for="supplier-number" class="form-label">Supplier Number:</label>
+                            <label for="supplier-number" class="form-label">Phone Number:</label>
                             <input type="text" id="supplier-number" name="phone_1" class="form-control" value="{{ request('phone_1') }}">
                         </div>
                     </div>
@@ -71,7 +71,6 @@
                             <th class="wd-15p">supplier Name</th>
                             <th class="wd-15p">supplier Type</th>
                             <th class="wd-15p">Phone</th>
-                            <th class="wd-15p">Email</th>
                             <th class="wd-15p">Status</th>
                             <th class="wd-15p">Action</th>
                         </tr>
@@ -87,7 +86,6 @@
                             <td>{{ $supplier->supplier_name }}</td>
                             <td>{{$supplier->supplier_type_id === 1 ? 'individual' : 'business'}}</td>
                             <td>{{ $supplier->phone_1 }}</td>
-                            <td>{{ $supplier->email }}</td>
                             <td>
                                 <button type="button" style="width: 70px;" onclick="changeStatus({{ $supplier->supplier_id }})" class="btn btn-sm @if($supplier->is_active == 0) btn-danger @else btn-success @endif">
                                     @if($supplier->is_active == 0)

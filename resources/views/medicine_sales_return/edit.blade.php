@@ -72,7 +72,7 @@ use App\Helpers\AdminHelper;
                      <div class="col-md-4">
                         <div class="form-group">
                            <label class="form-label">Select Invoice ID*</label>
-                           <select class="form-control" name="patient_invoice_id" id="patient_invoice_id">
+                           <select class="form-control" name="patient_invoice_id" id="patient_invoice_id" required="">
                               <option value="">Choose Invoice ID</option>
                            </select>
                         </div>
@@ -239,8 +239,8 @@ use App\Helpers\AdminHelper;
                         <!-- Left Div - terms_condition -->
                         <div id="terms_condition" class="custom-margin">
                            <div class="form-group">
-                              <label class="form-label">Notes:</label>
-                              <textarea class="form-control" name="notes" placeholder="Notes">{{ $medicine_sale_invoices->notes }}</textarea>
+                              <label class="form-label">Notes:*</label>
+                              <textarea class="form-control" name="notes" placeholder="Notes" required="">{{ $medicine_sale_invoices->notes }}</textarea>
                            </div>
                         </div>
                      </div>

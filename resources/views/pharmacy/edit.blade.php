@@ -78,7 +78,7 @@
                             <center>
                                 <button type="submit" class="btn btn-raised btn-primary">
                                     <i class="fa fa-check-square-o"></i> Update</button>
-                                <a class="btn btn-danger" href="{{ route('supplier.index') }}">Cancel</a>
+                                <a class="btn btn-danger" href="{{ route('pharmacy.index') }}">Cancel</a>
                             </center>
                         </div>
                     </form>

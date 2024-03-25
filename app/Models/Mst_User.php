@@ -33,9 +33,8 @@ class Mst_User extends Authenticatable
 
     public function userType()
     {
-        return $this->belongsTo(Mst_Master_Value::class, 'user_type_id', 'id');
+        return $this->belongsTo(Mst_User_Type::class, 'user_type_id', 'id');
     }
-
     public function staff()
     {
         return $this->belongsTo(Mst_Staff::class, 'staff_id', 'staff_id');

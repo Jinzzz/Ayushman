@@ -13,7 +13,7 @@
                 <div class="card-body">
                     <div class="wideget-user">
                         <div class="row">
-                            <div class="col-lg-6 col-md-12">
+                            <div class="col-lg-12 col-md-12">
                                 <div class="wideget-user-desc d-sm-flex">
                                     <div class="wideget-user-img">
                                         <img class="user-pic" src="{{ asset('assets/images/ayushman.jpg') }}"
@@ -22,7 +22,7 @@
                                     <div class="user-wrap">
                                         <h6><strong>Branch: {{ $show->branch_name }} ( {{ $show->branch_code }} )</strong>
                                         </h6>
-                                        <h6><strong>Email: {{ $show->branch_email }}</strong></h6>
+                                        <h6><strong>General URL: <a href="{{ route('general.index', $show->branch_code) }}">{{asset('/general/index/'.$show->branch_code)}}</a></strong></h6>
                                         <h6><strong>Contact: {{ $show->branch_contact_number }}</strong></h6>
                                         @if ($show->is_active == 0)
                                             <span class="btn  btn-sm btn-danger">Inactive</span>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
+<!-- <div class="container"> -->
    <div class="row" style="min-height: 70vh;">
       <div class="col-md-12">
          <div class="card">
@@ -67,7 +67,7 @@
          </form>
       </div>
    </div>
-</div>
+<!-- </div> -->
 @endsection
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

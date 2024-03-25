@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Mst_Medicine;
-use App\Models\Mst_Tax_Group;
+use App\Models\Mst_Tax;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Branch;
@@ -12,6 +12,9 @@ use App\Models\Mst_Manufacturer;
 use App\Models\Mst_Pharmacy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\Trn_Ledger_Posting;
+use App\Models\Mst_Tax_Group;
+use Carbon\Carbon;
 
 class MstMedicineController extends Controller
 {
@@ -45,7 +48,7 @@ class MstMedicineController extends Controller
         //         $q->where('master_value', 'like', '%' . $request->input('manufacturer') . '%');
         //     });
         // }
-        $medicines = $query->orderBy('updated_at', 'desc')->get();
+        $medicines = $query->orderBy('created_at', 'desc')->get();
         return view('medicine.index', compact('pageTitle', 'medicines','medicineType'));
     }
 
@@ -59,7 +62,7 @@ class MstMedicineController extends Controller
         ->whereNull('deleted_at') 
         ->get();
     // $branches = Mst_Branch::pluck('branch_name','branch_id'); 
-        $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
+    $taxes = Mst_Tax_Group::pluck('tax_group_name','id');
 
         $units = Mst_Unit::pluck('unit_name','id');
         $randomMedicineCode = 'MED_' . Str::random(8);
@@ -76,7 +79,6 @@ class MstMedicineController extends Controller
             'medicine_type' => 'required',
             'tax_id' => 'required|exists:mst__tax__groups,id',
             'unit_price' => 'required',
-            'description' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
             'is_active' => 'required',
             'medicine_code' => 'unique:mst_medicines,medicine_code|required',
@@ -122,6 +124,7 @@ class MstMedicineController extends Controller
 
     public function update(Request $request,$id)
     {
+        $medicine = Mst_Medicine::findOrFail($id);
         $request->validate([
         
             'medicine_name' => 'required',
@@ -130,9 +133,8 @@ class MstMedicineController extends Controller
             'medicine_type' => 'required',
             'tax_id' => 'required|exists:mst__tax__groups,id',      
             'unit_price' => 'required',
-            'description' => 'required',
             'unit_id' => 'required|exists:mst_units,id',
-            'is_active' => 'required',         
+            'medicine_code' => 'required|unique:mst_medicines,medicine_code,' . $medicine->id,
             //'Hsn_code' =>  'required|exists:mst_branches,branch_id',
            
            
@@ -140,7 +142,7 @@ class MstMedicineController extends Controller
         $is_active = $request->input('is_active') ? 1 : 0;
     
        
-        $medicine = Mst_Medicine::findOrFail($id);
+        
         $medicine->medicine_name = $request->input('medicine_name');
         $medicine->generic_name = $request->input('generic_name');
         $medicine->item_type = $request->input('item_type');
@@ -161,7 +163,11 @@ class MstMedicineController extends Controller
     public function show($id)
     {
         $pageTitle = "View medicine details";
-        $show = Mst_Medicine::findOrFail($id);
+        $show = Mst_Medicine::where('id', $id)
+        ->join('mst__manufacturers', 'mst__manufacturers.manufacturer_id', '=', 'mst_medicines.manufacturer')
+            ->select('mst_medicines.*', 'mst__manufacturers.name')
+            ->first();
+ 
         $medicineStock = Trn_Medicine_Stock::where('medicine_id', $id)->get();
         return view('medicine.show',compact('pageTitle','show','medicineStock'));
 
@@ -176,28 +182,30 @@ class MstMedicineController extends Controller
         return redirect()->route('medicine.index')->with('success','Medicine deleted successfully');
     }
 
-    public function changeStatus(Request $request, $id)
-    {
-        $medicine = Mst_Medicine::findOrFail($id);
-    
-        $medicine->is_active = !$medicine->is_active;
-        $medicine->save();
-        return 1;
-        return redirect()->back()->with('success','Status changed successfully');
+public function updateStatus($medicineId)
+{
+    $medicine = Mst_Medicine::find($medicineId);
+    if (!$medicine) {
+        return response()->json(['success' => false]);
     }
-    public function viewStockUpdation($id)
+
+    // Toggle the is_active value
+    $medicine->is_active = !$medicine->is_active;
+    $medicine->save();
+
+    return response()->json(['success' => true, 'status' => $medicine->is_active]);
+}
+
+    public function viewStockUpdation()
     {
      
         $pageTitle = "Medicine Initial Stock Updation";
-        $medicines = Mst_Medicine::findOrFail($id);
-
         $stock = Trn_Medicine_Stock::join('mst_medicines', 'trn_medicine_stocks.medicine_id', '=', 'mst_medicines.id')
-                    ->where('trn_medicine_stocks.medicine_id', $id)
                     ->select('trn_medicine_stocks.*')->first();
         $pharmacies = Mst_Pharmacy::get();
         $branchs = Mst_Branch::get();
         $meds = Mst_Medicine::get();
-        return view('medicine.stockupdation',compact('pageTitle','medicines','branchs','meds','pharmacies','stock'));
+        return view('medicine.stockupdation',compact('pageTitle','branchs','meds','pharmacies','stock'));
     }
     public function getBatchNumbers(Request $request)
 {
@@ -207,7 +215,7 @@ class MstMedicineController extends Controller
 
     return response()->json(['batchNumbers' => $batchNumbers]);
 }
-    public function getCurrentStock($medicineId, $batchNo)
+    public function getCurrentStockOld($medicineId, $batchNo)
     {
     
         // Fetch current stock based on the provided parameters
@@ -218,60 +226,231 @@ class MstMedicineController extends Controller
         // Return the current stock as JSON
         return response()->json(['current_stock' => $currentStock]);
     }
+    public function getCurrentStock($medicineId, $batchNo)
+{
+    // Fetch required data based on the provided parameters
+    $data = Trn_Medicine_Stock::where('medicine_id', $medicineId)
+        ->where('batch_no', $batchNo)
+        ->select('current_stock', 'purchase_rate', 'sale_rate')
+        ->first();
+
+    // Return the data as JSON
+    return response()->json([
+        'current_stock' => $data->current_stock,
+        'purchase_rate' => $data->purchase_rate,
+        'sale_rate' => $data->sale_rate
+    ]);
+}
+
+//old initial stock update code - modified on 29/02/2024 due to empty row php error issue
+// public function updateStockMedicine(Request $request)
+//     {
+
+//             $validatedData = $request->validate([
+//                 'pharmacy_id' => 'required',
+//                 'medicine_id' => 'required',
+//                 'batch_no' => 'required',
+//                 'mfd' => 'required',
+//                 'expd' => 'required',
+//                 'new_stock' => 'required',
+//                 'purchase_rate' => 'required',
+//                 'sale_rate' => 'required',
+//             ]);
+    
+//             $pharmacyId = $request->input('pharmacy_id');
+//             $medicineIds = $request->input('medicine_id');
+//             $batchNos = $request->input('batch_no');
+//             $mfdDates = $request->input('mfd');
+//             $expdDates = $request->input('expd');
+//             $newStocks = $request->input('new_stock');
+//             $purchaseRates = $request->input('purchase_rate');
+//             $saleRates = $request->input('sale_rate');
+
+//             // Remove the first element from  array
+//             array_shift($medicineIds);
+//             array_shift($batchNos);
+//             array_shift($mfdDates);
+//             array_shift($expdDates);
+//             array_shift($newStocks);
+//             array_shift($purchaseRates);
+//             array_shift($saleRates);
+    
+//             $existingRecordsMsg = [];
+
+// foreach ($medicineIds as $key => $medicineId) {
+//     $existingRecord = Trn_Medicine_Stock::leftjoin('mst_medicines','mst_medicines.id','=','trn_medicine_stocks.medicine_id')->where([
+//         'pharmacy_id' => $pharmacyId,
+//         'medicine_id' => $medicineId,
+//         'batch_no' => $batchNos[$key],
+//         'mfd' => $mfdDates[$key],
+//         'expd' => $expdDates[$key],
+//         'opening_stock' => 0,
+//         'current_stock' => $newStocks[$key],
+//         'purchase_rate' => $purchaseRates[$key],
+//         'sale_rate' => $saleRates[$key],
+//     ])->select('trn_medicine_stocks.*','mst_medicines.medicine_name')->first();
+
+//     if (!$existingRecord) {
+//         $newStockRecord = Trn_Medicine_Stock::create([
+//             'pharmacy_id' => $pharmacyId,
+//             'medicine_id' => $medicineId,
+//             'batch_no' => $batchNos[$key],
+//             'mfd' => $mfdDates[$key],
+//             'expd' => $expdDates[$key],
+//             'opening_stock' => 0,
+//             'current_stock' => $newStocks[$key],
+//             'purchase_rate' => $purchaseRates[$key],
+//             'sale_rate' => $saleRates[$key],
+//         ]);
+
+//         // Update the stock_code
+//         $stockCode = 'STK' . $newStockRecord->stock_id;
+//         $newStockRecord->update(['stock_code' => $stockCode]);
+//         $branchId = Mst_Pharmacy::where('id', $request->pharmacy_id)->value('branch');
+        
+//         //Accounts Receivable
+//         Trn_Ledger_Posting::create([
+//             'posting_date' => Carbon::now(),
+//             'master_id' => 'ISU' . $newStockRecord->stock_id,
+//             'account_ledger_id' => 3,
+//             'entity_id' => 0,
+//             'debit' => array_sum($purchaseRates),
+//             'credit' => 0,
+//             'branch_id' => $branchId,
+//             'transaction_id' => $newStockRecord->stock_id,
+//             'narration' => 'Initial Stock Updation Payment'
+//         ]);
+
+//         //Accounts Payable
+//         Trn_Ledger_Posting::create([
+//             'posting_date' => Carbon::now(),
+//             'master_id' => 'ISU' . $newStockRecord->stock_id,
+//             'account_ledger_id' => 4,
+//             'entity_id' => 0,
+//             'debit' => 0,
+//             'credit' => array_sum($purchaseRates),
+//             'branch_id' => $branchId,
+//             'transaction_id' => $newStockRecord->stock_id,
+//             'narration' => 'Initial Stock Updation Payment'
+//         ]);
+//     } else {
+//         $existingRecordsMsg[] = $existingRecord->medicine_name;
+//     }
+// }
+
+//     if (!empty($existingRecordsMsg)) {
+//         $medicineNames=implode(",",$existingRecordsMsg);
+//         $errorMessage = "Records for medicine $existingRecord->medicine_name already exists.";
+//         return redirect()->back()->with('errors', $errorMessage);
+//     } else {
+//         return redirect()->back()->with('success', 'Stock updated/created successfully');
+//     }
+//     }  
+
 
     public function updateStockMedicine(Request $request)
     {
-
-        $request->validate([
-            'medicine' => 'required',
-            'batch_no' => 'required',
-            'new_stock' => 'required|numeric|min:0',
-            // 'remarks' => 'required',
-            'pharmacy_id' => 'required',
-        ]);
-
         $pharmacyId = $request->input('pharmacy_id');
-        $medicineId = $request->input('medicine');
-        $batchNo = $request->input('batch_no'); 
-        $newStock = $request->input('new_stock');
-        $remarks = $request->input('remarks');
-        $mfd = $request->input('mfd');
-        $expd = $request->input('expd');
-        $purchase_rate = $request->input('purchase_rate');
-        $sale_rate = $request->input('sale_rate');
-        $purchase_unit_id = $request->input('purchase_unit_id');
-        //$total_stock = $request->current_stock + $request->new_stock;
+        
+        $existingRecordsMsg = [];
 
-        // $stock = Trn_Medicine_Stock::where('medicine_id', $medicineId)
-        //     ->where('batch_no', $batchNo)
-        //     ->where('mfd', $mfd)
-        //     ->where('expd', $expd)
-        //     ->first();
-
-            // if ($stock) {
-                // $stock->current_stock = $newStock; 
-                // $stock->save();
-            // } else {
-                $newStockRecord = Trn_Medicine_Stock::create([
-                    'medicine_id' => $medicineId,
+        foreach ($request->medicine_id as $key => $medicineId) {
+            if (empty($medicineId) || empty($request->batch_no[$key]) || empty($request->mfd[$key]) ||
+                empty($request->expd[$key]) || empty($request->new_stock[$key]) || 
+                empty($request->purchase_rate[$key]) || empty($request->sale_rate[$key])) {
+                continue;
+            }
+            
+            $validatedData = $request->validate([
+                'medicine_id.' . $key => 'required',
+                'batch_no.' . $key => 'required',
+                'mfd.' . $key => 'required',
+                'expd.' . $key => 'required',
+                'new_stock.' . $key => 'required',
+                'purchase_rate.' . $key => 'required',
+                'sale_rate.' . $key => 'required',
+            ]);
+            
+            $existingRecord = Trn_Medicine_Stock::leftjoin('mst_medicines', 'mst_medicines.id', '=', 'trn_medicine_stocks.medicine_id')
+                ->where([
                     'pharmacy_id' => $pharmacyId,
-                    'batch_no' => $batchNo,
-                    'mfd' => $mfd,
-                    'expd' => $expd,
-                    'purchase_rate' => $purchase_rate,
-                    'sale_rate' => $sale_rate,
-                    'purchase_unit_id' => $purchase_unit_id,
+                    'medicine_id' => $medicineId,
+                    'batch_no' => $request->batch_no[$key],
+                    'mfd' => $request->mfd[$key],
+                    'expd' => $request->expd[$key],
                     'opening_stock' => 0,
-                    'old_stock' => $request->new_stock,
-                    'current_stock' => $request->new_stock,
-                    'remarks' => $remarks,
+                    'current_stock' => $request->new_stock[$key],
+                    'purchase_rate' => $request->purchase_rate[$key],
+                    'sale_rate' => $request->sale_rate[$key],
+                ])->select('trn_medicine_stocks.*', 'mst_medicines.medicine_name')->first();
+            
+            if (!$existingRecord) {
+                $newStockRecord = Trn_Medicine_Stock::create([
+                    'pharmacy_id' => $pharmacyId,
+                    'medicine_id' => $medicineId,
+                    'batch_no' => $request->batch_no[$key],
+                    'mfd' => $request->mfd[$key],
+                    'expd' => $request->expd[$key],
+                    'opening_stock' => 0,
+                    'current_stock' => $request->new_stock[$key],
+                    'purchase_rate' => $request->purchase_rate[$key],
+                    'sale_rate' => $request->sale_rate[$key],
                 ]);
-                
-                $stockCode = 'STK' . $newStockRecord->stock_id ; 
+                $stockCode = 'STK' . $newStockRecord->stock_id;
                 $newStockRecord->update(['stock_code' => $stockCode]);
-         return redirect()->route('medicine.index')->with('success', 'Stock updated/created successfully');
+                $branchId = Mst_Pharmacy::where('id', $request->pharmacy_id)->value('branch');
+                
+                $subAmount = $request->new_stock[$key] * $request->purchase_rate[$key];
+                
+                Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => 'ISU' . $newStockRecord->stock_id,
+                    'account_ledger_id' => 3,
+                    'entity_id' => 0,
+                    'debit' => $subAmount,
+                    'credit' => 0,
+                    'branch_id' => $branchId,
+                    'transaction_id' => $newStockRecord->stock_id,
+                    'narration' => 'Initial Stock Updation Payment'
+                ]);
+    
+                Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => 'ISU' . $newStockRecord->stock_id,
+                    'account_ledger_id' => 4,
+                    'entity_id' => 0,
+                    'debit' => 0,
+                    'credit' => $subAmount,
+                    'branch_id' => $branchId,
+                    'transaction_id' => $newStockRecord->stock_id,
+                    'narration' => 'Initial Stock Updation Payment'
+                ]);
+            } else {
+                $existingRecordsMsg[] = $existingRecord->medicine_name;
+            }
+        }
+        
+        if (!empty($existingRecordsMsg)) {
+            $medicineNames = implode(",", $existingRecordsMsg);
+            $errorMessage = "Records for medicines $medicineNames already exist.";
+            return redirect()->back()->with('errors', $errorMessage);
+        } else {
+            return redirect()->back()->with('success', 'Stock updated/created successfully');
+        }
+    }
+    
+    
+    public function getUnitPrice(Request $request, $medicineId)
+    {
+        $medicine = Mst_Medicine::find($medicineId);
+    
+        if (!$medicine) {
+            return response()->json(['success' => false]);
+        }
+    
+        $unitPrice = $medicine->unit_price;
+    
+        return response()->json(['success' => true, 'unitPrice' => $unitPrice]);
+    }
 
-    //   }
-
-  }
 }

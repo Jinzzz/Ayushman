@@ -32,7 +32,7 @@
                             <thead>
                                 <tr>
                                     <th class="wd-15p">SL.NO</th>
-                                    <th class="wd-15p">Patient</th>
+                                    <th class="wd-15p">Booking</th>
                                     <th class="wd-15p">Ratings</th>
                                     <th class="wd-15p">Average Rating</th>
                                     <th class="wd-15p">Feedback</th>
@@ -47,7 +47,7 @@
                                 @foreach ($feedData as $feedDatas)
                                     <tr id="dataRow_{{ $feedDatas->id }}">
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $feedDatas->patient['patient_name'] }}</td>
+                                        <td>{{ @$feedDatas->booking['booking_reference_number'] }}</td>
                                         <td>
                                             Consultant : {{ $feedDatas->consultancy_rating }} / 5
                                             <br>

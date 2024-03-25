@@ -54,7 +54,6 @@
                             <th class="wd-15p">SL.NO</th>
                             <th class="wd-15p">Pharmacy Name</th>
                             <th class="wd-15p">Branch Name</th>
-                            <th class="wd-15p">Status</th>
                             <th class="wd-15p">Action</th>
                         </tr>
                     </thead>
@@ -67,15 +66,15 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $pharmacy->pharmacy_name }}</td>
                             <td>{{ $pharmacy->branch_name }}</td>
-                            <td>
-                                <button type="button" style="width: 70px;" onclick="changeStatus({{ $pharmacy->id }})" class="btn btn-sm @if($pharmacy->status == 0) btn-danger @else btn-success @endif">
-                                    @if($pharmacy->status == 0)
-                                    Inactive
-                                    @else
-                                    Active
-                                    @endif
-                                </button>
-                            </td>
+                            <!--<td>-->
+                            <!--    <button type="button" style="width: 70px;" onclick="changeStatus({{ $pharmacy->id }})" class="btn btn-sm @if($pharmacy->status == 0) btn-danger @else btn-success @endif">-->
+                            <!--        @if($pharmacy->status == 0)-->
+                            <!--        Inactive-->
+                            <!--        @else-->
+                            <!--        Active-->
+                            <!--        @endif-->
+                            <!--    </button>-->
+                            <!--</td>-->
 
                             <td>
                             <a class="btn btn-primary btn-sm edit-custom" href="{{ route('pharmacy.edit', $pharmacy->id) }}">

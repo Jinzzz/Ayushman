@@ -50,21 +50,44 @@
                   .empty-cell {
                     color: #CCCCCC;
                   }
-                </style> @foreach ($allStaff as $staff) <tr>
-                  <td>{{ $staff->staff_id }}</td>
-                  <td>{{ $staff->staff_name }}</td>
-                   @for ($day = 1; $day <= $daysInMonth; $day++) <td>
-                    {{-- Check if the day is in the future --}} @if (\Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->isFuture())
-                     <div class="empty-cell"> {{-- Display an empty cell for upcoming days --}}
-                    </div> @else {{-- Check if the staff is on leave on this day --}} @php $leaveForDay = $staffLeaves->where('staff_id', $staff->staff_id) ->where('from_date', '<=', $firstDayOfMonth->copy()->addDays($day - 1)) ->where('to_date', '>=', $firstDayOfMonth->copy()->addDays($day - 1)) ->first(); @endphp {{-- Display 'A' for absent if on leave, 'P' for present if not on leave --}}
-                      <div class="{{ $leaveForDay ? 'absent-cell' : 'present-cell' }}">
-                      @if ($leaveForDay && \Carbon\Carbon::parse($leaveForDay->from_date)->format('Y-m') == $selectedMonthYear)
-                        A
+                </style>@foreach ($allStaff as $staff)
+    <tr>
+        <td>{{ $staff->staff_id }}</td>
+        <td>{{ $staff->staff_name }}</td>
+        @for ($day = 1; $day <= $daysInMonth; $day++)
+            <td>
+                {{-- Check if the day is before the date of join --}}
+                @if (\Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->lt($staff->date_of_join))
+                    <div class="empty-cell"></div> {{-- Display an empty cell --}}
+                @else
+                    {{-- Continue with existing logic --}}
+                    {{-- Check if the day is in the future --}}
+                    @if (\Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->isFuture())
+                        <div class="empty-cell"></div> {{-- Display an empty cell for upcoming days --}}
                     @else
-                        P
+                        {{-- Check if the staff is on leave on this day --}}
+                        @php
+                            $leaveForDay = $staffLeaves->where('staff_id', $staff->staff_id)
+                                ->where('from_date', '<=', \Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->format('Y-m-d'))
+                                ->where('to_date', '>=', \Carbon\Carbon::parse($firstDayOfMonth->copy()->addDays($day - 1))->format('Y-m-d'))
+                                ->first();
+                        @endphp
+                        {{-- Display 'A' for absent if on leave, 'P' for present if not on leave --}}
+                        <div class="{{ $leaveForDay ? 'absent-cell' : 'present-cell' }}">
+                            @if ($leaveForDay && \Carbon\Carbon::parse($leaveForDay->from_date)->format('Y-m') == $selectedMonthYear)
+                                A
+                            @else
+                                P
+                            @endif
+                        </div>
                     @endif
-                      </div> @endif </td> @endfor
-                </tr> @endforeach
+                @endif
+            </td>
+        @endfor
+    </tr>
+@endforeach
+
+
               </tbody>
             </table>
           </div>

@@ -67,19 +67,19 @@
                                 <div class="form-group">
                                     <label class="form-label" for="tax_id">Tax</label>
                                     <input type="text" class="form-control" readonly name="tax_id"
-                                        value="{{ $show->tax->tax_name }}" placeholder=" Tax">
+                                        value="{{ @$show->tax['tax_group_name'] }}" placeholder=" Tax">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Manufacturer</label>
                                     <input type="text" class="form-control" readonly name="Manufacturer"
-                                        value="{{ $show->Manufacturer->master_value }}" placeholder=" Manufacturer">
+                                        value="{{ $show->name }}" placeholder=" Manufacturer">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="form-label">Unit Price</label>
+                                    <label class="form-label">Unit Price (Excluding GST)</label>
                                     <input type="text" class="form-control" readonly name="unit_price"
                                         value="{{ $show->unit_price }}" placeholder="Unit Price">
                                 </div>
@@ -129,6 +129,8 @@
                                                     <th class="text-white">ID</th>
                                                     <th class="text-white">Pharmacy</th>
                                                     <th class="text-white">Batch Number</th>
+                                                     <th class="text-white">MFD/EXP</th>
+                                                      <th class="text-white">Rate</th>
                                                     <th class="text-white">Current Stock</th>
                                                 </tr>
                                             </thead>
@@ -138,6 +140,12 @@
                                                         <th scope="row">{{ $key + 1 }}</th>
                                                         <td>{{ $stock->pharmacy['pharmacy_name'] ?? '' }}</td>
                                                         <td>{{ $stock->batch_no ?? '' }}</td>
+                                                        <td>MFD : {{ $stock->mfd ?? '' }} <br>
+                                                            EXP: {{ $stock->expd ?? '' }}
+                                                        </td>
+                                                        <td>Purchase Rate : {{ $stock->purchase_rate ?? '' }} <br>
+                                                            Sales Rate: {{ $stock->sale_rate ?? '' }}
+                                                        </td>
                                                         <td>{{ $stock->current_stock ?? '' }}</td>
                                                     </tr>
                                                 @endforeach

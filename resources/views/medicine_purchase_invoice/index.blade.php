@@ -1,11 +1,13 @@
 @extends('layouts.app')
 @section('content')
-
+@php
+use App\Models\Mst_Staff;
+@endphp
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Search Purchae Invoice</h3>
+                <h3 class="card-title">Search Purchase Invoice</h3>
             </div>
             <div class="card-body">
                 <form action="{{ route('medicinePurchaseInvoice.index') }}" method="GET">
@@ -20,12 +22,36 @@
                         </div>
                         <div class="col-md-3">
                             <label for="contact-number">Pharmacy</label>
+                           @if(Auth::check() && Auth::user()->user_type_id == 96)
+                           @php
+                            $staff = Mst_Staff::findOrFail(Auth::user()->staff_id);
+                            $mappedpharma = $staff->pharmacies()->pluck('mst_pharmacies.id')->toArray();
+                           @endphp
                             <select class="form-control" name="pharmacy_id" id="pharmacy_id">
+                                <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
+                                @foreach ($pharmacies as $pharmacy)
+                                       @if(in_array($pharmacy->id, $mappedpharma))
+                                           <option value="{{ $pharmacy->id }}" {{request()->input('pharmacy_id') == $pharmacy->id ? 'selected':''}}>{{ $pharmacy->pharmacy_name }}</option>
+                                       @endif
+                                @endforeach
+                            </select>
+                        @else
+                        <select class="form-control" name="pharmacy_id" id="pharmacy_id">
                                 <option value="" {{ !request('id') ? 'selected' : '' }}>Choose Pharmacy</option>
                                 @foreach($pharmacies as  $data)
                                     <option value="{{ $data->id }}"{{ old('id') == $data->id ? 'selected' : '' }}>
                                         {{ $data->pharmacy_name }}
                                     </option>
+                                @endforeach
+                            </select>
+                        @endif
+                        </div>
+                            <div class="col-md-3">
+                            <label for="contact-number">Select Supplier</label>
+                            <select class="form-control" name="supplier_id" id="supplier_id">
+                                 <option value="disabled selected"> Select Supplier </option> 
+                                @foreach($suppliers as  $data)
+                                    <option value="{{ $data->supplier_id  }}" }}>{{ $data->supplier_name }} </option>
                                 @endforeach
                             </select>
                         </div>
@@ -71,14 +97,15 @@
             <thead>
                <tr>
                   <th class="wd-15p">SL.NO</th>
-                  <th class="wd-15p">Purchase Invoice No</th>
+                  <th class="wd-15p">Invoice No</th>
                   <th class="wd-20p">Supplier</th>
                   <th class="wd-20p">Pharmacy</th>
                   <th class="wd-15p">Invoice Date</th>
                   <th class="wd-15p">Due Date</th>
                
                   {{-- <th class="wd-15p">Reason</th> --}}
-                  <th class="wd-15p">Sub Total</th>
+                  <th class="wd-15p">Total</th>
+                   <th class="wd-15p">Paid Amount</th>
                  
                   <th class="wd-15p">Action</th>
                </tr>
@@ -96,7 +123,12 @@
                   <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y') }}</td>
                   <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d-m-Y') }}</td>
 
-                  <td>{{ $invoice->sub_total }}</td><td>
+                  <td>{{ $invoice->total_amount }}</td>
+                     <td>{{ isset($invoice->paid_amount) ? $invoice->paid_amount : '0.00' }}</td>
+
+                      <td>
+                        <a class="btn btn-secondary btn-sm" href="{{ route('medicinePurchaseInvoice.view',$invoice->purchase_invoice_id) }}">
+                        <i class="fa fa-eye" aria-hidden="true"></i> View </a><br><br>
                      <form style="display: inline-block"
                         action="{{ route('medicinePurchaseInvoice.destroy', $invoice->purchase_invoice_id ) }}" method="post">
                         @csrf
@@ -162,4 +194,5 @@ function deleteData(dataId) {
         }
     });
 }
+
 </script>

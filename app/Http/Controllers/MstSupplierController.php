@@ -60,7 +60,7 @@ class MstSupplierController extends Controller
     public function store(Request $request)
     {
        
-        try {
+      
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -70,9 +70,7 @@ class MstSupplierController extends Controller
                     'supplier_city' => 'required',
                     'state' => 'required',
                     'country' => 'required',
-                    'pincode' => 'required',
                     'phone_1' => 'required|numeric',
-                    'email' => 'required|email',
                     'is_active' => 'required',
                 ],
                 [
@@ -82,28 +80,23 @@ class MstSupplierController extends Controller
                     'supplier_city.required' => 'City is required.',
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
-                    'pincode.required' => 'Pincode is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.required' => 'Email ID is required.',
-                    'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]
             );
             if (!$validator->fails()) {
                 $is_active = $request->input('is_active') ? 1 : 0;
                 $phone1Exists = Mst_Supplier::where('phone_1', $request->phone_1)
-                    ->orWhere('phone_2', $request->phone_1)
-                    ->where('email', $request->email)
                     ->exists();
 
-                $phone2Exists = Mst_Supplier::where('phone_1', $request->phone_2)
-                    ->orWhere('phone_2', $request->phone_2)
-                    ->where('email', $request->email)
-                    ->exists();
-                $emailExists = Mst_Supplier::where('email', $request->email)->exists();
+                // $phone2Exists = Mst_Supplier::where('phone_1', $request->phone_2)
+                //     ->orWhere('phone_2', $request->phone_2)
+                //     ->where('email', $request->email)
+                //     ->exists();
+                // $emailExists = Mst_Supplier::where('email', $request->email)->exists();
 
-                if ($phone1Exists || $phone2Exists || $emailExists) {
-                    return redirect()->route('supplier.index')->with('error', 'Failed to create. This supplier already exists.');
+                if ($phone1Exists) {
+                    return redirect()->route('supplier.create')->with('error', 'Failed to create.Supplier already exists with this Contact Number.');
                 }
                 $lastInsertedId = Mst_Supplier::insertGetId([
                     'supplier_code' => rand(50, 100),
@@ -157,7 +150,7 @@ class MstSupplierController extends Controller
                     'updated_at' => Carbon::now(),
                 ]);
                 
-                if ($request->opening_balance != null) {
+                if ($request->opening_balance != null && $request->opening_balance_type !=null) {
                     // Account posting of opening balance 
                     if (isset($request->opening_balance_type) && $supplier_ledger_id != null) {
                         // 1=>Debit, 2=>Credit
@@ -173,7 +166,6 @@ class MstSupplierController extends Controller
                         // For the time being, I am saving the primary key of the supplier table as a temporary measure.
                         TrnLedgerPosting::insertGetId([
                             'posting_date' => Carbon::now()->toDateString(),
-                            'voucher_type_id' => 6,
                             'master_id' => $lastInsertedId,
                             'account_ledger_id' => $supplier_ledger_id,
                             'debit' => $debit,
@@ -194,10 +186,7 @@ class MstSupplierController extends Controller
                 $messages = $validator->errors();
                 return redirect()->route('supplier.create')->with('errors', $messages);
             }
-        } catch (QueryException $e) {
-            dd($e->getMessage());
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+      
     }
 
 
@@ -216,7 +205,8 @@ class MstSupplierController extends Controller
 
     public function update(Request $request, $id)
     {
-        try {
+        // try {
+             $update = Mst_Supplier::find($id);
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -226,9 +216,7 @@ class MstSupplierController extends Controller
                     'supplier_city' => 'required',
                     'state' => 'required',
                     'country' => 'required',
-                    'pincode' => 'required',
-                    'phone_1' => 'required|numeric',
-                    'email' => 'required|email',
+                   'phone_1' => 'required|numeric|unique:mst_suppliers,supplier_id,' . $update->id . ',supplier_id',
                     'is_active' => 'required',
                 ],
                 [
@@ -238,41 +226,13 @@ class MstSupplierController extends Controller
                     'supplier_city.required' => 'City is required.',
                     'state.required' => 'State is required.',
                     'country.required' => 'Country is required.',
-                    'pincode.required' => 'Pincode is required.',
                     'phone_1.required' => 'Phone number is required.',
-                    'email.required' => 'Email ID is required.',
-                    'email.email' => 'Please provide a valid email format.',
                     'is_active.required' => 'Supplier status is required.',
                 ]
             );
+            
             if (!$validator->fails()) {
                 $is_active = $request->input('is_active') ? 1 : 0;
-                $phone1Exists = Mst_Supplier::where(function ($query) use ($id, $request) {
-                    $query->where('phone_1', $request->phone_1)
-                        ->orWhere('phone_2', $request->phone_1);
-                })
-                    ->where('email', $request->email)
-                    ->where('supplier_id', '!=', $id)
-                    ->first();
-
-                $phone2Exists = Mst_Supplier::where(function ($query) use ($id, $request) {
-                    $query->where('phone_1', $request->phone_2)
-                        ->orWhere('phone_2', $request->phone_2);
-                })
-                    ->where('supplier_id', '!=', $id)
-                    ->where('email', $request->email)
-                    ->first();
-
-                $emailExists = Mst_Supplier::where('email', $request->email)
-                    ->where('supplier_id', '!=', $id)
-                    ->first();
-
-                if ($phone1Exists || $phone2Exists || $emailExists) {
-                    // Handle the case where the update fails
-                    return redirect()->route('supplier.index')->with('error', 'Failed to update. This supplier already exists.');
-                }
-
-                $update = Mst_Supplier::find($id);
                 $update->update([
                     'supplier_type_id' => $request->supplier_type_id,
                     'supplier_name' => $request->supplier_name,
@@ -302,9 +262,9 @@ class MstSupplierController extends Controller
                 $messages = $validator->errors();
                 return redirect()->route('supplier.edit')->with('errors', $messages);
             }
-        } catch (QueryException $e) {
-            return redirect()->route('home')->with('error', 'Something went wrong');
-        }
+        // } catch (QueryException $e) {
+        //     return redirect()->route('supplier.index')->with('error', 'Something went wrong');
+        // }
     }
 
     public function show($id)
@@ -314,22 +274,14 @@ class MstSupplierController extends Controller
             $show = Mst_Supplier::findOrFail($id);
             $countries = DB::table('sys_countries')->get();
             $states = DB::table('sys_states')->get();
-            $outstanding_amount = Trn_Medicine_Purchase_Invoice::where('supplier_id', $id)
-                ->select('total_amount', 'paid_amount')
-                ->get();
+            $outstanding_sum = Trn_Medicine_Purchase_Invoice::where('supplier_id', $id)
+                ->selectRaw('SUM(total_amount - paid_amount) as outstanding_sum')
+                ->value('outstanding_sum');
+        
+                // If no outstanding amount found, set default value to 0
+                $outstanding_sum = $outstanding_sum ?? 0;
     
-            // Initialize $outstanding as an array
-            $outstanding = [];
-    
-            foreach ($outstanding_amount as $invoice) {
-                $totalAmount = $invoice->total_amount;
-                $paidAmount = $invoice->paid_amount;
-    
-                // Calculate outstanding amount for each row
-                $outstanding[] = $totalAmount - $paidAmount;
-            }
-    
-            return view('supplier.show', compact('pageTitle', 'show', 'outstanding','countries','states'));
+            return view('supplier.show', compact('pageTitle', 'show', 'outstanding_sum','countries','states'));
         } catch (QueryException $e) {
             return redirect()->route('home')->with('error', 'Something went wrong');
         }

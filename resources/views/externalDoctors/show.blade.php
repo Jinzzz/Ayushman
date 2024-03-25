@@ -68,20 +68,20 @@
                  </div>
                </div>
             
-            <div class="row">
-               <div class="col-md-12">
-                  <div class="form-group">
-                     <label class="form-label">Status</label>
-                     <button type="button" class="status-button @if($show->is_active) Active @else Inactive  @endif" disabled>
-                     @if($show->is_active)
-                     Active
-                     @else
-                     Inactive
-                     @endif
-                     </button>
-                  </div>
-               </div>
-            </div>
+            <!--<div class="row">-->
+            <!--   <div class="col-md-12">-->
+            <!--      <div class="form-group">-->
+            <!--         <label class="form-label">Status</label>-->
+            <!--         <button type="button" class="status-button @if($show->is_active) Active @else Inactive  @endif" disabled>-->
+            <!--         @if($show->is_active)-->
+            <!--         Active-->
+            <!--         @else-->
+            <!--         Inactive-->
+            <!--         @endif-->
+            <!--         </button>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
             <div class="col-md-12">
                <div class="form-group">
                   <center>

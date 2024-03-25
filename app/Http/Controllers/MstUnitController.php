@@ -71,25 +71,18 @@ class MstUnitController extends Controller
     public function update(Request $request, $id)
     {
         try {
+           $units =  Mst_Unit::findOrFail($id);
             $request->validate([
-                'unit_name' => 'required',
+                'unit_name' => 'required|unique:mst_units,unit_name,' . $units->id,
                 'is_active' => 'required',
             ]);
-            $is_exists = Mst_Unit::where('unit_name', $request->input('unit_name'))
-                                    ->where('id',!$id)
-                                    ->first();
-            if ($is_exists) {
-                return redirect()->route('unit.index')->with('error', 'This unit is already exists.');
-            } else {
                 $is_active = $request->input('is_active') ? 1 : 0;
-                $units =  Mst_Unit::findOrFail($id);
                 $units->unit_name = $request->input('unit_name');
                 $units->unit_short_name = $request->input('unit_short_name');
                 $units->is_active = $is_active;
                 $units->save();
 
                 return redirect()->route('unit.index')->with('success', 'Unit updated successfully');
-            }
         } catch (QueryException $e) {
             return redirect()->route('unit.index')->with('error', 'Something went wrong.');
         }
