@@ -8,11 +8,13 @@ use App\Models\Staff_Leave;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Mst_Branch;
 use App\Models\Mst_Staff;
+use App\Models\Mst_User;
 use App\Models\Mst_Leave_Type;
 use App\Models\Trn_Consultation_Booking;
 use App\Models\EmployeeAvailableLeave;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Mst_Master_Value;
 class StaffLeaveController extends Controller
 {
     /**
@@ -62,7 +64,8 @@ class StaffLeaveController extends Controller
         $pageTitle = "Create Leave Request";
         $branches = DB::table('mst_branches')->where('is_active', 1)->get();
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
-        return view('staffleave.create', compact('pageTitle','branches','leave_types'));
+        $stafftype   = Mst_Master_Value::where('master_id',4)->pluck('master_value','id');
+        return view('staffleave.create', compact('pageTitle','branches','leave_types','stafftype'));
     }
 
     /**
@@ -99,19 +102,26 @@ class StaffLeaveController extends Controller
         $staffId = $request->staff_id;
         $requestedDays = $request->days;
         $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
-
-        if ($requestedDays > $totalLeaves) {
-            return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
-        }
-        $updatedTotalLeaves = $totalLeaves -  $requestedDays;
+        
        if($request->leave_type!=5)
        {
+            if ($requestedDays > $totalLeaves) {
+            return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
+       }
+           $updatedTotalLeaves = $totalLeaves -  $requestedDays;
            EmployeeAvailableLeave::where('staff_id', $staffId)
                                ->update(['total_leaves' => $updatedTotalLeaves,
                             ]);
            
        }
+        $existingLeaveRequest = Staff_Leave::where('staff_id', $request->staff_id)
+            ->where('from_date', $request->from_date)
+            ->where('to_date', $request->to_date)
+            ->first();
         
+        if ($existingLeaveRequest) {
+            return redirect()->back()->withErrors(['duplicate' => 'Leave request already exist in this date.'])->withInput();
+        }
 
         $lastInsertedId = Staff_Leave::create([
             'branch_id' => $request->branch_id,
@@ -262,19 +272,29 @@ class StaffLeaveController extends Controller
         ]);
     }
 
-    public function getStaffNames($branchId)
-    {
-        $staffNames = Mst_Staff::where('branch_id', $branchId)->pluck('staff_name', 'staff_id');
-
-        return response()->json($staffNames);
-    }
-
-    public function getTotalLeaves(Request $request, $staffId)
-    {
-        // Fetch the total leaves for the given staffId from the database
+        public function getStaffNames(Request $request)
+        {
+            $branchId = $request->input('branch_id');
+            $staffTypeId = $request->input('staff_type');
         
-        return EmployeeAvailableLeave::where('staff_id', $staffId)->first();
+            $staffNames = Mst_Staff::where('branch_id', $branchId)
+                                   ->where('staff_type', $staffTypeId)
+                                   ->pluck('staff_name', 'staff_id');
+        
+            return response()->json($staffNames);
+        }
+
+
+    public function getTotalLeaves($staffId)
+    {
+        $userId = Mst_User::where('staff_id', $staffId)->value('user_id');
+        // Fetch the total leaves for the given staffId from the database
+        $totalLeaves = EmployeeAvailableLeave::where('staff_id', $userId)->first();
+    
+        return response()->json(['total_leaves' => $totalLeaves]);
     }
+
+
 
     public function checkDoctor($staffId)
     {

@@ -46,6 +46,21 @@
                                     @endif
                                 </div>
                             </div>
+                                <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Staff Type*</label>
+                                    <select class="form-control" name="staff_type" id="staff_type">
+                                    <option value="">Select Staff Type</option>
+                                    @foreach($stafftype as $masterId => $masterValue) <option value="{{ $masterId }}" {{ old('staff_type') == $masterId ? 'selected' : '' }}>
+                                      {{ $masterValue }}
+                                    </option> @endforeach
+                                  </select>
+                                    <p id="staff_type_error" style="color: red;"></p>
+
+
+                                </div>
+                            </div>
+                            
                         </div>
 
                         <div class="row" id="staffIdRow" style="display: none;">
@@ -57,6 +72,7 @@
                                     <p class="no-staff-message" style="color: red; display: none;">No staff members in the selected branch.</p>
                                 </div>
                             </div>
+ 
                         </div>
 
                         <div class="row">
@@ -191,99 +207,84 @@
 
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        // Hide the staff_id div on page load
-        $('#staff_id').closest('.row').hide();
+$(document).ready(function() {
+    // Hide the staff_id div on page load
+    $('#staff_id').closest('.row').hide();
+    $('.no-staff-message').hide();
+
+    // Handle change event on branch select
+    $('#branch_id, #staff_type').on('change', function() {
+        var branchId = $('#branch_id').val();
+        var staffTypeId = $('#staff_type').val();
+
+        // Clear the current options in the staff select
+        $('#staff_id').empty().append('<option value="">Select a Staff...</option>');
         $('.no-staff-message').hide();
 
-        // Handle change event on branch select
-        // $('#branch_id').change(function() {
-        $('#branch_id').on('change', function() {
-            var branchId = $(this).val();
-
-            // Clear the current options in the staff select
-            $('#staff_id').empty().append('<option value="">Select a Branch...</option>');
-            $('.no-staff-message').hide();
-
-            // Check if a branch is selected
-            if (branchId) {
-                // Make an AJAX request to get the staff names for the selected branch
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route("get-staff-names", ["branchId" => ":branchId"]) }}'.replace(':branchId', branchId),
-                    success: function(data) {
-                        // Populate the staff select with received data
-                        $('#staff_id').empty();
-                        $('#staff_id').append($('<option>', {
-                                value: '',
-                                text: '--Select a Staff--'
-                            }));
-                        if (Object.keys(data).length > 0) {
-                            $.each(data, function(key, value) {
-                                // Create an option element
-                                var option = $('<option>', {
-                                    value: key,
-                                    text: value
-                                });
-
-                                // Append the option to the staff select
-                                $('#staff_id').append(option);
+        // Check if both branch and staff type are selected
+        if (branchId && staffTypeId) {
+            // Make an AJAX request to get the staff names for the selected branch and staff type
+            $.ajax({
+                type: 'GET',
+                url: '{{ route("get-staff-names") }}',
+                data: {
+                    branch_id: branchId,
+                    staff_type: staffTypeId
+                },
+                success: function(data) {
+                    // Populate the staff select with received data
+                    $('#staff_id').empty();
+                    $('#staff_id').append($('<option>', {
+                        value: '',
+                        text: '--Select a Staff--'
+                    }));
+                    if (Object.keys(data).length > 0) {
+                        $.each(data, function(key, value) {
+                            // Create an option element
+                            var option = $('<option>', {
+                                value: key,
+                                text: value
                             });
-                            // Show the staff_id div when staff options are available
-                            $('#staff_id').closest('.row').show();
-                        } else {
-                            $('.no-staff-message').show();
-                        }
-                    },
-                    error: function(error) {
-                        console.error(error);
+
+                            // Append the option to the staff select
+                            $('#staff_id').append(option);
+                        });
+                        // Show the staff_id div when staff options are available
+                        $('#staff_id').closest('.row').show();
+                    } else {
+                        $('.no-staff-message').show();
                     }
-                });
-            } else {
-                // If no branch is selected, hide the staff_id div
-                $('#staff_id').closest('.row').hide();
-            }
-        });
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        } else {
+            // If either branch or staff type is not selected, hide the staff_id div
+            $('#staff_id').closest('.row').hide();
+        }
+    });
 
-        // Handle change event on staff select
-        // $('#staff_id').change(function() {
-        //     var staffId = $(this).val();
 
-        //     // Check if a staff member is selected
-        //     if (staffId) {
-        //         // Make an AJAX request to check if the selected staff is a doctor
-        //         $.ajax({
-        //             type: 'GET',
-        //             url: '/check-doctor/' + staffId, // Replace this URL with your endpoint to check if the staff is a doctor
-        //             success: function(data) {
-        //                 if (data.isDoctor) {
-        //                     console.log('Selected staff is a doctor.');
-        //                 } else {
-        //                     console.log('Selected staff is not a doctor.');
-        //                 }
-        //             },
-        //             error: function(error) {
-        //                 console.error(error);
-        //             }
-        //         });
-        //     }
-        // });
-          $('#staff_id').change(function() {
+    $('#staff_id').change(function() {
             var staffId = $(this).val();
-
+        
             // Make an AJAX request to get the total leaves for the selected staff
             $.ajax({
                 type: 'GET',
                 url: '{{ route("get-total-leaves", ["staffId" => ":staffId"]) }}'.replace(':staffId', staffId),
                 success: function(data) {
                     // Update the total days input with received data
-                    $('#total_days').val(data.total_leaves);
+                    console.log('Total leaves:', data.total_leaves);
+                    $('#total_days').val(data.total_leaves?.total_leaves?data.total_leaves?.total_leaves:"0")
                 },
                 error: function(error) {
                     console.error(error);
                 }
             });
         });
+
+
         
     });
 

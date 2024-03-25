@@ -519,7 +519,8 @@ Route::middleware('auth')->group(function () {
     // staff- leave
     Route::get('/staff-leave', [StaffLeaveController::class, 'index'])->name('staffleave.index');
     Route::get('/staffleave/create', [StaffLeaveController::class, 'create'])->name('staffleave.create');
-    Route::get('/get-staff-names/{branchId}', [StaffLeaveController::class, 'getStaffNames'])->name('get-staff-names');
+     Route::get('get-staff-names', [StaffLeaveController::class, 'getStaffNames'])->name('get-staff-names');
+
     Route::post('/staffleave/store', [StaffLeaveController::class, 'store'])->name('staffleave.store');
     Route::get('/staffleave/show/{staffleave_id}', [StaffLeaveController::class, 'show'])->name('staffleave.show');
     Route::get('/staffleave/edit/{id}', [StaffLeaveController::class, 'edit'])->name('staffleave.edit');
@@ -786,6 +787,10 @@ Route::get('/stock-transfer-report/detail/{id}', [ReportController::class, 'Stoc
 Route::get('/current-stocks-report', [ReportController::class, 'CurrentStockReport'])->name('current.stock.report');
 Route::get('/payment-made-report', [ReportController::class, 'PaymentMadeReport'])->name('payment.made.report');
 Route::get('/payment-made-report/detail/{id}', [ReportController::class, 'PaymentMadeReportDetail'])->name('payment.made.report.detail');
+Route::get('/payable-report', [ReportController::class, 'PayableReport'])->name('payable.report');
+Route::get('/payable-report/detail/{id}', [ReportController::class, 'PayableReportDetail'])->name('payable.report.detail');
+Route::get('/ledger-report', [ReportController::class, 'ledgerReport'])->name('ledger.report');
+Route::get('/ledger-report/detail/{id}', [ReportController::class, 'ledgerReportDetails'])->name('ledger.report.detail');
 
 //stock transfer to branches
 Route::get('/branch/stock-transfer', [BranchStockTransferController::class, 'index'])->name('branch-transfer.index');
@@ -808,6 +813,7 @@ Route::post('/booking/consultation-booking/savemember', [BookingController::clas
 Route::post('/booking/consultation-booking/patientbooking', [BookingController::class, 'patientBooking'])->name('patientbooking.consultation.booking');
 Route::get('/booking/consultation-booking/show/{id}', [BookingController::class, 'showBooking'])->name('show.consultation.booking');
 Route::delete('/booking/consultation-booking/delete/{id}', [BookingController::class, 'deleteBooking'])->name('delete.consultation.booking');
+Route::get('/booking/consultation-booking/print/{id}', [BookingController::class, 'generatePDF'])->name('consultation.booking.invoices.print');
 
 //wellness booking
 Route::get('/booking/wellness-booking', [BookingController::class, 'WellnessIndex'])->name('bookings.wellness.index');
@@ -819,6 +825,7 @@ Route::get('/wellness/getPatientMembershipDetails', [BookingController::class, '
 Route::post('/booking/wellness-booking/patientbooking', [BookingController::class, 'patientWellnessBooking'])->name('patientbooking.wellness.booking');
 Route::get('/wellness-booking/view/{id}', [BookingController::class, 'viewWellnessBooking'])->name('view.wellness.booking');
 Route::delete('/booking/wellness-booking/delete/{id}', [BookingController::class, 'deleteWellnessBooking'])->name('delete.wellness.booking');
+Route::get('/booking/wellness-booking/print/{id}', [BookingController::class, 'generateWellnessPDF'])->name('wellness.booking.invoices.print');
 
 
 //Therapy Booking
@@ -831,6 +838,7 @@ Route::get('/getExternalDoctors', [BookingController::class, 'getExternalDoctors
 Route::post('/booking/therapy-booking/patienttherapybooking', [BookingController::class, 'patientTherapyBooking'])->name('patientbooking.therapy.booking');
 Route::get('/therapy-booking/view/{id}', [BookingController::class, 'viewTherapyBooking'])->name('view.therapy.booking');
 Route::delete('/booking/therapy-booking/delete/{id}', [BookingController::class, 'deleteTherapyBooking'])->name('delete.therapy.booking');
+Route::get('/booking/therapy-booking/print/{id}', [BookingController::class, 'generateTherapyPDF'])->name('therapy.booking.invoices.print');
 
 //Therapy Refund
 
@@ -866,15 +874,18 @@ Route::delete('doctor-leave/destroy/{id}', [DoctorLeaveRequestController::class,
 //doctor-attendance
 Route::get('/doctor-attendance', [DoctorAttendanceController::class, 'viewAttendance'])->name('doctor.attendance.view');
 Route::get('/doctor-attendance/monthly', [DoctorAttendanceController::class, 'monthlyAttendance'])->name('doctorattendance.monthly');
-    
+  
 //Salary process new routes
 
 Route::patch('salary-processing/change-status/{id}', [SalaryProcessingController::class, 'changeStatus'])->name('salary_processing.changeStatus');
 Route::get('salary-processing/view/{id}', [SalaryProcessingController::class, 'salaryProcessingView'])->name('salary_processing.view');
+Route::get('/get-advance-salary/{staff_id}/{salary_month}', [SalaryProcessingController::class, 'getAdvanceSalary'])->name('get-advance-salary');
 
 //HRMS - Advance Salary
 Route::get('/advance-salary/index', [SalaryProcessingController::class, 'AdvanceSalaryIndex'])->name('advance-salary.index');
 Route::get('/advance-salary/create', [SalaryProcessingController::class, 'AdvanceSalaryCreate'])->name('staff.advance-salary.create');
+Route::post('/advance-salary/store', [SalaryProcessingController::class, 'AdvanceSalaryStore'])->name('staff.advance-salary.store');
+Route::get('/advance-salary/view/{id}', [SalaryProcessingController::class, 'AdvanceSalaryView'])->name('staff.advance-salary.view');
 
 });
 

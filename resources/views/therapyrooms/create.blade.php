@@ -25,29 +25,19 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('therapyrooms.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('therapyrooms.store') }}" id="addFm"  method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
-                            <div class="form-group">
+                                <div class="form-group">
                                     <label class="form-label">Branch*</label>
                                     <select class="form-control" name="branch" id="branch_id">
                                         <option value="">Choose Branch</option>
                                         @foreach($branch as $id => $branchName)
-                                        <option value="{{ $id }}"{{ old('branch') == $id ? 'selected' : '' }}>{{ $branchName }}</option>
+                                        <option value="{{ $id }}" {{ old('branch') == $id ? 'selected' : '' }}>{{ $branchName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-
-                             <!-- <div class="form-group">
-                                 <label class="form-label">Room Capacity*</label>
-                                 <select class="form-control" name="room_capacity" required>
-                                   <option value="" disabled>Select Room Capacity</option>
-                                         @for($i = 1; $i <= 10; $i++)
-                                             <option value="{{ $i }}"{{ old('room_capacity') == $i ? ' selected' : '' }}>{{ $i }}</option>
-                                         @endfor
-                               </select>
-                            </div> -->
 
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
@@ -60,24 +50,15 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                            <div class="form-group">
+                                <div class="form-group">
                                     <label class="form-label">Room Name*</label>
-                                    <input type="text" class="form-control" required name="room_name" maxlength="50" value="{{old('room_name')}}" placeholder="Room Name">
+                                    <input type="text" class="form-control" required name="room_name" value="{{old('room_name')}}" placeholder="Room Name">
                                 </div>
-                                <!-- <div class="form-group">
-                                    <label class="form-label">Room Type*</label>
-                                    <select class="form-control" name="room_type" id="room_type">
-                                        <option value="">Select Room Type</option>
-                                        @foreach($roomtype as $masterId => $masterValue)
-                                        <option value="{{ $masterId }}"{{ old('room_type') == $masterId ? 'selected' : '' }}>{{ $masterValue }}</option>
-                                        @endforeach
-                                    </select>
-                                </div> -->
                             </div>
                         </div>
                         <div class="form-group">
                             <center>
-                                <button type="submit" class="btn btn-raised btn-primary">
+                                <button type="submit" id="submitForm" class="btn btn-raised btn-primary">
                                     <i class="fa fa-check-square-o"></i> Add</button>
                                 <button type="reset" class="btn btn-raised btn-success">
                                     Reset</button>
@@ -93,7 +74,56 @@
 @endsection
 
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
+   $(document).ready(function() {
+      var validator = $("#addFm").validate({
+         ignore: "",
+         rules: {
+            room_name: {
+               required: true,
+               maxlength: 50
+            },
+            branch: "required",
+         },
+         messages: {
+            room_name: {
+               required: 'Please enter room name.',
+               maxlength: 'Room name must not exceed 50 characters.'
+            },
+            branch: {
+               required: 'Please select a branch.',
+            },
+         },
+         errorPlacement: function(label, element) {
+            label.addClass('text-danger');
+            label.insertAfter(element.parent().children().last());
+         },
+         highlight: function(element, errorClass) {
+            $(element).parent().addClass('has-error');
+            $(element).addClass('form-control-danger');
+         },
+         unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('has-error');
+            $(element).removeClass('form-control-danger');
+         }
+      });
+
+      $(document).on('click', '#submitForm', function() {
+         if (validator.form()) {
+            $('#addFm').submit();
+         } else {
+            flashMessage('w', 'Please fill all mandatory fields');
+         }
+      });
+
+      function flashMessage(type, message) {
+         // Implement or replace this function based on your needs
+         console.log(type, message);
+      }
+   });
+   // impliment jQuery Validation 
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
             $("#statusText").text('Active');

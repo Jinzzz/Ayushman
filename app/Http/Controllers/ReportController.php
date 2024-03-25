@@ -20,6 +20,9 @@ use App\Models\Trn_branch_stock_transfer_detail;
 use App\Models\Trn_Medicine_Stock;
 use App\Models\Mst_Master_Value;
 use App\Models\Mst_Staff;
+use App\Models\Trn_Ledger_Posting;
+use App\Models\Mst_Account_Ledger;
+use App\Models\Mst_Branch;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
@@ -526,5 +529,144 @@ class ReportController extends Controller
             'purchase_details' => $PurchaseDetail,
         ]);
     }
+    
+    public function PayableReport(Request $request)
+    {
+            $purchaseQuery = Trn_Medicine_Purchase_Invoice::with('Supplier')
+        ->select(
+            'trn_medicine_purchase_invoices.supplier_id',
+            DB::raw('COALESCE(SUM(trn_medicine_purchase_invoices.total_amount), 0) as total_payable_amount'),
+            DB::raw('COALESCE(SUM(trn_medicine_purchase_invoices.paid_amount), 0) as total_paid_amount'),
+            DB::raw('(COALESCE(SUM(trn_medicine_purchase_invoices.total_amount), 0) - COALESCE(SUM(trn_medicine_purchase_invoices.paid_amount), 0)) as balance_due')
+        );
+    
+        if ($request->filled('supplier_id')) {
+            $purchaseQuery->where('supplier_id', $request->input('supplier_id'));
+        }
+        
+        if ($request->filled('invoice_from_date') && $request->filled('invoice_to_date')) {
+            $purchaseQuery->whereBetween('invoice_date', [$request->input('invoice_from_date'), $request->input('invoice_to_date')]);
+        } elseif ($request->filled('invoice_from_date')) {
+            $purchaseQuery->where('invoice_date', '>=', $request->input('invoice_from_date'));
+        } elseif ($request->filled('invoice_to_date')) {
+            $purchaseQuery->where('invoice_date', '<=', $request->input('invoice_to_date'));
+        } else {
+            // No date range provided, default to today
+            $purchaseQuery->whereDate('invoice_date', Carbon::today());
+        }
+        $purchaseQuery->where('is_paid', 0);
+    
+    $Invoices = $purchaseQuery->groupBy('trn_medicine_purchase_invoices.supplier_id')
+        ->havingRaw('balance_due > 0')
+        ->get();
+    
+    //dd($Invoices);
+    
+        return view('reports.payable-report', [
+            'pageTitle' => 'Payable Report',
+            'suppliers' => Mst_Supplier::orderBy('created_at','DESC')->get(),
+            'purchase' => $Invoices,
+        ]);
+    }
+
+    public function PayableReportDetail(Request $request, $id)
+    {
+
+        $purchaseQuery = Trn_Medicine_Purchase_Invoice::query()->with('Supplier','Pharmacy');
+         if ($request->filled('pharmacy_id')) {
+            $purchaseQuery->where('pharmacy_id', $request->input('pharmacy_id'));
+        }
+
+
+        if ($request->filled('purchase_invoice_no')) {
+            $purchaseQuery->where('purchase_invoice_no','like', '%' . $request->input('purchase_invoice_no') . '%');
+        }
+        
+
+    
+      
+        if ($request->filled('invoice_detail_from_date') && $request->filled('invoice_detail_to_date')) {
+            $purchaseQuery->whereBetween('invoice_date', [$request->input('invoice_detail_from_date'), $request->input('invoice_detail_to_date')]);
+        } elseif ($request->filled('invoice_detail_from_date')) {
+            $purchaseQuery->where('invoice_date', '>=', $request->input('invoice_detail_from_date'));
+        } elseif ($request->filled('invoice_detail_to_date')) {
+            $purchaseQuery->where('invoice_date', '<=', $request->input('invoice_detail_to_date'));
+        } 
+        
+        $purchaseQuery->where('is_paid', 0)->whereRaw('total_amount - paid_amount > 0');
+    
+    $Invoices = $purchaseQuery->where('is_paid', 0)->where('supplier_id',$id)->get();
+  //dd($Invoices);
+        return view('reports.payable-report-detail', [
+            'pageTitle' => 'Payable Report Detail',
+            'supplier_id' => $id,
+            'purchase_details' => $Invoices ,
+             'pharmacy' => Mst_Pharmacy::orderBy('created_at','DESC')->get(),
+        ]);
+    }
+    public function ledgerReport(Request $request)
+    {
+        $ledgerQuery = Trn_Ledger_Posting::query()->with('ledger')
+                    ->select(
+                        'account_ledger_id',
+                        DB::raw('SUM(debit) as debit'),
+                        DB::raw('SUM(credit) as credit'),
+                        DB::raw('SUM(debit) - SUM(credit) as balance')
+                    );
+         if ($request->filled('account_ledger_id')) {
+            $ledgerQuery->where('account_ledger_id', $request->input('account_ledger_id'));
+        }
+        
+        if ($request->filled('posting_from_date') && $request->filled('posting_to_date')) {
+            $ledgerQuery->whereBetween('posting_date', [$request->input('posting_from_date'), $request->input('posting_to_date')]);
+        } elseif ($request->filled('posting_from_date')) {
+            $purchaseQuery->where('posting_date', '>=', $request->input('posting_from_date'));
+        } elseif ($request->filled('posting_to_date')) {
+            $ledgerQuery->where('posting_date', '<=', $request->input('posting_to_date'));
+        } else {
+            // No date range provided, default to today
+            $ledgerQuery->whereDate('posting_date', Carbon::today());
+        }
+                    //->where('account_ledger_id', $accountLedgerId)
+                    //->whereBetween('posting_date', [$fromDate, $toDate])
+        $ledgerQuery =$ledgerQuery->groupBy('account_ledger_id')
+                    ->get();
+          return view('reports.ledger-report', [
+            'pageTitle' => 'Ledger Report',
+            'ledgers' => Mst_Account_Ledger::orderBy('ledger_name','ASC')->get(),
+            'ledgerSummary' => $ledgerQuery,
+        ]);
+
+        
+    }
+    public function ledgerReportDetails(Request $request,$id)
+    {
+         $ledgerQuery = Trn_Ledger_Posting::query();
+         if ($request->filled('account_ledger_id')) {
+            $ledgerQuery->where('account_ledger_id', $request->input('account_ledger_id'));
+        }
+        
+        if ($request->filled('posting_from_date') && $request->filled('posting_to_date')) {
+            $ledgerQuery->whereBetween('posting_date', [$request->input('posting_from_date'), $request->input('posting_to_date')]);
+        } elseif ($request->filled('posting_from_date')) {
+            $purchaseQuery->where('posting_date', '>=', $request->input('posting_from_date'));
+        } elseif ($request->filled('posting_to_date')) {
+            $ledgerQuery->where('posting_date', '<=', $request->input('posting_to_date'));
+        } else {
+            // No date range provided, default to today
+            $ledgerQuery->whereDate('posting_date', Carbon::today());
+        }
+                    //->where('account_ledger_id', $accountLedgerId)
+                    //->whereBetween('posting_date', [$fromDate, $toDate])
+        $ledgerQuery =$ledgerQuery ->get();
+          return view('reports.ledger-report-detail', [
+            'pageTitle' => 'Ledger Report',
+            'branches'=>Mst_Branch::query()->get(),
+            'ledgers' => Mst_Account_Ledger::orderBy('ledger_name','ASC')->get(),
+            'ledgerDetails' => $ledgerQuery,
+        ]);
+        
+    }
+    
     
 }

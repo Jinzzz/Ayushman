@@ -142,9 +142,6 @@
                 </a>
                 <ul class="slide-menu">
                     <li><a class="slide-item" href="{{ url('/patients/index') }}">{{ __('Patients') }}</a></li>
-                    <li><a class="slide-item"
-                            href="{{ url('membership/index') }}">{{ __('Membership Packages') }}</a>
-                    </li>
             </li>
             </ul>
             <!-- HRMS  -->
@@ -621,6 +618,8 @@
                     <li><a class="slide-item" href="{{ url('/current-stocks-report') }}">{{ __('Current Stocks Report') }}</a>
                     </li>
                     <li><a class="slide-item" href="{{ url('/payment-made-report') }}">{{ __('Payment Made Report') }}</a>
+                    </li>
+                     <li><a class="slide-item" href="{{ url('/payable-report') }}">{{ __('Payable Report') }}</a>
                     </li>
                 </ul>
             </li>

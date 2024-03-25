@@ -28,6 +28,7 @@
           </form>
           </br>
           </br>
+          
           <!-- Display the filtered table here -->
           <div class="table-responsive">
             <table class="table table-bordered">
@@ -75,7 +76,7 @@
                         {{-- Display 'A' for absent if on leave, 'P' for present if not on leave --}}
                         <div class="{{ $leaveForDay ? 'absent-cell' : 'present-cell' }}">
                             @if ($leaveForDay && \Carbon\Carbon::parse($leaveForDay->from_date)->format('Y-m') == $selectedMonthYear)
-                                A
+                                L
                             @else
                                 P
                             @endif

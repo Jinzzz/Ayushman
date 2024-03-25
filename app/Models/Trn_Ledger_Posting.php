@@ -23,4 +23,13 @@ class Trn_Ledger_Posting extends Model
         'entity_id',
         'transaction_id'
     ];
+    
+     public function ledger()
+    {
+        return $this->belongsTo(Mst_Account_Ledger::class, 'account_ledger_id','id');
+    }
+     public function branch()
+    {
+        return $this->belongsTo(Mst_Branchr::class, 'branch_id','id');
+    }
 }

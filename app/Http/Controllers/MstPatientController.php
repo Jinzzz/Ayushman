@@ -22,6 +22,7 @@ use App\Models\Trn_Patient_Device_Tocken;
 use App\Models\Trn_Patient_Wellness_Sessions;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Trn_Ledger_Posting;
 
 class MstPatientController extends Controller
 {
@@ -258,6 +259,7 @@ class MstPatientController extends Controller
 
     public function patientMembershipStore(Request $request, $id)
     {
+ 
         try {
             $validator = Validator::make(
                 $request->all(),
@@ -299,7 +301,7 @@ class MstPatientController extends Controller
                 $membershipDuration = $selectedMembership->package_duration;
                 $expiryDate = $startDate->addDays($membershipDuration);
                 // Only one active membership at a time.
-                $is_membership = Mst_Patient_Membership_Booking::where('patient_id', $patientId)->latest()->first();
+                $is_membership = Mst_Patient_Membership_Booking::where('patient_id', $patientId)->first();
 
                 if ($is_membership) {
                     // Checking all membership booking in this patient_id? if yes taking last inserted row 
@@ -426,7 +428,7 @@ class MstPatientController extends Controller
             'debit' => $selectedMembership->package_price,
             'credit' => 0,
             'branch_id' => 1,
-            'transaction_id' =>  $booking->id,
+            'transaction_id' =>  $lastInsertedId,
             'narration' => 'Patient Membership Payment'
         ]);
 
@@ -439,7 +441,7 @@ class MstPatientController extends Controller
             'debit' => 0,
             'credit' => $selectedMembership->package_price,
             'branch_id' => 1,
-            'transaction_id' =>  $invoice->id,
+            'transaction_id' =>  $lastInsertedId,
             'narration' => 'Patient Membership Payment'
         ]);
         //Accounts Receivable
@@ -451,7 +453,7 @@ class MstPatientController extends Controller
             'debit' => 0,
             'credit' => $selectedMembership->package_price,
             'branch_id' => 1,
-            'transaction_id' =>  $invoice->id,
+            'transaction_id' =>  $lastInsertedId,
             'narration' => 'Patient Membership Payment'
         ]);
         //Cash or Bank Account
@@ -463,7 +465,7 @@ class MstPatientController extends Controller
             'debit' => $selectedMembership->package_price,
             'credit' => 0,
             'branch_id' => 1,
-            'transaction_id' =>  $invoice->id,
+            'transaction_id' =>  $lastInsertedId,
             'narration' => 'Patient Membership Payment'
         ]);
                 return redirect()->route('patients.index')->with('success', 'Membership assigned successfully');

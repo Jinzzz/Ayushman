@@ -163,17 +163,17 @@
                                     </label>
                                  </div>
                               </div>
-                              <div class="col-md-6">
-                                 <div class="form-group">
-                                    <div class="form-label">Has Credit</div>
-                                    <label class="custom-switch">
-                                       <input type="hidden" name="has_credit" value="0">
-                                       <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input" checked>
-                                       <span id="statusLabel1" class="custom-switch-indicator"></span>
-                                       <span id="statusText1" class="custom-switch-description">Active</span>
-                                    </label>
-                                 </div>
-                              </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-label">Has Credit</div>
+                        <label class="custom-switch">
+                            <input type="hidden" name="has_credit" value="0">
+                            <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input">
+                            <span class="custom-switch-indicator"></span>
+                            <span id="statusText1" class="custom-switch-description">Inactive</span>
+                        </label>
+                    </div>
+                </div>
                            </div>
                         <div class="form-group">
                             <center>

@@ -1314,6 +1314,40 @@ $(document).ready(function() {
 });
 
 
+$(document).ready(function() {
+    function checkAndCalculateTotal() {
+        var allValuesFilled = true;
+        $('input[name="amount[]"]').not(':first').each(function() { 
+            if (!$(this).val()) {
+                allValuesFilled = false;
+                return false; 
+            }
+        });
+        if (allValuesFilled) {
+            calculateTotal();
+        } else {
+            setTimeout(checkAndCalculateTotal, 500); 
+        }
+    }
+    setTimeout(function() {
+        checkAndCalculateTotal();
+    }, 1000);
+   
+});
+
+function calculateTotal() {
+    var total = 0;
+    $('input[name="amount[]"]').each(function() {
+        if ($(this).val()) {
+            total += parseFloat($(this).val());
+        }
+    });
+    $("#sub_total").val(total);
+}
+
+
+
+
 </script>
 
 

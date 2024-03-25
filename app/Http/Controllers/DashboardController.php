@@ -96,8 +96,52 @@ class DashboardController extends Controller
         $bookingCount = Trn_Consultation_Booking::where('branch_id', $branchId)
                 ->whereDate('created_at', $currentDate)
                 ->count();
+        $doctorOnLeaveCount = Staff_Leave::where('branch_id', $branchId)
+             ->whereHas('staff', function ($query) {
+                $query->where('staff_type', 20);
+            })
+            ->where(function ($query) {
+                $query->whereDate('from_date', '<=', Carbon::today())
+                    ->whereDate('to_date', '>=', Carbon::today());
+            })
+            ->count();
+        $todaysConsultationBooking = Trn_Consultation_Booking::with('bookingType', 'patient', 'bookingStatus','doctor')
+                ->where('branch_id', $branchId)
+                ->where('booking_type_id', 84) //consultation
+                ->whereDate('booking_date', $currentDate)
+                ->orderBy('created_at', 'DESC')
+                ->limit(5)
+                ->get();
+        $todaysWellnessBooking = Trn_Consultation_Booking::with('bookingType', 'patient', 'bookingStatus','wellnessBookings')
+                ->where('branch_id', $branchId)
+                ->where('booking_type_id', 85) //wellness
+                ->whereDate('booking_date', $currentDate)
+                ->orderBy('created_at', 'DESC')
+                ->limit(5)
+                ->get();
+        $todaysTherapyBooking = Trn_Consultation_Booking::with('bookingType', 'patient', 'bookingStatus','therapyBookings')
+                ->where('branch_id', $branchId)
+                ->where('booking_type_id', 86) //therapy
+                ->whereDate('booking_date', $currentDate)
+                ->orderBy('created_at', 'DESC')
+                ->limit(5)
+                ->get();
+        $staffOnLeave = Staff_Leave::where('branch_id', $branchId)->where(function ($query) {
+            $query->whereDate('from_date', '<=', Carbon::today())
+            ->whereDate('to_date', '>=', Carbon::today());
+        })->get();
+        $doctorOnLeave = Staff_Leave::where('branch_id', $branchId)
+             ->whereHas('staff', function ($query) {
+                $query->where('staff_type', 20);
+            })
+            ->where(function ($query) {
+                $query->whereDate('from_date', '<=', Carbon::today())
+                    ->whereDate('to_date', '>=', Carbon::today());
+            })
+            ->get();
+        
 
-        return view('auth.receptionist.home',compact('pageTitle','branchId','currentDayLeave','bookingCount'));
+        return view('auth.receptionist.home',compact('pageTitle','branchId','currentDayLeave','bookingCount','todaysConsultationBooking','todaysWellnessBooking','todaysTherapyBooking','staffOnLeave','doctorOnLeave','doctorOnLeaveCount'));
     }
     
      public function doctorIndex()

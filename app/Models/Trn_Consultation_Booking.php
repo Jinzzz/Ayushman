@@ -17,6 +17,14 @@ class Trn_Consultation_Booking extends Model
         'doctor_id',
         'is_billable',
         'is_paid',
+        'booking_status_id',
+        'family_member_id',
+        'is_for_family_member',
+        'time_slot_id',
+        'branch_id',
+        'booking_date',
+        'booking_fee',
+        'payable_amount'
 
     ];
 
@@ -34,7 +42,7 @@ class Trn_Consultation_Booking extends Model
     
     public function doctor()
     {
-        return $this->belongsTo(Mst_User::class, 'doctor_id', 'id');
+        return $this->belongsTo(Mst_Staff::class, 'doctor_id', 'staff_id');
     }
 
     public function branch()
@@ -81,6 +89,11 @@ class Trn_Consultation_Booking extends Model
     public function therapyBookings()
     {
         return $this->hasMany(Trn_Booking_Therapy_detail::class, 'booking_id','id');
+    }
+    
+    public function wellnessBookings()
+    {
+        return $this->hasMany(Trn_Booking_Wellness_Detail::class, 'booking_id', 'id');
     }
     
     public function precriptions()
