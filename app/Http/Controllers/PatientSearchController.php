@@ -46,20 +46,43 @@ class PatientSearchController extends Controller
     {
         $patient = Mst_Patient::where('id', $id)->first();   
 
-        $patient_bookings = Mst_Patient::leftJoin('trn_consultation_bookings', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+        $patient_bookings1 = Mst_Patient::leftJoin('trn_consultation_bookings', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
             ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
             ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
             ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
             ->leftJoin('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
             ->where('trn_consultation_bookings.patient_id', $patient->id)
-            ->select('mst_patients.*', 'trn_consultation_bookings.*', 'mst_staffs.*', 'mst_branches.*', 'mst_timeslots.*', 'mst_master_values.*') // Adjust the columns you want to select
+            ->where('trn_consultation_bookings.booking_type_id', 84)
+            ->select('mst_patients.*', 'trn_consultation_bookings.*', 'mst_staffs.*', 'mst_branches.*', 'mst_timeslots.*', 'mst_master_values.*','trn_consultation_bookings.created_at') // Adjust the columns you want to select
+            ->orderBy('trn_consultation_bookings.booking_date','DESC')
+            ->get();
+
+            $patient_bookings2 = Mst_Patient::leftJoin('trn_consultation_bookings', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+            ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+            ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
+            ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+            ->leftJoin('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
+            ->where('trn_consultation_bookings.patient_id', $patient->id)
+            ->where('trn_consultation_bookings.booking_type_id', 85)
+            ->select('mst_patients.*', 'trn_consultation_bookings.*', 'mst_staffs.*', 'mst_branches.*', 'mst_timeslots.*', 'mst_master_values.*','trn_consultation_bookings.created_at') // Adjust the columns you want to select
+            ->orderBy('trn_consultation_bookings.booking_date','DESC')
+            ->get();
+
+            $patient_bookings3 = Mst_Patient::leftJoin('trn_consultation_bookings', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+            ->leftJoin('mst_staffs', 'trn_consultation_bookings.doctor_id', '=', 'mst_staffs.staff_id')
+            ->leftJoin('mst_branches', 'trn_consultation_bookings.branch_id', '=', 'mst_branches.branch_id')
+            ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+            ->leftJoin('mst_master_values', 'trn_consultation_bookings.booking_status_id', '=', 'mst_master_values.id')
+            ->where('trn_consultation_bookings.patient_id', $patient->id)
+            ->where('trn_consultation_bookings.booking_type_id', 86)
+            ->select('mst_patients.*', 'trn_consultation_bookings.*', 'mst_staffs.*', 'mst_branches.*', 'mst_timeslots.*', 'mst_master_values.*','trn_consultation_bookings.created_at') // Adjust the columns you want to select
             ->orderBy('trn_consultation_bookings.booking_date','DESC')
             ->get();
 
             $medicines = Mst_Medicine::get();
             $pageTitle = "Booking Details";
       
-        return view('patient_search.show_new', compact('patient','patient_bookings','medicines','pageTitle'));
+        return view('patient_search.show_new', compact('patient','patient_bookings1','medicines','pageTitle','patient_bookings2','patient_bookings3',));
     }
 
     public function storePrescription(Request $request)

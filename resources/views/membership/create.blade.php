@@ -124,17 +124,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
 
 <script type="text/javascript">
-   function validatePrices() {
-      var regularPrice = parseFloat(document.getElementById('regularPrice').value);
-      var offerPrice = parseFloat(document.getElementById('offerPrice').value);
-      var priceError = document.getElementById('priceError');
+  document.getElementById('offerPrice').addEventListener('input', validatePrices);
 
-      if (offerPrice >= regularPrice) {
-         priceError.textContent = 'Offer Price must be less than Regular Price';
-      } else {
-         priceError.textContent = '';
-      }
-   }
+function validatePrices() {
+    var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+    var offerPrice = parseFloat(document.getElementById('offerPrice').value);
+    var priceError = document.getElementById('priceError');
+
+    if (offerPrice > regularPrice) {
+        priceError.textContent = "Offer Price cannot be greater than Regular Price.";
+        document.getElementById('offerPrice').value = '';
+    } else {
+        priceError.textContent = "";
+    }
+}
    $(document).ready(function() {
 
       CKEDITOR.replace('benefitsDescription', {
