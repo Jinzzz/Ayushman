@@ -148,17 +148,7 @@ select#patient_ids {
                         </div>
                      </div>
                   </div>
-                  <div class="row">
-                     <div class="col-md-6">
-                        <div class="form-group">
-                           <label class="custom-control custom-checkbox">
-                           <input type="checkbox" class="custom-control-input" name="pay_now" value="1" id="paynowCheck">
-                           <span class="custom-control-label">Pay Now ?</span>
-                           </label>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="no-pay row"  style=" display:none;">
+                            <div class="no-pay row">
                            
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -169,6 +159,17 @@ select#patient_ids {
                                 </div>
                             </div>
                         </div>
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="form-group">
+                           <label class="custom-control custom-checkbox">
+                           <input type="checkbox" class="custom-control-input" name="pay_now" value="1" id="paynowCheck">
+                           <span class="custom-control-label">Pay Now ?</span>
+                           </label>
+                        </div>
+                     </div>
+                  </div>
+  
                         <div class="discount-div row" style=" display:none;">
                             
     
@@ -185,7 +186,7 @@ select#patient_ids {
                             <div class="col-md-4">
                             <div class="form-group">
                                 <label class="form-label">Discount Amount</label>
-                                <input type="number" class="form-control discount numericInputvalue" name="discount_Total" id="discount_Total" placeholder="Discount Amount" >
+                                <input type="number" class="form-control discount numericInputvalue" name="discount_total" id="discount_Total" placeholder="Discount Amount" >
                             </div>
                         </div>
                         
@@ -407,19 +408,20 @@ select#patient_ids {
 
 
                   </div>
-                  <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <div class="form-label">Has Credit</div>
-                                                    <label class="custom-switch">
-                                                        <input type="hidden" name="has_credit" value="0">
-                                                        <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input" checked>
-                                                        <span id="statusLabel1" class="custom-switch-indicator"></span>
-                                                        <span id="statusText1" class="custom-switch-description">Active</span>
-                                                    </label>
-                                                </div>
-                                            </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-label">Has Credit</div>
+                        <label class="custom-switch">
+                            <input type="hidden" name="has_credit" value="0">
+                            <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input">
+                            <span class="custom-switch-indicator"></span>
+                            <span id="statusText1" class="custom-switch-description">Inactive</span>
+                        </label>
+                    </div>
+                </div>
+
                </div>
-               <div class="form-group">
+               <div class="form-group" style="display:flex;align-items:center;justify-content:center">
                   <center>
                      <button type="submit" class="btn btn-raised btn-primary">
                      <i class="fa fa-check-square-o"></i> Add
@@ -427,7 +429,10 @@ select#patient_ids {
                      <button type="reset" class="btn btn-raised btn-success">
                      Reset
                      </button>
-                     <a class="btn btn-danger" href="{{ route('create.consultation.booking') }}">Cancel</a>
+                     
+            <button type="button" class="btn btn-raised btn-danger" data-dismiss="modal">Close
+            <span aria-hidden="true">&times;</span>
+            </button>
                   </center>
                </div>
             </form>
@@ -540,7 +545,7 @@ select#patient_ids {
                      </div>
                   </div>
                </div>
-               <div class="form-group">
+               <div class="form-group" style="display:flex;align-items:center;justify-content:center">
                   <center>
                      <button type="submit" class="btn btn-raised btn-primary">
                      <i class="fa fa-check-square-o"></i> Add
@@ -548,7 +553,9 @@ select#patient_ids {
                      <button type="reset" class="btn btn-raised btn-success">
                      Reset
                      </button>
-                     <a class="btn btn-danger" href="{{ route('create.consultation.booking') }}">Cancel</a>
+                     <button type="button" class="btn btn-raised btn-danger" data-dismiss="modal">Close
+            <span aria-hidden="true">&times;</span>
+            </button>
                   </center>
                </div>
             </form>
@@ -602,7 +609,6 @@ for (let i = 0; i < numericInputs.length; i++) {
             if ($(this).is(":checked")) {
                 $('#paymentdiv').show();
                 $('#addRow').show();
-                $('.no-pay').show();
                 $('.discount-div').show();
                 $('input[name="payable_amount"]').attr('required', true);
                 $('select[name="payment_mode"]').attr('required', true);
@@ -613,7 +619,6 @@ for (let i = 0; i < numericInputs.length; i++) {
             } else {
                 $('#paymentdiv').hide();
                 $('#addRow').hide();
-                $('.no-pay').hide();
                 $('.discount-div').hide();
                 $('input[name="payable_amount"]').attr('required', false);
                 $('select[name="payment_mode"]').attr('required', false);
@@ -830,11 +835,12 @@ for (let i = 0; i < numericInputs.length; i++) {
 function toggleStatus1(checkbox) {
     var statusText = document.getElementById('statusText1');
     if (checkbox.checked) {
-        statusText1.textContent = 'Active';
+        statusText.textContent = 'Active';
     } else {
-        statusText1.textContent = 'Inactive';
+        statusText.textContent = 'Inactive';
     }
-}    
+}
+   
 document.getElementById('numericInput').addEventListener('input', function(event) {
         let inputValue = event.target.value;
         inputValue = inputValue.replace(/[^0-9.]/g, '');
@@ -1035,7 +1041,7 @@ function openModal(button) {
         var discount = parseFloat($("#discount_amount").val());
         var discountLimit = parseFloat($("#discount_amount").data("discount"));
         //var discountAmount = parseFloat($("#discount_amount").val());
-
+        
         // Check if discount exceeds the limit
         if (!isNaN(discount) && discount > discountLimit) {
             $("#error-msg").show();
@@ -1051,7 +1057,10 @@ function openModal(button) {
         if (!isNaN(discount)) {
             totalAmount -= (paidAmount * (discount / 100));
             var x = paidAmount * (discount / 100);
-            $("#discount_Total").val(x)
+            $("#discount_Total").val(x.toFixed(2))
+        }
+        else {
+            $("#discount_Total").val('0');
         }
 
         // Update total amount field

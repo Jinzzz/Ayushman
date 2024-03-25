@@ -95,7 +95,7 @@
                                 @foreach ($paymentDetails as $key => $paymentDetail)
                                     <tr id="">
                                         <td>{{ $key + 1 }}</td>
-                                        <td>{{$paymentDetail->paid_amount}}</td>
+                                        <td>{{ number_format($paymentDetail->paid_amount,2)}}</td>
                                         <td>{{$paymentDetail->master_value}}</td>
                                         <td>{{$paymentDetail->ledger_name}}</td>
                                         <td>{{ $paymentDetail->reference_no}}</td>

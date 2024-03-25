@@ -44,9 +44,9 @@
                                     <tr id="">
                                         <td>{{ $key + 1 }}</td>
                                         <td>{{@$booking->booking_reference_number}}</td>
-                                        <td>{{@$booking->patient['patient_name']}}
+                                        <td>{!! wordwrap(@$booking->patient['patient_name'], 10, "<br>", true) !!} <br>
                                         @if($booking->is_for_family_member !== null && @$booking->is_for_family_member > 0)
-                                        Booked For : {{@$booking->familyMember['family_member_name']}}
+                                        Booked For : {!! wordwrap(@$booking->familyMember['family_member_name'], 10, "<br>", true) !!}
                                         @endif
                                            
                                         </td>

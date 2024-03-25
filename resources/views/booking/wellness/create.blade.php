@@ -203,14 +203,14 @@ select#patient_id1 {
                                                     <div class="form-label">Has Credit</div>
                                                     <label class="custom-switch">
                                                         <input type="hidden" name="has_credit" value="0">
-                                                        <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input" checked>
-                                                        <span id="statusLabel1" class="custom-switch-indicator"></span>
-                                                        <span id="statusText1" class="custom-switch-description">Active</span>
+                                                        <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input">
+                                                        <span class="custom-switch-indicator"></span>
+                                                        <span id="statusText1" class="custom-switch-description">Inactive</span>
                                                     </label>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="form-group">
+                                                                    </div>
+                                        <div class="form-group" style="display:flex;align-items:center;justify-content:center">
                                             <center>
                                                 <button type="submit" class="btn btn-raised btn-primary" >
                                                     <i class="fa fa-check-square-o"></i> Add
@@ -218,7 +218,9 @@ select#patient_id1 {
                                                 <button type="reset" class="btn btn-raised btn-success">
                                                     Reset
                                                 </button>
-                                                <a class="btn btn-danger" class="close" data-dismiss="modal" aria-label="Close">Cancel</a>
+                                                <button type="button" class="btn btn-raised btn-danger" data-dismiss="modal">Close
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </center>
                                         </div>
                                     </form>
@@ -334,7 +336,7 @@ select#patient_id1 {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group" style="display:flex;align-items:center;justify-content:center">
                                             <center>
                                                 <button  class="btn btn-raised btn-primary">
                                                     <i class="fa fa-check-square-o"></i> Add
@@ -342,7 +344,9 @@ select#patient_id1 {
                                                 <button type="reset" class="btn btn-raised btn-success">
                                                     Reset
                                                 </button>
-                                                <a class="btn btn-danger"  data-dismiss="modal">Cancel</a>
+                                                          <button type="button" class="btn btn-raised btn-danger" data-dismiss="modal">Close
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </center>
                                         </div>
                                   
@@ -481,17 +485,7 @@ select#patient_id1 {
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" name="pay_now" value="1" id="paynowCheck">
-                                        <span class="custom-control-label">Pay Now ?</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="no-pay row"  style=" display:none;">
+                                              <div class="no-pay row">
                            
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -502,6 +496,17 @@ select#patient_id1 {
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" name="pay_now" value="1" id="paynowCheck">
+                                        <span class="custom-control-label">Pay Now ?</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="discount-div row" style=" display:none;">
                             <div class="col-md-3">
                                 <div class="form-group">
@@ -618,14 +623,14 @@ for (let i = 0; i < numericInputs.length; i++) {
         }
     }    
     
-    function toggleStatus1(checkbox) {
-        var statusText = document.getElementById('statusText1');
-        if (checkbox.checked) {
-            statusText1.textContent = 'Active';
-        } else {
-            statusText1.textContent = 'Inactive';
-        }
-    }    
+function toggleStatus1(checkbox) {
+    var statusText = document.getElementById('statusText1');
+    if (checkbox.checked) {
+        statusText.textContent = 'Active';
+    } else {
+        statusText.textContent = 'Inactive';
+    }
+}   
 
   $(document).ready(function() {
         var today = new Date();
@@ -663,7 +668,6 @@ for (let i = 0; i < numericInputs.length; i++) {
             } else {
                 $('#paymentdiv').hide();
                 $('#addRow').hide();
-                $('.no-pay').hide();
                 $('.discount-div').hide();
                 $('input[name="payable_amount"]').attr('required', false);
                 $('select[name="payment_mode"]').attr('required', false);
@@ -1160,8 +1164,12 @@ function validateForm() {
         if (!isNaN(discount)) {
             totalAmount -= (totalBookingFee * (discount / 100));
             var x = totalBookingFee * (discount / 100);
-            $("#amount").val(x)
+            $("#amount").val(x.toFixed(2))
         }
+                else {
+            $("#amount").val('0');
+        }
+        
 
         // Update total amount field
         $("#total_amount").val(totalAmount.toFixed(2));

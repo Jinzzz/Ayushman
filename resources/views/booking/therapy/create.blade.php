@@ -194,6 +194,17 @@
                                     </div>
                                 </div>
                             </div>
+                                                  <div class="no-pay row">
+                           
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="custom-control custom-checkbox">
+                                         <input type="checkbox" value="1" name="noBill" class="custom-control-input">
+                                        <span class="custom-control-label">No Bill</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -205,17 +216,7 @@
                                     </div>
                                 </div>
                             </div>
-                             <div class="no-pay row"  style=" display:none;">
-                           
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="custom-control custom-checkbox">
-                                         <input type="checkbox" value="1" name="noBill" class="custom-control-input">
-                                        <span class="custom-control-label">No Bill</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+ 
                             
                             <div class="discount-div row" style=" display:none;">
                             <div class="col-md-3">
@@ -446,6 +447,18 @@
                         </label>
                      </div>
                   </div>
+                    <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-label">Has Credit</div>
+                        <label class="custom-switch">
+                            <input type="hidden" name="has_credit" value="0">
+                            <input type="checkbox" id="has_credit" name="has_credit" onchange="toggleStatus1(this)" class="custom-switch-input">
+                            <span class="custom-switch-indicator"></span>
+                            <span id="statusText1" class="custom-switch-description">Inactive</span>
+                        </label>
+                    </div>
+                </div>
+               </div>
                </div>
                <div class="form-group">
                   <center>
@@ -603,7 +616,16 @@
     } else {
         statusText.textContent = 'Inactive';
     }
-}    
+}  
+
+function toggleStatus1(checkbox) {
+    var statusText = document.getElementById('statusText1');
+    if (checkbox.checked) {
+        statusText.textContent = 'Active';
+    } else {
+        statusText.textContent = 'Inactive';
+    }
+}
     $(document).ready(function() {
         var today = new Date();
         var maxDate = new Date(today);
@@ -679,7 +701,6 @@ function populateExternalDoctors(doctors) {
                 } else {
                     $('#paymentdiv').hide();
                     $('.discount-div').hide();
-                    $(".no-pay").hide();
                      $('#addRow').hide();
                 }
             });
@@ -1052,8 +1073,12 @@ function validateForm() {
         if (!isNaN(discount)) {
             totalAmount -= (totalBookingFee * (discount / 100));
             var x = totalBookingFee * (discount / 100);
-            $("#amount").val(x)
+            $("#amount").val(x.toFixed(2));
         }
+                else {
+            $("#amount").val('0');
+        }
+
 
         // Update total amount field
         $("#total_amount").val(totalAmount.toFixed(2));

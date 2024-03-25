@@ -33,7 +33,7 @@
                                 </ul>
                             </div>
                         @endif
-                        <form action="" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('staff.advance-salary.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-4">
@@ -73,6 +73,7 @@
                                     <div class="form-group">
                                         <label class="form-label">Payment Amount*</label>
                                         <input type="text" class="form-control paid_amount" required name="paid_amount" placeholder="Payment Amount">
+                                        <span class="payment-error text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -172,7 +173,7 @@
                             <!-- ... -->
                             <div class="form-group">
                                 <center>
-                                    <button type="submit" class="btn btn-raised btn-primary">
+                                    <button type="submit" class="btn btn-raised btn-primary" id="sub">
                                         <i class="fa fa-check-square-o"></i> Add</button>
                                     <button type="reset" class="btn btn-raised btn-success">
                                         <i class="fa fa-refresh"></i> Reset</button>
@@ -257,70 +258,42 @@
     <script>
         //total salary
         $(document).ready(function() {
+             function checkPaymentAmount() 
+             {
+                var paymentAmount = parseFloat($('.paid_amount').val());
+                var netEarnings = parseFloat($('.net_earnings').val());
+        
+                if (paymentAmount > netEarnings) {
+                    $('.payment-error').text("Payment amount cannot be greater than net earnings.");
+                    $('#sub').prop('disabled', true);
+                    //alert("Payment amount cannot be greater than net earnings.")
+                } else {
+                    $('.payment-error').text("");
+                    $('#sub').prop('disabled', false);
+                }
+            }
+            $('.paid_amount').on('input', function() {
+            checkPaymentAmount();
+        });
             function resetFields() {
                 $('.earnings, .deductions').hide();
                 $('.total_earnings, .total_deductions, .earning_head, .deduction_head').val('');
+                
             }
             
             // Function to update total earnings
-        function updateTotalEarnings() {
-            var totalEarnings = 0;
-            $('.bonus, .overtime, .other_earnings, .earning_head').each(function() {
-                var amount = parseFloat($(this).val());
-                if (!isNaN(amount)) {
-                    totalEarnings += amount;
-                }
-            });
-            $('.total_earnings').val(totalEarnings.toFixed(2));
-        }
-
-        // Function to update total deductions
-        function updateTotalDeductions() {
-            var totalDeductions = 0;
-            $('.lop, .other_deductions, .deduction_head').each(function() {
-                var amount = parseFloat($(this).val());
-                if (!isNaN(amount)) {
-                    totalDeductions += amount;
-                }
-            });
-            $('.total_deductions').val(totalDeductions.toFixed(2));
-        }
+        
         
             $('#staff').change(function() {
                 resetFields();
+                 checkPaymentAmount();
                 var staffId = $(this).val();
                 var selectedMonth = $('#salary_month').val();
                 if (staffId) {
-                    $.ajax({
-                        url: '/getStaffSalary/' + staffId,
-                        type: "GET",
-                        dataType: "json",
-                        success: function(data) {
-                            $('#total_salary').val(data.total_salary);
-                        }
-                    });
+                  
                     //get total leaves took by the staff in the selected month
                     if (selectedMonth) {
-                        $.ajax({
-                            url: '/getStaffLeaves/' + staffId + '/' + selectedMonth,
-                            type: "GET",
-                            dataType: "json",
-                            success: function(data) {
-                                $('#total_leave').val(data.total_leave);
-                            }
-                        });
-                        //deductible leaves
-                        $.ajax({
-                            url: '/getDeductibleLeaveCount/' + staffId + '/' + selectedMonth,
-                            type: "GET",
-                            dataType: "json",
-                            success: function(data) {
-                                $('#deductible_leave_count').val(data.deductible_leave_count);
-                            },
-                            error: function() {
-                                console.log('Error fetching deductible leave count');
-                            }
-                        });
+                       
                     } else {
                         $('#total_leave').val('');
                         $('#deductible_leave_count').val('');
@@ -328,27 +301,33 @@
                     }
 
                     //earnings and deduction listing
-                    $.ajax({
+                        var totalEarnings = 0;
+                        var totalDeductions=0;
+                        var netEarnings=0;
+                  $.ajax({
                         url: '/get-salary-heads/' + staffId,
                         type: 'GET',
                         dataType: "json",
                         success: function(response) {
-                            $('.earnings, .deductions').hide();
+                            
                             // Show earnings and calculate total earnings
                                 $.each(response.earnings, function(index, value) {
-                                    var inputField = $('input[name="earning_head"][placeholder="' + value.salary_head_name + '"]');
-                                    inputField.val(value.amount).closest('.form-group').show();
+                                    //var inputField = $('input[name="earning_head"][placeholder="' + value.salary_head_name + '"]');
+                                    totalEarnings+=parseFloat(value.amount);
                                 });
                                 // Update total earnings when staff is selected
-                                updateTotalEarnings();
+                               
 
                                 // Show deductions and calculate total deductions
                                 $.each(response.deductions, function(index, value) {
-                                    var inputField = $('input[name="deduction_head"][placeholder="' + value.salary_head_name + '"]');
-                                    inputField.val(value.amount).closest('.form-group').show();
+                                   totalDeductions+=parseFloat(value.amount);
                                 });
+                                $('.total_earnings').val(totalEarnings.toFixed(2));
+                                $('.total_deductions').val(totalDeductions.toFixed(2));
+                                  netEarnings=totalEarnings-totalDeductions;
+                                $('.net_earnings').val(netEarnings.toFixed(2));
                                 // Update total deductions when staff is selected
-                                updateTotalDeductions();
+                               
                         }
                     });
 
@@ -359,14 +338,7 @@
                 }
             });
             // Listen for changes in bonus, overtime, and other earnings fields
-            $('.bonus, .overtime, .other_earnings').on('input', function() {
-                        updateTotalEarnings();
-                    });
-
-                    // Listen for changes in lop and other deductions fields
-                    $('.lop, .other_deductions').on('input', function() {
-                        updateTotalDeductions();
-                    });
+            
         });
     </script>
 
@@ -397,6 +369,8 @@
                     $('#staff').append('<option value="">--Select Staff--</option>');
                 }
             });
+            
         });
+        
     </script>
 @endsection

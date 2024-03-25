@@ -166,7 +166,7 @@ class SalaryProcessingController extends Controller
        $salary_processing->total_earnings=$request->total_earnings;
        $salary_processing->total_deductions=$request->total_deductions;
        $salary_processing->net_earning=$request->net_earnings;
-       $salary_processing->reference_number=Request->reference_number;
+       $salary_processing->reference_number=$request->reference_number;
        $salary_processing->processing_status=$request->status;
        $salary_processing->remarks=$request->remarks;
        $salary_processing->payment_mode=$request->payment_mode;
@@ -182,35 +182,38 @@ class SalaryProcessingController extends Controller
            $salary_details->save();
            
        }
-       if($request->status==1)
+       if($request->net_earnings>0)//if advance salary is fully taken then net earnings will be zero
        {
-           Trn_Ledger_Posting::create([
-            'posting_date' => Carbon::now(),
-            'master_id' => 'SAL_PRO' . $salary_processing_id,
-            'account_ledger_id' => 93,
-            'entity_id' => $request->staff_id,
-            'debit' =>$request->net_earnings,
-            'credit' => 0,
-            'branch_id' => $request->input('branch_id'),
-            'transaction_id' =>  $salary_processing_id,
-            'narration' => 'Salary Processing'
-        ]);
-           
-       }
-        if($request->status==2)
-       {
-           Trn_Ledger_Posting::create([
-            'posting_date' => Carbon::now(),
-            'master_id' => 'SAL_PRO' . $salary_processing_id,
-            'account_ledger_id' => 92,
-            'entity_id' => $request->staff_id,
-            'debit' =>0,
-            'credit' => $request->net_earnings,
-            'branch_id' => $request->input('branch_id'),
-            'transaction_id' =>  $salary_processing_id,
-            'narration' => 'Salary Processing'
-        ]);
-           
+               if($request->status==1)
+               {
+                   Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => 'SAL_PRO' . $salary_processing_id,
+                    'account_ledger_id' => 93,
+                    'entity_id' => $request->staff_id,
+                    'debit' =>$request->net_earnings,
+                    'credit' => 0,
+                    'branch_id' => $request->input('branch_id'),
+                    'transaction_id' =>  $salary_processing_id,
+                    'narration' => 'Salary Processing'
+                ]);
+                   
+               }
+                if($request->status==2)
+               {
+                   Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => 'SAL_PRO' . $salary_processing_id,
+                    'account_ledger_id' => 92,
+                    'entity_id' => $request->staff_id,
+                    'debit' =>0,
+                    'credit' => $request->net_earnings,
+                    'branch_id' => $request->input('branch_id'),
+                    'transaction_id' =>  $salary_processing_id,
+                    'narration' => 'Salary Processing'
+                ]);
+                   
+               }
        }
         
        return redirect()->route('salary-processing.index')->with('success','Salary Processing updated Successfully');
@@ -237,17 +240,22 @@ class SalaryProcessingController extends Controller
             $s_process = Trn_staff_salary_processing::findOrFail($id);
             $s_process->processing_status = 2;
             $s_process->save();
-             Trn_Ledger_Posting::create([
-            'posting_date' => Carbon::now(),
-            'master_id' => 'SAL_PRO' . $id,
-            'account_ledger_id' => 92,
-            'entity_id' => $s_process->staff_id,
-            'debit' =>0,
-            'credit' => $s_process->net_earning,
-            'branch_id' => $s_process->branch_id,
-            'transaction_id' =>  $id,
-            'narration' => 'Salary Processing'
-        ]);
+            if($s_process->net_earning>0)
+            {
+                Trn_Ledger_Posting::create([
+                    'posting_date' => Carbon::now(),
+                    'master_id' => 'SAL_PRO' . $id,
+                    'account_ledger_id' => 92,
+                    'entity_id' => $s_process->staff_id,
+                    'debit' =>0,
+                    'credit' => $s_process->net_earning,
+                    'branch_id' => $s_process->branch_id,
+                    'transaction_id' =>  $id,
+                    'narration' => 'Salary Processing'
+                ]);
+                
+            }
+            
             return 1;
         } catch (QueryException $e) {
             return redirect()->route('salary-processing.index')->with('error', 'Something went wrong');
@@ -269,6 +277,117 @@ class SalaryProcessingController extends Controller
             'branches' => Mst_Branch::where('is_active','=',1)->orderBy('branch_name','ASC')->get(),
             'paymentType' => Mst_Master_Value::where('master_id', 25)->pluck('master_value', 'id'),
             'pageTitle' => 'Add Advance Salary'
+        ]);
+    }
+     public function AdvanceSalaryStore(Request $request)
+    {
+       //dd('under development');
+       try {
+       $existingAdvance = Trn_Staff_Advance_Salary::where('salary_month', $request->salary_month)
+            ->where('staff_id', $request->staff_id)
+            ->exists();
+
+        if ($existingAdvance) {
+            return redirect()->route('advance-salary.index')->with('error', 'Advance salary of this month for this staff already initiated.');
+        }
+         $existingProcessing = Trn_staff_salary_processing::where('salary_month', $request->salary_month)
+            ->where('staff_id', $request->staff_id)
+            ->exists();
+
+        if ($existingProcessing) {
+            return redirect()->route('advance-salary.index')->with('error', 'Salary Processing of this month for this staff already initiated.');
+        }
+         if ($request->paid_amount>$request->net_earnings) {
+            return redirect()->route('advance-salary.index')->with('error', 'Payment amount should be less than net earnings.');
+        }
+       
+       $advance_salary=new Trn_Staff_Advance_Salary();
+       $advance_salary->salary_month=$request->salary_month;
+       $advance_salary->staff_id=$request->staff_id;
+       $advance_salary->branch_id=$request->branch_id;
+       $advance_salary->payed_date=$request->payed_date;
+       $advance_salary->paid_amount=$request->paid_amount;
+       $advance_salary->payed_through_ledger_id=$request->payed_through_ledger_id;
+       $advance_salary->payed_through_mode=$request->payed_through_mode;
+       $advance_salary->net_earnings=$request->net_earnings;
+       $advance_salary->reference_number=$request->reference_number;
+       $advance_salary->remarks=$request->remarks;
+       $advance_salary->payment_mode=$request->payment_mode;
+       $advance_salary->created_by=Auth::user()->id;
+       $advance_salary->save();
+
+
+    
+         
+         Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'ADV_SAL' . $advance_salary->id,
+            'account_ledger_id' => 94,
+            'entity_id' => $request->staff_id,
+            'debit' =>$request->paid_amount,
+            'credit' => 0,
+            'branch_id' => $request->input('branch_id'),
+            'transaction_id' =>  $advance_salary->id,
+            'narration' => 'Advance Salary'
+        ]);
+     
+          Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SADV_SAL' . $advance_salary->id,
+            'account_ledger_id' => 93,
+            'entity_id' => $request->staff_id,
+            'debit' =>0,
+            'credit' => $request->paid_amount,
+            'branch_id' => $request->input('branch_id'),
+            'transaction_id' =>  $advance_salary->id,
+            'narration' => 'Advance Salary'
+        ]);
+         Trn_Ledger_Posting::create([
+            'posting_date' => Carbon::now(),
+            'master_id' => 'SADV_SAL' . $advance_salary->id,
+            'account_ledger_id' => $request->payed_through_ledger_id,
+            'entity_id' => $request->staff_id,
+            'debit' =>0,
+            'credit' => $request->paid_amount,
+            'branch_id' => $request->input('branch_id'),
+            'transaction_id' =>  $advance_salary->id,
+            'narration' => 'Advance Salary'
+        ]);
+           
+      
+        
+       return redirect()->route('advance-salary.index')->with('success','Advance salary  Processing completed Successfully');
+      
+    } catch (\Exception $e) {
+        return redirect()->route('advance-salary.index')->with('error', 'Error occurred while advance salary process: ' . $e->getMessage());
+    }
+       
+         
+       //Trn_staff_salary_processing_detail;
+    }
+     public function AdvanceSalaryView($id)
+    {
+          return view('advance-salary.view', [
+            'salary_process'=> Trn_Staff_Advance_Salary::findOrFail($id),
+            'pageTitle' => 'View Advance Salary'
+        ]);
+        
+    }
+     public function getAdvanceSalary($staffId,$salaryMonth, Request $request)
+    {
+        
+        $advance_salary=Trn_Staff_Advance_Salary::where('staff_id',$staffId)->where('salary_month',$salaryMonth)->first();
+        if($advance_salary)
+        {
+            $paid_amount=$advance_salary->paid_amount;
+        }
+        else
+        {
+            $paid_amount=0;
+        }
+
+        return response()->json([
+            'advance_salary' => $paid_amount
         ]);
     }
     

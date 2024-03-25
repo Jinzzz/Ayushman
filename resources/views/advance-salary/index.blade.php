@@ -47,14 +47,14 @@
                                 @foreach ($processDatas as $key => $processData)
                                     <tr id="">
                                         <td>{{ $key + 1 }}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{{@$processData->salary_month}}</td>
+                                        <td>{{@$processData->staff->staff_username}}</td>
+                                        <td>{{@$processData->payed_date}}</td>
+                                        <td>{{@$processData->branch->branch_name}}</td>
+                                        <td>{{@$processData->paid_amount}}</td>
+                                        <td>{{@$processData->net_earnings}}</td>
                                         <td>
-                                            <a class="btn btn-primary" href=""><i class="fa fa-pencil-square-o" aria-hidden="true"></i> View </a>
+                                            <a class="btn btn-primary" href="{{ route('staff.advance-salary.view', ['id' => @$processData->id]) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> View </a>
                                         </td>
                                     </tr>
                                 @endforeach

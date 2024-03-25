@@ -23,12 +23,13 @@ class DoctorLeaveRequestController extends Controller
     public function index(Request $request)
     {
         $user_id = Auth::id();
-        $pageTitle = "Admin Leave Request";
+        $pageTitle = "Leave Request";
         $query = Staff_Leave::query();
         $staffleaves = Staff_Leave::select('staff_leave.*', 'mst_users.*','mst_branches.branch_name')
             ->join('mst_users', 'staff_leave.staff_id', '=', 'mst_users.user_id')
              ->join('mst_branches', 'staff_leave.branch_id', '=', 'mst_branches.branch_id')
             ->where('staff_leave.staff_id', $user_id);
+       
         
         if ($request->has('from_date')) {
             $staffleaves->where('staff_leave.from_date', 'LIKE', "%{$request->from_date}%");
@@ -38,10 +39,10 @@ class DoctorLeaveRequestController extends Controller
             $staffleaves->where('staff_leave.to_date', 'LIKE', "%{$request->to_date}%");
         }
         
-        $staffleaves = $staffleaves->get();
-
+        $staffleaves = $staffleaves->orderBy('staff_leave.created_at', 'desc')->get();
+        $today = Carbon::now()->format('Y-m-d');
   
-    return view('employee.index', compact('pageTitle', 'staffleaves'));
+    return view('employee.index', compact('pageTitle', 'staffleaves','today'));
     }
 
     /**
@@ -54,13 +55,12 @@ class DoctorLeaveRequestController extends Controller
         $pageTitle = "Create Leave Request";
         $branches = DB::table('mst_branches')->where('is_active', 1)->get();
         $user_id = Auth::id();
-          $branch_name = Staff_Leave::select('mst_branches.branch_name')
-            ->join('mst_users', 'staff_leave.staff_id', '=', 'mst_users.user_id')
-            ->join('mst_branches', 'staff_leave.branch_id', '=', 'mst_branches.branch_id')
-            ->where('staff_leave.staff_id', $user_id)
-            ->select('mst_branches.branch_id', 'mst_branches.branch_name')
+        $branch_name = Mst_Staff::select('mst_branches.branch_id', 'mst_branches.branch_name')
+            ->join('mst_users', 'mst_staffs.staff_id', '=', 'mst_users.staff_id')
+            ->join('mst_branches', 'mst_staffs.branch_id', '=', 'mst_branches.branch_id')
+            ->where('mst_users.user_id', $user_id)
             ->first();
-        
+
         $leave_types = Mst_Leave_Type::where('is_active', 1)->get();
         $user_id = Auth::id();
         $staff = Mst_User::where('user_id', $user_id)->first();
@@ -76,6 +76,7 @@ class DoctorLeaveRequestController extends Controller
      */
     public function store(Request $request)
     {
+      
                $request->validate([
             'branch_id' => 'required',
             'staff_id' => 'required',
@@ -103,14 +104,24 @@ class DoctorLeaveRequestController extends Controller
         $requestedDays = $request->days;
         $totalLeaves = EmployeeAvailableLeave::where('staff_id', $staffId)->value('total_leaves');
 
-        if ($requestedDays > $totalLeaves) {
-            return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
+        if ($request->leave_type != 5) {
+            if ($requestedDays > $totalLeaves) {
+                return redirect()->back()->withErrors(['days' => 'Requested days cannot be greater than total available days.'])->withInput();
+            }
+            $updatedTotalLeaves = $totalLeaves -  $requestedDays;
+        
+            EmployeeAvailableLeave::where('staff_id', $staffId)
+                ->update(['total_leaves' => $updatedTotalLeaves]);
         }
-        $updatedTotalLeaves = $totalLeaves -  $requestedDays;
-   
-        EmployeeAvailableLeave::where('staff_id', $staffId)
-                               ->update(['total_leaves' => $updatedTotalLeaves,
-                            ]);
+
+        $existingLeaveRequest = Staff_Leave::where('staff_id', $request->staff_id)
+            ->where('from_date', $request->from_date)
+            ->where('to_date', $request->to_date)
+            ->first();
+        
+        if ($existingLeaveRequest) {
+            return redirect()->back()->withErrors(['duplicate' => 'Leave request already exist in this date.'])->withInput();
+        }
 
         $lastInsertedId = Staff_Leave::create([
             'branch_id' => $request->branch_id,
@@ -245,6 +256,7 @@ class DoctorLeaveRequestController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function destroy($id)
     {
                 $leaverequest = Staff_Leave::findOrFail($id);
@@ -257,4 +269,5 @@ class DoctorLeaveRequestController extends Controller
             'message' => 'Leave Request deleted successfully',
         ]);
     }
+
 }

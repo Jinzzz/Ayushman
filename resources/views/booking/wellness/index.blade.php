@@ -55,6 +55,11 @@
                                         <a class="btn btn-primary" href="{{ route('view.wellness.booking', ['id' => $booking->id]) }}">
                                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i> View
                                         </a>
+                                        @if($booking->master_value == "Approved" || $booking->master_value == "Completed")
+                                            <a class="btn btn-primary btn-sm edit-custom" href="{{ route('wellness.booking.invoices.print', $booking->id) }}" target="_blank">
+                                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                                            </a>
+                                        @endif
                                         <form style="display: inline-block"
                                             action="{{ route('delete.wellness.booking', $booking->id) }}" method="post">
                                             @csrf

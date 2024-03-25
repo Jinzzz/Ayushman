@@ -18,4 +18,13 @@ class Trn_Booking_Wellness_Detail extends Model
         'created_at',
         'updated_at',
     ];
+    
+    public function booking()
+    {
+        return $this->belongsTo(Trn_Consultation_Booking::class, 'booking_id', 'id');
+    }
+     public function wellness()
+    {
+        return $this->belongsTo(Mst_Wellness::class, 'wellness_id', 'wellness_id');
+    }
 }

@@ -55,6 +55,11 @@
                                                 <span class="form-label">Reference Number:{{@$salary_process->reference_number}}</span>
                                             </div>
                                             </div>
+                                             <div class="row">
+                                            <div class="col-md-4">
+                                                <span class="form-label">Remarks:{{@$salary_process->remarks}}</span>
+                                            </div>
+                                            </div>
                                            
                                              <div class="row"
                                 style="    border: 1px solid #0d97c6;

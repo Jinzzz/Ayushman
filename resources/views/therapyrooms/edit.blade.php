@@ -12,7 +12,7 @@
                 <div class="col-lg-12" style="background-color: #fff;">
                     @if ($errors->any())
                     <div class="alert alert-danger">
-                        <!-- <strong>Whoops!</strong> There were some problems with your input.<br><br> -->
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
                         <ul>
                             @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -20,7 +20,7 @@
                         </ul>
                     </div>
                     @endif
-                    <form  id="addFm"  action="{{ route('therapyrooms.update',['id'=>$therapyroom->id]) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('therapyrooms.update',['id'=>$therapyroom->id]) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row">
@@ -43,7 +43,33 @@
                                     </select>
                                 </div>
                             </div>
+                          <!-- <div class="col-md-6">
+                            <div class="form-group">
+                               <label class="form-label">Room Capacity</label>
+                                  <select class="form-control" name="room_capacity" required>
+                                   <option value="" disabled>Select Room Capacity</option>
+                               @for($i = 1; $i <= 10; $i++)
+                                   <option value="{{ $i }}"{{ $i == $therapyroom->room_capacity ? ' selected' : '' }}>
+                                    {{ $i }}
+                                   </option>
+                               @endfor
+                            </select>
+                            </div>
+                            </div> -->
 
+                            <!-- <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Room Type</label>
+                                    <select class="form-control" name="room_type" id="room_type">
+                                        <option value="">Select Room Type</option>
+                                        @foreach($roomtype as $masterId => $masterValue)
+                                        <option value="{{ $masterId }}"{{ $masterId == $therapyroom->room_type ? ' selected' : '' }}>
+                                            {{ $masterValue }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div> -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="form-label">Status</div>
@@ -63,7 +89,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <center>
-                                        <button id="submitForm" type="submit" class="btn btn-raised btn-primary">
+                                        <button type="submit" class="btn btn-raised btn-primary">
                                             <i class="fa fa-check-square-o"></i> Update
                                         </button>
                                        
@@ -81,56 +107,7 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/jquery.validation/latest/jquery.validate.min.js"></script>
 <script>
-   $(document).ready(function() {
-      var validator = $("#addFm").validate({
-         ignore: "",
-         rules: {
-            room_name: {
-               required: true,
-               maxlength: 50
-            },
-            branch: "required",
-         },
-         messages: {
-            room_name: {
-               required: 'Please enter room name.',
-               maxlength: 'Room name must not exceed 50 characters.'
-            },
-            branch: {
-               required: 'Please select a branch.',
-            },
-         },
-         errorPlacement: function(label, element) {
-            label.addClass('text-danger');
-            label.insertAfter(element.parent().children().last());
-         },
-         highlight: function(element, errorClass) {
-            $(element).parent().addClass('has-error');
-            $(element).addClass('form-control-danger');
-         },
-         unhighlight: function(element, errorClass, validClass) {
-            $(element).parent().removeClass('has-error');
-            $(element).removeClass('form-control-danger');
-         }
-      });
-
-      $(document).on('click', '#submitForm', function() {
-         if (validator.form()) {
-            $('#addFm').submit();
-         } else {
-            flashMessage('w', 'Please fill all mandatory fields');
-         }
-      });
-
-      function flashMessage(type, message) {
-         // Implement or replace this function based on your needs
-         console.log(type, message);
-      }
-   });
-   // impliment jQuery Validation 
     function toggleStatus(checkbox) {
         if (checkbox.checked) {
             $("#statusText").text('Active');

@@ -129,11 +129,13 @@ class ConsultationController extends Controller
     public function PatientHistory($id, Request $request)
     {
         $bookingInfo = Trn_Consultation_Booking::with('patient','familyMember','branch','bookingStatus')->findOrFail($id);
+        
         if($bookingInfo->is_for_family_member !== null && $bookingInfo->is_for_family_member > 0)
         {
-            
             $booked_for=$bookingInfo->familyMember['id'];
+           
             $bookingPreviousIds = Trn_Consultation_Booking::where('family_member_id',$booked_for)->where('booking_type_id',84)->where('booking_status_id',89)->pluck('id');
+           
         }
         else
         {
@@ -142,10 +144,11 @@ class ConsultationController extends Controller
         }
         
         $patient_histories=Trn_Prescription::with('Staff','BookingDetails','BookingDetails.bookingStatus','BookingDetails.timeSlot','BookingDetails.therapyBookings','PrescriptionDetails','PrescriptionDetails.medicine')->whereIn('Booking_id', $bookingPreviousIds)->orderBy('created_at','DESC')->get();
-        //dd($patient_histories);
+        
         return view('doctor.consultation.patient-history', [
             'pageTitle' => 'Patient History',
-            'patient_histories'=>$patient_histories
+            'patient_histories'=>$patient_histories,
+            'booking_info' => $bookingInfo
         ]);
     }
      public function ConsultHistory(Request $request)

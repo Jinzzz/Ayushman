@@ -23,9 +23,5 @@ class Mst_Leave_Type extends Model
         'deleted_by',
         'deleted_at',
     ];
-    public function leaveType()
-    {
-        return $this->belongsTo(Mst_Leave_Type::class, 'leave_type_id');
-    }
     
 }

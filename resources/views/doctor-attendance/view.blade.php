@@ -53,7 +53,7 @@
                 </style>
               @foreach ($allStaff as $staff)
     <tr>
-        <td>{{ $staff->user_id }}</td>
+        
      
         @for ($day = 1; $day <= $daysInMonth; $day++)
             @php
@@ -69,7 +69,7 @@
                 @if ($isDateBeforeJoin || $isFutureDate)
                     <div class="empty-cell"></div>
                 @elseif ($leaveForDay)
-                    <div class="absent-cell">A</div>
+                    <div class="absent-cell">L</div>
                 @else
                     <div class="present-cell">P</div>
                 @endif

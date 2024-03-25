@@ -30,7 +30,13 @@
                     <div class="col-lg-12 card-background" style="background-color:#fff; padding: 10px;">
                         <form action="" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @if($patient_histories->isEmpty())
+                                <p>No previous consultation history for the patient   @if($booking_info->is_for_family_member !== null && $booking_info->is_for_family_member > 0) for
+                                {{@$booking_info->familyMember['family_member_name']}} @else for {{ @$booking_info->patient['patient_name']}} @endif
+                                </p>
+                            @else
                             @foreach($patient_histories as $history)
+                           
                                 <div class="card">
 									<div class="card-header">
 										<h3 class="card-title">BOOKING ID:{{ @$history->bookingDetails['booking_reference_number']}}</h3>
@@ -95,7 +101,9 @@
                                         </div>
 									</div>
                                 </div>
+                                
                             @endforeach
+                            @endif
 								
                           
                             <div class="row" style="margin-top:20px;">

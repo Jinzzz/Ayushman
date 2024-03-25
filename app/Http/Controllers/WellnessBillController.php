@@ -17,71 +17,72 @@ use Carbon\Carbon;
 class WellnessBillController extends Controller
 {
     public function wellnessBill(Request $request)
-{
-    $userTypeId = Auth::user()->user_type_id;
-    $branchId = null;
-
-    if ($userTypeId != 1) {
+    {
+        $userTypeId = Auth::user()->user_type_id;
+        $branchId = null;
+    
+        if ($userTypeId != 1) {
+            
+        $staffId = Auth::user()->staff_id;
+        $branchId = Mst_Staff::where('staff_id',$staffId)->pluck('branch_id');
+    
+        $patients = Trn_Consultation_Booking::leftJoin('mst_patients', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+        ->leftJoin('mst_master_values as booking_type', 'booking_type.id', '=', 'trn_consultation_bookings.booking_type_id')
+        ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+        ->leftJoin('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
+        ->leftJoin('mst_branches', 'mst_branches.branch_id', '=', 'trn_consultation_bookings.branch_id')
+        ->leftJoin('mst_master_values as booking_status', 'booking_status.id', '=', 'trn_consultation_bookings.booking_status_id')
+        ->where('trn_consultation_bookings.booking_type_id', 85)
+        ->where('trn_consultation_bookings.branch_id', $branchId)
+        ->where('trn_consultation_bookings.is_billable', 0)
+        ->select('trn_consultation_bookings.*', 'mst_patients.patient_code', 'mst_patients.patient_name', 'mst_patients.patient_email', 'mst_patients.patient_mobile', 'booking_type.master_value', 'booking_status.master_value','mst_staffs.*','mst_branches.*');
+    
+    if ($request->filled('patient_name')) {
+        $patients->where('mst_patients.patient_name', $request->input('patient_name'));
+    }
+    
+    if ($request->filled('booking_date')) {
+        $patients->whereDate('trn_consultation_bookings.booking_date', $request->input('booking_date'));
+    }
+                
+    $patients = $patients->orderBy('trn_consultation_bookings.created_at', 'desc')->get();
+    //Assuming 10 records per page
         
-    $staffId = Auth::user()->staff_id;
-    $branchId = Mst_Staff::where('staff_id',$staffId)->pluck('branch_id');
-
-    $patients = Trn_Consultation_Booking::leftJoin('mst_patients', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
-    ->leftJoin('mst_master_values as booking_type', 'booking_type.id', '=', 'trn_consultation_bookings.booking_type_id')
-    ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-    ->leftJoin('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
-    ->leftJoin('mst_branches', 'mst_branches.branch_id', '=', 'trn_consultation_bookings.branch_id')
-    ->leftJoin('mst_master_values as booking_status', 'booking_status.id', '=', 'trn_consultation_bookings.booking_status_id')
-    ->where('trn_consultation_bookings.booking_type_id', 85)
-    ->where('trn_consultation_bookings.branch_id', $branchId)
-    ->where('trn_consultation_bookings.is_billable', 0)
-    ->select('trn_consultation_bookings.*', 'mst_patients.patient_code', 'mst_patients.patient_name', 'mst_patients.patient_email', 'mst_patients.patient_mobile', 'booking_type.master_value', 'booking_status.master_value','mst_staffs.*','mst_branches.*');
-
-if ($request->filled('patient_name')) {
-    $patients->where('mst_patients.patient_name', $request->input('patient_name'));
-}
-
-if ($request->filled('booking_date')) {
-    $patients->whereDate('trn_consultation_bookings.booking_date', $request->input('booking_date'));
-}
-            
-$patients = $patients->get(); // Assuming 10 records per page
+    $pageTitle = "Wellness Billing";
     
-$pageTitle = "Wellness Billing";
-
-$patientLists = Mst_Patient::get();
-
-return view('wellness-bill.index', compact('patients', 'pageTitle','patientLists'));
-}
-else{
-    $patients = Trn_Consultation_Booking::leftJoin('mst_patients', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
-    ->leftJoin('mst_master_values as booking_type', 'booking_type.id', '=', 'trn_consultation_bookings.booking_type_id')
-    ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
-    ->leftJoin('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
-    ->leftJoin('mst_branches', 'mst_branches.branch_id', '=', 'trn_consultation_bookings.branch_id')
-    ->leftJoin('mst_master_values as booking_status', 'booking_status.id', '=', 'trn_consultation_bookings.booking_status_id')
-    ->where('trn_consultation_bookings.booking_type_id', 85)
-    ->where('trn_consultation_bookings.is_billable', 0)
-    ->select('trn_consultation_bookings.*', 'mst_patients.patient_code', 'mst_patients.patient_name', 'mst_patients.patient_email', 'mst_patients.patient_mobile', 'booking_type.master_value', 'booking_status.master_value','mst_staffs.*','mst_branches.*');
+    $patientLists = Mst_Patient::get();
     
-
-if ($request->filled('patient_name')) {
-    $patients->where('mst_patients.patient_name', $request->input('patient_name'));
-}
-
-if ($request->filled('booking_date')) {
-    $patients->whereDate('trn_consultation_bookings.booking_date', $request->input('booking_date'));
-}
-            
-$patients = $patients->get(); // Assuming 10 records per page
+    return view('wellness-bill.index', compact('patients', 'pageTitle','patientLists'));
+    }
+    else{
+        $patients = Trn_Consultation_Booking::leftJoin('mst_patients', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
+        ->leftJoin('mst_master_values as booking_type', 'booking_type.id', '=', 'trn_consultation_bookings.booking_type_id')
+        ->leftJoin('mst_timeslots', 'trn_consultation_bookings.time_slot_id', '=', 'mst_timeslots.id')
+        ->leftJoin('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
+        ->leftJoin('mst_branches', 'mst_branches.branch_id', '=', 'trn_consultation_bookings.branch_id')
+        ->leftJoin('mst_master_values as booking_status', 'booking_status.id', '=', 'trn_consultation_bookings.booking_status_id')
+        ->where('trn_consultation_bookings.booking_type_id', 85)
+        ->where('trn_consultation_bookings.is_billable', 0)
+        ->select('trn_consultation_bookings.*', 'mst_patients.patient_code', 'mst_patients.patient_name', 'mst_patients.patient_email', 'mst_patients.patient_mobile', 'booking_type.master_value', 'booking_status.master_value','mst_staffs.*','mst_branches.*');
+        
     
-$pageTitle = "Wellness Billing";
-
-$patientLists = Mst_Patient::get();
-
-return view('wellness-bill.index', compact('patients', 'pageTitle','patientLists'));
-}
-}
+    if ($request->filled('patient_name')) {
+        $patients->where('mst_patients.patient_name', $request->input('patient_name'));
+    }
+    
+    if ($request->filled('booking_date')) {
+        $patients->whereDate('trn_consultation_bookings.booking_date', $request->input('booking_date'));
+    }
+                
+    $patients = $patients->orderBy('trn_consultation_bookings.created_at', 'desc')->get(); // Assuming 10 records per page
+        
+    $pageTitle = "Wellness Billing";
+    
+    $patientLists = Mst_Patient::get();
+    
+    return view('wellness-bill.index', compact('patients', 'pageTitle','patientLists'));
+    }
+    }
 
 
     public function generateInvoice($id)
@@ -90,6 +91,7 @@ return view('wellness-bill.index', compact('patients', 'pageTitle','patientLists
         $invoice  = Trn_Consultation_Booking::leftJoin('mst_patients', 'mst_patients.id', '=', 'trn_consultation_bookings.patient_id')
         ->leftJoin('mst_staffs', 'mst_staffs.staff_id', '=', 'trn_consultation_bookings.doctor_id')
         ->where('trn_consultation_bookings.id', $id)->first(); 
+ 
      
          $booking_id = $id;
     

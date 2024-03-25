@@ -9,7 +9,7 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 </style>
-<div class="container">
+
     <div class="row" style="min-height: 70vh;">
         <div class="col-md-12">
             <div class="card">
@@ -78,7 +78,14 @@ input[type="checkbox"] {
                                 </div>
                             </div> 
                         </div>
-                        
+                                              <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group checkbox-row" style="display:flex; align-items:center;">
+                                <input type="checkbox" class="form-control" id="no_bill" name="no_bill" style="width:100%; max-width:30px;">
+                                <strong> <label for="no_bill" style="margin-bottom:0;">No Bill</label> </strong>
+                            </div>
+                        </div>
+                      </div>
                         <div class="row">
                         <div class="col-md-6">
                             <div class="form-group checkbox-row" style="display:flex; align-items:center;">
@@ -87,16 +94,10 @@ input[type="checkbox"] {
                             </div>
                         </div>
                       </div>
-                      <div id="payNowDetails" style="display: none;">
+                      
 
-                      <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group checkbox-row" style="display:flex; align-items:center;">
-                                <input type="checkbox" class="form-control" id="no_bill" name="no_bill" style="width:100%; max-width:30px;">
-                                <strong> <label for="no_bill" style="margin-bottom:0;">No Bill</label> </strong>
-                            </div>
-                        </div>
-                      </div>
+
+                      <div id="payNowDetails" style="display: none;">
                       <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -190,7 +191,7 @@ input[type="checkbox"] {
                  </div>
         </div>
     </div>
-</div>
+
 
 @endsection
 @section('js')

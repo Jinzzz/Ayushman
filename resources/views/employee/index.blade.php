@@ -22,7 +22,7 @@
                     <div class="col-md-3 d-flex align-items-end">
                         <div>
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>&nbsp;
-                            <a class="btn btn-primary" href="{{ route('staffleave.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
+                            <a class="btn btn-primary" href="{{ route('employee.index') }}"><i class="fa fa-times" aria-hidden="true"></i> Reset</a>
                         </div>
                     </div>
                     </div>
@@ -66,6 +66,18 @@
                         $i = 0;
                         @endphp
                         @foreach($staffleaves as $staffleave)
+                        @php
+                            try {
+                                $currentDate = now();
+                                $fromDate = \Carbon\Carbon::parse($staffleave->from_date);
+                                $toDate = \Carbon\Carbon::parse($staffleave->to_date);
+                                $leaveCompleted = $currentDate->gt($toDate);
+                                $leaveNotStarted = $currentDate->lt($fromDate);
+                            } catch (\Exception $e) {
+                                $leaveCompleted = false; 
+                                $leaveNotStarted = false; 
+                            }
+                        @endphp
                         <tr id="dataRow_{{$staffleave->id }}">
                             <td>{{ ++$i }}</td>
                             <td>{{ $staffleave->branch_name }}</td>
@@ -73,18 +85,18 @@
                             <td>{{ $staffleave->to_date }}</td>
                             <td>{{ $staffleave->days}}</td>
                             <td>
-                            <a class="btn btn-secondary btn-sm" href="{{ route('employee.show', $staffleave->id) }}">
-                                    <i class="fa fa-eye" aria-hidden="true"></i> View </a>
-                                <a class="btn btn-primary btn-sm edit-custom" href="{{ route('employee.edit', $staffleave->id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit </a>
-                              
+                            @if(!$leaveCompleted && $currentDate->lt($toDate))
+                                <a class="btn btn-primary btn-sm edit-custom" href="{{ route('employee.edit', $staffleave->id) }}">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+                                </a>
                                 <form style="display: inline-block" action="{{ route('employee.destroy', $staffleave->id) }}" method="post">
                                     @csrf
                                     @method('delete')
                                     <button type="button" onclick="deleteData({{ $staffleave->id }})" class="btn-danger btn-sm">
                                         <i class="fa fa-trash" aria-hidden="true"></i> Delete
                                     </button>
-
                                 </form>
+                            @endif
                             </td>
                         </tr>
                         @endforeach

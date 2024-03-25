@@ -68,6 +68,7 @@
                                             name="total_salary" placeholder="Total Salary" value="" readonly>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="form-label">Staff*</label>
@@ -231,6 +232,18 @@
                                 </div>
                             </div>
                             <div class="row" style="margin: 0 10px 10px;">
+                                <div class="col-6">
+                                    <div class="form-group" style="margin-top: 1rem">
+                                        <div class="row">
+                                            <div class="col-4"><label class="form-label">Advance Salary</label>
+                                            </div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control advance_salary" required
+                                                    name="advance_salary" placeholder="Advance Salary" value="0" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-6">
                                     <div class="form-group" style="margin-top: 1rem">
                                         <div class="row">
@@ -414,7 +427,8 @@
             var netEarnings=0;
             totalEarnings=$('.total_earnings').val();
             totalDeductions=$('.total_deductions').val();
-            netEarnings=totalEarnings-totalDeductions;
+            advanceSalary=$('.advance_salary').val();
+            netEarnings=totalEarnings-totalDeductions-advanceSalary;
             $('.net_earnings').val(netEarnings.toFixed(2));
             
         }
@@ -432,6 +446,20 @@
                             $('#total_salary').val(data.total_salary);
                         }
                     });
+                      $.ajax({
+                            url: '/get-advance-salary/' + staffId + '/' + selectedMonth,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(data) {
+                                $('.advance_salary').val(data.advance_salary);
+                                var netEarn=$('.net_earnings').val()-data.advance_salary;
+                                
+                                $('.net_earnings').val(netEarn.toFixed(2));
+                            },
+                            error: function() {
+                                console.log('Error fetchingAdv salary');
+                            }
+                        });
                     //get total leaves took by the staff in the selected month
                     if (selectedMonth) {
                         $.ajax({
@@ -454,6 +482,7 @@
                                 console.log('Error fetching deductible leave count');
                             }
                         });
+                       
                     } else {
                         $('#total_leave').val('');
                         $('#deductible_leave_count').val('');

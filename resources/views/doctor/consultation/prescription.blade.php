@@ -125,10 +125,10 @@
                                                             </select>
                                                         </td>
                                                         <td class="medicine-batch-no">
-                                                            <input type="text" class="form-control" required name="dosage[]">
+                                                            <input type="text" class="form-control" required name="dosage[]" placeholder="Example: 1-0-1">
                                                         </td>
                                                         <td class="medicine-quantity">
-                                                            <input type="text" class="form-control" required name="duration[]">
+                                                            <input type="text" class="form-control" required name="duration[]" placeholder="Example: Twice a Day">
                                                         </td>
                                                         <td><button type="button" onclick="removeFn(this)"
                                                                 style="background-color: #007BFF; color: #FFF; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Remove</button>
@@ -224,31 +224,33 @@
             $('#consulting_date').val(currentDate);
         });
        
-
-      function removeFn(button) {
+function removeFn(button) {
     var row = $(button).closest('tr');
-    row.remove();
+    // Check if it's the first row, if yes, do not remove
+    if (!row.is(':first-child')) {
+        row.remove();
+    }
 }
 
 function removeFn2(button) {
     var row = $(button).closest('tr');
-    row.remove();
+    if (!row.is(':first-child')) {
+        row.remove();
+    }
 }
 
         $(document).ready(function() {
             
             $("#addProductBtn").click(function(event) {
                 event.preventDefault();
-                //alert(1);
-                var newRow = $("#productRowTemplate").clone().removeAttr("style");
+                // Clone the first row if the table is empty or clone a new empty row if it's not empty
+                var newRow = $("#productTable tbody tr").length == 0 ? $("#productRowTemplate").clone().removeAttr("style") : $("#productTable tbody tr:first").clone().removeAttr("style");
                 newRow.find('select').addClass('medicine-select');
                 newRow.find('input').val('').prop('readonly', false);
                 newRow.find('input span').remove();
-                
                 $("#productTable tbody").append(newRow);
-               
-               // $('#productTable tbody tr:first-child button').show();
             });
+            
             $("#addProductBtn2").click(function(event) {
                 event.preventDefault();
                 //alert(2)

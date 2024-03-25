@@ -22,5 +22,6 @@ class Trn_Consultation_Booking_Invoice extends Model
         'reference_no',
         'is_paid',
         'created_by',
+        'discount',
     ];
 }

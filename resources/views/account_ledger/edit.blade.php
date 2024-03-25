@@ -35,11 +35,7 @@
                                     <select required class="form-control" name="account_group_id" id="account_group_id">
                                         <option value="">Choose Account Group</option>
                                         @foreach($account_groups as $account_group)
-                                        @if(isset($account_sub_group))
                                         <option value="{{ $account_group->id }}" {{$account_sub_group->account_group_id == $account_group->id ? 'selected' : '' }}>{{ $account_group->account_group_name }}</option>
-                                        @else
-                                        <option value="{{ $account_group->id }}">{{ $account_group->account_group_name }}</option>
-                                        @endif
                                         @endforeach
                                     </select>
                                 </div>

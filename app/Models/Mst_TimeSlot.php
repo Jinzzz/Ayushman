@@ -23,4 +23,11 @@ class Mst_TimeSlot extends Model
         'updated_by',
         'deleted_by',
     ];
+    
+    public function therapyRooms()
+    {
+        return $this->hasMany(Mst_Therapy_Room_Slot::class, 'timeslot', 'id');
+    }
+    
+    
 }

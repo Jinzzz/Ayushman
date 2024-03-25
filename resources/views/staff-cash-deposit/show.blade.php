@@ -6,6 +6,7 @@
                     <div class="card-header">
                         <h3 class="mb-0 card-title">View Cash Deposit Transfer Detils</h3>
                     </div>
+                    <div class="card-header">
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -58,10 +59,12 @@
                                 </div>
                                 
                             </div>
+                            </div>
+                            
                             <div class="form-group">
-                                <center>s
+                                <center>
                                     <a class="btn btn-danger" href="{{ route('staff.cash.deposit.index') }}"> <i class="fa fa-times"></i>
-                                        Bank</a>
+                                        Back</a>
                                 </center>
                             </div>
                     </div>

@@ -18,7 +18,7 @@ input[type="checkbox"] {
     color: red;
 }
 </style>
-<div class="container">
+
     <div class="row" style="min-height: 70vh;">
         <div class="col-md-12">
             <div class="card">
@@ -74,30 +74,15 @@ input[type="checkbox"] {
                             </div>
                         </div>
                         <div class="row">
-                        <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Doctor Name</label>
-                                    <input type="text" class="form-control" name="doctor_name" id="doctor_name" value="{{ $invoice->staff_name }}"readonly>
-                                </div>
-                            </div> 
+       
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Consultation Fees</label>
-                                    <input type="text" class="form-control" name="consultation_fee" id="consultation_fee" value="{{ $invoice->staff_booking_fee }}" placeholder="Company" readonly>
+                                    <input type="text" class="form-control" name="consultation_fee" id="consultation_fee" value="{{ $invoice->booking_fee }}" placeholder="Company" readonly>
                                 </div>
                             </div> 
                         </div>
-                        
-                        <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group checkbox-row" style="display:flex; align-items:center;">
-                                <input type="checkbox" class="form-control" id="pay_now" name="pay_now" style="width:100%; max-width:30px;">
-                               <strong> <label for="pay_now" style="margin-bottom:0;">Pay Now</label> </strong>
-                            </div>
-                        </div>
-                      </div>
-                      <div id="payNowDetails" style="display: none;">
-
+                                              
                       <div class="row">
                         <div class="col-md-6">
                             <div class="form-group checkbox-row" style="display:flex; align-items:center;">
@@ -106,6 +91,17 @@ input[type="checkbox"] {
                             </div>
                         </div>
                       </div>
+                        <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group checkbox-row" style="display:flex; align-items:center;">
+                                <input type="checkbox" class="form-control" id="pay_now" name="pay_now" style="width:100%; max-width:30px;">
+                               <strong> <label for="pay_now" style="margin-bottom:0;">Pay Now</label> </strong>
+                            </div>
+                        </div>
+                      </div>
+
+                      <div id="payNowDetails" style="display: none;">
+
                       <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -198,7 +194,6 @@ input[type="checkbox"] {
             </div>
         </div>
     </div>
-</div>
 
 @endsection
 @section('js')
